@@ -1,14 +1,80 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, MapPin, Music, Users, Ticket, Loader2, User } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Music, Users, Ticket, Loader2, User, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAirtableEvent } from "@/hooks/useAirtableEvents";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const AfterpartyDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: event, isLoading, error } = useAirtableEvent(slug);
+  const { toast } = useToast();
+  
+  const [fanName, setFanName] = useState("");
+  const [fanPhone, setFanPhone] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleRsvpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!fanName.trim() || !fanPhone.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please enter your name and phone number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!event?.id) {
+      toast({
+        title: "Error",
+        description: "Event not found.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("create-rsvp", {
+        body: {
+          fan_name: fanName.trim(),
+          fan_phone: fanPhone.trim(),
+          event_id: event.id,
+        },
+      });
+
+      if (fnError) {
+        throw fnError;
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setIsSubmitted(true);
+      toast({
+        title: "RSVP Confirmed!",
+        description: "You're on the list. See you there!",
+      });
+    } catch (err) {
+      console.error("RSVP submission error:", err);
+      toast({
+        title: "RSVP failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -183,26 +249,48 @@ const AfterpartyDetail = () => {
                   <Ticket className="h-5 w-5 text-primary" />
                   <h3 className="font-display text-xl text-foreground">RSVP</h3>
                 </div>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Reserve your spot for this event. We'll send you a QR code for check-in.
-                </p>
-                <div className="space-y-3">
-                  <Input
-                    type="text"
-                    placeholder="Your Name"
-                    className="bg-secondary border-border"
-                    required
-                  />
-                  <Input
-                    type="tel"
-                    placeholder="Phone Number (e.g., +1 555 123 4567)"
-                    className="bg-secondary border-border"
-                    required
-                  />
-                  <Button variant="hero" className="w-full">
-                    RSVP NOW
-                  </Button>
-                </div>
+                
+                {isSubmitted ? (
+                  <div className="text-center py-4">
+                    <CheckCircle className="h-12 w-12 text-primary mx-auto mb-3" />
+                    <p className="font-medium text-foreground mb-1">You're on the list!</p>
+                    <p className="text-sm text-muted-foreground">We'll send you a QR code for check-in.</p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Reserve your spot for this event. We'll send you a QR code for check-in.
+                    </p>
+                    <form onSubmit={handleRsvpSubmit} className="space-y-3">
+                      <Input
+                        type="text"
+                        placeholder="Your Name"
+                        className="bg-secondary border-border"
+                        value={fanName}
+                        onChange={(e) => setFanName(e.target.value)}
+                        required
+                      />
+                      <Input
+                        type="tel"
+                        placeholder="Phone Number (e.g., +1 555 123 4567)"
+                        className="bg-secondary border-border"
+                        value={fanPhone}
+                        onChange={(e) => setFanPhone(e.target.value)}
+                        required
+                      />
+                      <Button variant="hero" className="w-full" type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          "RSVP NOW"
+                        )}
+                      </Button>
+                    </form>
+                  </>
+                )}
                 <p className="text-xs text-muted-foreground mt-3 text-center">
                   Free entry • No payment required
                 </p>
