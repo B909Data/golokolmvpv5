@@ -28,16 +28,15 @@ serve(async (req) => {
     const params = new URLSearchParams();
     
     if (slug) {
-      // Filter by slug if provided
+      // Filter by slug if provided - no status/public filter for direct lookup
       params.append('filterByFormula', `{slug} = '${slug}'`);
     } else {
-      // Filter for live and public events only
+      // Filter for live and public events only for listing
       params.append('filterByFormula', `AND({status} = 'live', {is_public} = TRUE())`);
+      // Sort by date_time ascending
+      params.append('sort[0][field]', 'date_time');
+      params.append('sort[0][direction]', 'asc');
     }
-    
-    // Sort by date_time ascending
-    params.append('sort[0][field]', 'date_time');
-    params.append('sort[0][direction]', 'asc');
     
     airtableUrl += `?${params.toString()}`;
 

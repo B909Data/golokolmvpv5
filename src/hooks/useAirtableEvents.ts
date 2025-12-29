@@ -41,17 +41,25 @@ export const useAirtableEvent = (slug: string | undefined) => {
     queryFn: async (): Promise<AirtableEvent | null> => {
       if (!slug) return null;
       
-      const { data, error } = await supabase.functions.invoke("airtable-events", {
-        body: {},
-      });
+      // Fetch with slug parameter to get specific event
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/airtable-events?slug=${encodeURIComponent(slug)}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
       
-      if (error) {
-        console.error("Error fetching event:", error);
-        throw error;
+      if (!response.ok) {
+        console.error("Error fetching event:", response.statusText);
+        throw new Error("Failed to fetch event");
       }
       
+      const data = await response.json();
       const events = data.events || [];
-      return events.find((e: AirtableEvent) => e.slug === slug) || null;
+      return events.length > 0 ? events[0] : null;
     },
     enabled: !!slug,
   });
