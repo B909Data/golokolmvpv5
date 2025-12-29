@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const apiKey = Deno.env.get('AIRTABLE_API_KEY');
+    const apiKey = Deno.env.get('AIRTABLE_PAT');
     const baseId = Deno.env.get('AIRTABLE_BASE_ID');
     
     if (!apiKey || !baseId) {
