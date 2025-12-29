@@ -7,21 +7,38 @@ import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
 import { useAirtableEvents } from "@/hooks/useAirtableEvents";
 
+const splitGenres = (genreString: string) => {
+  if (!genreString) return [] as string[];
+  return genreString
+    .split(",")
+    .map((g) => g.trim())
+    .filter(Boolean);
+};
+
 const Shows = () => {
   const [selectedGenre, setSelectedGenre] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const { data: events = [], isLoading, error } = useAirtableEvents();
 
-  // Extract unique genres from events
-  const genres = ["All", ...new Set(events.map((e) => e.genre).filter(Boolean))];
+  const genres = [
+    "All",
+    ...Array.from(
+      new Set(events.flatMap((e) => splitGenres(e.genre)))
+    ).sort((a, b) => a.localeCompare(b)),
+  ];
 
   const filteredEvents = events.filter((event) => {
-    const matchesGenre = selectedGenre === "All" || event.genre === selectedGenre;
+    const genreHaystack = (event.genre || "").toLowerCase();
+    const genreNeedle = selectedGenre.toLowerCase();
+    const matchesGenre = selectedGenre === "All" || genreHaystack.includes(genreNeedle);
+
+    const q = searchQuery.toLowerCase();
     const matchesSearch =
-      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.venue.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.artistName?.toLowerCase().includes(searchQuery.toLowerCase());
+      event.title.toLowerCase().includes(q) ||
+      event.venue.toLowerCase().includes(q) ||
+      (event.artistName || "").toLowerCase().includes(q);
+
     return matchesGenre && matchesSearch;
   });
 
@@ -31,7 +48,6 @@ const Shows = () => {
 
       <main className="flex-1 pt-24 pb-20">
         <div className="container mx-auto px-4">
-          {/* Header */}
           <div className="mb-10">
             <h1 className="font-display text-5xl md:text-6xl text-foreground mb-4">
               UPCOMING <span className="text-primary">GOLOKOL</span> SHOWS
@@ -41,7 +57,6 @@ const Shows = () => {
             </p>
           </div>
 
-          {/* Filters */}
           <div className="flex flex-col md:flex-row gap-4 mb-10">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -71,14 +86,12 @@ const Shows = () => {
             )}
           </div>
 
-          {/* Loading State */}
           {isLoading && (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           )}
 
-          {/* Error State */}
           {error && (
             <div className="text-center py-20">
               <p className="text-destructive text-lg mb-2">Failed to load events</p>
@@ -86,7 +99,6 @@ const Shows = () => {
             </div>
           )}
 
-          {/* Events Grid */}
           {!isLoading && !error && filteredEvents.length > 0 && (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredEvents.map((event) => (
@@ -104,7 +116,6 @@ const Shows = () => {
             </div>
           )}
 
-          {/* No Results */}
           {!isLoading && !error && filteredEvents.length === 0 && (
             <div className="text-center py-20">
               <p className="text-muted-foreground text-lg">No events found matching your criteria.</p>
