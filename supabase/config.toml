@@ -1,10 +1,1 @@
-project_id = "ofbzecojhkyokfsqqgwn"
-
-[functions.airtable-events]
-verify_jwt = false
-
-[functions.create-event]
-verify_jwt = false
-
-[functions.create-rsvp]
-verify_jwt = false
+project_id = "ofgiftmzbytkswlzwlqe"
