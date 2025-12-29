@@ -1,1 +1,7 @@
 project_id = "ofbzecojhkyokfsqqgwn"
+
+[functions.airtable-events]
+verify_jwt = false
+
+[functions.create-event]
+verify_jwt = false
