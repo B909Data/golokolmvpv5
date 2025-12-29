@@ -1,63 +1,22 @@
 import { useState } from "react";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
-
-const allEvents = [
-  {
-    slug: "midnight-groove",
-    title: "Midnight Groove Session",
-    venue: "The Basement",
-    date: "Jan 15, 2025",
-    genre: "Indie Rock",
-  },
-  {
-    slug: "jazz-underground",
-    title: "Jazz Underground",
-    venue: "Blue Note Club",
-    date: "Jan 18, 2025",
-    genre: "Jazz",
-  },
-  {
-    slug: "electronic-nights",
-    title: "Electronic Nights",
-    venue: "Warehouse 21",
-    date: "Jan 22, 2025",
-    genre: "Electronic",
-  },
-  {
-    slug: "acoustic-sundays",
-    title: "Acoustic Sundays",
-    venue: "The Coffee House",
-    date: "Jan 26, 2025",
-    genre: "Acoustic",
-  },
-  {
-    slug: "punk-revival",
-    title: "Punk Revival Night",
-    venue: "The Pit",
-    date: "Jan 28, 2025",
-    genre: "Punk",
-  },
-  {
-    slug: "hip-hop-cypher",
-    title: "Hip-Hop Cypher",
-    venue: "Studio 54",
-    date: "Feb 1, 2025",
-    genre: "Hip-Hop",
-  },
-];
-
-const genres = ["All", "Indie Rock", "Jazz", "Electronic", "Acoustic", "Punk", "Hip-Hop"];
+import { useAirtableEvents } from "@/hooks/useAirtableEvents";
 
 const Shows = () => {
   const [selectedGenre, setSelectedGenre] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const { data: events = [], isLoading, error } = useAirtableEvents();
 
-  const filteredEvents = allEvents.filter((event) => {
+  // Extract unique genres from events
+  const genres = ["All", ...new Set(events.map((e) => e.genre).filter(Boolean))];
+
+  const filteredEvents = events.filter((event) => {
     const matchesGenre = selectedGenre === "All" || event.genre === selectedGenre;
     const matchesSearch =
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -109,14 +68,40 @@ const Shows = () => {
             </div>
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-20">
+              <p className="text-destructive text-lg mb-2">Failed to load events</p>
+              <p className="text-muted-foreground">Please check your Airtable configuration</p>
+            </div>
+          )}
+
           {/* Events Grid */}
-          {filteredEvents.length > 0 ? (
+          {!isLoading && !error && filteredEvents.length > 0 && (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredEvents.map((event) => (
-                <EventCard key={event.slug} {...event} />
+                <EventCard
+                  key={event.id}
+                  slug={event.slug}
+                  title={event.title}
+                  venue={event.venue}
+                  date={event.date}
+                  genre={event.genre}
+                  imageUrl={event.imageUrl}
+                />
               ))}
             </div>
-          ) : (
+          )}
+
+          {/* No Results */}
+          {!isLoading && !error && filteredEvents.length === 0 && (
             <div className="text-center py-20">
               <p className="text-muted-foreground text-lg">No events found matching your criteria.</p>
               <Button
