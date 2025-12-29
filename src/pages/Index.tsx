@@ -9,22 +9,25 @@ const featuredEvents = [
   {
     slug: "midnight-groove",
     title: "Midnight Groove Session",
+    artistName: "The Velvet Sounds",
     venue: "The Basement",
-    date: "Jan 15, 2025",
+    dateTime: "2025-01-15T21:00:00",
     genre: "Indie Rock",
   },
   {
     slug: "jazz-underground",
     title: "Jazz Underground",
+    artistName: "The Smooth Quartet",
     venue: "Blue Note Club",
-    date: "Jan 18, 2025",
+    dateTime: "2025-01-18T20:00:00",
     genre: "Jazz",
   },
   {
     slug: "electronic-nights",
     title: "Electronic Nights",
+    artistName: "DJ Synthwave",
     venue: "Warehouse 21",
-    date: "Jan 22, 2025",
+    dateTime: "2025-01-22T22:00:00",
     genre: "Electronic",
   },
 ];

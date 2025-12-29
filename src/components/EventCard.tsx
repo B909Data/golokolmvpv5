@@ -1,17 +1,34 @@
 import { Link } from "react-router-dom";
-import { Calendar, MapPin, Music } from "lucide-react";
+import { Calendar, MapPin, Music, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface EventCardProps {
   slug: string;
   title: string;
+  artistName?: string;
   venue: string;
-  date: string;
+  dateTime: string;
   genre: string;
   imageUrl?: string;
 }
 
-const EventCard = ({ slug, title, venue, date, genre, imageUrl }: EventCardProps) => {
+const formatDateTime = (dateTime: string) => {
+  if (!dateTime) return "";
+  try {
+    const date = new Date(dateTime);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return dateTime;
+  }
+};
+
+const EventCard = ({ slug, title, artistName, venue, dateTime, genre, imageUrl }: EventCardProps) => {
   return (
     <div className="group relative overflow-hidden rounded-xl border border-border bg-card gradient-card transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_hsl(330_85%_60%/0.15)]">
       <div className="aspect-[16/10] overflow-hidden bg-secondary">
@@ -35,18 +52,24 @@ const EventCard = ({ slug, title, venue, date, genre, imageUrl }: EventCardProps
           </span>
         </div>
 
-        <h3 className="font-display text-2xl text-foreground mb-3 group-hover:text-primary transition-colors">
+        <h3 className="font-display text-2xl text-foreground mb-2 group-hover:text-primary transition-colors">
           {title}
         </h3>
 
         <div className="space-y-2 mb-4">
+          {artistName && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="h-4 w-4" />
+              <span>{artistName}</span>
+            </div>
+          )}
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4" />
             <span>{venue}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4" />
-            <span>{date}</span>
+            <span>{formatDateTime(dateTime)}</span>
           </div>
         </div>
 
