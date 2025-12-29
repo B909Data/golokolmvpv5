@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Music, Calendar, Plus, Radio } from "lucide-react";
+import { Music, Calendar, Plus, Radio, Disc } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
@@ -39,6 +39,16 @@ const Navbar = () => {
               >
                 <Plus className="h-4 w-4" />
                 Create Event
+              </Button>
+            </Link>
+            <Link to="/songs">
+              <Button
+                variant={isActive("/songs") ? "secondary" : "ghost"}
+                size="sm"
+                className="gap-2"
+              >
+                <Disc className="h-4 w-4" />
+                Songs
               </Button>
             </Link>
             <Link to="/submit-song">

@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
+import Songs from "./pages/Songs";
+import SongDetail from "./pages/SongDetail";
 import AfterpartyDetail from "./pages/AfterpartyDetail";
 import CreateAfterparty from "./pages/CreateAfterparty";
 import Checkin from "./pages/Checkin";
@@ -22,6 +24,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/shows" element={<Shows />} />
+          <Route path="/songs" element={<Songs />} />
+          <Route path="/song/:slug" element={<SongDetail />} />
           <Route path="/afterparty/:slug" element={<AfterpartyDetail />} />
           <Route path="/create-afterparty" element={<CreateAfterparty />} />
           <Route path="/checkin/:qr_token" element={<Checkin />} />
