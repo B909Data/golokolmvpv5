@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Calendar, MapPin, Music, Tag, Image, Clock } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Music, Tag, User, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { z } from "zod";
 
 const genres = [
   "Indie Rock",
@@ -24,32 +25,139 @@ const genres = [
   "Other",
 ];
 
+// Placeholder artists - in production this would come from Airtable
+const artists = [
+  "The Velvet Sounds",
+  "Echo Chamber",
+  "Moonlight Drive",
+  "The Smooth Quartet",
+  "Sarah Miles Trio",
+  "DJ Synthwave",
+  "Binary Code",
+  "Neon Dreams",
+];
+
+const eventSchema = z.object({
+  artist: z.string().min(1, "Please select an artist"),
+  title: z.string().trim().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  venue: z.string().trim().min(1, "Venue is required").max(200, "Venue must be less than 200 characters"),
+  dateTime: z.string().min(1, "Date and time is required"),
+  genre: z.string().min(1, "Please select a genre"),
+});
+
 const CreateAfterparty = () => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
+    artist: "",
     title: "",
     venue: "",
-    address: "",
-    date: "",
-    time: "",
+    dateTime: "",
     genre: "",
-    description: "",
-    capacity: "",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
     
-    // Placeholder submission
-    toast({
-      title: "Event Created!",
-      description: "Your afterparty has been submitted for review.",
-    });
+    // Validate form data
+    const result = eventSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("create-event", {
+        body: {
+          artist: formData.artist,
+          title: formData.title.trim(),
+          venue: formData.venue.trim(),
+          dateTime: formData.dateTime,
+          genre: formData.genre,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setIsSuccess(true);
+      toast({
+        title: "Event Created!",
+        description: "Your afterparty has been submitted as a draft.",
+      });
+    } catch (error) {
+      console.error("Error creating event:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create event. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
   };
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <main className="flex-1 pt-24 pb-20 flex items-center justify-center">
+          <div className="max-w-md mx-auto text-center px-4">
+            <div className="rounded-full bg-primary/20 w-20 h-20 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="h-10 w-10 text-primary" />
+            </div>
+            <h1 className="font-display text-4xl text-foreground mb-4">
+              EVENT CREATED!
+            </h1>
+            <p className="text-muted-foreground mb-6">
+              Your afterparty has been saved as a draft. A shareable link will be available once the event is live.
+            </p>
+            <div className="rounded-xl border border-border bg-card p-4 mb-6 gradient-card">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">Note:</strong> To appear in the public feed, set <span className="text-primary font-medium">status</span> to "live" and <span className="text-primary font-medium">is_public</span> to "true" in the admin table.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <Button
+                variant="hero"
+                onClick={() => {
+                  setIsSuccess(false);
+                  setFormData({ artist: "", title: "", venue: "", dateTime: "", genre: "" });
+                }}
+              >
+                Create Another Event
+              </Button>
+              <Link to="/shows">
+                <Button variant="outline" className="w-full">
+                  View All Shows
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -74,6 +182,27 @@ const CreateAfterparty = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="rounded-xl border border-border bg-card p-6 gradient-card space-y-6">
+                {/* Artist Select */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-primary" />
+                    Artist
+                  </Label>
+                  <Select onValueChange={(value) => handleChange("artist", value)} value={formData.artist}>
+                    <SelectTrigger className={`bg-secondary border-border ${errors.artist ? 'border-destructive' : ''}`}>
+                      <SelectValue placeholder="Select an artist" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {artists.map((artist) => (
+                        <SelectItem key={artist} value={artist}>
+                          {artist}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.artist && <p className="text-sm text-destructive">{errors.artist}</p>}
+                </div>
+
                 {/* Event Title */}
                 <div className="space-y-2">
                   <Label htmlFor="title" className="flex items-center gap-2">
@@ -85,69 +214,43 @@ const CreateAfterparty = () => {
                     placeholder="e.g., Midnight Groove Session"
                     value={formData.title}
                     onChange={(e) => handleChange("title", e.target.value)}
-                    className="bg-secondary border-border"
-                    required
+                    className={`bg-secondary border-border ${errors.title ? 'border-destructive' : ''}`}
+                    maxLength={200}
                   />
+                  {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
                 </div>
 
                 {/* Venue */}
                 <div className="space-y-2">
                   <Label htmlFor="venue" className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-primary" />
-                    Venue Name
+                    Venue
                   </Label>
                   <Input
                     id="venue"
                     placeholder="e.g., The Basement"
                     value={formData.venue}
                     onChange={(e) => handleChange("venue", e.target.value)}
-                    className="bg-secondary border-border"
-                    required
+                    className={`bg-secondary border-border ${errors.venue ? 'border-destructive' : ''}`}
+                    maxLength={200}
                   />
-                </div>
-
-                {/* Address */}
-                <div className="space-y-2">
-                  <Label htmlFor="address">Venue Address</Label>
-                  <Input
-                    id="address"
-                    placeholder="123 Main Street, City"
-                    value={formData.address}
-                    onChange={(e) => handleChange("address", e.target.value)}
-                    className="bg-secondary border-border"
-                  />
+                  {errors.venue && <p className="text-sm text-destructive">{errors.venue}</p>}
                 </div>
 
                 {/* Date & Time */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="date" className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      Date
-                    </Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) => handleChange("date", e.target.value)}
-                      className="bg-secondary border-border"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="time" className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-primary" />
-                      Time
-                    </Label>
-                    <Input
-                      id="time"
-                      type="time"
-                      value={formData.time}
-                      onChange={(e) => handleChange("time", e.target.value)}
-                      className="bg-secondary border-border"
-                      required
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dateTime" className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    Date & Time
+                  </Label>
+                  <Input
+                    id="dateTime"
+                    type="datetime-local"
+                    value={formData.dateTime}
+                    onChange={(e) => handleChange("dateTime", e.target.value)}
+                    className={`bg-secondary border-border ${errors.dateTime ? 'border-destructive' : ''}`}
+                  />
+                  {errors.dateTime && <p className="text-sm text-destructive">{errors.dateTime}</p>}
                 </div>
 
                 {/* Genre */}
@@ -156,8 +259,8 @@ const CreateAfterparty = () => {
                     <Tag className="h-4 w-4 text-primary" />
                     Genre
                   </Label>
-                  <Select onValueChange={(value) => handleChange("genre", value)} required>
-                    <SelectTrigger className="bg-secondary border-border">
+                  <Select onValueChange={(value) => handleChange("genre", value)} value={formData.genre}>
+                    <SelectTrigger className={`bg-secondary border-border ${errors.genre ? 'border-destructive' : ''}`}>
                       <SelectValue placeholder="Select a genre" />
                     </SelectTrigger>
                     <SelectContent>
@@ -168,53 +271,25 @@ const CreateAfterparty = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-
-                {/* Capacity */}
-                <div className="space-y-2">
-                  <Label htmlFor="capacity">Expected Capacity</Label>
-                  <Input
-                    id="capacity"
-                    type="number"
-                    placeholder="e.g., 100"
-                    value={formData.capacity}
-                    onChange={(e) => handleChange("capacity", e.target.value)}
-                    className="bg-secondary border-border"
-                  />
-                </div>
-
-                {/* Description */}
-                <div className="space-y-2">
-                  <Label htmlFor="description">Event Description</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Tell people what to expect at your event..."
-                    value={formData.description}
-                    onChange={(e) => handleChange("description", e.target.value)}
-                    className="bg-secondary border-border min-h-[120px]"
-                  />
-                </div>
-
-                {/* Cover Image Placeholder */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Image className="h-4 w-4 text-primary" />
-                    Cover Image
-                  </Label>
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer">
-                    <Image className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground text-sm">
-                      Click to upload or drag and drop
-                    </p>
-                    <p className="text-muted-foreground text-xs mt-1">
-                      PNG, JPG up to 10MB
-                    </p>
-                  </div>
+                  {errors.genre && <p className="text-sm text-destructive">{errors.genre}</p>}
                 </div>
               </div>
 
-              <Button type="submit" variant="hero" size="xl" className="w-full">
-                CREATE EVENT
+              <Button 
+                type="submit" 
+                variant="hero" 
+                size="xl" 
+                className="w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                    Creating...
+                  </>
+                ) : (
+                  "CREATE EVENT"
+                )}
               </Button>
             </form>
           </div>
