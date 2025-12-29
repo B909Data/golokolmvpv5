@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, MapPin, Music, Users, Ticket, Loader2 } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Music, Users, Ticket, Loader2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
@@ -82,6 +82,12 @@ const AfterpartyDetail = () => {
                 <h1 className="font-display text-5xl md:text-6xl text-foreground mb-4">
                   {event.title}
                 </h1>
+                {event.artistName && (
+                  <div className="flex items-center gap-2 text-xl text-muted-foreground mb-4">
+                    <User className="h-5 w-5 text-primary" />
+                    <span>{event.artistName}</span>
+                  </div>
+                )}
                 {event.description && (
                   <p className="text-muted-foreground text-lg leading-relaxed">
                     {event.description}
