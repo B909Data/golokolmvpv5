@@ -191,11 +191,13 @@ const AfterpartyDetail = () => {
                     type="text"
                     placeholder="Your Name"
                     className="bg-secondary border-border"
+                    required
                   />
                   <Input
-                    type="email"
-                    placeholder="Email Address"
+                    type="tel"
+                    placeholder="Phone Number (e.g., +1 555 123 4567)"
                     className="bg-secondary border-border"
+                    required
                   />
                   <Button variant="hero" className="w-full">
                     RSVP NOW
