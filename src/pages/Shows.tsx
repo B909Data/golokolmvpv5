@@ -20,7 +20,8 @@ const Shows = () => {
     const matchesGenre = selectedGenre === "All" || event.genre === selectedGenre;
     const matchesSearch =
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.venue.toLowerCase().includes(searchQuery.toLowerCase());
+      event.venue.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.artistName?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesGenre && matchesSearch;
   });
 
@@ -45,27 +46,29 @@ const Shows = () => {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search events or venues..."
+                placeholder="Search events, venues, or artists..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-secondary border-border"
               />
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
-              <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
-              {genres.map((genre) => (
-                <Button
-                  key={genre}
-                  variant={selectedGenre === genre ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedGenre(genre)}
-                  className="whitespace-nowrap"
-                >
-                  {genre}
-                </Button>
-              ))}
-            </div>
+            {genres.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+                <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
+                {genres.map((genre) => (
+                  <Button
+                    key={genre}
+                    variant={selectedGenre === genre ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedGenre(genre)}
+                    className="whitespace-nowrap"
+                  >
+                    {genre}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Loading State */}
@@ -91,8 +94,9 @@ const Shows = () => {
                   key={event.id}
                   slug={event.slug}
                   title={event.title}
+                  artistName={event.artistName}
                   venue={event.venue}
-                  date={event.date}
+                  dateTime={event.dateTime}
                   genre={event.genre}
                   imageUrl={event.imageUrl}
                 />

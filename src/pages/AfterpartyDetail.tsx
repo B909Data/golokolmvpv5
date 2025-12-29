@@ -116,12 +116,23 @@ const AfterpartyDetail = () => {
               <div className="rounded-xl border border-border bg-card p-6 gradient-card">
                 <h3 className="font-display text-xl text-foreground mb-4">EVENT DETAILS</h3>
                 <div className="space-y-4">
-                  {event.date && (
+                  {event.dateTime && (
                     <div className="flex items-start gap-3">
                       <Calendar className="h-5 w-5 text-primary mt-0.5" />
                       <div>
-                        <p className="font-medium text-foreground">{event.date}</p>
-                        {event.time && <p className="text-sm text-muted-foreground">{event.time}</p>}
+                        <p className="font-medium text-foreground">
+                          {new Date(event.dateTime).toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(event.dateTime).toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </p>
                       </div>
                     </div>
                   )}

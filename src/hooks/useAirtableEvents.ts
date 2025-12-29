@@ -5,9 +5,9 @@ export interface AirtableEvent {
   id: string;
   slug: string;
   title: string;
+  artistName: string;
   venue: string;
-  date: string;
-  time: string;
+  dateTime: string;
   genre: string;
   description: string;
   artists: string[];
@@ -15,6 +15,8 @@ export interface AirtableEvent {
   attending: number;
   address: string;
   imageUrl: string;
+  status: string;
+  isPublic: boolean;
 }
 
 export const useAirtableEvents = () => {

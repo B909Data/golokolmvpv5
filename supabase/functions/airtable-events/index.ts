@@ -23,14 +23,23 @@ serve(async (req) => {
     const url = new URL(req.url);
     const slug = url.searchParams.get('slug');
     
-    // Build Airtable API URL
+    // Build Airtable API URL with filters
     let airtableUrl = `https://api.airtable.com/v0/${baseId}/Events`;
+    const params = new URLSearchParams();
     
     if (slug) {
       // Filter by slug if provided
-      const filterFormula = encodeURIComponent(`{slug} = '${slug}'`);
-      airtableUrl += `?filterByFormula=${filterFormula}`;
+      params.append('filterByFormula', `{slug} = '${slug}'`);
+    } else {
+      // Filter for live and public events only
+      params.append('filterByFormula', `AND({status} = 'live', {is_public} = TRUE())`);
     }
+    
+    // Sort by date_time ascending
+    params.append('sort[0][field]', 'date_time');
+    params.append('sort[0][direction]', 'asc');
+    
+    airtableUrl += `?${params.toString()}`;
 
     console.log('Fetching from Airtable:', airtableUrl);
 
@@ -55,9 +64,9 @@ serve(async (req) => {
       id: record.id,
       slug: record.fields.slug || record.id,
       title: record.fields.title || record.fields.Name || 'Untitled Event',
+      artistName: record.fields.artist_name || record.fields.artistName || '',
       venue: record.fields.venue || record.fields.Venue || 'TBD',
-      date: record.fields.date || record.fields.Date || '',
-      time: record.fields.time || record.fields.Time || '',
+      dateTime: record.fields.date_time || record.fields.dateTime || '',
       genre: record.fields.genre || record.fields.Genre || '',
       description: record.fields.description || record.fields.Description || '',
       artists: record.fields.artists || record.fields.Artists || [],
@@ -65,6 +74,8 @@ serve(async (req) => {
       attending: record.fields.attending || record.fields.Attending || 0,
       address: record.fields.address || record.fields.Address || '',
       imageUrl: record.fields.imageUrl || record.fields['Image URL'] || record.fields.image?.[0]?.url || '',
+      status: record.fields.status || '',
+      isPublic: record.fields.is_public || false,
     }));
 
     return new Response(JSON.stringify({ events }), {
