@@ -10,13 +10,27 @@ const Checkin = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleCheckin = () => {
+  const handleCheckin = async () => {
     setIsLoading(true);
-    // Simulate check-in process
-    setTimeout(() => {
+    try {
+      const response = await fetch('https://hook.us2.make.com/jnoiyr20q7mimvwkct7wakgwk04pft8i', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ qr_token }),
+      });
+      
+      if (response.ok) {
+        setIsCheckedIn(true);
+      } else {
+        console.error('Check-in failed:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Check-in error:', error);
+    } finally {
       setIsLoading(false);
-      setIsCheckedIn(true);
-    }, 1500);
+    }
   };
 
   return (
