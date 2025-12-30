@@ -18,7 +18,7 @@ const Checkin = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ qr_token }),
+        body: JSON.stringify({ record_id: qr_token }),
       });
       
       if (response.ok) {
