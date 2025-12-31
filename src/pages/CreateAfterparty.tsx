@@ -162,9 +162,8 @@ const CreateAfterparty = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
-      <main className="flex-1 pt-24 pb-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
-        <div className="container relative z-10 mx-auto px-4">
+      <main className="flex-1 pt-24 pb-20">
+        <div className="container mx-auto px-4">
           <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8">
             <ArrowLeft className="h-4 w-4" />
             Back to Home
@@ -181,97 +180,100 @@ const CreateAfterparty = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="rounded-xl border border-border bg-card p-6 gradient-card space-y-6">
-                {/* Artist Select */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-primary" />
-                    Artist
-                  </Label>
-                  <Select onValueChange={(value) => handleChange("artist", value)} value={formData.artist}>
-                    <SelectTrigger className={`bg-secondary border-border ${errors.artist ? 'border-destructive' : ''}`}>
-                      <SelectValue placeholder="Select an artist" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {artists.map((artist) => (
-                        <SelectItem key={artist} value={artist}>
-                          {artist}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.artist && <p className="text-sm text-destructive">{errors.artist}</p>}
-                </div>
+              <div className="rounded-xl border border-border p-6 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
+                <div className="relative z-10 space-y-6">
+                  {/* Artist Select */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-primary" />
+                      Artist
+                    </Label>
+                    <Select onValueChange={(value) => handleChange("artist", value)} value={formData.artist}>
+                      <SelectTrigger className={`bg-secondary border-border ${errors.artist ? 'border-destructive' : ''}`}>
+                        <SelectValue placeholder="Select an artist" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {artists.map((artist) => (
+                          <SelectItem key={artist} value={artist}>
+                            {artist}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.artist && <p className="text-sm text-destructive">{errors.artist}</p>}
+                  </div>
 
-                {/* Event Title */}
-                <div className="space-y-2">
-                  <Label htmlFor="title" className="flex items-center gap-2">
-                    <Music className="h-4 w-4 text-primary" />
-                    Event Title
-                  </Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g., Midnight Groove Session"
-                    value={formData.title}
-                    onChange={(e) => handleChange("title", e.target.value)}
-                    className={`bg-secondary border-border ${errors.title ? 'border-destructive' : ''}`}
-                    maxLength={200}
-                  />
-                  {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
-                </div>
+                  {/* Event Title */}
+                  <div className="space-y-2">
+                    <Label htmlFor="title" className="flex items-center gap-2">
+                      <Music className="h-4 w-4 text-primary" />
+                      Event Title
+                    </Label>
+                    <Input
+                      id="title"
+                      placeholder="e.g., Midnight Groove Session"
+                      value={formData.title}
+                      onChange={(e) => handleChange("title", e.target.value)}
+                      className={`bg-secondary border-border ${errors.title ? 'border-destructive' : ''}`}
+                      maxLength={200}
+                    />
+                    {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
+                  </div>
 
-                {/* Venue */}
-                <div className="space-y-2">
-                  <Label htmlFor="venue" className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-primary" />
-                    Venue
-                  </Label>
-                  <Input
-                    id="venue"
-                    placeholder="e.g., The Basement"
-                    value={formData.venue}
-                    onChange={(e) => handleChange("venue", e.target.value)}
-                    className={`bg-secondary border-border ${errors.venue ? 'border-destructive' : ''}`}
-                    maxLength={200}
-                  />
-                  {errors.venue && <p className="text-sm text-destructive">{errors.venue}</p>}
-                </div>
+                  {/* Venue */}
+                  <div className="space-y-2">
+                    <Label htmlFor="venue" className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      Venue
+                    </Label>
+                    <Input
+                      id="venue"
+                      placeholder="e.g., The Basement"
+                      value={formData.venue}
+                      onChange={(e) => handleChange("venue", e.target.value)}
+                      className={`bg-secondary border-border ${errors.venue ? 'border-destructive' : ''}`}
+                      maxLength={200}
+                    />
+                    {errors.venue && <p className="text-sm text-destructive">{errors.venue}</p>}
+                  </div>
 
-                {/* Date & Time */}
-                <div className="space-y-2">
-                  <Label htmlFor="dateTime" className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-primary" />
-                    Date & Time
-                  </Label>
-                  <Input
-                    id="dateTime"
-                    type="datetime-local"
-                    value={formData.dateTime}
-                    onChange={(e) => handleChange("dateTime", e.target.value)}
-                    className={`bg-secondary border-border ${errors.dateTime ? 'border-destructive' : ''}`}
-                  />
-                  {errors.dateTime && <p className="text-sm text-destructive">{errors.dateTime}</p>}
-                </div>
+                  {/* Date & Time */}
+                  <div className="space-y-2">
+                    <Label htmlFor="dateTime" className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      Date & Time
+                    </Label>
+                    <Input
+                      id="dateTime"
+                      type="datetime-local"
+                      value={formData.dateTime}
+                      onChange={(e) => handleChange("dateTime", e.target.value)}
+                      className={`bg-secondary border-border ${errors.dateTime ? 'border-destructive' : ''}`}
+                    />
+                    {errors.dateTime && <p className="text-sm text-destructive">{errors.dateTime}</p>}
+                  </div>
 
-                {/* Genre */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Tag className="h-4 w-4 text-primary" />
-                    Genre
-                  </Label>
-                  <Select onValueChange={(value) => handleChange("genre", value)} value={formData.genre}>
-                    <SelectTrigger className={`bg-secondary border-border ${errors.genre ? 'border-destructive' : ''}`}>
-                      <SelectValue placeholder="Select a genre" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {genres.map((genre) => (
-                        <SelectItem key={genre} value={genre}>
-                          {genre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.genre && <p className="text-sm text-destructive">{errors.genre}</p>}
+                  {/* Genre */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Tag className="h-4 w-4 text-primary" />
+                      Genre
+                    </Label>
+                    <Select onValueChange={(value) => handleChange("genre", value)} value={formData.genre}>
+                      <SelectTrigger className={`bg-secondary border-border ${errors.genre ? 'border-destructive' : ''}`}>
+                        <SelectValue placeholder="Select a genre" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {genres.map((genre) => (
+                          <SelectItem key={genre} value={genre}>
+                            {genre}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.genre && <p className="text-sm text-destructive">{errors.genre}</p>}
+                  </div>
                 </div>
               </div>
 
