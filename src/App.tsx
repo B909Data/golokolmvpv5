@@ -11,6 +11,7 @@ import AfterpartyDetail from "./pages/AfterpartyDetail";
 import CreateAfterparty from "./pages/CreateAfterparty";
 import Checkin from "./pages/Checkin";
 import SubmitSong from "./pages/SubmitSong";
+import HowToGoLokol from "./pages/HowToGoLokol";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/create-afterparty" element={<CreateAfterparty />} />
           <Route path="/checkin/:qr_token" element={<Checkin />} />
           <Route path="/submit-song" element={<SubmitSong />} />
+          <Route path="/how-to-golokol" element={<HowToGoLokol />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
