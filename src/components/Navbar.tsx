@@ -18,9 +18,9 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { label: "Lokol After Parties", path: "/shows", shortLabel: "After Parties" },
+    { label: "Lokol After Parties", path: "/shows", shortLabel: "After Parties", highlight: true },
     { label: "Create After Party", path: "/create-afterparty", hideOnTablet: true },
-    { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Lokol Listening Sessions" },
+    { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Listening Sessions", highlight: true },
     { label: "Submit a Song", path: "/submit-song", hideOnTablet: true },
   ];
 
@@ -47,7 +47,7 @@ const Navbar = () => {
                 <Button
                   variant={isActive(item.path) ? "secondary" : "ghost"}
                   size="sm"
-                  className="whitespace-nowrap"
+                  className={`whitespace-nowrap ${item.highlight && !isActive(item.path) ? "text-primary hover:text-primary" : ""}`}
                 >
                   {item.label}
                 </Button>
@@ -56,13 +56,13 @@ const Navbar = () => {
           </div>
 
           {/* Tablet Navigation - Reduced menu with More dropdown */}
-          <div className="hidden md:flex lg:hidden items-center gap-1">
+          <div className="hidden md:flex lg:hidden items-center gap-0.5">
             {navItems.filter(item => !item.hideOnTablet).map((item) => (
               <Link key={item.path} to={item.path}>
                 <Button
                   variant={isActive(item.path) ? "secondary" : "ghost"}
                   size="sm"
-                  className="whitespace-nowrap"
+                  className={`whitespace-nowrap text-xs px-2 ${item.highlight && !isActive(item.path) ? "text-primary hover:text-primary" : ""}`}
                 >
                   {item.shortLabel || item.label}
                 </Button>
@@ -90,9 +90,9 @@ const Navbar = () => {
           </div>
 
           {/* Desktop/Tablet CTA Button */}
-          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
+          <div className="hidden md:flex items-center flex-shrink-0 ml-2">
             <Link to="/how-to-golokol">
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" className="text-xs md:text-sm whitespace-nowrap">
                 How to GoLokol
               </Button>
             </Link>
