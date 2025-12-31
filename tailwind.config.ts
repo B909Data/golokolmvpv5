@@ -60,6 +60,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        badge: {
+          checked: "hsl(var(--badge-checked))",
+          "checked-foreground": "hsl(var(--badge-checked-foreground))",
+          inactive: "hsl(var(--badge-inactive))",
+          "inactive-foreground": "hsl(var(--badge-inactive-foreground))",
+          ended: "hsl(var(--badge-ended))",
+          "ended-foreground": "hsl(var(--badge-ended-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
