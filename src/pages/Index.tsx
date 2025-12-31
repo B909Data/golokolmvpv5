@@ -1,11 +1,34 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Calendar, Music, Radio, Users } from "lucide-react";
+import { ArrowRight, Music, Play, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
 
-const featuredEvents = [
+// Featured songs - editorially curated
+const featuredSongs = [
+  {
+    slug: "midnight-drive",
+    title: "Midnight Drive",
+    artist: "Luna Waves",
+    imageUrl: null,
+  },
+  {
+    slug: "concrete-dreams",
+    title: "Concrete Dreams",
+    artist: "The Static",
+    imageUrl: null,
+  },
+  {
+    slug: "summer-fade",
+    title: "Summer Fade",
+    artist: "Dusk Patrol",
+    imageUrl: null,
+  },
+];
+
+// Featured shows - hand-picked highlights
+const featuredShows = [
   {
     slug: "midnight-groove",
     title: "Midnight Groove Session",
@@ -29,6 +52,34 @@ const featuredEvents = [
     venue: "Warehouse 21",
     dateTime: "2025-01-22T22:00:00",
     genre: "Electronic",
+  },
+];
+
+// Upcoming shows - utility listing
+const upcomingShows = [
+  {
+    slug: "acoustic-sunset",
+    title: "Acoustic Sunset",
+    artistName: "River Folk",
+    venue: "The Patio",
+    dateTime: "2025-01-25T18:00:00",
+    genre: "Folk",
+  },
+  {
+    slug: "punk-revival",
+    title: "Punk Revival Night",
+    artistName: "The Razors",
+    venue: "Dive Bar",
+    dateTime: "2025-01-28T21:00:00",
+    genre: "Punk",
+  },
+  {
+    slug: "soul-session",
+    title: "Soul Session",
+    artistName: "Velvet Voice",
+    venue: "The Lounge",
+    dateTime: "2025-02-01T20:00:00",
+    genre: "Soul",
   },
 ];
 
@@ -75,46 +126,82 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 border-y border-border bg-card/30">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { icon: Calendar, label: "Events This Month", value: "24+" },
-              { icon: Users, label: "Active Artists", value: "150+" },
-              { icon: Music, label: "Venues", value: "35" },
-              { icon: Radio, label: "Songs Submitted", value: "500+" },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <stat.icon className="h-8 w-8 text-primary mx-auto mb-3" />
-                <div className="font-display text-4xl text-foreground mb-1">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Events */}
-      <section className="py-20">
+      {/* Featured Songs Section */}
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex items-end justify-between mb-10">
             <div>
               <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
-                UPCOMING <span className="text-primary">SHOWS</span>
+                FEATURED <span className="text-primary">SONGS</span>
               </h2>
-              <p className="text-muted-foreground">Don't miss out on these local events</p>
+              <p className="text-muted-foreground">Curated sounds from the local scene</p>
             </div>
-            <Link to="/shows" className="hidden md:block">
+            <Link to="/songs" className="hidden md:block">
               <Button variant="ghost" className="gap-2">
-                View All
+                Browse All
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredEvents.map((event) => (
+            {featuredSongs.map((song) => (
+              <Link key={song.slug} to={`/song/${song.slug}`}>
+                <div className="group rounded-xl bg-card-feature p-6 transition-all duration-300 hover:shadow-[0_8px_30px_hsl(var(--primary)/0.3)]">
+                  {/* Song Image / Placeholder */}
+                  <div className="aspect-square w-full bg-card-foreground/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                    <Music className="w-16 h-16 text-card-foreground/40" />
+                    {/* Play action overlay */}
+                    <div className="absolute inset-0 bg-card-foreground/0 group-hover:bg-card-foreground/10 transition-colors flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-full bg-card-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform scale-90 group-hover:scale-100">
+                        <Play className="w-6 h-6 text-card-feature fill-card-feature ml-1" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Song Info */}
+                  <h3 className="font-extrabold text-xl text-card-foreground leading-tight">
+                    {song.title}
+                  </h3>
+                  <p className="text-card-foreground/70 font-medium">
+                    {song.artist}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center md:hidden">
+            <Link to="/songs">
+              <Button variant="outlineFeature" className="gap-2">
+                Browse All Songs
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Shows Section */}
+      <section className="py-20 bg-secondary">
+        <div className="container mx-auto px-4">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
+                FEATURED <span className="text-primary">SHOWS</span>
+              </h2>
+              <p className="text-muted-foreground">Hand-picked events worth your time</p>
+            </div>
+            <Link to="/shows" className="hidden md:block">
+              <Button variant="ghost" className="gap-2">
+                See All Shows
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {featuredShows.map((event) => (
               <EventCard key={event.slug} {...event} />
             ))}
           </div>
@@ -122,10 +209,49 @@ const Index = () => {
           <div className="mt-8 text-center md:hidden">
             <Link to="/shows">
               <Button variant="outline" className="gap-2">
-                View All Shows
+                See All Shows
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Upcoming Shows - Utility Section */}
+      <section className="py-16 bg-background border-t border-border">
+        <div className="container mx-auto px-4">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h3 className="font-bold text-2xl text-foreground mb-1">
+                More Shows
+              </h3>
+              <p className="text-muted-foreground text-sm">Browse the full calendar</p>
+            </div>
+            <Link to="/shows">
+              <Button variant="ghost" size="sm" className="gap-2">
+                View All
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {upcomingShows.map((event) => (
+              <Link key={event.slug} to={`/afterparty/${event.slug}`}>
+                <div className="group rounded-lg bg-card p-4 transition-all duration-200 hover:bg-card/80 border border-border">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-muted rounded flex items-center justify-center shrink-0">
+                      <Music className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-semibold text-foreground truncate">{event.title}</h4>
+                      <p className="text-sm text-muted-foreground truncate">{event.artistName} • {event.venue}</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground shrink-0">{event.genre}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
