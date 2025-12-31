@@ -102,8 +102,9 @@ const Index = () => {
       </section>
 
       {/* Lokol Listening Sessions Section */}
-      <section className="py-20 bg-background border-t border-border">
-        <div className="container mx-auto px-4">
+      <section className="py-20 relative overflow-hidden border-t border-border">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
+        <div className="container relative z-10 mx-auto px-4">
           <div className="mb-10">
             <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
               LOKOL <span className="text-primary">LISTENING SESSIONS?</span>
