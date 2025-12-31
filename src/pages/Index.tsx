@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Music, Play, Radio } from "lucide-react";
+import { ArrowRight, Music, Play, Radio, Star, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -12,18 +12,24 @@ const featuredSongs = [
     title: "Midnight Drive",
     artist: "Luna Waves",
     imageUrl: null,
+    fanRating: 4.2,
+    curatorRating: 4.5,
   },
   {
     slug: "concrete-dreams",
     title: "Concrete Dreams",
     artist: "The Static",
     imageUrl: null,
+    fanRating: 3.8,
+    curatorRating: 4.0,
   },
   {
     slug: "summer-fade",
     title: "Summer Fade",
     artist: "Dusk Patrol",
     imageUrl: null,
+    fanRating: 4.5,
+    curatorRating: 4.7,
   },
 ];
 
@@ -80,6 +86,38 @@ const upcomingShows = [
     venue: "The Lounge",
     dateTime: "2025-02-01T20:00:00",
     genre: "Soul",
+  },
+];
+
+// Placeholder editorial articles
+const placeholderArticles = [
+  {
+    title: "The Rise of DIY Venues in the Midwest",
+    excerpt: "How abandoned warehouses and community spaces are reshaping the local music landscape.",
+  },
+  {
+    title: "Interview: Luna Waves on Recording 'Midnight Drive'",
+    excerpt: "The duo discusses their creative process and what it means to stay independent.",
+  },
+  {
+    title: "Scene Report: Winter Shows Worth Catching",
+    excerpt: "Our picks for the most anticipated local performances this season.",
+  },
+];
+
+// Placeholder video items
+const placeholderVideos = [
+  {
+    title: "Live Session: The Static at Warehouse 21",
+    type: "featured",
+  },
+  {
+    title: "Scene Highlights: December Recap",
+    type: "small",
+  },
+  {
+    title: "Backstage with Dusk Patrol",
+    type: "small",
   },
 ];
 
@@ -163,9 +201,23 @@ const Index = () => {
                   <h3 className="font-extrabold text-xl text-card-foreground leading-tight">
                     {song.title}
                   </h3>
-                  <p className="text-card-foreground/70 font-medium">
+                  <p className="text-card-foreground/70 font-medium mb-3">
                     {song.artist}
                   </p>
+                  
+                  {/* Ratings */}
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-1.5">
+                      <Star className="w-4 h-4 text-card-foreground fill-card-foreground" />
+                      <span className="text-card-foreground font-semibold">{song.fanRating.toFixed(1)}</span>
+                      <span className="text-card-foreground/60">Fan</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Star className="w-4 h-4 text-card-foreground fill-card-foreground" />
+                      <span className="text-card-foreground font-semibold">{song.curatorRating.toFixed(1)}</span>
+                      <span className="text-card-foreground/60">Curator</span>
+                    </div>
+                  </div>
                 </div>
               </Link>
             ))}
@@ -183,7 +235,7 @@ const Index = () => {
       </section>
 
       {/* Featured Shows Section */}
-      <section className="py-20 bg-secondary">
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -213,6 +265,80 @@ const Index = () => {
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* LOKOL SCENES - Editorial & Media Section */}
+      <section className="py-20 bg-background border-t border-border">
+        <div className="container mx-auto px-4">
+          <div className="mb-12">
+            <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
+              LOKOL <span className="text-primary">SCENES</span>
+            </h2>
+            <p className="text-muted-foreground">Stories, videos, and field notes from local music culture.</p>
+          </div>
+
+          <div className="grid gap-10 lg:grid-cols-2">
+            {/* Left Column: Editorial / Field Notes */}
+            <div>
+              <div className="mb-6">
+                <h3 className="font-bold text-xl text-foreground mb-1">FIELD NOTES</h3>
+                <p className="text-muted-foreground text-sm">Writing and dispatches from the GoLokol scene.</p>
+              </div>
+              
+              <div className="space-y-4">
+                {placeholderArticles.map((article, index) => (
+                  <div 
+                    key={index} 
+                    className="rounded-lg bg-card p-5 border border-border"
+                  >
+                    <div className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Editorial placeholder</div>
+                    <h4 className="font-semibold text-foreground mb-2 leading-snug">{article.title}</h4>
+                    <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{article.excerpt}</p>
+                    <span className="text-primary text-sm font-medium hover:underline cursor-pointer">
+                      Read more →
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column: Video Picks */}
+            <div>
+              <div className="mb-6">
+                <h3 className="font-bold text-xl text-foreground mb-1">VIDEO PICKS</h3>
+                <p className="text-muted-foreground text-sm">Live sessions, scene clips, and highlights.</p>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Featured Video */}
+                <div className="rounded-lg bg-secondary p-5 border border-primary/20">
+                  <div className="text-xs text-primary mb-2 uppercase tracking-wide">Video playlist placeholder</div>
+                  <div className="aspect-video w-full bg-background rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <PlayCircle className="w-16 h-16 text-primary" />
+                    </div>
+                  </div>
+                  <h4 className="font-semibold text-foreground">{placeholderVideos[0].title}</h4>
+                </div>
+
+                {/* Smaller Videos */}
+                <div className="grid grid-cols-2 gap-4">
+                  {placeholderVideos.slice(1).map((video, index) => (
+                    <div 
+                      key={index}
+                      className="rounded-lg bg-secondary p-4 border border-primary/10"
+                    >
+                      <div className="aspect-video w-full bg-background rounded mb-3 flex items-center justify-center">
+                        <PlayCircle className="w-8 h-8 text-primary/70" />
+                      </div>
+                      <h5 className="font-medium text-foreground text-sm leading-snug">{video.title}</h5>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
