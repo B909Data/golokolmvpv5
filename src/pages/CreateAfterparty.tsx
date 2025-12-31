@@ -138,7 +138,6 @@ const CreateAfterparty = () => {
             </div>
             <div className="flex flex-col gap-3">
               <Button
-                variant="hero"
                 onClick={() => {
                   setIsSuccess(false);
                   setFormData({ artist: "", title: "", venue: "", dateTime: "", genre: "" });
@@ -277,8 +276,7 @@ const CreateAfterparty = () => {
 
               <Button 
                 type="submit" 
-                variant="hero" 
-                size="xl" 
+                size="lg" 
                 className="w-full"
                 disabled={isSubmitting}
               >

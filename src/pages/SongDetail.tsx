@@ -101,7 +101,7 @@ const SongDetail = () => {
           <h1 className="font-display text-4xl text-foreground mb-4">Song Not Found</h1>
           <p className="text-muted-foreground mb-8">The song you're looking for doesn't exist.</p>
           <Link to="/songs">
-            <Button variant="glow">
+            <Button variant="secondary">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Songs
             </Button>
@@ -236,7 +236,7 @@ const SongDetail = () => {
               <div className="flex flex-col items-center gap-6">
                 <Button
                   onClick={handlePlayPause}
-                  variant="glow"
+                  variant="secondary"
                   size="lg"
                   className="w-20 h-20 rounded-full p-0"
                 >

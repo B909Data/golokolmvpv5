@@ -65,7 +65,7 @@ const Navbar = () => {
 
           <div className="flex items-center gap-3">
             <Link to="/shows">
-              <Button variant="glow" size="sm" className="hidden sm:flex">
+              <Button variant="secondary" size="sm" className="hidden sm:flex">
                 Explore Shows
               </Button>
             </Link>

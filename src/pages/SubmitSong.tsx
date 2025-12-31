@@ -171,7 +171,7 @@ const SubmitSong = () => {
                 </div>
               </div>
 
-              <Button type="submit" variant="accent" size="xl" className="w-full">
+              <Button type="submit" size="lg" className="w-full">
                 SUBMIT SONG
                 <Music className="h-5 w-5" />
               </Button>
