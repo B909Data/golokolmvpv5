@@ -89,35 +89,13 @@ const upcomingShows = [
   },
 ];
 
-// Placeholder editorial articles
-const placeholderArticles = [
+// Featured videos - minimal editorial
+const featuredVideos = [
   {
-    title: "The Rise of DIY Venues in the Midwest",
-    excerpt: "How abandoned warehouses and community spaces are reshaping the local music landscape.",
+    label: "BACKSTAGE",
   },
   {
-    title: "Interview: Luna Waves on Recording 'Midnight Drive'",
-    excerpt: "The duo discusses their creative process and what it means to stay independent.",
-  },
-  {
-    title: "Scene Report: Winter Shows Worth Catching",
-    excerpt: "Our picks for the most anticipated local performances this season.",
-  },
-];
-
-// Placeholder video items
-const placeholderVideos = [
-  {
-    title: "Live Session: The Static at Warehouse 21",
-    type: "featured",
-  },
-  {
-    title: "Scene Highlights: December Recap",
-    type: "small",
-  },
-  {
-    title: "Backstage with Dusk Patrol",
-    type: "small",
+    label: "GOLOKOL LIVE",
   },
 ];
 
@@ -279,66 +257,20 @@ const Index = () => {
             <p className="text-muted-foreground">Stories, videos, and field notes from local music culture.</p>
           </div>
 
-          <div className="grid gap-10 lg:grid-cols-2">
-            {/* Left Column: Editorial / Field Notes */}
-            <div>
-              <div className="mb-6">
-                <h3 className="font-bold text-xl text-foreground mb-1">FIELD NOTES</h3>
-                <p className="text-muted-foreground text-sm">Writing and dispatches from the GoLokol scene.</p>
-              </div>
-              
-              <div className="space-y-4">
-                {placeholderArticles.map((article, index) => (
-                  <div 
-                    key={index} 
-                    className="rounded-lg bg-card p-5 border border-border"
-                  >
-                    <div className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Editorial placeholder</div>
-                    <h4 className="font-semibold text-foreground mb-2 leading-snug">{article.title}</h4>
-                    <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{article.excerpt}</p>
-                    <span className="text-primary text-sm font-medium hover:underline cursor-pointer">
-                      Read more →
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Column: Video Picks */}
-            <div>
-              <div className="mb-6">
-                <h3 className="font-bold text-xl text-foreground mb-1">VIDEO PICKS</h3>
-                <p className="text-muted-foreground text-sm">Live sessions, scene clips, and highlights.</p>
-              </div>
-              
-              <div className="space-y-4">
-                {/* Featured Video */}
-                <div className="rounded-lg bg-secondary p-5 border border-primary/20">
-                  <div className="text-xs text-primary mb-2 uppercase tracking-wide">Video playlist placeholder</div>
-                  <div className="aspect-video w-full bg-background rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <PlayCircle className="w-16 h-16 text-primary" />
-                    </div>
-                  </div>
-                  <h4 className="font-semibold text-foreground">{placeholderVideos[0].title}</h4>
+          {/* Two-column video layout */}
+          <div className="grid gap-8 md:grid-cols-2">
+            {featuredVideos.map((video, index) => (
+              <div key={index} className="flex flex-col">
+                {/* Video Card */}
+                <div className="aspect-video w-full bg-secondary rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer group">
+                  <PlayCircle className="w-16 h-16 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
                 </div>
-
-                {/* Smaller Videos */}
-                <div className="grid grid-cols-2 gap-4">
-                  {placeholderVideos.slice(1).map((video, index) => (
-                    <div 
-                      key={index}
-                      className="rounded-lg bg-secondary p-4 border border-primary/10"
-                    >
-                      <div className="aspect-video w-full bg-background rounded mb-3 flex items-center justify-center">
-                        <PlayCircle className="w-8 h-8 text-primary/70" />
-                      </div>
-                      <h5 className="font-medium text-foreground text-sm leading-snug">{video.title}</h5>
-                    </div>
-                  ))}
-                </div>
+                {/* Label */}
+                <span className="mt-3 text-xs text-muted-foreground uppercase tracking-widest font-medium">
+                  {video.label}
+                </span>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
