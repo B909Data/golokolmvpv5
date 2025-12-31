@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
@@ -97,13 +97,52 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold tracking-tight;
+  h1 {
+    @apply font-extrabold text-[32px] md:text-[44px] leading-[1.1] tracking-[-0.02em];
+  }
+
+  h2 {
+    @apply font-extrabold text-[26px] md:text-[36px] leading-[1.15] tracking-[-0.015em];
+  }
+
+  h3 {
+    @apply font-bold text-[22px] md:text-[28px] leading-[1.2] tracking-[-0.01em];
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Body tokens */
+  .type-body-lg {
+    @apply text-[18px] font-normal leading-[1.6] tracking-normal;
+  }
+
+  .type-body-md {
+    @apply text-[16px] font-normal leading-[1.55] tracking-normal;
+  }
+
+  .type-body-sm {
+    @apply text-[14px] font-normal leading-[1.5] tracking-normal;
+  }
+
+  /* Action tokens */
+  .type-button {
+    @apply text-[16px] font-semibold leading-[1.2] tracking-normal;
+  }
+
+  .type-link {
+    @apply text-[16px] font-medium leading-[1.4] tracking-normal;
+  }
+
+  /* Status tokens */
+  .type-badge {
+    @apply text-[12px] font-semibold leading-none tracking-[0.02em] uppercase;
+  }
+
+  .type-meta {
+    @apply text-[12px] font-normal leading-[1.4] tracking-normal;
   }
 }
