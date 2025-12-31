@@ -6,7 +6,62 @@
 
 @layer base {
   :root {
-    /* GoLokol Brand - Clean, High-Contrast, Minimal */
+    /* GoLokol Brand - Dark-First, Cultural, Grounded */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+
+    /* Cards float on dark canvas - white/light grey */
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 8%;
+
+    --popover: 0 0% 98%;
+    --popover-foreground: 0 0% 8%;
+
+    /* GoLokol Yellow - Warm, Confident */
+    --primary: 48 96% 53%;
+    --primary-foreground: 0 0% 8%;
+
+    /* Secondary surfaces - white on dark */
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 0 0% 8%;
+
+    /* Muted for subtle elements on dark */
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 60%;
+
+    /* Accent yellow for emphasis */
+    --accent: 48 96% 53%;
+    --accent-foreground: 0 0% 8%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 14%;
+    --ring: 48 96% 53%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 48 96% 53%;
+    --sidebar-primary-foreground: 0 0% 8%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 48 96% 53%;
+
+    /* Badge colors for dark surfaces */
+    --badge-checked: 0 0% 8%;
+    --badge-checked-foreground: 0 0% 100%;
+    --badge-inactive: 0 0% 20%;
+    --badge-inactive-foreground: 0 0% 55%;
+    --badge-ended: 0 0% 85%;
+    --badge-ended-foreground: 0 0% 30%;
+  }
+
+  /* Light mode override if needed */
+  .light {
     --background: 0 0% 100%;
     --foreground: 0 0% 8%;
 
@@ -16,7 +71,6 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 8%;
 
-    /* GoLokol Yellow - Warm, Confident */
     --primary: 48 96% 53%;
     --primary-foreground: 0 0% 8%;
 
@@ -36,8 +90,6 @@
     --input: 0 0% 94%;
     --ring: 48 96% 53%;
 
-    --radius: 0.5rem;
-
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 0 0% 8%;
     --sidebar-primary: 48 96% 53%;
@@ -45,45 +97,6 @@
     --sidebar-accent: 0 0% 94%;
     --sidebar-accent-foreground: 0 0% 8%;
     --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 48 96% 53%;
-  }
-
-  .dark {
-    --background: 0 0% 6%;
-    --foreground: 0 0% 96%;
-
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 96%;
-
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 96%;
-
-    --primary: 48 96% 53%;
-    --primary-foreground: 0 0% 8%;
-
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 96%;
-
-    --muted: 0 0% 18%;
-    --muted-foreground: 0 0% 55%;
-
-    --accent: 48 96% 53%;
-    --accent-foreground: 0 0% 8%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 20%;
-    --input: 0 0% 14%;
-    --ring: 48 96% 53%;
-
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 0 0% 96%;
-    --sidebar-primary: 48 96% 53%;
-    --sidebar-primary-foreground: 0 0% 8%;
-    --sidebar-accent: 0 0% 14%;
-    --sidebar-accent-foreground: 0 0% 96%;
-    --sidebar-border: 0 0% 20%;
     --sidebar-ring: 48 96% 53%;
   }
 }

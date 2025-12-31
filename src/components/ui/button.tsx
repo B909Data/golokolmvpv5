@@ -5,15 +5,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md type-button ring-offset-background transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground disabled:border-transparent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md type-button ring-offset-background transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
+        // Primary: Yellow on dark backgrounds only
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        secondary: "bg-background text-foreground border border-foreground hover:bg-secondary",
+        // Secondary: White/transparent with proper contrast
+        secondary: "bg-secondary text-secondary-foreground border border-border hover:bg-secondary/90",
+        // Ghost for dark surfaces: transparent with white text
+        ghost: "bg-transparent text-foreground hover:bg-muted",
+        // Outline for cards: black border on white surfaces
+        outline: "border border-foreground bg-transparent text-foreground hover:bg-muted",
+        // Card variant: for buttons inside white cards
+        card: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-border bg-transparent text-foreground hover:bg-secondary",
-        ghost: "hover:bg-secondary hover:text-foreground",
         link: "text-foreground underline-offset-4 hover:underline",
       },
       size: {
