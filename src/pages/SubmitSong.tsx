@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Music, Upload, User, Link as LinkIcon, FileAudio } from "lucide-react";
+import { ArrowLeft, Music, Upload, User, Link as LinkIcon, FileAudio, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,7 +53,7 @@ const SubmitSong = () => {
                 LOCAL <span className="text-accent">LISTENING</span> SESSIONS
               </h1>
               <p className="text-muted-foreground text-lg">
-                Submit your music and get featured in our weekly listening sessions
+                Submit your music and get feedback and possibly featured at the next Lokol Listening Sessions event. One Artist, One Song.
               </p>
             </div>
 
@@ -126,19 +126,19 @@ const SubmitSong = () => {
                     </p>
                   </div>
 
-                  {/* File Upload Placeholder */}
+                  {/* Song Image Upload */}
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2">
-                      <Upload className="h-4 w-4 text-accent" />
-                      Upload Track (Optional)
+                      <Image className="h-4 w-4 text-accent" />
+                      Upload Song Img (Optional)
                     </Label>
                     <div className="border-2 border-dashed border-border rounded-lg p-8 text-center bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer">
-                      <FileAudio className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                      <Image className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
                       <p className="text-muted-foreground text-sm">
                         Click to upload or drag and drop
                       </p>
                       <p className="text-muted-foreground text-xs mt-1">
-                        MP3, WAV up to 50MB
+                        1MB max
                       </p>
                     </div>
                   </div>
