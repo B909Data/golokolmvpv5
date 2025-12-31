@@ -125,16 +125,11 @@ const Index = () => {
               GoLokol helps local artists and fans find each other beyond noise.
             </p>
             
-            <div className="flex flex-wrap items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: "0.2s" }}>
-              <Link to="/songs">
-                <Button size="lg">
-                  LOKOL LISTENS
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
+            <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
               <Link to="/create-afterparty">
-                <Button variant="secondary" size="lg">
+                <Button size="lg">
                   CREATE AN AFTER PARTY
+                  <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
             </div>
