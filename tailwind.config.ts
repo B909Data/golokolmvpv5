@@ -56,6 +56,7 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           muted: "hsl(var(--card-muted))",
+          feature: "hsl(var(--card-feature))",
           foreground: "hsl(var(--card-foreground))",
           "foreground-secondary": "hsl(var(--card-foreground-secondary))",
         },

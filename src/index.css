@@ -18,6 +18,7 @@
     /* Cards float on dark canvas - warm off-white */
     --card: 60 11% 96.5%;             /* #F7F7F5 - warm off-white */
     --card-muted: 50 14% 92.5%;       /* #EFEFEA - muted card surface */
+    --card-feature: 50 100% 50%;      /* #FFD400 - yellow feature surface */
     --card-foreground: 0 0% 6.7%;     /* #111111 - primary text on light */
     --card-foreground-secondary: 0 0% 33.3%; /* #555555 - secondary text on light */
 
