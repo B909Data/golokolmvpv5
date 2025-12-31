@@ -9,14 +9,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Primary: Yellow on dark backgrounds only
+        // Primary: Yellow button on dark backgrounds only
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        // Secondary: White/transparent with proper contrast
+        // Secondary: Light surface with border
         secondary: "bg-secondary text-secondary-foreground border border-border hover:bg-secondary/90",
         // Ghost for dark surfaces: transparent with white text
         ghost: "bg-transparent text-foreground hover:bg-muted",
-        // Outline for cards: black border on white surfaces
+        // Outline on dark surfaces: transparent with border
         outline: "border border-foreground bg-transparent text-foreground hover:bg-muted",
+        // For yellow/feature surfaces: Black button with yellow text
+        onFeature: "bg-card-foreground text-primary hover:bg-card-foreground/90",
+        // Outline variant for yellow surfaces: Black border
+        outlineFeature: "border border-card-foreground bg-transparent text-card-foreground hover:bg-card-foreground/10",
         // Card variant: for buttons inside white cards
         card: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
