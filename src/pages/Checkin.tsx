@@ -64,8 +64,7 @@ const Checkin = () => {
                 </div>
 
                 <Button
-                  variant="hero"
-                  size="xl"
+                  size="lg"
                   className="w-full"
                   onClick={handleCheckin}
                   disabled={isLoading}

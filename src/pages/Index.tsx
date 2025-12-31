@@ -60,13 +60,13 @@ const Index = () => {
             
             <div className="flex flex-wrap items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: "0.2s" }}>
               <Link to="/shows">
-                <Button variant="hero" size="xl">
+                <Button size="lg">
                   EXPLORE SHOWS
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/create-afterparty">
-                <Button variant="glow" size="xl">
+                <Button variant="secondary" size="lg">
                   CREATE EVENT
                 </Button>
               </Link>
@@ -142,7 +142,7 @@ const Index = () => {
               Submit your music for our Local Listening Sessions and get featured in front of a growing community of music lovers.
             </p>
             <Link to="/submit-song">
-              <Button variant="accent" size="xl">
+              <Button size="lg">
                 SUBMIT YOUR SONG
                 <Music className="h-5 w-5" />
               </Button>
