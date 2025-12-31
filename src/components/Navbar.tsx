@@ -19,10 +19,10 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { label: "Lokol After Parties", path: "/shows", shortLabel: "After Parties", highlight: true },
-    { label: "Create After Party", path: "/create-afterparty", hideOnTablet: true },
-    { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Listening Sessions", highlight: true },
-    { label: "Submit a Song", path: "/submit-song", hideOnTablet: true },
+    { label: "Lokol After Parties", path: "/shows", shortLabel: "After Parties", colorClass: "text-foreground" },
+    { label: "Create After Party", path: "/create-afterparty", hideOnTablet: true, colorClass: "text-foreground" },
+    { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Listening Sessions", colorClass: "text-primary" },
+    { label: "Submit a Song", path: "/submit-song", hideOnTablet: true, colorClass: "text-primary" },
   ];
 
   const tabletHiddenItems = navItems.filter(item => item.hideOnTablet);
@@ -48,7 +48,7 @@ const Navbar = () => {
                 <Button
                   variant={isActive(item.path) ? "secondary" : "ghost"}
                   size="sm"
-                  className={`whitespace-nowrap ${item.highlight && !isActive(item.path) ? "text-primary hover:text-primary" : ""}`}
+                  className={`whitespace-nowrap ${!isActive(item.path) ? `${item.colorClass} hover:${item.colorClass}` : ""}`}
                 >
                   {item.label}
                 </Button>
@@ -63,7 +63,7 @@ const Navbar = () => {
                 <Button
                   variant={isActive(item.path) ? "secondary" : "ghost"}
                   size="sm"
-                  className={`whitespace-nowrap text-xs px-2 ${item.highlight && !isActive(item.path) ? "text-primary hover:text-primary" : ""}`}
+                  className={`whitespace-nowrap text-xs px-2 ${!isActive(item.path) ? `${item.colorClass} hover:${item.colorClass}` : ""}`}
                 >
                   {item.shortLabel || item.label}
                 </Button>
@@ -141,9 +141,9 @@ const Navbar = () => {
                   <Button
                     variant={isActive(item.path) ? "secondary" : "ghost"}
                     size="sm"
-                    className="w-full justify-start"
+                    className={`w-full justify-start ${!isActive(item.path) ? item.colorClass : ""}`}
                   >
-                    {item.shortLabel || item.label}
+                    {item.label}
                   </Button>
                 </Link>
               ))}
