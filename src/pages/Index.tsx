@@ -113,16 +113,16 @@ const Index = () => {
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-2 text-sm text-accent mb-6 animate-fade-in">
               <Radio className="h-4 w-4" />
-              <span>Supporting Local Music Since 2024</span>
+              <span>Supporting Local Music Since 2025</span>
             </div>
             
             <h1 className="font-display text-6xl md:text-8xl text-foreground mb-6 leading-[0.9] animate-slide-up text-glow">
-              DISCOVER YOUR <br />
-              <span className="text-primary">LOCAL SCENE</span>
+              THE FUTURE OF <br />
+              <span className="text-primary">MUSIC IS LOCAL</span>
             </h1>
             
             <p className="text-xl text-muted-foreground mb-8 max-w-xl mx-auto animate-slide-up" style={{ animationDelay: "0.1s" }}>
-              Find upcoming shows, connect with local bands, and be part of the underground music movement in your city.
+              GoLokol helps local artists and fans find each other and connect beyond noise.
             </p>
             
             <div className="flex flex-wrap items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: "0.2s" }}>
