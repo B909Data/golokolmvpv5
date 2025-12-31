@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Calendar, MapPin, Music, Tag, User, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Music, Tag, User, CheckCircle, Loader2, DollarSign, Ticket, Image, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,24 +25,24 @@ const genres = [
   "Other",
 ];
 
-// Placeholder artists - in production this would come from Airtable
-const artists = [
-  "The Velvet Sounds",
-  "Echo Chamber",
-  "Moonlight Drive",
-  "The Smooth Quartet",
-  "Sarah Miles Trio",
-  "DJ Synthwave",
-  "Binary Code",
-  "Neon Dreams",
+const showTypes = [
+  "Full Set",
+  "Showcase",
+  "Residency",
+  "DJ Set",
 ];
 
 const eventSchema = z.object({
-  artist: z.string().min(1, "Please select an artist"),
+  artist: z.string().trim().min(1, "Artist/Band Name is required").max(200, "Artist name must be less than 200 characters"),
   title: z.string().trim().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
   venue: z.string().trim().min(1, "Venue is required").max(200, "Venue must be less than 200 characters"),
   dateTime: z.string().min(1, "Date and time is required"),
+  price: z.string().optional(),
+  ticketUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   genre: z.string().min(1, "Please select a genre"),
+  showType: z.string().min(1, "Please select a show type"),
+  email: z.string().email("Please enter a valid email").min(1, "Email is required"),
+  phone: z.string().min(1, "Phone is required").max(20, "Phone must be less than 20 characters"),
 });
 
 const CreateAfterparty = () => {
@@ -54,7 +54,12 @@ const CreateAfterparty = () => {
     title: "",
     venue: "",
     dateTime: "",
+    price: "",
+    ticketUrl: "",
     genre: "",
+    showType: "",
+    email: "",
+    phone: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -80,11 +85,16 @@ const CreateAfterparty = () => {
     try {
       const { data, error } = await supabase.functions.invoke("create-event", {
         body: {
-          artist: formData.artist,
+          artist: formData.artist.trim(),
           title: formData.title.trim(),
           venue: formData.venue.trim(),
           dateTime: formData.dateTime,
+          price: formData.price,
+          ticketUrl: formData.ticketUrl,
           genre: formData.genre,
+          showType: formData.showType,
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
         },
       });
 
@@ -140,7 +150,7 @@ const CreateAfterparty = () => {
               <Button
                 onClick={() => {
                   setIsSuccess(false);
-                  setFormData({ artist: "", title: "", venue: "", dateTime: "", genre: "" });
+                  setFormData({ artist: "", title: "", venue: "", dateTime: "", price: "", ticketUrl: "", genre: "", showType: "", email: "", phone: "" });
                 }}
               >
                 Create Another Event
@@ -175,7 +185,7 @@ const CreateAfterparty = () => {
                 CREATE AN <span className="text-primary">AFTERPARTY</span>
               </h1>
               <p className="text-muted-foreground text-lg">
-                Set up your event and let the community know about your show
+                Set up an after party for your next show
               </p>
             </div>
 
@@ -183,24 +193,20 @@ const CreateAfterparty = () => {
               <div className="rounded-xl border border-border p-6 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
                 <div className="relative z-10 space-y-6">
-                  {/* Artist Select */}
+                  {/* Artist/Band Name */}
                   <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
+                    <Label htmlFor="artist" className="flex items-center gap-2">
                       <User className="h-4 w-4 text-primary" />
-                      Artist
+                      Artist/Band Name
                     </Label>
-                    <Select onValueChange={(value) => handleChange("artist", value)} value={formData.artist}>
-                      <SelectTrigger className={`bg-secondary border-border ${errors.artist ? 'border-destructive' : ''}`}>
-                        <SelectValue placeholder="Select an artist" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {artists.map((artist) => (
-                          <SelectItem key={artist} value={artist}>
-                            {artist}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      id="artist"
+                      placeholder="Your artist or band name"
+                      value={formData.artist}
+                      onChange={(e) => handleChange("artist", e.target.value)}
+                      className={`bg-secondary border-border ${errors.artist ? 'border-destructive' : ''}`}
+                      maxLength={200}
+                    />
                     {errors.artist && <p className="text-sm text-destructive">{errors.artist}</p>}
                   </div>
 
@@ -254,6 +260,38 @@ const CreateAfterparty = () => {
                     {errors.dateTime && <p className="text-sm text-destructive">{errors.dateTime}</p>}
                   </div>
 
+                  {/* Price */}
+                  <div className="space-y-2">
+                    <Label htmlFor="price" className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-primary" />
+                      Price
+                    </Label>
+                    <Input
+                      id="price"
+                      placeholder="e.g., $15, Free, $10-20"
+                      value={formData.price}
+                      onChange={(e) => handleChange("price", e.target.value)}
+                      className="bg-secondary border-border"
+                    />
+                  </div>
+
+                  {/* Ticket URL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="ticketUrl" className="flex items-center gap-2">
+                      <Ticket className="h-4 w-4 text-primary" />
+                      Buy Ticket URL
+                    </Label>
+                    <Input
+                      id="ticketUrl"
+                      type="url"
+                      placeholder="https://tickets.example.com/your-show"
+                      value={formData.ticketUrl}
+                      onChange={(e) => handleChange("ticketUrl", e.target.value)}
+                      className={`bg-secondary border-border ${errors.ticketUrl ? 'border-destructive' : ''}`}
+                    />
+                    {errors.ticketUrl && <p className="text-sm text-destructive">{errors.ticketUrl}</p>}
+                  </div>
+
                   {/* Genre */}
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2">
@@ -273,6 +311,85 @@ const CreateAfterparty = () => {
                       </SelectContent>
                     </Select>
                     {errors.genre && <p className="text-sm text-destructive">{errors.genre}</p>}
+                  </div>
+
+                  {/* Show Type */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Music className="h-4 w-4 text-primary" />
+                      Show Type
+                    </Label>
+                    <Select onValueChange={(value) => handleChange("showType", value)} value={formData.showType}>
+                      <SelectTrigger className={`bg-secondary border-border ${errors.showType ? 'border-destructive' : ''}`}>
+                        <SelectValue placeholder="Select show type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {showTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.showType && <p className="text-sm text-destructive">{errors.showType}</p>}
+                  </div>
+
+                  {/* Artist Image Upload */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Image className="h-4 w-4 text-primary" />
+                      Artist Img (Optional)
+                    </Label>
+                    <div className="border-2 border-dashed border-border rounded-lg p-8 text-center bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer">
+                      <Image className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-muted-foreground text-sm">
+                        Click to upload or drag and drop
+                      </p>
+                      <p className="text-muted-foreground text-xs mt-1">
+                        PNG, JPG up to 5MB
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-primary" />
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={formData.email}
+                      onChange={(e) => handleChange("email", e.target.value)}
+                      className={`bg-secondary border-border ${errors.email ? 'border-destructive' : ''}`}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      We'll use this to notify you about planning your after party
+                    </p>
+                    {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                  </div>
+
+                  {/* Phone */}
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-primary" />
+                      Phone
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="(555) 123-4567"
+                      value={formData.phone}
+                      onChange={(e) => handleChange("phone", e.target.value)}
+                      className={`bg-secondary border-border ${errors.phone ? 'border-destructive' : ''}`}
+                      maxLength={20}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Used to access your after party. No Spam.
+                    </p>
+                    {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
                   </div>
                 </div>
               </div>
