@@ -14,6 +14,7 @@ const Navbar = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -70,17 +71,32 @@ const Navbar = () => {
             ))}
             
             {/* More dropdown for tablet */}
-            <DropdownMenu>
+            <DropdownMenu open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className={`gap-1 transition-colors ${
+                    moreMenuOpen 
+                      ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground" 
+                      : "text-foreground hover:text-foreground"
+                  }`}
+                >
                   More
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className={`h-4 w-4 transition-transform ${moreMenuOpen ? "rotate-180" : ""}`} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-background border-border">
+              <DropdownMenuContent 
+                align="end" 
+                className="bg-primary border-primary min-w-[180px]"
+              >
                 {tabletHiddenItems.map((item) => (
-                  <DropdownMenuItem key={item.path} asChild>
-                    <Link to={item.path} className="w-full cursor-pointer">
+                  <DropdownMenuItem 
+                    key={item.path} 
+                    asChild
+                    className="text-primary-foreground hover:bg-primary-foreground hover:text-primary focus:bg-primary-foreground focus:text-primary cursor-pointer font-medium"
+                  >
+                    <Link to={item.path} className="w-full">
                       {item.label}
                     </Link>
                   </DropdownMenuItem>
