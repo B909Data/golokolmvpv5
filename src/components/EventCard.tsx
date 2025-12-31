@@ -30,8 +30,9 @@ const formatDateTime = (dateTime: string) => {
 
 const EventCard = ({ slug, title, artistName, venue, dateTime, genre, imageUrl }: EventCardProps) => {
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-border bg-card gradient-card transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_hsl(330_85%_60%/0.15)]">
-      <div className="aspect-[16/10] overflow-hidden bg-secondary">
+    <div className="group relative overflow-hidden rounded-xl bg-card-feature transition-all duration-300 hover:shadow-[0_8px_30px_hsl(var(--primary)/0.3)]">
+      {/* Image section */}
+      <div className="aspect-[16/10] overflow-hidden">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -39,42 +40,47 @@ const EventCard = ({ slug, title, artistName, venue, dateTime, genre, imageUrl }
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-accent/10">
-            <Music className="h-12 w-12 text-primary/50" />
+          <div className="flex h-full w-full items-center justify-center bg-card-foreground/10">
+            <Music className="h-12 w-12 text-card-foreground/40" />
           </div>
         )}
       </div>
 
+      {/* Content section */}
       <div className="p-5">
-        <div className="mb-3 flex items-center gap-2">
-          <span className="inline-flex items-center rounded-full bg-accent/20 px-3 py-1 text-xs font-medium text-accent">
+        {/* Genre label - stamp style on yellow */}
+        <div className="mb-3">
+          <span className="inline-flex items-center rounded px-2 py-1 type-badge bg-card-foreground/10 text-card-foreground">
             {genre}
           </span>
         </div>
 
-        <h3 className="font-display text-2xl text-foreground mb-2 group-hover:text-primary transition-colors">
+        {/* Title */}
+        <h3 className="font-extrabold text-xl text-card-foreground mb-2 leading-tight">
           {title}
         </h3>
 
-        <div className="space-y-2 mb-4">
+        {/* Meta info */}
+        <div className="space-y-1.5 mb-4">
           {artistName && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 type-body-sm text-card-foreground/80">
               <User className="h-4 w-4" />
               <span>{artistName}</span>
             </div>
           )}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 type-body-sm text-card-foreground/80">
             <MapPin className="h-4 w-4" />
             <span>{venue}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 type-body-sm text-card-foreground/80">
             <Calendar className="h-4 w-4" />
             <span>{formatDateTime(dateTime)}</span>
           </div>
         </div>
 
+        {/* CTA - Black button on yellow surface */}
         <Link to={`/afterparty/${slug}`}>
-          <Button variant="outline" className="w-full">
+          <Button variant="onFeature" className="w-full">
             View Details
           </Button>
         </Link>
