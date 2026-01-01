@@ -22,7 +22,7 @@ const SubmitSong = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     toast({
       title: "Song Submitted!",
       description: "We'll review your submission and get back to you soon.",
@@ -39,7 +39,10 @@ const SubmitSong = () => {
 
       <main className="flex-1 pt-24 pb-20">
         <div className="container mx-auto px-4">
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Link>
@@ -50,10 +53,10 @@ const SubmitSong = () => {
                 <Music className="h-8 w-8 text-accent" />
               </div>
               <h1 className="font-display text-5xl md:text-6xl text-foreground mb-4">
-                LOCAL <span className="text-accent">LISTENING</span> SESSIONS
+                SUBMIT A <span className="text-accent">LISTENING</span> SESSION
               </h1>
               <p className="text-muted-foreground text-lg">
-                Submit your music and get feedback and possibly featured at the next Lokol Listening Sessions event. One Artist, One Song.
+                Your musc, get feedback and featured at the next Lokol Listening Sessions event. One Artist, One Song.
               </p>
             </div>
 
@@ -121,9 +124,7 @@ const SubmitSong = () => {
                       className="bg-secondary border-border"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Link to your song on any major streaming platform
-                    </p>
+                    <p className="text-xs text-muted-foreground">Link to your song on any major streaming platform</p>
                   </div>
 
                   {/* Song Image Upload */}
@@ -134,12 +135,8 @@ const SubmitSong = () => {
                     </Label>
                     <div className="border-2 border-dashed border-border rounded-lg p-8 text-center bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer">
                       <Image className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-muted-foreground text-sm">
-                        Click to upload or drag and drop
-                      </p>
-                      <p className="text-muted-foreground text-xs mt-1">
-                        1MB max
-                      </p>
+                      <p className="text-muted-foreground text-sm">Click to upload or drag and drop</p>
+                      <p className="text-muted-foreground text-xs mt-1">1MB max</p>
                     </div>
                   </div>
 
@@ -167,9 +164,7 @@ const SubmitSong = () => {
                       className="bg-secondary border-border"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">
-                      We'll use this to notify you about your submission
-                    </p>
+                    <p className="text-xs text-muted-foreground">We'll use this to notify you about your submission</p>
                   </div>
                 </div>
               </div>
