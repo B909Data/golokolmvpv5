@@ -109,22 +109,22 @@ const SubmitSong = () => {
                     />
                   </div>
 
-                  {/* Streaming Link */}
+                  {/* YouTube Link */}
                   <div className="space-y-2">
-                    <Label htmlFor="streamingLink" className="flex items-center gap-2">
+                    <Label htmlFor="youtubeLink" className="flex items-center gap-2">
                       <LinkIcon className="h-4 w-4 text-accent" />
-                      Streaming Link
+                      YouTube Link
                     </Label>
                     <Input
-                      id="streamingLink"
+                      id="youtubeLink"
                       type="url"
-                      placeholder="Spotify, SoundCloud, YouTube, etc."
+                      placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
                       value={formData.streamingLink}
                       onChange={(e) => handleChange("streamingLink", e.target.value)}
                       className="bg-secondary border-border"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">Link to your song on any major streaming platform</p>
+                    <p className="text-xs text-muted-foreground">Paste your YouTube video URL (youtube.com/watch?v=... or youtu.be/...)</p>
                   </div>
 
                   {/* Song Image Upload */}

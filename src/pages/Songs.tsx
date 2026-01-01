@@ -14,6 +14,7 @@ const mockSongs = [
     genre: "Indie Rock",
     fanRating: 4.2,
     curatorRating: 3.8,
+    youtubeId: "dQw4w9WgXcQ",
   },
   {
     slug: "electric-soul",
@@ -22,6 +23,7 @@ const mockSongs = [
     genre: "Electronic",
     fanRating: 4.7,
     curatorRating: 4.5,
+    youtubeId: "fJ9rUzIMcZQ",
   },
   {
     slug: "broken-strings",
@@ -30,6 +32,7 @@ const mockSongs = [
     genre: "Folk",
     fanRating: 3.9,
     curatorRating: 4.1,
+    youtubeId: "kJQP7kiw5Fk",
   },
   {
     slug: "neon-lights",
@@ -38,6 +41,7 @@ const mockSongs = [
     genre: "Electronic",
     fanRating: 4.4,
     curatorRating: 4.0,
+    youtubeId: "60ItHLz5WEA",
   },
   {
     slug: "raw-power",
@@ -46,6 +50,7 @@ const mockSongs = [
     genre: "Punk",
     fanRating: 4.0,
     curatorRating: 3.5,
+    youtubeId: "hTWKbfoikeg",
   },
   {
     slug: "summer-haze",
@@ -54,6 +59,7 @@ const mockSongs = [
     genre: "Indie Rock",
     fanRating: 4.3,
     curatorRating: 4.2,
+    youtubeId: "JGwWNGJdvx8",
   },
   {
     slug: "downtown-blues",
@@ -62,6 +68,7 @@ const mockSongs = [
     genre: "Blues",
     fanRating: 4.6,
     curatorRating: 4.8,
+    youtubeId: "RgKAFK5djSk",
   },
   {
     slug: "future-nostalgia",
@@ -70,6 +77,7 @@ const mockSongs = [
     genre: "Electronic",
     fanRating: 4.1,
     curatorRating: 3.9,
+    youtubeId: "oygrmJFKYZY",
   },
 ];
 

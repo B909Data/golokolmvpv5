@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Star, Music, User, Play, Pause } from "lucide-react";
+import { ArrowLeft, Star, Music, User, Play } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ const mockSongs: Record<string, {
   genre: string;
   fanRating: number;
   curatorRating: number;
-  audioUrl: string;
+  youtubeId: string;
 }> = {
   "midnight-drive": {
     title: "Midnight Drive",
@@ -22,7 +22,7 @@ const mockSongs: Record<string, {
     genre: "Indie Rock",
     fanRating: 4.2,
     curatorRating: 3.8,
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    youtubeId: "dQw4w9WgXcQ",
   },
   "electric-soul": {
     title: "Electric Soul",
@@ -30,7 +30,7 @@ const mockSongs: Record<string, {
     genre: "Electronic",
     fanRating: 4.7,
     curatorRating: 4.5,
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    youtubeId: "fJ9rUzIMcZQ",
   },
   "broken-strings": {
     title: "Broken Strings",
@@ -38,7 +38,7 @@ const mockSongs: Record<string, {
     genre: "Folk",
     fanRating: 3.9,
     curatorRating: 4.1,
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    youtubeId: "kJQP7kiw5Fk",
   },
   "neon-lights": {
     title: "Neon Lights",
@@ -46,7 +46,7 @@ const mockSongs: Record<string, {
     genre: "Electronic",
     fanRating: 4.4,
     curatorRating: 4.0,
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+    youtubeId: "60ItHLz5WEA",
   },
   "raw-power": {
     title: "Raw Power",
@@ -54,7 +54,7 @@ const mockSongs: Record<string, {
     genre: "Punk",
     fanRating: 4.0,
     curatorRating: 3.5,
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+    youtubeId: "hTWKbfoikeg",
   },
   "summer-haze": {
     title: "Summer Haze",
@@ -62,7 +62,7 @@ const mockSongs: Record<string, {
     genre: "Indie Rock",
     fanRating: 4.3,
     curatorRating: 4.2,
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+    youtubeId: "JGwWNGJdvx8",
   },
   "downtown-blues": {
     title: "Downtown Blues",
@@ -70,7 +70,7 @@ const mockSongs: Record<string, {
     genre: "Blues",
     fanRating: 4.6,
     curatorRating: 4.8,
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+    youtubeId: "RgKAFK5djSk",
   },
   "future-nostalgia": {
     title: "Future Nostalgia",
@@ -78,14 +78,13 @@ const mockSongs: Record<string, {
     genre: "Electronic",
     fanRating: 4.1,
     curatorRating: 3.9,
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+    youtubeId: "oygrmJFKYZY",
   },
 };
 
 const SongDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { toast } = useToast();
-  const [isPlaying, setIsPlaying] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoveredStar, setHoveredStar] = useState<number | null>(null);
   const [hasRated, setHasRated] = useState(false);
@@ -111,18 +110,6 @@ const SongDetail = () => {
       </div>
     );
   }
-
-  const handlePlayPause = () => {
-    const audio = document.getElementById("song-player") as HTMLAudioElement;
-    if (audio) {
-      if (isPlaying) {
-        audio.pause();
-      } else {
-        audio.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
 
   const handleRating = (rating: number) => {
     if (hasRated) {
@@ -224,34 +211,22 @@ const SongDetail = () => {
             </div>
           </div>
 
-          {/* Music Player */}
+          {/* YouTube Video Player */}
           <Card className="gradient-card-dark border-border/50 mb-8">
             <CardHeader>
               <CardTitle className="font-display text-2xl flex items-center gap-2 text-foreground">
-                <Music className="w-6 h-6 text-primary" />
-                Listen Now
+                <Play className="w-6 h-6 text-primary" />
+                Watch Now
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col items-center gap-6">
-                <Button
-                  onClick={handlePlayPause}
-                  variant="secondary"
-                  size="lg"
-                  className="w-20 h-20 rounded-full p-0"
-                >
-                  {isPlaying ? (
-                    <Pause className="w-10 h-10" />
-                  ) : (
-                    <Play className="w-10 h-10 ml-1" />
-                  )}
-                </Button>
-                <audio
-                  id="song-player"
-                  src={song.audioUrl}
-                  onEnded={() => setIsPlaying(false)}
-                  className="w-full"
-                  controls
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black/20">
+                <iframe
+                  src={`https://www.youtube.com/embed/${song.youtubeId}?rel=0`}
+                  title={`${song.title} by ${song.artist}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
                 />
               </div>
             </CardContent>

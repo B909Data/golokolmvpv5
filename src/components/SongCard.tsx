@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Star, Play } from "lucide-react";
+import { getYouTubeThumbnail } from "@/lib/youtube";
 
 interface SongCardProps {
   slug: string;
@@ -8,9 +9,10 @@ interface SongCardProps {
   genre: string;
   fanRating: number;
   curatorRating: number;
+  youtubeId?: string;
 }
 
-const SongCard = ({ slug, title, artist, genre, fanRating, curatorRating }: SongCardProps) => {
+const SongCard = ({ slug, title, artist, genre, fanRating, curatorRating, youtubeId }: SongCardProps) => {
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -25,9 +27,27 @@ const SongCard = ({ slug, title, artist, genre, fanRating, curatorRating }: Song
     <Link to={`/song/${slug}`}>
       <div className="group rounded-xl bg-card-feature p-6 transition-all duration-300 hover:shadow-[0_8px_30px_hsl(var(--primary)/0.3)]">
         <div className="flex items-start gap-4">
-          {/* Icon */}
-          <div className="w-16 h-16 bg-card-foreground/10 rounded-lg flex items-center justify-center">
-            <Play className="w-8 h-8 text-card-foreground fill-card-foreground" />
+          {/* YouTube Thumbnail or Fallback Icon */}
+          <div className="relative w-24 h-16 bg-card-foreground/10 rounded-lg overflow-hidden flex-shrink-0">
+            {youtubeId ? (
+              <>
+                <img
+                  src={getYouTubeThumbnail(youtubeId, 'mq')}
+                  alt={`${title} thumbnail`}
+                  className="w-full h-full object-cover"
+                />
+                {/* Play overlay */}
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="w-10 h-10 bg-card-foreground rounded-full flex items-center justify-center">
+                    <Play className="w-5 h-5 text-card-feature fill-card-feature ml-0.5" />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Play className="w-8 h-8 text-card-foreground fill-card-foreground" />
+              </div>
+            )}
           </div>
           
           {/* Content */}
