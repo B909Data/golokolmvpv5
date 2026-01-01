@@ -104,7 +104,8 @@ const Index = () => {
               LOKOL <span className="text-primary">LISTENING SESSIONS?</span>
             </h2>
             <p className="text-muted-foreground text-lg">
-              Get local feedback on new music. The best is added to a Lokol Listening Session DJ Set and Youtube series.
+              Get feedback and featured. A monthly competition to be added to the next Lokol Listening Session DJ Set
+              and Youtube series.
             </p>
           </div>
 
@@ -121,7 +122,7 @@ const Index = () => {
               <ChecklistItem number={1}>Artists list a song (one at a time)</ChecklistItem>
               <ChecklistItem number={2}>Opt in to be considered for LLS ($5 submission fee)</ChecklistItem>
               <ChecklistItem number={3}>Fans and local curators rate the song</ChecklistItem>
-              <ChecklistItem number={4}>Artists receive feedback and may be featured</ChecklistItem>
+              <ChecklistItem number={4}>Best songs make the DJ set for LLS taping.</ChecklistItem>
               <ChecklistItem number={5}>
                 LLS happens Saturday, Feb , 2026 at The Handle Bar in Edgewood and @golokolmusic YouTube
               </ChecklistItem>
