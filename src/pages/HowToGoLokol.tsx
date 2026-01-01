@@ -4,10 +4,10 @@ import { Check } from "lucide-react";
 
 const CheckBullet = ({ children }: { children: React.ReactNode }) => (
   <li className="flex items-start gap-3">
-    <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-[#0E0E0E] flex items-center justify-center">
-      <Check className="w-3 h-3 text-primary" strokeWidth={3} />
+    <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+      <Check className="w-3 h-3 text-[#0E0E0E]" strokeWidth={3} />
     </span>
-    <span>{children}</span>
+    <span className="font-normal">{children}</span>
   </li>
 );
 
