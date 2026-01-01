@@ -23,23 +23,26 @@ const Index = () => {
       <section className="relative pt-32 pb-20 overflow-hidden noise-overlay">
         <div className="absolute inset-0 gradient-hero" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[120px]" />
-        
+
         <div className="container relative z-10 mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-2 text-sm text-accent mb-6 animate-fade-in">
               <Radio className="h-4 w-4" />
               <span>Supporting Local Music Since 2025</span>
             </div>
-            
+
             <h1 className="font-display text-6xl md:text-8xl text-foreground mb-6 leading-[0.9] animate-slide-up text-glow">
               THE FUTURE OF <br />
               <span className="text-primary">MUSIC IS LOCAL</span>
             </h1>
-            
-            <p className="text-xl text-muted-foreground mb-8 max-w-xl mx-auto animate-slide-up" style={{ animationDelay: "0.1s" }}>
+
+            <p
+              className="text-xl text-muted-foreground mb-8 max-w-xl mx-auto animate-slide-up"
+              style={{ animationDelay: "0.1s" }}
+            >
               GoLokol helps local artists and fans find each other where the music is. Near by.
             </p>
-            
+
             <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
               <Link to="/create-afterparty">
                 <Button variant="secondary" size="lg">
@@ -59,9 +62,7 @@ const Index = () => {
             <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
               WHAT'S AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
-            <p className="text-muted-foreground text-lg">
-              A better way to take new fans home after the show.
-            </p>
+            <p className="text-muted-foreground text-lg">A better way to take new fans home after the show.</p>
           </div>
 
           <div className="grid gap-10 lg:grid-cols-2 items-start">
@@ -117,11 +118,13 @@ const Index = () => {
             {/* Checklist */}
             <div className="space-y-5">
               <h3 className="font-bold text-xl text-foreground mb-6">Currently available in Atlanta only.</h3>
-              <ChecklistItem number={1}>Artists list a song (one at a time)</ChecklistItem>
+              <ChecklistItem number={1}>List a song (one at a time)</ChecklistItem>
               <ChecklistItem number={2}>Opt in to be considered for LLS ($5 submission fee)</ChecklistItem>
               <ChecklistItem number={3}>Fans and local curators rate the song</ChecklistItem>
               <ChecklistItem number={4}>Artists receive feedback and may be featured</ChecklistItem>
-              <ChecklistItem number={5}>LLS happens Saturday, Feb , 2026 at The Handle Bar in Edgewood and @golokolmusic YouTube</ChecklistItem>
+              <ChecklistItem number={5}>
+                LLS happens Saturday, Feb , 2026 at The Handle Bar in Edgewood and @golokolmusic YouTube
+              </ChecklistItem>
             </div>
           </div>
 
@@ -179,9 +182,7 @@ const Index = () => {
             <h2 className="font-display text-4xl md:text-5xl text-foreground mb-4">
               ARE YOU AN <span className="text-accent">ARTIST?</span>
             </h2>
-            <p className="text-muted-foreground mb-8">
-              Start building your local fanbase today.
-            </p>
+            <p className="text-muted-foreground mb-8">Start building your local fanbase today.</p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link to="/submit-song">
                 <Button variant="secondary" size="lg">
