@@ -64,7 +64,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} GoLokol. Support your local scene.</p>
+          <p>© {new Date().getFullYear()} GoLokol. The future of music is local.</p>
         </div>
       </div>
     </footer>
