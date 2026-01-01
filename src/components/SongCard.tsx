@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Star, Music } from "lucide-react";
+import { Star, Play } from "lucide-react";
 
 interface SongCardProps {
   slug: string;
@@ -27,7 +27,7 @@ const SongCard = ({ slug, title, artist, genre, fanRating, curatorRating }: Song
         <div className="flex items-start gap-4">
           {/* Icon */}
           <div className="w-16 h-16 bg-card-foreground/10 rounded-lg flex items-center justify-center">
-            <Music className="w-8 h-8 text-card-foreground" />
+            <Play className="w-8 h-8 text-card-foreground fill-card-foreground" />
           </div>
           
           {/* Content */}
