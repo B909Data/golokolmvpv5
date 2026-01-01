@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, Menu, X } from "lucide-react";
-import golokolLogo from "@/assets/golokol-logo.svg";
+import { Music, ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,12 +20,12 @@ const Navbar = () => {
 
   const navItems = [
     { label: "Find an After Party", path: "/shows", shortLabel: "After Parties", colorClass: "text-foreground" },
-    { label: "Create After Party", path: "/create-afterparty", hideOnTablet: true, colorClass: "text-foreground" },
+    { label: "Create an After Party", path: "/create-afterparty", hideOnTablet: true, colorClass: "text-foreground" },
     { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Listening Sessions", colorClass: "text-primary" },
     { label: "Submit a Song", path: "/submit-song", hideOnTablet: true, colorClass: "text-primary" },
   ];
 
-  const tabletHiddenItems = navItems.filter(item => item.hideOnTablet);
+  const tabletHiddenItems = navItems.filter((item) => item.hideOnTablet);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -34,10 +33,10 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-            <img src={golokolLogo} alt="GoLokol" className="h-10 w-10" />
-            <span className="font-display text-2xl text-foreground tracking-wide">
-              GoLokol
-            </span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 group-hover:bg-primary/30 transition-colors">
+              <Music className="h-5 w-5 text-primary" />
+            </div>
+            <span className="font-display text-2xl text-foreground tracking-wide">GoLokol</span>
           </Link>
 
           {/* Desktop Navigation - Full menu */}
@@ -57,27 +56,29 @@ const Navbar = () => {
 
           {/* Tablet Navigation - Reduced menu with More dropdown */}
           <div className="hidden md:flex lg:hidden items-center gap-0.5">
-            {navItems.filter(item => !item.hideOnTablet).map((item) => (
-              <Link key={item.path} to={item.path}>
-                <Button
-                  variant={isActive(item.path) ? "secondary" : "ghost"}
-                  size="sm"
-                  className={`whitespace-nowrap text-xs px-2 ${!isActive(item.path) ? `${item.colorClass} hover:${item.colorClass}` : ""}`}
-                >
-                  {item.shortLabel || item.label}
-                </Button>
-              </Link>
-            ))}
-            
+            {navItems
+              .filter((item) => !item.hideOnTablet)
+              .map((item) => (
+                <Link key={item.path} to={item.path}>
+                  <Button
+                    variant={isActive(item.path) ? "secondary" : "ghost"}
+                    size="sm"
+                    className={`whitespace-nowrap text-xs px-2 ${!isActive(item.path) ? `${item.colorClass} hover:${item.colorClass}` : ""}`}
+                  >
+                    {item.shortLabel || item.label}
+                  </Button>
+                </Link>
+              ))}
+
             {/* More dropdown for tablet */}
             <DropdownMenu open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   className={`gap-1 transition-colors ${
-                    moreMenuOpen 
-                      ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground" 
+                    moreMenuOpen
+                      ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                       : "text-foreground hover:text-foreground"
                   }`}
                 >
@@ -85,13 +86,10 @@ const Navbar = () => {
                   <ChevronDown className={`h-4 w-4 transition-transform ${moreMenuOpen ? "rotate-180" : ""}`} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="bg-primary border-primary min-w-[180px]"
-              >
+              <DropdownMenuContent align="end" className="bg-primary border-primary min-w-[180px]">
                 {tabletHiddenItems.map((item) => (
-                  <DropdownMenuItem 
-                    key={item.path} 
+                  <DropdownMenuItem
+                    key={item.path}
                     asChild
                     className="text-primary-foreground hover:bg-primary-foreground hover:text-primary focus:bg-primary-foreground focus:text-primary cursor-pointer font-medium"
                   >
@@ -119,11 +117,7 @@ const Navbar = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
@@ -132,11 +126,7 @@ const Navbar = () => {
           <div className="md:hidden border-t border-border/50 bg-background py-4">
             <div className="flex flex-col gap-2">
               {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <Link key={item.path} to={item.path} onClick={() => setMobileMenuOpen(false)}>
                   <Button
                     variant={isActive(item.path) ? "secondary" : "ghost"}
                     size="sm"
