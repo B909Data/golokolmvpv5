@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { Music, Instagram, Twitter } from "lucide-react";
+import { Music, Instagram, Youtube } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border bg-card/50 mt-auto">
+    <footer className="border-t border-border bg-secondary mt-auto">
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
@@ -45,16 +45,20 @@ const Footer = () => {
             <h4 className="font-display text-lg text-foreground mb-4">Connect</h4>
             <div className="flex gap-3">
               <a
-                href="#"
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary hover:bg-primary/20 transition-colors"
+                href="https://instagram.com/golokolmusic"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 w-10 items-center justify-center rounded-lg bg-background"
               >
-                <Instagram className="h-5 w-5 text-foreground" />
+                <Instagram className="h-5 w-5 text-primary" />
               </a>
               <a
-                href="#"
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary hover:bg-primary/20 transition-colors"
+                href="https://youtube.com/@golokolmusic"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 w-10 items-center justify-center rounded-lg bg-background"
               >
-                <Twitter className="h-5 w-5 text-foreground" />
+                <Youtube className="h-5 w-5 text-primary" />
               </a>
             </div>
           </div>

@@ -7,10 +7,10 @@ import Footer from "@/components/Footer";
 // Featured videos - minimal editorial
 const featuredVideos = [
   {
-    label: "BACKSTAGE",
+    label: "CITY-WIDE SOUNDS",
   },
   {
-    label: "GOLOKOL LIVE",
+    label: "LOKOL LIVE",
   },
 ];
 
@@ -37,7 +37,7 @@ const Index = () => {
             </h1>
             
             <p className="text-xl text-muted-foreground mb-8 max-w-xl mx-auto animate-slide-up" style={{ animationDelay: "0.1s" }}>
-              GoLokol helps local artists and fans find each other beyond noise.
+              GoLokol helps local artists and fans find each other where the music is. Near by.
             </p>
             
             <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
@@ -60,7 +60,7 @@ const Index = () => {
               WHAT'S AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
             <p className="text-muted-foreground text-lg">
-              A better way to take new fans home with you from the show.
+              A better way to take new fans home after the show.
             </p>
           </div>
 
@@ -73,13 +73,12 @@ const Index = () => {
 
             {/* Checklist */}
             <div className="space-y-5">
-              <h3 className="font-bold text-xl text-foreground mb-6">How it works</h3>
-              <ChecklistItem number={1}>Create an After Party</ChecklistItem>
-              <ChecklistItem number={2}>List your show</ChecklistItem>
-              <ChecklistItem number={3}>Promote your show page</ChecklistItem>
-              <ChecklistItem number={4}>Fans RSVP and receive a QR code</ChecklistItem>
-              <ChecklistItem number={5}>They check in at the show + access the After Party</ChecklistItem>
-              <ChecklistItem number={6}>Share an After Party link at the merch table</ChecklistItem>
+              <h3 className="font-bold text-xl text-foreground mb-6">How to create an After Party?</h3>
+              <ChecklistItem number={1}>List your show (one at a time)</ChecklistItem>
+              <ChecklistItem number={2}>Prep and promote your After Party</ChecklistItem>
+              <ChecklistItem number={3}>Fans RSVP and receive a QR code</ChecklistItem>
+              <ChecklistItem number={4}>Fans check in at the merch table</ChecklistItem>
+              <ChecklistItem number={5}>The clock starts. 3 days to get to know and grow your fanbase.</ChecklistItem>
             </div>
           </div>
 
@@ -88,12 +87,6 @@ const Index = () => {
             <Link to="/shows">
               <Button variant="secondary" size="lg">
                 Find an After Party
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/create-afterparty">
-              <Button size="lg">
-                Create an After Party
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
@@ -110,7 +103,7 @@ const Index = () => {
               LOKOL <span className="text-primary">LISTENING SESSIONS?</span>
             </h2>
             <p className="text-muted-foreground text-lg">
-              Local music and feedback leads to a feature at a Lokol Listening Sessions event and YouTube series.
+              Get local feedback on new music. The best is added to a Lokol Listening Session DJ Set and Youtube series.
             </p>
           </div>
 
@@ -123,12 +116,12 @@ const Index = () => {
 
             {/* Checklist */}
             <div className="space-y-5">
-              <h3 className="font-bold text-xl text-foreground mb-6">Lokol Listening Sessions (ATL)</h3>
-              <ChecklistItem number={1}>Artists list one song</ChecklistItem>
-              <ChecklistItem number={2}>Opt in to have it considered for LLS ($5 submission fee)</ChecklistItem>
+              <h3 className="font-bold text-xl text-foreground mb-6">Currently available in Atlanta only.</h3>
+              <ChecklistItem number={1}>Artists list a song (one at a time)</ChecklistItem>
+              <ChecklistItem number={2}>Opt in to be considered for LLS ($5 submission fee)</ChecklistItem>
               <ChecklistItem number={3}>Fans and local curators rate the song</ChecklistItem>
-              <ChecklistItem number={4}>Artists receive feedback or may be featured</ChecklistItem>
-              <ChecklistItem number={5}>LLS happens at The Handle Bar in Edgewood and on @golokolmusic on YouTube</ChecklistItem>
+              <ChecklistItem number={4}>Artists receive feedback and may be featured</ChecklistItem>
+              <ChecklistItem number={5}>LLS happens Saturday, Feb , 2026 at The Handle Bar in Edgewood and @golokolmusic YouTube</ChecklistItem>
             </div>
           </div>
 
@@ -136,7 +129,7 @@ const Index = () => {
           <div className="flex flex-wrap gap-4 mt-12">
             <Link to="/submit-song">
               <Button variant="secondary" size="lg">
-                List a Song
+                Submit a Song
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
@@ -150,14 +143,14 @@ const Index = () => {
         </div>
       </section>
 
-      {/* LOKOL SCENES - Media Section */}
+      {/* LOKOL LIVE - Media Section */}
       <section className="py-20 bg-background border-t border-border">
         <div className="container mx-auto px-4">
           <div className="mb-12">
             <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
-              LOKOL <span className="text-primary">SCENES</span>
+              LOKOL <span className="text-primary">LIVE</span>
             </h2>
-            <p className="text-muted-foreground">Stories, videos, and field notes from local music culture.</p>
+            <p className="text-muted-foreground">Live shows are OG analog.</p>
           </div>
 
           {/* Two-column video layout */}
