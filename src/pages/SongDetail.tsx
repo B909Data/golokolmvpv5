@@ -225,15 +225,14 @@ const SongDetail = () => {
           </div>
 
           {/* Music Player */}
-          <Card className="border-border/50 mb-8 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
-            <CardHeader className="relative z-10">
+          <Card className="gradient-card-dark border-border/50 mb-8">
+            <CardHeader>
               <CardTitle className="font-display text-2xl flex items-center gap-2 text-foreground">
                 <Music className="w-6 h-6 text-primary" />
                 Listen Now
               </CardTitle>
             </CardHeader>
-            <CardContent className="relative z-10">
+            <CardContent>
               <div className="flex flex-col items-center gap-6">
                 <Button
                   onClick={handlePlayPause}
@@ -259,15 +258,14 @@ const SongDetail = () => {
           </Card>
 
           {/* Rating Form */}
-          <Card className="border-border/50 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
-            <CardHeader className="relative z-10">
+          <Card className="gradient-card-dark border-border/50">
+            <CardHeader>
               <CardTitle className="font-display text-2xl flex items-center gap-2 text-foreground">
                 <Star className="w-6 h-6 text-accent" />
                 Rate This Song
               </CardTitle>
             </CardHeader>
-            <CardContent className="relative z-10">
+            <CardContent>
               {hasRated ? (
                 <div className="text-center py-4">
                   <p className="text-foreground/70 mb-2">Thanks for rating!</p>

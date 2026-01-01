@@ -136,6 +136,11 @@
     text-wrap: balance;
   }
 
+  /* Dark gradient card - black to yellow fade */
+  .gradient-card-dark {
+    background: linear-gradient(135deg, hsl(0 0% 8.6%) 0%, hsl(50 100% 50% / 0.15) 100%);
+  }
+
   /* Body tokens */
   .type-body-lg {
     @apply text-[18px] font-normal leading-[1.6] tracking-normal;
