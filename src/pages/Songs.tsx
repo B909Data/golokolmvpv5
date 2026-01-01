@@ -90,18 +90,18 @@ const Songs = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-6">
             <Music className="w-12 h-12 text-primary" />
             <h1 className="font-display text-5xl md:text-7xl text-foreground">
-              LOCAL <span className="text-primary text-glow">SOUNDS</span>
+              LOKOL <span className="text-primary text-glow">SOUNDS</span>
             </h1>
           </div>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Discover amazing music from local artists. Listen, rate, and support your community's talent.
+            Discover new music near you. Listen, rate, and support your city's sound.
           </p>
         </div>
       </section>

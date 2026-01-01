@@ -48,7 +48,7 @@ const Shows = () => {
         <div className="container mx-auto px-4">
           <div className="mb-10">
             <h1 className="font-display text-5xl md:text-6xl text-foreground mb-4">
-              UPCOMING <span className="text-primary">GOLOKOL</span> AFTER PARTIES
+              UPCOMING <span className="text-primary">LOKOL</span> AFTER PARTIES
             </h1>
             <p className="text-muted-foreground text-lg">Discover live music and after show antics online.</p>
           </div>
