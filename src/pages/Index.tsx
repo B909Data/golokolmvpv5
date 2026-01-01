@@ -118,7 +118,7 @@ const Index = () => {
             {/* Checklist */}
             <div className="space-y-5">
               <h3 className="font-bold text-xl text-foreground mb-6">Currently available in Atlanta only.</h3>
-              <ChecklistItem number={1}>List a song (one at a time)</ChecklistItem>
+              <ChecklistItem number={1}>Artists list a song (one at a time)</ChecklistItem>
               <ChecklistItem number={2}>Opt in to be considered for LLS ($5 submission fee)</ChecklistItem>
               <ChecklistItem number={3}>Fans and local curators rate the song</ChecklistItem>
               <ChecklistItem number={4}>Artists receive feedback and may be featured</ChecklistItem>
@@ -138,7 +138,7 @@ const Index = () => {
             </Link>
             <Link to="/songs">
               <Button size="lg">
-                Lokol Listens
+                Rate Lokol Songs
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
