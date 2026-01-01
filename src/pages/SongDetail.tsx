@@ -142,12 +142,12 @@ const SongDetail = () => {
     });
   };
 
-  const renderStars = (rating: number, size: number = 20) => {
+  const renderStars = (rating: number, size: number = 20, forCard: boolean = false) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
         size={size}
-        className={i < Math.round(rating) ? "fill-primary text-primary" : "text-muted-foreground"}
+        className={i < Math.round(rating) ? "fill-primary text-primary" : forCard ? "text-white/40" : "text-muted-foreground"}
       />
     ));
   };
@@ -168,7 +168,7 @@ const SongDetail = () => {
         >
           <Star
             size={32}
-            className={isFilled ? "fill-accent text-accent" : "text-muted-foreground hover:text-accent"}
+            className={isFilled ? "fill-accent text-accent" : "text-white/40 hover:text-accent"}
           />
         </button>
       );
@@ -225,14 +225,15 @@ const SongDetail = () => {
           </div>
 
           {/* Music Player */}
-          <Card className="bg-card/50 border-border/50 mb-8">
-            <CardHeader>
-              <CardTitle className="font-display text-2xl flex items-center gap-2">
+          <Card className="border-border/50 mb-8 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
+            <CardHeader className="relative z-10">
+              <CardTitle className="font-display text-2xl flex items-center gap-2 text-foreground">
                 <Music className="w-6 h-6 text-primary" />
                 Listen Now
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <div className="flex flex-col items-center gap-6">
                 <Button
                   onClick={handlePlayPause}
@@ -258,25 +259,26 @@ const SongDetail = () => {
           </Card>
 
           {/* Rating Form */}
-          <Card className="bg-card/50 border-border/50">
-            <CardHeader>
-              <CardTitle className="font-display text-2xl flex items-center gap-2">
+          <Card className="border-border/50 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
+            <CardHeader className="relative z-10">
+              <CardTitle className="font-display text-2xl flex items-center gap-2 text-foreground">
                 <Star className="w-6 h-6 text-accent" />
                 Rate This Song
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               {hasRated ? (
                 <div className="text-center py-4">
-                  <p className="text-muted-foreground mb-2">Thanks for rating!</p>
+                  <p className="text-foreground/70 mb-2">Thanks for rating!</p>
                   <div className="flex justify-center gap-1">
-                    {renderStars(userRating || 0, 32)}
+                    {renderStars(userRating || 0, 32, true)}
                   </div>
                   <p className="text-foreground mt-2">You gave this song {userRating} star{userRating && userRating > 1 ? "s" : ""}.</p>
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <p className="text-muted-foreground mb-4">Click a star to rate this song (1-5)</p>
+                  <p className="text-foreground/70 mb-4">Click a star to rate this song (1-5)</p>
                   <div className="flex justify-center gap-2">
                     {renderRatingStars()}
                   </div>
