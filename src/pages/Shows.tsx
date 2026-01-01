@@ -23,9 +23,7 @@ const Shows = () => {
 
   const genres = [
     "All",
-    ...Array.from(
-      new Set(events.flatMap((e) => splitGenres(e.genre)))
-    ).sort((a, b) => a.localeCompare(b)),
+    ...Array.from(new Set(events.flatMap((e) => splitGenres(e.genre)))).sort((a, b) => a.localeCompare(b)),
   ];
 
   const filteredEvents = events.filter((event) => {
@@ -50,11 +48,9 @@ const Shows = () => {
         <div className="container mx-auto px-4">
           <div className="mb-10">
             <h1 className="font-display text-5xl md:text-6xl text-foreground mb-4">
-              UPCOMING <span className="text-primary">GOLOKOL</span> SHOWS
+              UPCOMING <span className="text-primary">GOLOKOL</span> AFTER PARTIES
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Discover live music events happening in your area
-            </p>
+            <p className="text-muted-foreground text-lg">Discover live music and after show antics online.</p>
           </div>
 
           <div className="flex flex-col md:flex-row gap-4 mb-10">
