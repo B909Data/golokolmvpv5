@@ -115,9 +115,10 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased font-normal;
   }
 
+  /* Headers - bold weights */
   h1 {
     @apply font-extrabold text-[32px] md:text-[44px] leading-[1.1] tracking-[-0.02em];
   }
@@ -128,6 +129,25 @@
 
   h3 {
     @apply font-bold text-[22px] md:text-[28px] leading-[1.2] tracking-[-0.01em];
+  }
+
+  h4 {
+    @apply font-bold text-[18px] md:text-[22px] leading-[1.25] tracking-[-0.005em];
+  }
+
+  /* Body text - regular weight */
+  p, li, span, div, td, th, dd, dt, blockquote {
+    font-weight: 400;
+  }
+
+  /* Override for semantic elements that should inherit */
+  strong, b {
+    font-weight: 700;
+  }
+
+  /* Lists - regular weight by default */
+  ul, ol {
+    @apply font-normal;
   }
 }
 
