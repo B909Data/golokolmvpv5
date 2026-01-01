@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Music, ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
+import golokolLogo from "@/assets/golokol-logo.svg";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -33,9 +34,7 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 group-hover:bg-primary/30 transition-colors">
-              <Music className="h-5 w-5 text-primary" />
-            </div>
+            <img src={golokolLogo} alt="GoLokol" className="h-10 w-10" />
             <span className="font-display text-2xl text-foreground tracking-wide">
               GoLokol
             </span>

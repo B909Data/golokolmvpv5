@@ -1,16 +1,15 @@
 import { Link } from "react-router-dom";
-import { Music, Instagram, Youtube } from "lucide-react";
+import { Instagram, Youtube } from "lucide-react";
+import golokolLogo from "@/assets/golokol-logo.svg";
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border bg-secondary mt-auto">
+    <footer className="border-t border-border bg-[#161616] mt-auto">
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20">
-                <Music className="h-5 w-5 text-primary" />
-              </div>
+              <img src={golokolLogo} alt="GoLokol" className="h-10 w-10" />
               <span className="font-display text-2xl text-foreground tracking-wide">
                 GoLokol
               </span>
