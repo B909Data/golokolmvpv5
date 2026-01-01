@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -115,39 +115,44 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased font-normal;
-  }
-
-  /* Headers - bold weights */
-  h1 {
-    @apply font-extrabold text-[32px] md:text-[44px] leading-[1.1] tracking-[-0.02em];
-  }
-
-  h2 {
-    @apply font-extrabold text-[26px] md:text-[36px] leading-[1.15] tracking-[-0.015em];
-  }
-
-  h3 {
-    @apply font-bold text-[22px] md:text-[28px] leading-[1.2] tracking-[-0.01em];
-  }
-
-  h4 {
-    @apply font-bold text-[18px] md:text-[22px] leading-[1.25] tracking-[-0.005em];
-  }
-
-  /* Body text - regular weight */
-  p, li, span, div, td, th, dd, dt, blockquote {
+    @apply bg-background text-foreground font-sans antialiased;
     font-weight: 400;
   }
 
-  /* Override for semantic elements that should inherit */
+  /* Headers - controlled bold weights */
+  h1 {
+    @apply text-[32px] md:text-[44px] leading-[1.1] tracking-[-0.02em];
+    font-weight: 700; /* Bold */
+  }
+
+  h2 {
+    @apply text-[26px] md:text-[36px] leading-[1.15] tracking-[-0.015em];
+    font-weight: 600; /* SemiBold */
+  }
+
+  h3 {
+    @apply text-[22px] md:text-[28px] leading-[1.2] tracking-[-0.01em];
+    font-weight: 600; /* SemiBold */
+  }
+
+  h4 {
+    @apply text-[18px] md:text-[22px] leading-[1.25] tracking-[-0.005em];
+    font-weight: 600; /* SemiBold */
+  }
+
+  /* Body text - strictly regular weight */
+  p, li, span, div, td, th, dd, dt, blockquote, label {
+    font-weight: 400; /* Regular - never Medium or Bold */
+  }
+
+  /* Only strong/b tags should be bold */
   strong, b {
     font-weight: 700;
   }
 
   /* Lists - regular weight by default */
   ul, ol {
-    @apply font-normal;
+    font-weight: 400;
   }
 }
 
@@ -174,9 +179,10 @@
     @apply text-[14px] font-normal leading-[1.5] tracking-normal;
   }
 
-  /* Action tokens */
+  /* Action tokens - Medium weight for buttons/UI */
   .type-button {
-    @apply text-[16px] font-semibold leading-[1.2] tracking-normal;
+    @apply text-[16px] leading-[1.2] tracking-normal;
+    font-weight: 500; /* Medium - not SemiBold */
   }
 
   .type-link {
