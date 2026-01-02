@@ -9,7 +9,7 @@ interface CountdownTime {
 }
 
 const VotingCountdownOverlay = () => {
-  const votingStartDate = new Date("2025-01-31T00:00:00");
+  const votingStartDate = new Date("2026-01-31T00:00:00");
   const [countdown, setCountdown] = useState<CountdownTime>({ days: 0, hours: 0, minutes: 0 });
   const [isVotingOpen, setIsVotingOpen] = useState(false);
 
