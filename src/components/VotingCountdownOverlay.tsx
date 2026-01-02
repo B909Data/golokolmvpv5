@@ -43,20 +43,25 @@ const VotingCountdownOverlay = () => {
   const padNumber = (num: number) => num.toString().padStart(2, "0");
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none" style={{ top: "80px" }}>
-      {/* Semi-transparent overlay */}
-      <div className="absolute inset-0 bg-background/50 backdrop-blur-sm pointer-events-auto" />
+    <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-center" style={{ top: "280px" }}>
+      {/* Full-width semi-transparent overlay - 65% opacity, blocks all interactions */}
+      <div className="absolute inset-0 bg-background/[0.65] pointer-events-auto" />
       
-      {/* Content */}
-      <div className="relative z-10 text-center px-6 py-12 max-w-lg mx-4 pointer-events-auto">
-        {/* Logo */}
+      {/* Centered Content */}
+      <div className="relative z-10 text-center px-6 py-12 max-w-lg mx-4">
+        {/* GoLokol Logo */}
         <div className="mb-8">
           <img 
             src={golokolNameLogo} 
             alt="GoLokol" 
-            className="h-16 md:h-20 mx-auto"
+            className="h-20 md:h-24 mx-auto"
           />
         </div>
+
+        {/* Primary Header */}
+        <h2 className="font-display text-2xl md:text-3xl text-foreground mb-4">
+          Voting Opens Soon
+        </h2>
 
         {/* Countdown Timer */}
         <div className="mb-6">
@@ -66,25 +71,20 @@ const VotingCountdownOverlay = () => {
           <p className="text-muted-foreground text-sm mt-2">days : hours : minutes</p>
         </div>
 
-        {/* Primary Header */}
-        <h2 className="font-display text-2xl md:text-3xl text-foreground mb-2">
-          Voting will begin January 31
-        </h2>
-
-        {/* Secondary Headers */}
+        {/* Secondary Subheader */}
         <div className="mb-8">
           <p className="text-lg md:text-xl text-primary font-semibold">
             The next Lokol Listening Sessions
           </p>
           <p className="text-muted-foreground mt-1">
-            Handle Bar on Edgewood
+            Handle Bar, Edgewood
           </p>
           <p className="text-muted-foreground">
-            Saturday February 21
+            Saturday, February 21
           </p>
         </div>
 
-        {/* Buy Tickets Button */}
+        {/* Primary CTA Button */}
         <Button variant="default" size="lg" className="px-8">
           Buy Tickets
         </Button>
