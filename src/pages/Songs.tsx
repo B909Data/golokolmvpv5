@@ -3,9 +3,9 @@ import { Music, Filter } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SongCard from "@/components/SongCard";
+import VotingCountdownOverlay from "@/components/VotingCountdownOverlay";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
 const mockSongs = [
   {
     slug: "midnight-drive",
@@ -96,8 +96,9 @@ const Songs = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
       <Navbar />
+      <VotingCountdownOverlay />
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4">
