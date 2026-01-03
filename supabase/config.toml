@@ -6,6 +6,9 @@ verify_jwt = false
 [functions.send-rsvp-sms]
 verify_jwt = false
 
+[functions.send-checkin-sms]
+verify_jwt = false
+
 [functions.create-afterparty-checkout]
 verify_jwt = false
 

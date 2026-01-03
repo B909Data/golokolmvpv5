@@ -13,6 +13,8 @@ import AfterPartyRoom from "./pages/AfterPartyRoom";
 import AfterPartyRecap from "./pages/AfterPartyRecap";
 import RSVPAfterParty from "./pages/RSVPAfterParty";
 import RSVPConfirmed from "./pages/RSVPConfirmed";
+import QRDisplayPage from "./pages/QRDisplayPage";
+import VerifyQRPage from "./pages/VerifyQRPage";
 import CreateAfterparty from "./pages/CreateAfterparty";
 import CreateAfterpartySuccess from "./pages/CreateAfterpartySuccess";
 import Checkin from "./pages/Checkin";
@@ -39,6 +41,8 @@ const App = () => (
           <Route path="/after-party/:eventId" element={<AfterParty />} />
           <Route path="/after-party/:eventId/rsvp" element={<RSVPAfterParty />} />
           <Route path="/after-party/:eventId/rsvp/confirmed" element={<RSVPConfirmed />} />
+          <Route path="/after-party/:eventId/qr/:qrToken" element={<QRDisplayPage />} />
+          <Route path="/after-party/:eventId/verify/:qrToken" element={<VerifyQRPage />} />
           <Route path="/after-party/:eventId/room" element={<AfterPartyRoom />} />
           <Route path="/after-party/:eventId/recap" element={<AfterPartyRecap />} />
           <Route path="/create-afterparty" element={<CreateAfterparty />} />

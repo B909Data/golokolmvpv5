@@ -32,13 +32,42 @@ const AfterPartyRoom = () => {
   const [isCreatingRecap, setIsCreatingRecap] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const attendeeId = eventId ? localStorage.getItem(`afterparty-attendee-${eventId}`) : null;
+  const attendeeId = eventId ? localStorage.getItem(`attendee_${eventId}`) : null;
+  const qrToken = eventId ? localStorage.getItem(`attendee_qr_${eventId}`) : null;
+
+  // Check if attendee is checked in
+  const { data: attendeeData, isLoading: isCheckingIn } = useQuery({
+    queryKey: ["attendee-checkin", attendeeId],
+    queryFn: async () => {
+      if (!attendeeId) return null;
+      const { data, error } = await supabase
+        .from("attendees")
+        .select("id, checked_in_at, qr_token")
+        .eq("id", attendeeId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!attendeeId,
+  });
 
   useEffect(() => {
+    // If no attendee ID, redirect to RSVP
     if (!attendeeId && eventId) {
-      navigate(`/after-party/${eventId}`, { replace: true });
+      navigate(`/after-party/${eventId}/rsvp`, { replace: true });
+      return;
     }
-  }, [attendeeId, eventId, navigate]);
+
+    // If attendee exists but not checked in, redirect to QR page
+    if (attendeeData && !attendeeData.checked_in_at && eventId) {
+      const token = attendeeData.qr_token || qrToken;
+      if (token) {
+        navigate(`/after-party/${eventId}/qr/${token}`, { replace: true });
+      } else {
+        navigate(`/after-party/${eventId}/rsvp`, { replace: true });
+      }
+    }
+  }, [attendeeId, attendeeData, eventId, qrToken, navigate]);
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", eventId],
@@ -157,8 +186,13 @@ const AfterPartyRoom = () => {
     }
   };
 
-  if (!attendeeId) {
-    return null;
+  // Don't render if not checked in
+  if (!attendeeId || isCheckingIn || !attendeeData?.checked_in_at) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Checking access...</p>
+      </div>
+    );
   }
 
   if (isLoading) {
