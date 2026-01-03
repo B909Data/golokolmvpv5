@@ -1,1 +1,4 @@
 project_id = "qtduseiexmhssdkzjwbn"
+
+[functions.send-recap-sms]
+verify_jwt = false

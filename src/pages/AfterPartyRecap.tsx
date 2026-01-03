@@ -1,12 +1,67 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Send } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const AfterPartyRecap = () => {
   const { eventId } = useParams<{ eventId: string }>();
+  const [searchParams] = useSearchParams();
   const attendeeId = eventId ? localStorage.getItem(`afterparty-attendee-${eventId}`) : null;
+  const isAdminMode = searchParams.get("admin") === "1";
+  
+  const [isSending, setIsSending] = useState(false);
+  const [hasSent, setHasSent] = useState(false);
+
+  // Check if current attendee is an artist
+  const { data: attendeeRole } = useQuery({
+    queryKey: ["attendee-role", attendeeId, eventId],
+    queryFn: async () => {
+      if (!attendeeId || !eventId) return null;
+      
+      const { data, error } = await supabase
+        .from("after_party_messages")
+        .select("role")
+        .eq("attendee_id", attendeeId)
+        .eq("event_id", eventId)
+        .eq("role", "artist")
+        .limit(1)
+        .maybeSingle();
+
+      if (error) return null;
+      return data?.role || null;
+    },
+    enabled: !!attendeeId && !!eventId,
+  });
+
+  const canSendSms = isAdminMode || attendeeRole === "artist";
+
+  const handleSendSms = async () => {
+    if (!eventId || isSending || hasSent) return;
+    
+    setIsSending(true);
+    try {
+      const recapUrl = `${window.location.origin}/after-party/${eventId}/recap`;
+      
+      const { data, error } = await supabase.functions.invoke("send-recap-sms", {
+        body: { eventId, recapUrl },
+      });
+
+      if (error) throw error;
+
+      toast.success(`Recap sent to ${data.sentCount} attendee${data.sentCount === 1 ? "" : "s"}`);
+      setHasSent(true);
+    } catch (error: any) {
+      console.error("Error sending SMS:", error);
+      toast.error("Failed to send recap SMS");
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const { data: event } = useQuery({
     queryKey: ["event", eventId],
@@ -164,6 +219,25 @@ const AfterPartyRecap = () => {
           {attendeeCount} {attendeeCount === 1 ? "attendee" : "attendees"}
         </p>
       </section>
+
+      {/* Admin SMS Button */}
+      {canSendSms && (
+        <section className="px-6 py-6 border-t border-border/30">
+          {hasSent ? (
+            <p className="text-sm text-muted-foreground">Recap sent to attendees.</p>
+          ) : (
+            <Button
+              onClick={handleSendSms}
+              disabled={isSending}
+              variant="secondary"
+              className="gap-2"
+            >
+              <Send className="h-4 w-4" />
+              {isSending ? "Sending..." : "Send Recap via SMS"}
+            </Button>
+          )}
+        </section>
+      )}
 
       {/* Recent Messages */}
       {recentMessages.length > 0 && (
