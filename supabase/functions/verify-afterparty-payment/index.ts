@@ -47,16 +47,30 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Generate artist access token
-    const artistAccessToken = crypto.randomUUID();
+    // First, fetch current event to check if token exists
+    const { data: existingEvent, error: fetchError } = await supabaseAdmin
+      .from("events")
+      .select("artist_access_token")
+      .eq("id", eventId)
+      .single();
 
-    // Update event to enable after party and set artist token
+    if (fetchError) {
+      console.error("Fetch error:", fetchError);
+      throw new Error(`Failed to fetch event: ${fetchError.message}`);
+    }
+
+    // Only generate token if one doesn't exist
+    const artistAccessToken = existingEvent.artist_access_token || crypto.randomUUID();
+
+    // Update event to enable after party and set artist token (if new)
+    const updateData: Record<string, unknown> = { after_party_enabled: true };
+    if (!existingEvent.artist_access_token) {
+      updateData.artist_access_token = artistAccessToken;
+    }
+
     const { data: event, error: updateError } = await supabaseAdmin
       .from("events")
-      .update({ 
-        after_party_enabled: true,
-        artist_access_token: artistAccessToken,
-      })
+      .update(updateData)
       .eq("id", eventId)
       .select()
       .single();
@@ -77,6 +91,7 @@ serve(async (req) => {
         start_at: event.start_at,
         city: event.city,
         venue_name: event.venue_name,
+        artist_access_token: artistAccessToken,
       }
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
