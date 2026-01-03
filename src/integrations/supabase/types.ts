@@ -20,6 +20,7 @@ export type Database = {
           created_at: string | null
           event_id: string
           id: string
+          message: string | null
           role: Database["public"]["Enums"]["message_role"]
         }
         Insert: {
@@ -27,6 +28,7 @@ export type Database = {
           created_at?: string | null
           event_id: string
           id?: string
+          message?: string | null
           role?: Database["public"]["Enums"]["message_role"]
         }
         Update: {
@@ -34,6 +36,7 @@ export type Database = {
           created_at?: string | null
           event_id?: string
           id?: string
+          message?: string | null
           role?: Database["public"]["Enums"]["message_role"]
         }
         Relationships: [
