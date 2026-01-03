@@ -112,6 +112,7 @@ const CreateAfterparty = () => {
   };
 
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
   const onSubmit = async (data: FormData) => {
     // Prevent double submission
@@ -155,11 +156,14 @@ const CreateAfterparty = () => {
       }
 
       if (response?.url) {
-        // Use top-level navigation to escape iframe (Stripe Checkout cannot run in iframe)
-        if (window.top) {
-          window.top.location.href = response.url;
+        // Open in new tab to avoid iframe navigation restrictions
+        const newWindow = window.open(response.url, '_blank', 'noopener,noreferrer');
+        if (!newWindow) {
+          // Popup was blocked - show fallback link
+          setCheckoutUrl(response.url);
+          toast.error("Popup blocked — please allow popups or use the link below");
         } else {
-          window.location.href = response.url;
+          toast.success("Stripe Checkout opened in new tab");
         }
       } else if (response?.error) {
         setCheckoutError(response.error);
@@ -204,6 +208,20 @@ const CreateAfterparty = () => {
           {checkoutError && (
             <div className="mb-6 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive">
               <strong>Error:</strong> {checkoutError}
+            </div>
+          )}
+
+          {checkoutUrl && (
+            <div className="mb-6 p-4 rounded-lg bg-primary/10 border border-primary/20">
+              <p className="text-foreground mb-2">Popup was blocked. Click below to continue to Stripe Checkout:</p>
+              <a
+                href={checkoutUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+              >
+                Open Stripe Checkout →
+              </a>
             </div>
           )}
 
