@@ -136,6 +136,7 @@ export type Database = {
         Row: {
           after_party_enabled: boolean
           after_party_opens_at: string | null
+          artist_access_token: string | null
           artist_name: string | null
           city: string | null
           contact_email: string | null
@@ -145,6 +146,8 @@ export type Database = {
           genres: string[] | null
           id: string
           image_url: string | null
+          livestream_url: string | null
+          pinned_message: string | null
           start_at: string
           status: Database["public"]["Enums"]["event_status"]
           ticket_url: string | null
@@ -156,6 +159,7 @@ export type Database = {
         Insert: {
           after_party_enabled?: boolean
           after_party_opens_at?: string | null
+          artist_access_token?: string | null
           artist_name?: string | null
           city?: string | null
           contact_email?: string | null
@@ -165,6 +169,8 @@ export type Database = {
           genres?: string[] | null
           id?: string
           image_url?: string | null
+          livestream_url?: string | null
+          pinned_message?: string | null
           start_at: string
           status?: Database["public"]["Enums"]["event_status"]
           ticket_url?: string | null
@@ -176,6 +182,7 @@ export type Database = {
         Update: {
           after_party_enabled?: boolean
           after_party_opens_at?: string | null
+          artist_access_token?: string | null
           artist_name?: string | null
           city?: string | null
           contact_email?: string | null
@@ -185,6 +192,8 @@ export type Database = {
           genres?: string[] | null
           id?: string
           image_url?: string | null
+          livestream_url?: string | null
+          pinned_message?: string | null
           start_at?: string
           status?: Database["public"]["Enums"]["event_status"]
           ticket_url?: string | null
