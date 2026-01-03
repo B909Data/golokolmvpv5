@@ -1,13 +1,15 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Share2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const RSVPConfirmed = () => {
   const { eventId } = useParams<{ eventId: string }>();
+  const { toast } = useToast();
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", eventId],
@@ -24,6 +26,40 @@ const RSVPConfirmed = () => {
     },
     enabled: !!eventId,
   });
+
+  const handleShare = async () => {
+    const rsvpUrl = `${window.location.origin}/after-party/${eventId}/rsvp`;
+    const shareData = {
+      title: event?.title || "After Party",
+      text: `RSVP for ${event?.title || "this After Party"}!`,
+      url: rsvpUrl,
+    };
+
+    // Try Web Share API first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err) {
+        // User cancelled or share failed, fall back to clipboard
+      }
+    }
+
+    // Fallback to clipboard
+    try {
+      await navigator.clipboard.writeText(rsvpUrl);
+      toast({
+        title: "Link copied",
+        description: "Share this link with your friends!",
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: "Please copy the link manually.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -78,11 +114,10 @@ const RSVPConfirmed = () => {
               </a>
             )}
 
-            <Link to={`/after-party/${eventId}`} className="block">
-              <Button variant="secondary" className="w-full">
-                View Event
-              </Button>
-            </Link>
+            <Button variant="secondary" className="w-full" onClick={handleShare}>
+              <Share2 className="h-4 w-4 mr-2" />
+              Share with a friend
+            </Button>
           </div>
         </div>
       </main>
