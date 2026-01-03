@@ -130,35 +130,62 @@ export type Database = {
         Row: {
           after_party_enabled: boolean
           after_party_opens_at: string | null
+          artist_name: string | null
+          city: string | null
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string | null
           ends_at: string | null
+          genres: string[] | null
           id: string
+          image_url: string | null
           start_at: string
           status: Database["public"]["Enums"]["event_status"]
+          ticket_url: string | null
           title: string
           type: Database["public"]["Enums"]["event_type"]
+          venue_name: string | null
+          youtube_url: string | null
         }
         Insert: {
           after_party_enabled?: boolean
           after_party_opens_at?: string | null
+          artist_name?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           ends_at?: string | null
+          genres?: string[] | null
           id?: string
+          image_url?: string | null
           start_at: string
           status?: Database["public"]["Enums"]["event_status"]
+          ticket_url?: string | null
           title: string
           type: Database["public"]["Enums"]["event_type"]
+          venue_name?: string | null
+          youtube_url?: string | null
         }
         Update: {
           after_party_enabled?: boolean
           after_party_opens_at?: string | null
+          artist_name?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           ends_at?: string | null
+          genres?: string[] | null
           id?: string
+          image_url?: string | null
           start_at?: string
           status?: Database["public"]["Enums"]["event_status"]
+          ticket_url?: string | null
           title?: string
           type?: Database["public"]["Enums"]["event_type"]
+          venue_name?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
