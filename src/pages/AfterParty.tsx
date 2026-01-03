@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 
 type EventData = {
@@ -16,21 +15,21 @@ type EventData = {
   after_party_opens_at: string;
 } | null;
 
-type Message = {
-  id: string;
-  role: string;
-  message: string | null;
-  created_at: string | null;
-};
-
 const AfterParty = () => {
   const { eventId } = useParams<{ eventId: string }>();
-  const [joinedAttendeeId, setJoinedAttendeeId] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [joinError, setJoinError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
-  const [messageText, setMessageText] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Check if already joined
+  const existingAttendeeId = eventId ? localStorage.getItem(`afterparty-attendee-${eventId}`) : null;
+
+  // If already joined, redirect to room
+  useEffect(() => {
+    if (existingAttendeeId && eventId) {
+      navigate(`/after-party/${eventId}/room`, { replace: true });
+    }
+  }, [existingAttendeeId, eventId, navigate]);
 
   const handleJoinAfterParty = async () => {
     if (!eventId) return;
@@ -48,7 +47,10 @@ const AfterParty = () => {
     if (error) {
       setJoinError(error.message);
     } else if (data) {
-      setJoinedAttendeeId(data.id);
+      // Persist attendee ID in localStorage
+      localStorage.setItem(`afterparty-attendee-${eventId}`, data.id);
+      // Navigate to room
+      navigate(`/after-party/${eventId}/room`);
     }
   };
 
@@ -81,63 +83,12 @@ const AfterParty = () => {
     enabled: !!eventId,
   });
 
-  const { data: messages = [], refetch: refetchMessages } = useQuery({
-    queryKey: ["after-party-messages", eventId],
-    queryFn: async (): Promise<Message[]> => {
-      const { data, error } = await supabase
-        .from("after_party_messages")
-        .select("id, role, message, created_at")
-        .eq("event_id", eventId)
-        .order("created_at", { ascending: true });
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!eventId,
-  });
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSendMessage = async () => {
-    if (!messageText.trim() || !eventId || !joinedAttendeeId) return;
-
-    setIsSending(true);
-    const { error } = await supabase.from("after_party_messages").insert({
-      event_id: eventId,
-      attendee_id: joinedAttendeeId,
-      role: "fan",
-      message: messageText.trim(),
-    });
-
-    setIsSending(false);
-
-    if (!error) {
-      setMessageText("");
-      refetchMessages();
-    }
-  };
-
-  const formatTime = (dateString: string | null) => {
-    if (!dateString) return "";
-    try {
-      return format(new Date(dateString), "h:mm a");
-    } catch {
-      return "";
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1 flex items-center justify-center p-8">
-          <p>Loading...</p>
+          <p className="text-foreground">Loading...</p>
         </main>
         <Footer />
       </div>
@@ -146,10 +97,10 @@ const AfterParty = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1 flex items-center justify-center p-8">
-          <p>Event not found</p>
+          <p className="text-foreground">Event not found</p>
         </main>
         <Footer />
       </div>
@@ -165,75 +116,29 @@ const AfterParty = () => {
   })();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-1 flex flex-col p-8 max-w-2xl mx-auto w-full">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold">{event.title}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{formattedDate}</p>
-          <p className="text-sm text-muted-foreground mt-2">
+      <main className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="text-center max-w-md">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">{event.title}</h1>
+          <p className="text-muted-foreground mb-4">{formattedDate}</p>
+          <p className="text-muted-foreground mb-8">
             {attendeeCount} {attendeeCount === 1 ? "person" : "people"} here
           </p>
-        </div>
 
-        {/* Join Section */}
-        {!joinedAttendeeId ? (
-          <div className="text-center mb-6">
-            {joinError && (
-              <p className="text-destructive mb-2">{joinError}</p>
-            )}
-            <Button onClick={handleJoinAfterParty} disabled={isJoining}>
-              {isJoining ? "Joining..." : "Join After Party"}
-            </Button>
-          </div>
-        ) : (
-          <p className="text-center font-medium mb-6">You're in.</p>
-        )}
-
-        {/* Messages Section */}
-        <div className="flex-1 border rounded-lg p-4 mb-4 min-h-[300px] max-h-[400px] overflow-y-auto bg-card">
-          {messages.length === 0 ? (
-            <p className="text-muted-foreground text-center">No messages yet. Start the conversation!</p>
-          ) : (
-            <div className="space-y-3">
-              {messages.map((msg) => (
-                <div key={msg.id} className="flex flex-col">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xs font-medium text-primary">{msg.role}</span>
-                    <span className="text-xs text-muted-foreground">{formatTime(msg.created_at)}</span>
-                  </div>
-                  <p className="text-sm">{msg.message}</p>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
+          {joinError && (
+            <p className="text-destructive mb-4 text-sm">{joinError}</p>
           )}
-        </div>
 
-        {/* Message Composer */}
-        {joinedAttendeeId && (
-          <div className="flex gap-2">
-            <Input
-              placeholder="Type a message..."
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              disabled={isSending}
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!messageText.trim() || isSending}
-            >
-              {isSending ? "Sending..." : "Send"}
-            </Button>
-          </div>
-        )}
+          <Button
+            size="lg"
+            onClick={handleJoinAfterParty}
+            disabled={isJoining}
+            className="px-8 py-6 text-lg"
+          >
+            {isJoining ? "Joining..." : "Join After Party"}
+          </Button>
+        </div>
       </main>
       <Footer />
     </div>
