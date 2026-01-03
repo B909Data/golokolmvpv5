@@ -46,7 +46,7 @@ const Index = () => {
             <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
               <Link to="/create-afterparty">
                 <Button variant="secondary" size="lg">
-                  CREATE AN AFTER PARTY
+                  r CREATE AN AFTER PARTY
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
