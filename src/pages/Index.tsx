@@ -40,7 +40,7 @@ const Index = () => {
               className="text-xl text-muted-foreground mb-8 max-w-xl mx-auto animate-slide-up"
               style={{ animationDelay: "0.1s" }}
             >
-              GoLokol helps local artists and fans find each other where the music is. Near by.
+              GoLokol helps local artists and fans find each othe.
             </p>
 
             <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
