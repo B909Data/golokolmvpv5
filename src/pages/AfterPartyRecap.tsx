@@ -2,9 +2,11 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 const AfterPartyRecap = () => {
   const { eventId } = useParams<{ eventId: string }>();
+  const attendeeId = eventId ? localStorage.getItem(`afterparty-attendee-${eventId}`) : null;
 
   const { data: event } = useQuery({
     queryKey: ["event", eventId],
@@ -49,6 +51,45 @@ const AfterPartyRecap = () => {
     },
     enabled: !!eventId,
   });
+
+  const { data: currentAttendee } = useQuery({
+    queryKey: ["current-attendee", attendeeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("attendees")
+        .select("id, phone, display_name")
+        .eq("id", attendeeId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!attendeeId,
+  });
+
+  const { data: attendanceHistory = 0 } = useQuery({
+    queryKey: ["attendance-history", currentAttendee?.phone, currentAttendee?.display_name],
+    queryFn: async () => {
+      if (!currentAttendee) return 0;
+
+      let query = supabase.from("attendees").select("*", { count: "exact", head: true });
+
+      if (currentAttendee.phone) {
+        query = query.eq("phone", currentAttendee.phone);
+      } else if (currentAttendee.display_name) {
+        query = query.eq("display_name", currentAttendee.display_name);
+      } else {
+        return 1;
+      }
+
+      const { count, error } = await query;
+      if (error) return 1;
+      return count || 1;
+    },
+    enabled: !!currentAttendee,
+  });
+
+  const statusBadge = attendanceHistory >= 2 ? "REPEAT SUPPORTER" : "FIRST SHOW";
 
   const { data: recentMessages = [] } = useQuery({
     queryKey: ["recap-messages", eventId],
@@ -100,6 +141,18 @@ const AfterPartyRecap = () => {
           {event.title}
         </h1>
         <p className="text-muted-foreground mt-1">{formatDate(event.start_at)}</p>
+
+        {/* Your Status Badge */}
+        {attendeeId && currentAttendee && (
+          <div className="mt-4">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground/50 mb-2">
+              Your Status
+            </p>
+            <Badge variant="secondary" className="text-xs font-medium">
+              {statusBadge}
+            </Badge>
+          </div>
+        )}
       </header>
 
       {/* Recap Content */}
