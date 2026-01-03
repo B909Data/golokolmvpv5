@@ -140,13 +140,15 @@ const AfterParty = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-1 flex flex-col items-center justify-center p-8">
-        <div className="text-center max-w-md w-full">
-          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">{event.title}</h1>
-          <p className="text-muted-foreground mb-4">{formattedDate}</p>
-          <p className="text-muted-foreground mb-8">
-            {attendeeCount} {attendeeCount === 1 ? "person" : "people"} here
-          </p>
+      <main className="flex-1 pt-24 pb-24 px-4">
+        <div className="max-w-md mx-auto w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">{event.title}</h1>
+            <p className="text-muted-foreground mb-2">{formattedDate}</p>
+            <p className="text-muted-foreground">
+              {attendeeCount} {attendeeCount === 1 ? "person" : "people"} here
+            </p>
+          </div>
 
           <div className="space-y-4 text-left mb-6">
             <div className="space-y-2">
