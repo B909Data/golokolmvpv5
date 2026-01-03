@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,8 @@ type Message = {
 const AfterPartyRoom = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isAdminMode = searchParams.get("admin") === "1";
   const [messageText, setMessageText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isCreatingRecap, setIsCreatingRecap] = useState(false);
@@ -66,6 +68,25 @@ const AfterPartyRoom = () => {
     },
     enabled: !!eventId && !!attendeeId,
   });
+
+  const { data: attendeeRole } = useQuery({
+    queryKey: ["attendee-role", attendeeId],
+    queryFn: async () => {
+      if (!attendeeId) return null;
+      const { data, error } = await supabase
+        .from("after_party_messages")
+        .select("role")
+        .eq("attendee_id", attendeeId)
+        .limit(1)
+        .maybeSingle();
+
+      if (error) return null;
+      return data?.role || null;
+    },
+    enabled: !!attendeeId,
+  });
+
+  const canCreateRecap = isAdminMode || attendeeRole === "artist";
 
   const { data: messages = [], refetch: refetchMessages } = useQuery({
     queryKey: ["after-party-messages", eventId],
@@ -187,16 +208,18 @@ const AfterPartyRoom = () => {
             Welcome to the After Party. Be respectful. Artist note coming soon.
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCreateRecap}
-          disabled={isCreatingRecap}
-          className="shrink-0"
-        >
-          <FileText size={16} className="mr-2" />
-          {isCreatingRecap ? "Creating..." : "Create Recap"}
-        </Button>
+        {canCreateRecap && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCreateRecap}
+            disabled={isCreatingRecap}
+            className="shrink-0"
+          >
+            <FileText size={16} className="mr-2" />
+            {isCreatingRecap ? "Creating..." : "Create Recap"}
+          </Button>
+        )}
       </div>
 
       {/* Message Stream */}
