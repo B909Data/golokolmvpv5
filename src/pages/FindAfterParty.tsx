@@ -228,9 +228,9 @@ const FindAfterParty = () => {
                         )}
                       </div>
 
-                      <Link to={`/after-party/${event.id}`} className="mt-auto pt-2">
+                      <Link to={`/after-party/${event.id}/rsvp`} className="mt-auto pt-2">
                         <Button variant="secondary" size="sm" className="w-full">
-                          View After Party
+                          RSVP
                         </Button>
                       </Link>
                     </div>
