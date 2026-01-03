@@ -111,8 +111,18 @@ const CreateAfterparty = () => {
     }
   };
 
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
   const onSubmit = async (data: FormData) => {
+    // Prevent double submission
+    if (isSubmitting) return;
+    
     setIsSubmitting(true);
+    setCheckoutError(null);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
     try {
       const city = data.city === "Other" && data.custom_city ? data.custom_city : data.city;
 
@@ -135,15 +145,32 @@ const CreateAfterparty = () => {
         { body: payload }
       );
 
-      if (error) throw error;
+      clearTimeout(timeoutId);
+
+      if (error) {
+        const errMsg = error.message || "Failed to create checkout session";
+        setCheckoutError(errMsg);
+        toast.error(errMsg);
+        return;
+      }
+
       if (response?.url) {
         window.location.href = response.url;
+      } else if (response?.error) {
+        setCheckoutError(response.error);
+        toast.error(response.error);
       } else {
-        throw new Error("No checkout URL returned");
+        setCheckoutError("No checkout URL returned. Please try again.");
+        toast.error("No checkout URL returned");
       }
     } catch (err: any) {
+      clearTimeout(timeoutId);
+      const errMsg = err.name === "AbortError" 
+        ? "Request timed out. Please try again."
+        : err.message || "Failed to start checkout";
       console.error("Checkout error:", err);
-      toast.error(err.message || "Failed to start checkout");
+      setCheckoutError(errMsg);
+      toast.error(errMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -166,6 +193,12 @@ const CreateAfterparty = () => {
           {canceled && (
             <div className="mb-6 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive">
               Payment was canceled. You can try again below.
+            </div>
+          )}
+
+          {checkoutError && (
+            <div className="mb-6 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive">
+              <strong>Error:</strong> {checkoutError}
             </div>
           )}
 
