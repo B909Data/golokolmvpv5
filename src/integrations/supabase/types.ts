@@ -128,6 +128,7 @@ export type Database = {
       }
       events: {
         Row: {
+          after_party_enabled: boolean
           after_party_opens_at: string | null
           created_at: string | null
           ends_at: string | null
@@ -138,6 +139,7 @@ export type Database = {
           type: Database["public"]["Enums"]["event_type"]
         }
         Insert: {
+          after_party_enabled?: boolean
           after_party_opens_at?: string | null
           created_at?: string | null
           ends_at?: string | null
@@ -148,6 +150,7 @@ export type Database = {
           type: Database["public"]["Enums"]["event_type"]
         }
         Update: {
+          after_party_enabled?: boolean
           after_party_opens_at?: string | null
           created_at?: string | null
           ends_at?: string | null
