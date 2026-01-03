@@ -47,10 +47,16 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Update event to enable after party
+    // Generate artist access token
+    const artistAccessToken = crypto.randomUUID();
+
+    // Update event to enable after party and set artist token
     const { data: event, error: updateError } = await supabaseAdmin
       .from("events")
-      .update({ after_party_enabled: true })
+      .update({ 
+        after_party_enabled: true,
+        artist_access_token: artistAccessToken,
+      })
       .eq("id", eventId)
       .select()
       .single();

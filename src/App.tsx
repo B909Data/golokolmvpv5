@@ -22,7 +22,10 @@ import Checkin from "./pages/Checkin";
 import SubmitSong from "./pages/SubmitSong";
 import HowToGoLokol from "./pages/HowToGoLokol";
 import FindAfterParty from "./pages/FindAfterParty";
+import Admin from "./pages/Admin";
 import AdminLLS from "./pages/AdminLLS";
+import AdminAfterParties from "./pages/AdminAfterParties";
+import ArtistEvent from "./pages/ArtistEvent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,7 +42,10 @@ const App = () => (
           <Route path="/find-after-party" element={<FindAfterParty />} />
           <Route path="/songs" element={<Songs />} />
           <Route path="/songs/success" element={<SongsSuccess />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/admin/lls" element={<AdminLLS />} />
+          <Route path="/admin/after-parties" element={<AdminAfterParties />} />
+          <Route path="/artist/event/:eventId" element={<ArtistEvent />} />
           <Route path="/song/:slug" element={<SongDetail />} />
           <Route path="/afterparty/:slug" element={<AfterpartyDetail />} />
           <Route path="/after-party/:eventId" element={<AfterParty />} />

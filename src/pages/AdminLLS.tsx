@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Music, RefreshCw, ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -32,7 +32,7 @@ const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
 
 const AdminLLS = () => {
   const [searchParams] = useSearchParams();
-  const isAdmin = searchParams.get("admin") === "1";
+  const key = searchParams.get("key");
 
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,9 +40,10 @@ const AdminLLS = () => {
   const [saving, setSaving] = useState(false);
 
   const fetchSubmissions = async () => {
+    if (!key) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("admin-list-submissions?admin=1");
+      const { data, error } = await supabase.functions.invoke(`admin-list-submissions?key=${key}`);
 
       if (error) throw error;
       setSubmissions(data?.submissions || []);
@@ -55,19 +56,19 @@ const AdminLLS = () => {
   };
 
   useEffect(() => {
-    if (isAdmin) {
+    if (key) {
       fetchSubmissions();
     }
-  }, [isAdmin]);
+  }, [key]);
 
   const selectedSubmission = submissions.find((s) => s.id === selectedId);
 
   const handleStatusChange = async (status: string) => {
-    if (!selectedId) return;
+    if (!selectedId || !key) return;
 
     setSaving(true);
     try {
-      const { error } = await supabase.functions.invoke("admin-update-submission?admin=1", {
+      const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
         body: { id: selectedId, status },
       });
 
@@ -86,11 +87,11 @@ const AdminLLS = () => {
   };
 
   const handleNotesChange = async (admin_notes: string) => {
-    if (!selectedId) return;
+    if (!selectedId || !key) return;
 
     setSaving(true);
     try {
-      const { error } = await supabase.functions.invoke("admin-update-submission?admin=1", {
+      const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
         body: { id: selectedId, admin_notes },
       });
 
@@ -108,7 +109,7 @@ const AdminLLS = () => {
     }
   };
 
-  if (!isAdmin) {
+  if (!key) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -134,10 +135,15 @@ const AdminLLS = () => {
               <Music className="w-8 h-8 text-primary" />
               <h1 className="font-display text-3xl text-foreground">LLS Submissions</h1>
             </div>
-            <Button variant="outline" size="sm" onClick={fetchSubmissions} disabled={loading}>
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-              Refresh
-            </Button>
+            <div className="flex items-center gap-2">
+              <Link to={`/admin?key=${key}`}>
+                <Button variant="ghost" size="sm">← Back</Button>
+              </Link>
+              <Button variant="outline" size="sm" onClick={fetchSubmissions} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+            </div>
           </div>
         </div>
       </section>

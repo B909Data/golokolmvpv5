@@ -23,30 +23,59 @@ serve(async (req) => {
       });
     }
 
+    const { event_id } = await req.json();
+
+    if (!event_id) {
+      throw new Error("Missing event_id");
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { data, error } = await supabase
-      .from("submissions")
-      .select("*")
-      .order("created_at", { ascending: false });
+    // Check if recap already exists
+    const { data: existingRecap } = await supabase
+      .from("recaps")
+      .select("id")
+      .eq("event_id", event_id)
+      .single();
 
-    if (error) {
-      console.error("Error fetching submissions:", error);
-      throw new Error("Failed to fetch submissions");
+    if (existingRecap) {
+      return new Response(JSON.stringify({ success: true, recap_id: existingRecap.id, exists: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
     }
 
-    console.log("Fetched", data?.length || 0, "submissions");
+    // Generate share token
+    const shareToken = crypto.randomUUID();
 
-    return new Response(JSON.stringify({ submissions: data }), {
+    // Create new recap
+    const { data: recap, error } = await supabase
+      .from("recaps")
+      .insert({
+        event_id,
+        share_token: shareToken,
+        generated_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error creating recap:", error);
+      throw new Error("Failed to create recap");
+    }
+
+    console.log("Created recap for event:", event_id);
+
+    return new Response(JSON.stringify({ success: true, recap_id: recap.id, exists: false }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("Error in admin-list-submissions:", errorMessage);
+    console.error("Error in admin-create-recap:", errorMessage);
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

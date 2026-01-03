@@ -1,0 +1,267 @@
+import { useEffect, useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import { Calendar, RefreshCw, ExternalLink, Copy, Check, Users } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface Event {
+  id: string;
+  title: string;
+  artist_name: string | null;
+  city: string | null;
+  start_at: string;
+  after_party_enabled: boolean;
+  artist_access_token: string | null;
+  rsvp_count: number;
+}
+
+const AdminAfterParties = () => {
+  const [searchParams] = useSearchParams();
+  const key = searchParams.get("key");
+
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [creatingRecap, setCreatingRecap] = useState<string | null>(null);
+  const [sendingSms, setSendingSms] = useState<string | null>(null);
+
+  const fetchEvents = async () => {
+    if (!key) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(`admin-list-events?key=${key}`);
+      if (error) throw error;
+      setEvents(data?.events || []);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      toast.error("Failed to load events");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (key) {
+      fetchEvents();
+    }
+  }, [key]);
+
+  const copyArtistLink = (event: Event) => {
+    if (!event.artist_access_token) {
+      toast.error("No artist token for this event");
+      return;
+    }
+    const link = `${window.location.origin}/artist/event/${event.id}?token=${event.artist_access_token}`;
+    navigator.clipboard.writeText(link);
+    setCopiedId(event.id);
+    toast.success("Artist link copied!");
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const createRecap = async (eventId: string) => {
+    setCreatingRecap(eventId);
+    try {
+      const { data, error } = await supabase.functions.invoke(`admin-create-recap?key=${key}`, {
+        body: { event_id: eventId },
+      });
+      if (error) throw error;
+      if (data?.exists) {
+        toast.info("Recap already exists");
+      } else {
+        toast.success("Recap created");
+      }
+    } catch (err) {
+      console.error("Create recap error:", err);
+      toast.error("Failed to create recap");
+    } finally {
+      setCreatingRecap(null);
+    }
+  };
+
+  const sendRecapSms = async (eventId: string) => {
+    setSendingSms(eventId);
+    try {
+      const { error } = await supabase.functions.invoke("send-recap-sms", {
+        body: { event_id: eventId },
+      });
+      if (error) throw error;
+      toast.success("Recap SMS sent");
+    } catch (err) {
+      console.error("Send SMS error:", err);
+      toast.error("Failed to send recap SMS");
+    } finally {
+      setSendingSms(null);
+    }
+  };
+
+  if (!key) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <section className="pt-32 pb-24 px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <h1 className="font-display text-4xl text-foreground mb-4">Not authorized</h1>
+            <p className="text-muted-foreground">You don't have access to this page.</p>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+
+      <section className="pt-32 pb-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <Calendar className="w-8 h-8 text-primary" />
+              <h1 className="font-display text-3xl text-foreground">After Parties</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link to={`/admin?key=${key}`}>
+                <Button variant="ghost" size="sm">← Back</Button>
+              </Link>
+              <Button variant="outline" size="sm" onClick={fetchEvents} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-24">
+        <div className="max-w-7xl mx-auto">
+          {loading ? (
+            <p className="text-muted-foreground text-center py-8">Loading...</p>
+          ) : events.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">No after parties yet.</p>
+          ) : (
+            <div className="border border-border/50 rounded-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-card/50 border-b border-border/50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">Title</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">Artist</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">City</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">Date</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">Enabled</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">RSVPs</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {events.map((event) => (
+                      <tr key={event.id} className="border-b border-border/30 hover:bg-card/30 transition-colors">
+                        <td className="px-4 py-3 text-foreground font-medium">{event.title}</td>
+                        <td className="px-4 py-3 text-foreground">{event.artist_name || "—"}</td>
+                        <td className="px-4 py-3 text-foreground">{event.city || "—"}</td>
+                        <td className="px-4 py-3 text-foreground">
+                          {new Date(event.start_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                            event.after_party_enabled
+                              ? "bg-primary/20 text-primary"
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            {event.after_party_enabled ? "Yes" : "No"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center gap-1 text-foreground">
+                            <Users className="w-4 h-4 text-muted-foreground" />
+                            {event.rsvp_count}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap gap-2">
+                            <a
+                              href={`/after-party/${event.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-card/50 border border-border/50 rounded hover:bg-card transition-colors"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              RSVP
+                            </a>
+                            <a
+                              href={`/after-party/${event.id}/room`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-card/50 border border-border/50 rounded hover:bg-card transition-colors"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              Room
+                            </a>
+                            <a
+                              href={`/after-party/${event.id}/recap`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-card/50 border border-border/50 rounded hover:bg-card transition-colors"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              Recap
+                            </a>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => createRecap(event.id)}
+                              disabled={creatingRecap === event.id}
+                            >
+                              {creatingRecap === event.id ? "..." : "Create Recap"}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => sendRecapSms(event.id)}
+                              disabled={sendingSms === event.id}
+                            >
+                              {sendingSms === event.id ? "..." : "Send Recap SMS"}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => copyArtistLink(event)}
+                              disabled={!event.artist_access_token}
+                            >
+                              {copiedId === event.id ? (
+                                <>
+                                  <Check className="w-3 h-3 mr-1" />
+                                  Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3 mr-1" />
+                                  Artist Link
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default AdminAfterParties;
