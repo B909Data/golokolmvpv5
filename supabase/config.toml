@@ -26,3 +26,18 @@ verify_jwt = false
 
 [functions.admin-update-submission]
 verify_jwt = false
+
+[functions.admin-list-events]
+verify_jwt = false
+
+[functions.admin-create-recap]
+verify_jwt = false
+
+[functions.artist-get-event]
+verify_jwt = false
+
+[functions.artist-update-event]
+verify_jwt = false
+
+[functions.artist-delete-message]
+verify_jwt = false

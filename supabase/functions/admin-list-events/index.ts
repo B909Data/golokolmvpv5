@@ -28,25 +28,50 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { data, error } = await supabase
-      .from("submissions")
+    // Fetch all after_party events with RSVP counts
+    const { data: events, error: eventsError } = await supabase
+      .from("events")
       .select("*")
-      .order("created_at", { ascending: false });
+      .eq("type", "after_party")
+      .order("start_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching submissions:", error);
-      throw new Error("Failed to fetch submissions");
+    if (eventsError) {
+      console.error("Error fetching events:", eventsError);
+      throw new Error("Failed to fetch events");
     }
 
-    console.log("Fetched", data?.length || 0, "submissions");
+    // Get RSVP counts for each event
+    const eventIds = events?.map((e) => e.id) || [];
+    const { data: attendeeCounts, error: countError } = await supabase
+      .from("attendees")
+      .select("event_id")
+      .in("event_id", eventIds);
 
-    return new Response(JSON.stringify({ submissions: data }), {
+    if (countError) {
+      console.error("Error fetching attendee counts:", countError);
+    }
+
+    // Count RSVPs per event
+    const rsvpCounts: Record<string, number> = {};
+    attendeeCounts?.forEach((a) => {
+      rsvpCounts[a.event_id] = (rsvpCounts[a.event_id] || 0) + 1;
+    });
+
+    // Attach RSVP counts to events
+    const eventsWithCounts = events?.map((event) => ({
+      ...event,
+      rsvp_count: rsvpCounts[event.id] || 0,
+    }));
+
+    console.log("Fetched", eventsWithCounts?.length || 0, "events");
+
+    return new Response(JSON.stringify({ events: eventsWithCounts }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("Error in admin-list-submissions:", errorMessage);
+    console.error("Error in admin-list-events:", errorMessage);
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

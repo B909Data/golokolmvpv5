@@ -13,9 +13,10 @@ serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const admin = url.searchParams.get("admin");
+    const key = url.searchParams.get("key");
+    const adminKey = Deno.env.get("ADMIN_KEY");
 
-    if (admin !== "1") {
+    if (!adminKey || key !== adminKey) {
       return new Response(JSON.stringify({ error: "Not authorized" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 403,

@@ -1,0 +1,71 @@
+import { useSearchParams, Link } from "react-router-dom";
+import { Shield, Music, Calendar } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+const Admin = () => {
+  const [searchParams] = useSearchParams();
+  const key = searchParams.get("key");
+
+  if (!key) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <section className="pt-32 pb-24 px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <h1 className="font-display text-4xl text-foreground mb-4">Not authorized</h1>
+            <p className="text-muted-foreground">You don't have access to this page.</p>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+
+      <section className="pt-32 pb-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-3 mb-8">
+            <Shield className="w-8 h-8 text-primary" />
+            <h1 className="font-display text-3xl text-foreground">Admin Portal</h1>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Link
+              to={`/admin/after-parties?key=${key}`}
+              className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Calendar className="w-6 h-6 text-primary" />
+                <h2 className="font-display text-xl text-foreground">After Parties</h2>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Manage events, view RSVPs, send recaps, and generate artist links.
+              </p>
+            </Link>
+
+            <Link
+              to={`/admin/lls?key=${key}`}
+              className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Music className="w-6 h-6 text-primary" />
+                <h2 className="font-display text-xl text-foreground">LLS Submissions</h2>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Review song submissions, update statuses, and manage notes.
+              </p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default Admin;
