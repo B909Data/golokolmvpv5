@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+const PUBLIC_BASE_URL = "https://golokol.app";
+
 interface EventData {
   id: string;
   title: string;
@@ -14,6 +16,7 @@ interface EventData {
   start_at: string;
   city: string;
   venue_name: string;
+  artist_access_token: string;
 }
 
 const CreateAfterpartySuccess = () => {
@@ -54,11 +57,14 @@ const CreateAfterpartySuccess = () => {
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${label} copied to clipboard`);
+    toast.success(`${label} copied`);
   };
 
-  const publicUrl = event ? `${window.location.origin}/after-party/${event.id}` : "";
-  const recapUrl = event ? `${window.location.origin}/after-party/${event.id}/recap?admin=1` : "";
+  const publicRsvpUrl = event ? `${PUBLIC_BASE_URL}/after-party/${event.id}/rsvp` : "";
+  const adminRecapUrl = event ? `${PUBLIC_BASE_URL}/after-party/${event.id}/recap` : "";
+  const artistControlsUrl = event?.artist_access_token 
+    ? `${PUBLIC_BASE_URL}/artist/event/${event.id}?token=${event.artist_access_token}` 
+    : "";
 
   if (isVerifying) {
     return (
@@ -125,58 +131,94 @@ const CreateAfterpartySuccess = () => {
               </div>
 
               <div className="space-y-4">
+                {/* Public RSVP Link */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    Public Event Link
+                    Public RSVP Link
                   </label>
                   <div className="flex gap-2">
                     <input
                       readOnly
-                      value={publicUrl}
+                      value={publicRsvpUrl}
                       className="flex-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
                     />
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => copyToClipboard(publicUrl, "Public link")}
+                      onClick={() => copyToClipboard(publicRsvpUrl, "Public RSVP link")}
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="icon" asChild>
-                      <a href={publicUrl} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    Admin / Recap Link
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      readOnly
-                      value={recapUrl}
-                      className="flex-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => copyToClipboard(recapUrl, "Admin link")}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" asChild>
-                      <a href={recapUrl} target="_blank" rel="noopener noreferrer">
+                      <a href={publicRsvpUrl} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Save this link! You'll need it to access your event recap.
+                    Share this with fans to let them RSVP.
                   </p>
                 </div>
+
+                {/* Admin Recap Link */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
+                    Admin Recap Link
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      readOnly
+                      value={adminRecapUrl}
+                      className="flex-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => copyToClipboard(adminRecapUrl, "Admin recap link")}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" asChild>
+                      <a href={adminRecapUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Use this to access the event recap after it ends.
+                  </p>
+                </div>
+
+                {/* Artist Controls Link */}
+                {artistControlsUrl && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">
+                      Artist Controls Link
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        readOnly
+                        value={artistControlsUrl}
+                        className="flex-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => copyToClipboard(artistControlsUrl, "Artist controls link")}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" asChild>
+                        <a href={artistControlsUrl} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Private link to manage your event, pin messages, and moderate chat.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
