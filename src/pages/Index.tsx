@@ -51,14 +51,6 @@ const Index = () => {
                 </Button>
               </Link>
             </div>
-            <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
-              <Link to="/submit-song">
-                <Button variant="secondary" size="lg">
-                  SUBMIT A SONG
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
-            </div>
           </div>
         </div>
       </section>
