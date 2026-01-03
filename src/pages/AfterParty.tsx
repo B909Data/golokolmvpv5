@@ -64,42 +64,54 @@ const AfterParty = () => {
     retry: false,
   });
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center p-8">
+          <p>Loading...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center p-8">
+          <p>Event not found</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 flex items-center justify-center p-8">
-        <div className="bg-muted border border-border rounded-lg p-6 max-w-xl w-full font-mono text-sm">
-          <h2 className="text-lg font-bold mb-4">Debug: AfterParty</h2>
-          
-          <div className="space-y-2">
-            <p><strong>supabaseUrl (env):</strong> {import.meta.env.VITE_SUPABASE_URL ?? "undefined"}</p>
-            <p><strong>supabaseUrl (client):</strong> {(supabase as any).supabaseUrl ?? "undefined"}</p>
-            <p><strong>eventId:</strong> {eventId ?? <span className="text-destructive">Missing eventId</span>}</p>
-            <p><strong>loading:</strong> {String(isLoading)}</p>
-            <p><strong>error:</strong> {error ? <span className="text-destructive">{JSON.stringify(error, null, 2)}</span> : "null"}</p>
-            <div>
-              <strong>event:</strong>
-              <pre className="mt-1 bg-background p-2 rounded overflow-auto max-h-48">
-                {event ? JSON.stringify(event, null, 2) : "null"}
-              </pre>
-            </div>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">{event.title}</h1>
+          <p className="mt-2 text-muted-foreground">{event.status}</p>
 
-            {joinedAttendeeId && (
-              <p className="mt-4 text-green-600 font-bold">Joined ✅ attendee_id: {joinedAttendeeId}</p>
-            )}
-
-            {joinError && (
-              <p className="mt-4 text-destructive"><strong>Join error:</strong> {joinError}</p>
-            )}
-
-            <Button 
-              onClick={handleJoinAfterParty} 
-              disabled={isJoining || !eventId}
-              className="mt-4"
-            >
-              {isJoining ? "Joining..." : "Join After Party"}
-            </Button>
-          </div>
+          {joinedAttendeeId ? (
+            <p className="mt-6 font-medium">You're in.</p>
+          ) : (
+            <>
+              {joinError && (
+                <p className="mt-4 text-destructive">{joinError}</p>
+              )}
+              <Button
+                onClick={handleJoinAfterParty}
+                disabled={isJoining}
+                className="mt-6"
+              >
+                {isJoining ? "Joining..." : "Join After Party"}
+              </Button>
+            </>
+          )}
         </div>
       </main>
       <Footer />
