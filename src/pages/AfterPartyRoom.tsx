@@ -2,11 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
+import { Image, Smile, Film } from "lucide-react";
 
 type EventData = {
   id: string;
@@ -30,7 +29,6 @@ const AfterPartyRoom = () => {
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Check if user has joined - redirect to lobby if not
   const attendeeId = eventId ? localStorage.getItem(`afterparty-attendee-${eventId}`) : null;
 
   useEffect(() => {
@@ -120,110 +118,131 @@ const AfterPartyRoom = () => {
   };
 
   if (!attendeeId) {
-    return null; // Will redirect
+    return null;
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center p-8">
-          <p className="text-foreground">Loading...</p>
-        </main>
-        <Footer />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     );
   }
 
   if (!event) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center p-8">
-          <p className="text-foreground">Event not found</p>
-        </main>
-        <Footer />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Event not found</p>
       </div>
     );
   }
 
   const formattedDate = (() => {
     try {
-      return format(new Date(event.start_at), "EEEE, MMMM d, yyyy 'at' h:mm a");
+      return format(new Date(event.start_at), "EEEE, MMMM d · h:mm a");
     } catch {
       return event.start_at;
     }
   })();
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <main className="flex-1 flex flex-col w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Room Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{event.title}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{formattedDate}</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            {attendeeCount} {attendeeCount === 1 ? "person" : "people"} here
-          </p>
-        </div>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Flush Header */}
+      <header className="px-6 pt-8 pb-4">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
+          {event.title}
+        </h1>
+        <p className="text-muted-foreground mt-1">{formattedDate}</p>
+        <p className="text-muted-foreground/60 text-sm mt-2">
+          {attendeeCount} {attendeeCount === 1 ? "person" : "people"} here
+        </p>
+      </header>
 
-        {/* Pinned / Agenda Area */}
-        <div className="bg-card border border-border rounded-lg p-4 mb-6">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Pinned</p>
-          <p className="text-sm text-foreground">
-            Welcome to the After Party. Be respectful. Artist note coming soon.
-          </p>
-        </div>
+      {/* Pinned / Stage Area */}
+      <div className="px-6 py-4 border-b border-border/30">
+        <p className="text-xs uppercase tracking-widest text-muted-foreground/50 mb-1">
+          Pinned
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Welcome to the After Party. Be respectful. Artist note coming soon.
+        </p>
+      </div>
 
-        {/* Messages Area - takes remaining space */}
-        <div className="flex-1 min-h-[40vh] max-h-[60vh] overflow-y-auto border border-border rounded-lg p-4 mb-4 bg-card">
-          {messages.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              No messages yet. Start the conversation!
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {messages.map((msg) => (
-                <div key={msg.id} className="flex flex-col">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xs font-semibold text-primary capitalize">{msg.role}</span>
-                    <span className="text-xs text-muted-foreground">{formatTime(msg.created_at)}</span>
-                  </div>
-                  <p className="text-sm text-foreground mt-0.5">{msg.message}</p>
+      {/* Message Stream */}
+      <main className="flex-1 overflow-y-auto px-6 py-6 pb-32">
+        {messages.length === 0 ? (
+          <p className="text-muted-foreground/50 text-center py-16">
+            No messages yet. Start the conversation.
+          </p>
+        ) : (
+          <div className="space-y-6">
+            {messages.map((msg) => (
+              <div key={msg.id} className="group">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-sm font-medium text-primary capitalize">
+                    {msg.role}
+                  </span>
+                  <span className="text-xs text-muted-foreground/40">
+                    {formatTime(msg.created_at)}
+                  </span>
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-          )}
-        </div>
-
-        {/* Message Composer - sticky at bottom */}
-        <div className="sticky bottom-0 bg-background pt-2 pb-4 border-t border-border -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-          <div className="flex gap-3 max-w-4xl mx-auto">
-            <Input
-              placeholder="Type a message..."
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              disabled={isSending}
-              className="flex-1"
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!messageText.trim() || isSending}
-            >
-              {isSending ? "Sending..." : "Send"}
-            </Button>
+                <p className="text-foreground mt-1 leading-relaxed">
+                  {msg.message}
+                </p>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
-        </div>
+        )}
       </main>
-      <Footer />
+
+      {/* Composer */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/30 px-4 py-4">
+        <div className="flex items-center gap-3 max-w-4xl mx-auto">
+          <button
+            type="button"
+            className="p-2 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+            aria-label="Add image"
+          >
+            <Image size={20} />
+          </button>
+          <button
+            type="button"
+            className="p-2 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+            aria-label="Add GIF"
+          >
+            <Film size={20} />
+          </button>
+          <button
+            type="button"
+            className="p-2 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+            aria-label="Add emoji"
+          >
+            <Smile size={20} />
+          </button>
+          <Input
+            placeholder="Type a message…"
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            disabled={isSending}
+            className="flex-1 bg-transparent border-none shadow-none focus-visible:ring-0 placeholder:text-muted-foreground/40"
+          />
+          <Button
+            onClick={handleSendMessage}
+            disabled={!messageText.trim() || isSending}
+            size="sm"
+            className="px-6"
+          >
+            {isSending ? "…" : "Send"}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
