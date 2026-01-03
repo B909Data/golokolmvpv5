@@ -9,6 +9,7 @@ import Songs from "./pages/Songs";
 import SongDetail from "./pages/SongDetail";
 import AfterpartyDetail from "./pages/AfterpartyDetail";
 import AfterParty from "./pages/AfterParty";
+import AfterPartyRoom from "./pages/AfterPartyRoom";
 import CreateAfterparty from "./pages/CreateAfterparty";
 import Checkin from "./pages/Checkin";
 import SubmitSong from "./pages/SubmitSong";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/song/:slug" element={<SongDetail />} />
           <Route path="/afterparty/:slug" element={<AfterpartyDetail />} />
           <Route path="/after-party/:eventId" element={<AfterParty />} />
+          <Route path="/after-party/:eventId/room" element={<AfterPartyRoom />} />
           <Route path="/create-afterparty" element={<CreateAfterparty />} />
           <Route path="/checkin/:qr_token" element={<Checkin />} />
           <Route path="/submit-song" element={<SubmitSong />} />
