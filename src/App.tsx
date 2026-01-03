@@ -11,6 +11,8 @@ import AfterpartyDetail from "./pages/AfterpartyDetail";
 import AfterParty from "./pages/AfterParty";
 import AfterPartyRoom from "./pages/AfterPartyRoom";
 import AfterPartyRecap from "./pages/AfterPartyRecap";
+import RSVPAfterParty from "./pages/RSVPAfterParty";
+import RSVPConfirmed from "./pages/RSVPConfirmed";
 import CreateAfterparty from "./pages/CreateAfterparty";
 import CreateAfterpartySuccess from "./pages/CreateAfterpartySuccess";
 import Checkin from "./pages/Checkin";
@@ -35,6 +37,8 @@ const App = () => (
           <Route path="/song/:slug" element={<SongDetail />} />
           <Route path="/afterparty/:slug" element={<AfterpartyDetail />} />
           <Route path="/after-party/:eventId" element={<AfterParty />} />
+          <Route path="/after-party/:eventId/rsvp" element={<RSVPAfterParty />} />
+          <Route path="/after-party/:eventId/rsvp/confirmed" element={<RSVPConfirmed />} />
           <Route path="/after-party/:eventId/room" element={<AfterPartyRoom />} />
           <Route path="/after-party/:eventId/recap" element={<AfterPartyRecap />} />
           <Route path="/create-afterparty" element={<CreateAfterparty />} />
