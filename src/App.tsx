@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
 import Songs from "./pages/Songs";
+import SongsSuccess from "./pages/SongsSuccess";
 import SongDetail from "./pages/SongDetail";
 import AfterpartyDetail from "./pages/AfterpartyDetail";
 import AfterParty from "./pages/AfterParty";
@@ -21,6 +22,7 @@ import Checkin from "./pages/Checkin";
 import SubmitSong from "./pages/SubmitSong";
 import HowToGoLokol from "./pages/HowToGoLokol";
 import FindAfterParty from "./pages/FindAfterParty";
+import AdminLLS from "./pages/AdminLLS";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,8 @@ const App = () => (
           <Route path="/shows" element={<Shows />} />
           <Route path="/find-after-party" element={<FindAfterParty />} />
           <Route path="/songs" element={<Songs />} />
+          <Route path="/songs/success" element={<SongsSuccess />} />
+          <Route path="/admin/lls" element={<AdminLLS />} />
           <Route path="/song/:slug" element={<SongDetail />} />
           <Route path="/afterparty/:slug" element={<AfterpartyDetail />} />
           <Route path="/after-party/:eventId" element={<AfterParty />} />

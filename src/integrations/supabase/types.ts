@@ -230,6 +230,48 @@ export type Database = {
           },
         ]
       }
+      submissions: {
+        Row: {
+          admin_notes: string | null
+          artist_name: string
+          contact_email: string
+          created_at: string
+          id: string
+          notes: string | null
+          song_title: string
+          spotify_url: string
+          status: string
+          stripe_session_id: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          artist_name: string
+          contact_email: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          song_title: string
+          spotify_url: string
+          status?: string
+          stripe_session_id?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          artist_name?: string
+          contact_email?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          song_title?: string
+          spotify_url?: string
+          status?: string
+          stripe_session_id?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
