@@ -155,7 +155,12 @@ const CreateAfterparty = () => {
       }
 
       if (response?.url) {
-        window.location.href = response.url;
+        // Use top-level navigation to escape iframe (Stripe Checkout cannot run in iframe)
+        if (window.top) {
+          window.top.location.href = response.url;
+        } else {
+          window.location.href = response.url;
+        }
       } else if (response?.error) {
         setCheckoutError(response.error);
         toast.error(response.error);
