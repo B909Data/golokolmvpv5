@@ -14,3 +14,15 @@ verify_jwt = false
 
 [functions.verify-afterparty-payment]
 verify_jwt = false
+
+[functions.create-lls-checkout]
+verify_jwt = false
+
+[functions.verify-lls-payment]
+verify_jwt = false
+
+[functions.admin-list-submissions]
+verify_jwt = false
+
+[functions.admin-update-submission]
+verify_jwt = false
