@@ -40,13 +40,21 @@ const Index = () => {
               className="text-xl text-muted-foreground mb-8 max-w-xl mx-auto animate-slide-up"
               style={{ animationDelay: "0.1s" }}
             >
-              GoLokol helps local artists and fans find each othe.
+              GoLokol helps local artists and fans find each other.
             </p>
 
             <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
               <Link to="/create-afterparty">
                 <Button variant="secondary" size="lg">
-                  r CREATE AN AFTER PARTY
+                  CREATE AN AFTER PARTY
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+            <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
+              <Link to="/submit-song">
+                <Button variant="secondary" size="lg">
+                  SUBMIT A SONG
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
