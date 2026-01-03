@@ -12,6 +12,7 @@ import AfterParty from "./pages/AfterParty";
 import AfterPartyRoom from "./pages/AfterPartyRoom";
 import AfterPartyRecap from "./pages/AfterPartyRecap";
 import CreateAfterparty from "./pages/CreateAfterparty";
+import CreateAfterpartySuccess from "./pages/CreateAfterpartySuccess";
 import Checkin from "./pages/Checkin";
 import SubmitSong from "./pages/SubmitSong";
 import HowToGoLokol from "./pages/HowToGoLokol";
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/after-party/:eventId/room" element={<AfterPartyRoom />} />
           <Route path="/after-party/:eventId/recap" element={<AfterPartyRecap />} />
           <Route path="/create-afterparty" element={<CreateAfterparty />} />
+          <Route path="/create-afterparty/success" element={<CreateAfterpartySuccess />} />
           <Route path="/checkin/:qr_token" element={<Checkin />} />
           <Route path="/submit-song" element={<SubmitSong />} />
           <Route path="/how-to-golokol" element={<HowToGoLokol />} />
