@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
 
 type EventData = {
   id: string;
@@ -14,6 +16,29 @@ type EventData = {
 
 const AfterParty = () => {
   const { eventId } = useParams<{ eventId: string }>();
+  const [joinedAttendeeId, setJoinedAttendeeId] = useState<string | null>(null);
+  const [joinError, setJoinError] = useState<string | null>(null);
+  const [isJoining, setIsJoining] = useState(false);
+
+  const handleJoinAfterParty = async () => {
+    if (!eventId) return;
+    setIsJoining(true);
+    setJoinError(null);
+
+    const { data, error } = await supabase
+      .from("attendees")
+      .insert({ event_id: eventId, checkin_method: "qr" })
+      .select("id")
+      .single();
+
+    setIsJoining(false);
+
+    if (error) {
+      setJoinError(error.message);
+    } else if (data) {
+      setJoinedAttendeeId(data.id);
+    }
+  };
 
   const { data: event, isLoading, error } = useQuery({
     queryKey: ["event", eventId],
@@ -58,11 +83,23 @@ const AfterParty = () => {
                 {event ? JSON.stringify(event, null, 2) : "null"}
               </pre>
             </div>
-          </div>
 
-          {!eventId && (
-            <p className="mt-4 text-destructive font-bold">Missing eventId</p>
-          )}
+            {joinedAttendeeId && (
+              <p className="mt-4 text-green-600 font-bold">Joined ✅ attendee_id: {joinedAttendeeId}</p>
+            )}
+
+            {joinError && (
+              <p className="mt-4 text-destructive"><strong>Join error:</strong> {joinError}</p>
+            )}
+
+            <Button 
+              onClick={handleJoinAfterParty} 
+              disabled={isJoining || !eventId}
+              className="mt-4"
+            >
+              {isJoining ? "Joining..." : "Join After Party"}
+            </Button>
+          </div>
         </div>
       </main>
       <Footer />
