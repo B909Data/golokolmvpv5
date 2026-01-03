@@ -1,0 +1,1 @@
+ALTER TABLE public.events ADD COLUMN after_party_enabled BOOLEAN NOT NULL DEFAULT false;
