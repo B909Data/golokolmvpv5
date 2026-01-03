@@ -14,7 +14,183 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      after_party_messages: {
+        Row: {
+          attendee_id: string
+          created_at: string | null
+          event_id: string
+          id: string
+          role: Database["public"]["Enums"]["message_role"]
+        }
+        Insert: {
+          attendee_id: string
+          created_at?: string | null
+          event_id: string
+          id?: string
+          role?: Database["public"]["Enums"]["message_role"]
+        }
+        Update: {
+          attendee_id?: string
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          role?: Database["public"]["Enums"]["message_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "after_party_messages_attendee_id_fkey"
+            columns: ["attendee_id"]
+            isOneToOne: false
+            referencedRelation: "attendees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "after_party_messages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendees: {
+        Row: {
+          checkin_method: Database["public"]["Enums"]["checkin_method"]
+          created_at: string | null
+          display_name: string | null
+          event_id: string
+          id: string
+          phone: string | null
+        }
+        Insert: {
+          checkin_method?: Database["public"]["Enums"]["checkin_method"]
+          created_at?: string | null
+          display_name?: string | null
+          event_id: string
+          id?: string
+          phone?: string | null
+        }
+        Update: {
+          checkin_method?: Database["public"]["Enums"]["checkin_method"]
+          created_at?: string | null
+          display_name?: string | null
+          event_id?: string
+          id?: string
+          phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      badges: {
+        Row: {
+          artist_id: string | null
+          attendee_id: string
+          badge: Database["public"]["Enums"]["badge_type"]
+          count: number
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          artist_id?: string | null
+          attendee_id: string
+          badge: Database["public"]["Enums"]["badge_type"]
+          count?: number
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          artist_id?: string | null
+          attendee_id?: string
+          badge?: Database["public"]["Enums"]["badge_type"]
+          count?: number
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "badges_attendee_id_fkey"
+            columns: ["attendee_id"]
+            isOneToOne: false
+            referencedRelation: "attendees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          after_party_opens_at: string | null
+          created_at: string | null
+          ends_at: string | null
+          id: string
+          start_at: string
+          status: Database["public"]["Enums"]["event_status"]
+          title: string
+          type: Database["public"]["Enums"]["event_type"]
+        }
+        Insert: {
+          after_party_opens_at?: string | null
+          created_at?: string | null
+          ends_at?: string | null
+          id?: string
+          start_at: string
+          status?: Database["public"]["Enums"]["event_status"]
+          title: string
+          type: Database["public"]["Enums"]["event_type"]
+        }
+        Update: {
+          after_party_opens_at?: string | null
+          created_at?: string | null
+          ends_at?: string | null
+          id?: string
+          start_at?: string
+          status?: Database["public"]["Enums"]["event_status"]
+          title?: string
+          type?: Database["public"]["Enums"]["event_type"]
+        }
+        Relationships: []
+      }
+      recaps: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          event_id: string
+          generated_at: string | null
+          id: string
+          share_token: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          event_id: string
+          generated_at?: string | null
+          id?: string
+          share_token?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          event_id?: string
+          generated_at?: string | null
+          id?: string
+          share_token?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recaps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +199,11 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      badge_type: "first_show" | "repeat_show"
+      checkin_method: "qr"
+      event_status: "upcoming" | "live" | "ended"
+      event_type: "lls" | "after_party"
+      message_role: "fan" | "artist"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +330,12 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      badge_type: ["first_show", "repeat_show"],
+      checkin_method: ["qr"],
+      event_status: ["upcoming", "live", "ended"],
+      event_type: ["lls", "after_party"],
+      message_role: ["fan", "artist"],
+    },
   },
 } as const
