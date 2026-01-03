@@ -1,14 +1,15 @@
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 const AfterPartyRecap = () => {
+  const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>();
   const [searchParams] = useSearchParams();
   const attendeeId = eventId ? localStorage.getItem(`afterparty-attendee-${eventId}`) : null;
@@ -16,6 +17,13 @@ const AfterPartyRecap = () => {
   
   const [isSending, setIsSending] = useState(false);
   const [hasSent, setHasSent] = useState(false);
+
+  // Redirect to lobby if no attendee_id (unless admin mode)
+  useEffect(() => {
+    if (!attendeeId && !isAdminMode && eventId) {
+      navigate(`/after-party/${eventId}`, { replace: true });
+    }
+  }, [attendeeId, isAdminMode, eventId, navigate]);
 
   // Check if current attendee is an artist
   const { data: attendeeRole } = useQuery({
