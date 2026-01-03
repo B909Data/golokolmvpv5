@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
-import { Image, Smile, Film } from "lucide-react";
+import { Image, Smile, Film, FileText } from "lucide-react";
 
 type EventData = {
   id: string;
@@ -27,6 +27,7 @@ const AfterPartyRoom = () => {
   const navigate = useNavigate();
   const [messageText, setMessageText] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [isCreatingRecap, setIsCreatingRecap] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const attendeeId = eventId ? localStorage.getItem(`afterparty-attendee-${eventId}`) : null;
@@ -108,6 +109,24 @@ const AfterPartyRoom = () => {
     }
   };
 
+  const handleCreateRecap = async () => {
+    if (!eventId || !event) return;
+
+    setIsCreatingRecap(true);
+    const headline = `After Party — ${event.title}`;
+
+    const { error } = await supabase.from("recaps").insert({
+      event_id: eventId,
+      content: headline,
+    });
+
+    setIsCreatingRecap(false);
+
+    if (!error) {
+      navigate(`/after-party/${eventId}/recap`);
+    }
+  };
+
   const formatTime = (dateString: string | null) => {
     if (!dateString) return "";
     try {
@@ -159,13 +178,25 @@ const AfterPartyRoom = () => {
       </header>
 
       {/* Pinned / Stage Area */}
-      <div className="px-6 py-4 border-b border-border/30">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground/50 mb-1">
-          Pinned
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Welcome to the After Party. Be respectful. Artist note coming soon.
-        </p>
+      <div className="px-6 py-4 border-b border-border/30 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground/50 mb-1">
+            Pinned
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Welcome to the After Party. Be respectful. Artist note coming soon.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCreateRecap}
+          disabled={isCreatingRecap}
+          className="shrink-0"
+        >
+          <FileText size={16} className="mr-2" />
+          {isCreatingRecap ? "Creating..." : "Create Recap"}
+        </Button>
       </div>
 
       {/* Message Stream */}
