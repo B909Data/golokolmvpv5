@@ -47,6 +47,8 @@ const AfterParty = () => {
           <h2 className="text-lg font-bold mb-4">Debug: AfterParty</h2>
           
           <div className="space-y-2">
+            <p><strong>supabaseUrl (env):</strong> {import.meta.env.VITE_SUPABASE_URL ?? "undefined"}</p>
+            <p><strong>supabaseUrl (client):</strong> {(supabase as any).supabaseUrl ?? "undefined"}</p>
             <p><strong>eventId:</strong> {eventId ?? <span className="text-destructive">Missing eventId</span>}</p>
             <p><strong>loading:</strong> {String(isLoading)}</p>
             <p><strong>error:</strong> {error ? <span className="text-destructive">{JSON.stringify(error, null, 2)}</span> : "null"}</p>
