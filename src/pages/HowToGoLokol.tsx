@@ -38,33 +38,21 @@ const HowToGoLokol = () => {
             <header className="mb-12">
               <h1 className="font-display text-4xl md:text-5xl font-black text-[#0E0E0E] mb-6">How GoLokol Works</h1>
               <p className="text-xl md:text-2xl text-[#555555] leading-relaxed font-medium">
-                Good music lives here, and it lives in real rooms with real people.
+                A better way to take fans home after the show.
               </p>
             </header>
 
-            {/* Intro */}
-            <div className="mb-12">
-              <Paragraph>
-                GoLokol is built around live shows and local scenes.
-                <br />
-                Not algorithms. Not endless content. Not follower counts.
-              </Paragraph>
-              <Paragraph>Here's what to expect After Parties and Lokol Listening Sessions.</Paragraph>
-            </div>
-
-            {/* After Parties Section */}
-            <SectionHeader>After Parties (What happens after the show)</SectionHeader>
-
             <SubHeader>What an After Party is</SubHeader>
-            <Paragraph>After Parties are temporary, event-only group chats that open after a show.</Paragraph>
+            <Paragraph>
+              After Parties are temporary, event-only group chats that open after a show and disappear 3 day slater.
+            </Paragraph>
             <Paragraph>
               They're not public feeds.
               <br />
               They're not permanent communities.
               <br />
-              They're not another place to perform.
+              They're only for those who were there.
             </Paragraph>
-            <Paragraph>They're a shared room for the people who were actually there.</Paragraph>
 
             {/* For Fans */}
             <SubHeader>For fans: How After Parties work</SubHeader>
@@ -78,28 +66,24 @@ const HowToGoLokol = () => {
 
             <SubSubHeader>Inside the After Party:</SubSubHeader>
             <ul className="space-y-3 text-[#0E0E0E] mb-6">
-              <CheckBullet>Chat with the artist</CheckBullet>
+              <CheckBullet>Show afterglow with the artist</CheckBullet>
               <CheckBullet>Conversation with other fans who were there</CheckBullet>
-              <CheckBullet>Exclusive drops, livestream links, or whatever the artist imagines</CheckBullet>
+              <CheckBullet>Exclusive drops, livestream links, or whatever the band imagines</CheckBullet>
             </ul>
-
-            <Paragraph>After Parties last 3 days from the show date.</Paragraph>
-            <Paragraph>
-              If you weren't there, you don't experience it.
-              <br />
-              That's the point.
-            </Paragraph>
 
             {/* For Artists */}
             <SubHeader>For artists: How After Parties work?</SubHeader>
-            <Paragraph>After setting up and paying for an after party (only $14.99). You'll receive:</Paragraph>
+            <Paragraph>
+              After setting up and paying for an after party (only $9.99), as needed. No subscriptions. You'll receive:
+            </Paragraph>
             <ul className="space-y-3 text-[#0E0E0E] mb-6">
+              <CheckBullet>An email with suggestions of how to throw one.</CheckBullet>
               <CheckBullet>
-                A promo link to your RSVP page to share with your fans on socials, website or flyers.
+                A promo link to your RSVP page to share with your fans on your socials, website or flyer.
               </CheckBullet>
-              <CheckBullet>Create an experience for those who show up.</CheckBullet>
-              <CheckBullet>Connections that last until the next show</CheckBullet>
-              <CheckBullet>Your data. No overwhelm.</CheckBullet>
+              <CheckBullet>
+                Authentic and automated ways to notify and incentivize their return to the next show
+              </CheckBullet>
             </ul>
 
             {/* Poster Placeholder */}
@@ -108,57 +92,27 @@ const HowToGoLokol = () => {
                 <span className="text-[#888888] text-sm">[insert poster sample]</span>
               </div>
             </div>
-
-            <Paragraph>The day of the show you're sent a link. When you check in, the After Party begins.</Paragraph>
-            <Paragraph>We suggest you post a quick welcome greeting to fans who will show up later.</Paragraph>
-            <ol className="list-decimal list-outside ml-6 space-y-3 text-[#0E0E0E] mb-6">
-              <li className="pl-2">Invite more people to the after party from the stage.</li>
-              <li className="pl-2">
-                Tell your fans who RSVP to meet you at the merch table to get access to your after party
-              </li>
-              <li className="pl-2">Scan their QR Code to give them access.</li>
-            </ol>
-
-            <Paragraph>After Parties are:</Paragraph>
+            <SubHeader>For your fans and new fans</SubHeader>
             <ul className="space-y-3 text-[#0E0E0E] mb-6">
-              <CheckBullet>Optional</CheckBullet>
-              <CheckBullet>Lightweight</CheckBullet>
-              <CheckBullet>Short-lived</CheckBullet>
+              <CheckBullet>Invite more people to the after party from the stage.</CheckBullet>
+              <CheckBullet>
+                Tell your fans who RSVP to meet you at the merch table to get access to your after party
+              </CheckBullet>
+              <CheckBullet>Scan their QR Code to give them access.</CheckBullet>
+              <CheckBullet>
+                he day of the show you're sent a link. When you check in, the After Party begins.
+              </CheckBullet>
             </ul>
-
-            <Paragraph>
-              They're not meant to be managed forever.
-              <br />
-              They're meant to extend the energy of the night and get new fans to become community.
-            </Paragraph>
 
             {/* Important Things to Know */}
             <SectionHeader>A few important things to know</SectionHeader>
 
-            <SubHeader>After Parties are not social media</SubHeader>
-            <Paragraph>
-              There are no feeds to maintain.
-              <br />
-              No posting schedules.
-              <br />
-              No pressure to perform online.
-            </Paragraph>
-            <Paragraph>GoLokol is about:</Paragraph>
             <ul className="space-y-3 text-[#0E0E0E] mb-6">
-              <CheckBullet>Being present</CheckBullet>
-              <CheckBullet>Showing up</CheckBullet>
-              <CheckBullet>Letting moments exist, then end</CheckBullet>
+              <CheckBullet>There are no feeds to maintain.</CheckBullet>
+              <CheckBullet> No pressure to be other than who you want to be to your fans</CheckBullet>
+              <CheckBullet>After Parties are not social media</CheckBullet>
+              <CheckBullet>After Parties appear, happen and diapear right on GoLokol</CheckBullet>
             </ul>
-
-            <SubHeader>WhatsApp is required for After Parties</SubHeader>
-            <Paragraph>After Parties happen on WhatsApp.</Paragraph>
-            <Paragraph>You don't need WhatsApp to:</Paragraph>
-            <ul className="space-y-3 text-[#0E0E0E] mb-6">
-              <CheckBullet>RSVP</CheckBullet>
-              <CheckBullet>Attend a show</CheckBullet>
-              <CheckBullet>Support artists</CheckBullet>
-            </ul>
-            <Paragraph>You only need it if you want to participate in the After Party chat.</Paragraph>
 
             {/* LLS Section */}
             <SectionHeader>Lokol Listening Sessions (LLS)</SectionHeader>
