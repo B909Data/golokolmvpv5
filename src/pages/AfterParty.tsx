@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 
 type EventData = {
@@ -20,6 +22,8 @@ const AfterParty = () => {
   const navigate = useNavigate();
   const [joinError, setJoinError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [displayName, setDisplayName] = useState("");
 
   // Check if already joined
   const existingAttendeeId = eventId ? localStorage.getItem(`afterparty-attendee-${eventId}`) : null;
@@ -33,12 +37,30 @@ const AfterParty = () => {
 
   const handleJoinAfterParty = async () => {
     if (!eventId) return;
+    
+    const trimmedPhone = phone.trim();
+    const trimmedName = displayName.trim();
+    
+    if (!trimmedPhone) {
+      setJoinError("Phone number is required");
+      return;
+    }
+    if (!trimmedName) {
+      setJoinError("Display name is required");
+      return;
+    }
+    
     setIsJoining(true);
     setJoinError(null);
 
     const { data, error } = await supabase
       .from("attendees")
-      .insert({ event_id: eventId, checkin_method: "qr" })
+      .insert({ 
+        event_id: eventId, 
+        checkin_method: "qr",
+        phone: trimmedPhone,
+        display_name: trimmedName
+      })
       .select("id")
       .single();
 
@@ -47,9 +69,7 @@ const AfterParty = () => {
     if (error) {
       setJoinError(error.message);
     } else if (data) {
-      // Persist attendee ID in localStorage
       localStorage.setItem(`afterparty-attendee-${eventId}`, data.id);
-      // Navigate to room
       navigate(`/after-party/${eventId}/room`);
     }
   };
@@ -115,16 +135,42 @@ const AfterParty = () => {
     }
   })();
 
+  const isFormValid = phone.trim() && displayName.trim();
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-1 flex flex-col items-center justify-center p-8">
-        <div className="text-center max-w-md">
+        <div className="text-center max-w-md w-full">
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">{event.title}</h1>
           <p className="text-muted-foreground mb-4">{formattedDate}</p>
           <p className="text-muted-foreground mb-8">
             {attendeeCount} {attendeeCount === 1 ? "person" : "people"} here
           </p>
+
+          <div className="space-y-4 text-left mb-6">
+            <div className="space-y-2">
+              <Label htmlFor="displayName">Your Name</Label>
+              <Input
+                id="displayName"
+                placeholder="Enter your name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                disabled={isJoining}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="Enter your phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={isJoining}
+              />
+            </div>
+          </div>
 
           {joinError && (
             <p className="text-destructive mb-4 text-sm">{joinError}</p>
@@ -133,8 +179,8 @@ const AfterParty = () => {
           <Button
             size="lg"
             onClick={handleJoinAfterParty}
-            disabled={isJoining}
-            className="px-8 py-6 text-lg"
+            disabled={isJoining || !isFormValid}
+            className="px-8 py-6 text-lg w-full"
           >
             {isJoining ? "Joining..." : "Join After Party"}
           </Button>
