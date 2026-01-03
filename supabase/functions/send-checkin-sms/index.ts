@@ -6,10 +6,10 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface SendRsvpSmsRequest {
+interface SendCheckinSmsRequest {
   phone: string;
   eventTitle: string;
-  qrUrl: string;
+  roomUrl: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -19,12 +19,12 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { phone, eventTitle, qrUrl }: SendRsvpSmsRequest = await req.json();
+    const { phone, eventTitle, roomUrl }: SendCheckinSmsRequest = await req.json();
 
-    if (!phone || !eventTitle || !qrUrl) {
-      console.error("Missing required fields:", { phone: !!phone, eventTitle: !!eventTitle, qrUrl: !!qrUrl });
+    if (!phone || !eventTitle || !roomUrl) {
+      console.error("Missing required fields:", { phone: !!phone, eventTitle: !!eventTitle, roomUrl: !!roomUrl });
       return new Response(
-        JSON.stringify({ error: "phone, eventTitle, and qrUrl are required" }),
+        JSON.stringify({ error: "phone, eventTitle, and roomUrl are required" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
@@ -41,9 +41,9 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const messageBody = `GoLokol: You're RSVP'd for ${eventTitle}. Show this QR at the door to unlock the After Party: ${qrUrl}`;
+    const messageBody = `GoLokol: You're in 🎉 Join the After Party for ${eventTitle}: ${roomUrl}`;
     
-    console.log(`Sending RSVP SMS to ${phone}`);
+    console.log(`Sending check-in SMS to ${phone}`);
 
     const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
     
@@ -63,7 +63,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (response.ok) {
       const result = await response.json();
-      console.log("SMS sent successfully:", result.sid);
+      console.log("Check-in SMS sent successfully:", result.sid);
       return new Response(
         JSON.stringify({ success: true, messageSid: result.sid }),
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -77,7 +77,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
   } catch (error: any) {
-    console.error("Error in send-rsvp-sms function:", error);
+    console.error("Error in send-checkin-sms function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }

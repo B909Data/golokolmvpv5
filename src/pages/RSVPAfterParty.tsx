@@ -51,7 +51,10 @@ const RSVPAfterParty = () => {
     setIsSubmitting(true);
 
     try {
-      // Insert attendee
+      // Generate QR token
+      const qrToken = crypto.randomUUID();
+
+      // Insert attendee with qr_token
       const { data: attendee, error: insertError } = await supabase
         .from("attendees")
         .insert({
@@ -59,25 +62,27 @@ const RSVPAfterParty = () => {
           display_name: displayName.trim(),
           phone: phone.trim(),
           checkin_method: "qr",
+          qr_token: qrToken,
         })
         .select("id")
         .single();
 
       if (insertError) throw insertError;
 
-      // Send RSVP SMS
-      const publicEventUrl = `${window.location.origin}/after-party/${eventId}`;
+      // Send RSVP SMS with QR link
+      const qrUrl = `${window.location.origin}/after-party/${eventId}/qr/${qrToken}`;
       
       await supabase.functions.invoke("send-rsvp-sms", {
         body: {
           phone: phone.trim(),
           eventTitle: event?.title || "After Party",
-          eventUrl: publicEventUrl,
+          qrUrl,
         },
       });
 
-      // Store attendee ID for later use
+      // Store attendee ID and qr_token for later use
       localStorage.setItem(`attendee_${eventId}`, attendee.id);
+      localStorage.setItem(`attendee_qr_${eventId}`, qrToken);
 
       // Navigate to confirmation
       navigate(`/after-party/${eventId}/rsvp/confirmed`);

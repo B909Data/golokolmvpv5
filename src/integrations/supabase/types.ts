@@ -58,28 +58,34 @@ export type Database = {
       }
       attendees: {
         Row: {
+          checked_in_at: string | null
           checkin_method: Database["public"]["Enums"]["checkin_method"]
           created_at: string | null
           display_name: string | null
           event_id: string
           id: string
           phone: string | null
+          qr_token: string | null
         }
         Insert: {
+          checked_in_at?: string | null
           checkin_method?: Database["public"]["Enums"]["checkin_method"]
           created_at?: string | null
           display_name?: string | null
           event_id: string
           id?: string
           phone?: string | null
+          qr_token?: string | null
         }
         Update: {
+          checked_in_at?: string | null
           checkin_method?: Database["public"]["Enums"]["checkin_method"]
           created_at?: string | null
           display_name?: string | null
           event_id?: string
           id?: string
           phone?: string | null
+          qr_token?: string | null
         }
         Relationships: [
           {
