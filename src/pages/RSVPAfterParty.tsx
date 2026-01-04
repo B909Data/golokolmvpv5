@@ -80,7 +80,7 @@ const RSVPAfterParty = () => {
         localStorage.setItem(`attendee_qr_${eventId}`, existingAttendee.qr_token || "");
 
         toast({
-          title: "You're already RSVP'd",
+          title: "You are already on the list",
           description: "Check your texts for your QR code.",
         });
 
@@ -139,7 +139,7 @@ const RSVPAfterParty = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground font-sans">Loading...</p>
         </main>
         <Footer />
       </div>
@@ -151,7 +151,7 @@ const RSVPAfterParty = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
-          <p className="text-muted-foreground">Event not found.</p>
+          <p className="text-muted-foreground font-sans">Event not found.</p>
         </main>
         <Footer />
       </div>
@@ -164,50 +164,55 @@ const RSVPAfterParty = () => {
       <main className="flex-1 pt-24 pb-24 px-4">
         <div className="max-w-md mx-auto w-full">
           <div className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-              RSVP — {event.title}
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-2 uppercase">
+              RSVP
             </h1>
+            <h2 className="font-display text-xl text-primary mb-2">{event.title}</h2>
             {event.city && (
-              <p className="text-muted-foreground">{event.city}</p>
+              <p className="text-muted-foreground font-sans">{event.city}</p>
             )}
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="displayName">Your Name</Label>
-              <Input
-                id="displayName"
-                type="text"
-                placeholder="Enter your name"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                required
-              />
-            </div>
+          <div className="rounded-xl border-2 border-primary bg-background p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="displayName" className="text-foreground font-sans">Your Name</Label>
+                <Input
+                  id="displayName"
+                  type="text"
+                  placeholder="Enter your name"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  required
+                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+1 555 123 4567"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                We'll text you your QR code and event link.
-              </p>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-foreground font-sans">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+1 555 123 4567"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
+                />
+                <p className="text-xs text-muted-foreground font-sans">
+                  We will text you your QR code and event link.
+                </p>
+              </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "RSVP"}
-            </Button>
-          </form>
+              <Button
+                type="submit"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-sans"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "RSVP"}
+              </Button>
+            </form>
+          </div>
         </div>
       </main>
       <Footer />

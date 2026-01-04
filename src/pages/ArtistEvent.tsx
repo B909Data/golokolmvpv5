@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Mic, Save, Trash2, RefreshCw } from "lucide-react";
+import { Lock, Save, Trash2, RefreshCw } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -122,7 +122,7 @@ const ArtistEvent = () => {
         <section className="pt-32 pb-24 px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h1 className="font-display text-4xl text-foreground mb-4">Not authorized</h1>
-            <p className="text-muted-foreground">You don't have access to this page.</p>
+            <p className="text-muted-foreground font-sans">You do not have access to this page.</p>
           </div>
         </section>
         <Footer />
@@ -136,7 +136,7 @@ const ArtistEvent = () => {
         <Navbar />
         <section className="pt-32 pb-24 px-4">
           <div className="max-w-2xl mx-auto text-center">
-            <p className="text-muted-foreground">Loading...</p>
+            <p className="text-muted-foreground font-sans">Loading...</p>
           </div>
         </section>
         <Footer />
@@ -152,15 +152,20 @@ const ArtistEvent = () => {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <Mic className="w-8 h-8 text-primary" />
+              <Lock className="w-6 h-6 text-primary" />
               <div>
-                <h1 className="font-display text-3xl text-foreground">{event?.title}</h1>
-                <p className="text-muted-foreground text-sm">
-                  {event?.city} • {event?.start_at ? new Date(event.start_at).toLocaleDateString() : ""}
+                <div className="flex items-center gap-2">
+                  <h1 className="font-display text-3xl text-foreground">{event?.title}</h1>
+                  <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded font-sans uppercase tracking-wide">
+                    Private Link
+                  </span>
+                </div>
+                <p className="text-muted-foreground text-sm font-sans">
+                  {event?.city} · {event?.start_at ? new Date(event.start_at).toLocaleDateString() : ""}
                 </p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={fetchEvent} disabled={loading}>
+            <Button variant="outline" size="sm" onClick={fetchEvent} disabled={loading} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-sans">
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </Button>
@@ -170,52 +175,52 @@ const ArtistEvent = () => {
 
       <section className="px-4 pb-12">
         <div className="max-w-4xl mx-auto">
-          <div className="border border-border/50 rounded-lg p-6 bg-card/30 space-y-6">
-            <h2 className="font-display text-xl text-foreground">Event Settings</h2>
+          <div className="border-2 border-primary rounded-xl p-6 bg-background space-y-6">
+            <h2 className="font-display text-xl text-primary uppercase tracking-wide">Event Settings</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-muted-foreground mb-2">Pinned Message</label>
+                <label className="block text-sm text-primary mb-2 font-sans font-medium">Pinned Message</label>
                 <Textarea
                   value={pinnedMessage}
                   onChange={(e) => setPinnedMessage(e.target.value)}
                   placeholder="A message that will be pinned in the chat room..."
                   rows={3}
-                  className="bg-card/50 border-border/50"
+                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-muted-foreground mb-2">YouTube URL</label>
+                <label className="block text-sm text-primary mb-2 font-sans font-medium">YouTube URL</label>
                 <Input
                   value={youtubeUrl}
                   onChange={(e) => setYoutubeUrl(e.target.value)}
                   placeholder="https://youtube.com/watch?v=..."
-                  className="bg-card/50 border-border/50"
+                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-muted-foreground mb-2">Image URL</label>
+                <label className="block text-sm text-primary mb-2 font-sans font-medium">Image URL</label>
                 <Input
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://..."
-                  className="bg-card/50 border-border/50"
+                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-muted-foreground mb-2">Livestream URL</label>
+                <label className="block text-sm text-primary mb-2 font-sans font-medium">Livestream URL</label>
                 <Input
                   value={livestreamUrl}
                   onChange={(e) => setLivestreamUrl(e.target.value)}
                   placeholder="https://..."
-                  className="bg-card/50 border-border/50"
+                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
                 />
               </div>
 
-              <Button onClick={handleSave} disabled={saving}>
+              <Button onClick={handleSave} disabled={saving} className="bg-primary text-primary-foreground hover:bg-primary/90 font-sans">
                 <Save className="w-4 h-4 mr-2" />
                 {saving ? "Saving..." : "Save Changes"}
               </Button>
@@ -226,22 +231,22 @@ const ArtistEvent = () => {
 
       <section className="px-4 pb-24">
         <div className="max-w-4xl mx-auto">
-          <div className="border border-border/50 rounded-lg p-6 bg-card/30">
-            <h2 className="font-display text-xl text-foreground mb-4">Chat Messages ({messages.length})</h2>
+          <div className="border-2 border-primary rounded-xl p-6 bg-background">
+            <h2 className="font-display text-xl text-primary mb-4 uppercase tracking-wide">Chat Messages ({messages.length})</h2>
 
             {messages.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">No messages yet.</p>
+              <p className="text-muted-foreground text-center py-8 font-sans">No messages yet.</p>
             ) : (
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className="flex items-start justify-between gap-4 p-3 bg-card/50 rounded-lg border border-border/30"
+                    className="flex items-start justify-between gap-4 p-3 bg-muted/20 rounded-lg border border-border/30"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-foreground text-sm break-words">{msg.message || "(empty)"}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {msg.role} • {new Date(msg.created_at).toLocaleString()}
+                      <p className="text-foreground text-sm break-words font-sans">{msg.message || "(empty)"}</p>
+                      <p className="text-xs text-muted-foreground mt-1 font-sans">
+                        {msg.role} · {new Date(msg.created_at).toLocaleString()}
                       </p>
                     </div>
                     <Button
