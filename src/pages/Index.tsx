@@ -1,18 +1,8 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Radio, PlayCircle, Check } from "lucide-react";
+import { ArrowRight, PlayCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
-// Featured videos - minimal editorial
-const featuredVideos = [
-  {
-    label: "CITY-WIDE SOUNDS",
-  },
-  {
-    label: "LOKOL LIVE",
-  },
-];
 
 const Index = () => {
   return (
@@ -20,33 +10,21 @@ const Index = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden noise-overlay">
-        <div className="absolute inset-0 gradient-hero" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[120px]" />
-
-        <div className="container relative z-10 mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-2 text-sm text-accent mb-6 animate-fade-in">
-              <Radio className="h-4 w-4" />
-              <span>Supporting Local Music Since 2025</span>
-            </div>
-
-            <h1 className="font-display font-black text-6xl md:text-8xl text-foreground mb-6 leading-[0.9] animate-slide-up text-glow">
-              THE FUTURE OF <br />
-              <span className="text-primary">MUSIC IS LOCAL</span>
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+        {/* Background placeholder for hero artwork */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-muted" />
+        <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center opacity-30" />
+        
+        <div className="container relative z-10 mx-auto px-4 py-20">
+          <div className="max-w-4xl">
+            <h1 className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-foreground mb-8 leading-[0.95]">
+              A better way <span className="text-primary">to take fans home</span> after the show.
             </h1>
 
-            <p
-              className="text-xl text-muted-foreground mb-8 max-w-xl mx-auto animate-slide-up"
-              style={{ animationDelay: "0.1s" }}
-            >
-              GoLokol helps local artists and fans find each other.
-            </p>
-
-            <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
+            <div className="mt-10">
               <Link to="/create-afterparty">
                 <Button variant="secondary" size="lg">
-                  CREATE AN AFTER PARTY
+                  Create an After Party
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
@@ -58,35 +36,96 @@ const Index = () => {
       {/* What's an After Party Section */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="mb-10">
-            <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
+          <div className="mb-8">
+            <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
               WHAT'S AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
-            <p className="text-muted-foreground text-lg">A better way to take new fans home after the show.</p>
+            <p className="text-muted-foreground text-lg max-w-xl">
+              Keep them in the palm of your hands after the adrenaline wears off.
+            </p>
           </div>
 
           <div className="grid gap-10 lg:grid-cols-2 items-start">
             {/* Video Placeholder */}
             <div className="aspect-video w-full bg-secondary rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group">
               <PlayCircle className="w-20 h-20 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 mb-3" />
-              <span className="text-sm text-muted-foreground">After Party Explainer (30s)</span>
+              <span className="text-sm text-muted-foreground">After Party Explainer</span>
             </div>
 
             {/* Checklist */}
             <div className="space-y-5">
-              <h3 className="font-bold text-xl text-foreground mb-6">How to create an After Party?</h3>
-              <ChecklistItem number={1}>List your show (one at a time)</ChecklistItem>
-              <ChecklistItem number={2}>Prep and promote your After Party</ChecklistItem>
-              <ChecklistItem number={3}>Fans RSVP and receive a QR code</ChecklistItem>
-              <ChecklistItem number={4}>Fans check in at the merch table</ChecklistItem>
-              <ChecklistItem number={5}>The clock starts. 3 days to get to know and grow your fanbase.</ChecklistItem>
+              <ChecklistItem>An exclusive room online. Only the fans who attend shows get access.</ChecklistItem>
+              <ChecklistItem>Get to know your true fans and they get to know each other.</ChecklistItem>
+              <ChecklistItem>Create an experience that reflects your music, imagination and capacity.</ChecklistItem>
+              <ChecklistItem>In 3 days the moment disappears, like the show but not the data.</ChecklistItem>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Large Image Hero Section 1 - "Never shout your instagram" */}
+      <section className="relative min-h-[80vh] flex items-end overflow-hidden">
+        {/* Background placeholder for poster artwork */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
+        <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center" />
+        
+        <div className="container relative z-20 mx-auto px-4 py-20">
+          <div className="max-w-4xl">
+            <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl text-foreground leading-[0.95]">
+              never shout <span className="text-primary">your instagram from the</span> stage again.
+            </h1>
+          </div>
+        </div>
+      </section>
+
+      {/* How to Throw an After Party Section */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="mb-10">
+            <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
+              HOW TO THROW AN <span className="text-primary">AFTER PARTY?</span>
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Be an artist. As much or as little as you want.
+            </p>
+          </div>
+
+          <div className="grid gap-8 lg:grid-cols-2">
+            {/* Left column - Text items */}
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <ChecklistItem>Answer questions, crack jokes, take roll call! Talk about what happened at the show last night.</ChecklistItem>
+              </div>
+              
+              <div className="space-y-2">
+                <ChecklistItem>Write a song with fans.</ChecklistItem>
+              </div>
+              
+              <div className="space-y-2">
+                <ChecklistItem>Livestream from the studio, or the kitchen or somewhere local near by.</ChecklistItem>
+              </div>
+              
+              <div className="space-y-2">
+                <ChecklistItem>Plan a stunt together for the next show.</ChecklistItem>
+              </div>
+            </div>
+
+            {/* Right column - Image placeholder */}
+            <div className="aspect-square w-full bg-secondary rounded-lg flex items-center justify-center">
+              <span className="text-muted-foreground text-sm">Illustration Placeholder</span>
             </div>
           </div>
 
           {/* CTAs */}
           <div className="flex flex-wrap gap-4 mt-12">
-            <Link to="/shows">
+            <Link to="/create-afterparty">
               <Button variant="secondary" size="lg">
+                Create an After Party
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            </Link>
+            <Link to="/shows">
+              <Button size="lg">
                 Find an After Party
                 <ArrowRight className="h-5 w-5" />
               </Button>
@@ -95,108 +134,65 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Large Image Hero Section 2 - "The future of music is local" */}
+      <section className="relative min-h-[80vh] flex items-end overflow-hidden">
+        {/* Background placeholder for poster artwork */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
+        <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center" />
+        
+        <div className="container relative z-20 mx-auto px-4 py-20">
+          <div className="max-w-3xl">
+            <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl text-foreground leading-[0.95]">
+              the future<span className="text-primary">of music</span><br />
+              <span className="text-primary">is local.</span>
+            </h1>
+          </div>
+        </div>
+      </section>
+
       {/* Lokol Listening Sessions Section */}
-      <section className="py-20 relative overflow-hidden border-t border-border">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
-        <div className="container relative z-10 mx-auto px-4">
-          <div className="mb-10">
-            <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
-              LOKOL <span className="text-primary">LISTENING SESSIONS?</span>
+      <section className="py-20 bg-background border-t border-border">
+        <div className="container mx-auto px-4">
+          <div className="mb-8">
+            <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
+              LOKOL LISTENING SESSIONS
             </h2>
             <p className="text-muted-foreground text-lg">
-              Get feedback and featured. Each month, standout tracks make it into the next Lokol Listening Sessions DJ
-              set and YouTube series.
+              A dj event and youtube series featuring the emerging sounds of a city.
             </p>
           </div>
 
           <div className="grid gap-10 lg:grid-cols-2 items-start">
-            {/* Video Placeholder */}
-            <div className="aspect-video w-full bg-secondary rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group">
-              <PlayCircle className="w-20 h-20 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 mb-3" />
-              <span className="text-sm text-muted-foreground">Lokol Listening Sessions Explainer (30s)</span>
-            </div>
+            {/* Left column - Description + CTA */}
+            <div className="space-y-6">
+              <p className="text-foreground text-lg leading-relaxed">
+                A dj event and youtube series featuring the emerging sounds of a city. Music discovery the right way. In-person and on Youtube screens at the same time.
+              </p>
+              <p className="text-foreground text-lg leading-relaxed">
+                Local fans and artists turn up when their song come on.
+              </p>
+              <p className="text-foreground text-lg leading-relaxed">
+                We launch this February in Atlanta at Handlebar on Edgewood. Only Atlanta based music for now.
+              </p>
 
-            {/* Checklist */}
-            <div className="space-y-5">
-              <h3 className="font-bold text-xl text-foreground mb-6">Currently available in Atlanta only.</h3>
-              <ChecklistItem number={1}>Artists list a song (one at a time)</ChecklistItem>
-              <ChecklistItem number={2}>Opt in to be considered for LLS ($5 submission fee)</ChecklistItem>
-              <ChecklistItem number={3}>Fans and local curators rate the song</ChecklistItem>
-              <ChecklistItem number={4}>Best songs make the DJ set for LLS taping.</ChecklistItem>
-              <ChecklistItem number={5}>
-                LLS happens every 1st Saturday at The Handle Bar in Edgewood and @golokolmusic YouTube
-              </ChecklistItem>
-            </div>
-          </div>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-4 mt-12">
-            <Link to="/submit-song">
-              <Button variant="secondary" size="lg">
-                Submit a Song
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/songs">
-              <Button size="lg">
-                Rate Lokol Songs
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* LOKOL LIVE - Media Section */}
-      <section className="py-20 bg-background border-t border-border">
-        <div className="container mx-auto px-4">
-          <div className="mb-12">
-            <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
-              LOKOL <span className="text-primary">LIVE</span>
-            </h2>
-            <p className="text-muted-foreground">Live shows are OG analog.</p>
-          </div>
-
-          {/* Two-column video layout */}
-          <div className="grid gap-8 md:grid-cols-2">
-            {featuredVideos.map((video, index) => (
-              <div key={index} className="flex flex-col">
-                {/* Video Card */}
-                <div className="aspect-video w-full bg-secondary rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer group">
-                  <PlayCircle className="w-16 h-16 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
-                </div>
-                {/* Label */}
-                <span className="mt-3 text-xs text-muted-foreground uppercase tracking-widest font-medium">
-                  {video.label}
-                </span>
+              <div className="pt-4">
+                <Link to="/submit-song">
+                  <Button variant="secondary" size="lg">
+                    Submit a Song
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <p className="text-muted-foreground text-sm mt-2">$5 per submission</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </div>
 
-      {/* Artist CTA Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
-        <div className="container relative z-10 mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="font-display text-4xl md:text-5xl text-foreground mb-4">
-              ARE YOU AN <span className="text-accent">ARTIST?</span>
-            </h2>
-            <p className="text-muted-foreground mb-8">Start building your local fanbase today.</p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link to="/submit-song">
-                <Button variant="secondary" size="lg">
-                  Submit a Song
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link to="/create-afterparty">
-                <Button size="lg">
-                  Create an After Party
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
+            {/* Right column - Video/Image placeholder */}
+            <div className="space-y-4">
+              <div className="aspect-video w-full bg-secondary rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group">
+                <PlayCircle className="w-16 h-16 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 mb-2" />
+                <span className="text-sm text-muted-foreground">Lokol Listening Sessions</span>
+                <span className="text-xs text-muted-foreground">Coming Soon</span>
+              </div>
             </div>
           </div>
         </div>
@@ -207,11 +203,11 @@ const Index = () => {
   );
 };
 
-// Checklist item component
-const ChecklistItem = ({ number, children }: { number: number; children: React.ReactNode }) => (
+// Checklist item component with green checkmark
+const ChecklistItem = ({ children }: { children: React.ReactNode }) => (
   <div className="flex items-start gap-4">
-    <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0 mt-0.5">
-      <Check className="w-4 h-4 text-primary-foreground" />
+    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shrink-0 mt-0.5">
+      <Check className="w-4 h-4 text-white" />
     </div>
     <p className="text-foreground text-lg leading-relaxed">{children}</p>
   </div>
