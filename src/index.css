@@ -2,7 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+/* Breul Grotesk - Display font for headers */
+/* Add your Breul Grotesk font files to public/fonts/ and uncomment below */
+@font-face {
+  font-family: 'Breul Grotesk';
+  src: url('/fonts/BreulGrotesk-Regular.woff2') format('woff2'),
+       url('/fonts/BreulGrotesk-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Breul Grotesk';
+  src: url('/fonts/BreulGrotesk-Medium.woff2') format('woff2'),
+       url('/fonts/BreulGrotesk-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Breul Grotesk';
+  src: url('/fonts/BreulGrotesk-Bold.woff2') format('woff2'),
+       url('/fonts/BreulGrotesk-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @layer base {
   :root {
@@ -117,32 +144,34 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-weight: 400;
+    font-size: 17px;
+    line-height: 1.6;
   }
 
-  /* Headers - controlled bold weights */
+  /* Headers - Breul Grotesk display font */
   h1 {
-    @apply text-[32px] md:text-[44px] leading-[1.1] tracking-[-0.02em];
-    font-weight: 700; /* Bold */
+    @apply font-display text-[32px] md:text-[44px] leading-[1.1] tracking-[-0.02em];
+    font-weight: 700;
   }
 
   h2 {
-    @apply text-[26px] md:text-[36px] leading-[1.15] tracking-[-0.015em];
-    font-weight: 600; /* SemiBold */
+    @apply font-display text-[26px] md:text-[36px] leading-[1.15] tracking-[-0.015em];
+    font-weight: 600;
   }
 
   h3 {
-    @apply text-[22px] md:text-[28px] leading-[1.2] tracking-[-0.01em];
-    font-weight: 600; /* SemiBold */
+    @apply font-display text-[22px] md:text-[28px] leading-[1.2] tracking-[-0.01em];
+    font-weight: 600;
   }
 
   h4 {
-    @apply text-[18px] md:text-[22px] leading-[1.25] tracking-[-0.005em];
-    font-weight: 600; /* SemiBold */
+    @apply font-display text-[18px] md:text-[22px] leading-[1.25] tracking-[-0.005em];
+    font-weight: 600;
   }
 
-  /* Body text - strictly regular weight */
+  /* Body text - Roboto, strictly regular weight */
   p, li, span, div, td, th, dd, dt, blockquote, label {
-    font-weight: 400; /* Regular - never Medium or Bold */
+    font-weight: 400; /* Regular - never bold */
   }
 
   /* Only strong/b tags should be bold */
@@ -166,23 +195,28 @@
     background: linear-gradient(135deg, hsl(0 0% 8.6%) 0%, hsl(50 100% 50% / 0.15) 100%);
   }
 
-  /* Body tokens */
+  /* Subcaption token - larger for readability */
+  .type-subcaption {
+    @apply text-[18px] md:text-[20px] font-normal leading-[1.5] tracking-normal;
+  }
+
+  /* Body tokens - increased for readability */
   .type-body-lg {
-    @apply text-[18px] font-normal leading-[1.6] tracking-normal;
+    @apply text-[19px] font-normal leading-[1.6] tracking-normal;
   }
 
   .type-body-md {
-    @apply text-[16px] font-normal leading-[1.55] tracking-normal;
+    @apply text-[17px] font-normal leading-[1.55] tracking-normal;
   }
 
   .type-body-sm {
-    @apply text-[14px] font-normal leading-[1.5] tracking-normal;
+    @apply text-[15px] font-normal leading-[1.5] tracking-normal;
   }
 
   /* Action tokens - Medium weight for buttons/UI */
   .type-button {
     @apply text-[16px] leading-[1.2] tracking-normal;
-    font-weight: 500; /* Medium - not SemiBold */
+    font-weight: 500;
   }
 
   .type-link {
