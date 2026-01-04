@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Send, Shield } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const AfterPartyRecap = () => {
   const navigate = useNavigate();
@@ -173,7 +175,7 @@ const AfterPartyRecap = () => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "";
     try {
-      return format(new Date(dateString), "EEEE, MMMM d · h:mm a");
+      return format(new Date(dateString), "EEEE, MMMM d");
     } catch {
       return dateString;
     }
@@ -190,88 +192,113 @@ const AfterPartyRecap = () => {
 
   if (!event || !recap) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading recap...</p>
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground font-sans">Loading recap...</p>
+        </main>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="px-6 pt-8 pb-6">
-        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
-          {event.title}
-        </h1>
-        <p className="text-muted-foreground mt-1">{formatDate(event.start_at)}</p>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
+      
+      <main className="flex-1 pt-24 pb-20">
+        <div className="max-w-2xl mx-auto px-4">
+          {/* Header */}
+          <header className="mb-8">
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="font-display text-2xl sm:text-3xl text-foreground uppercase">
+                {event.title}
+              </h1>
+              {isAdminMode && (
+                <span className="flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-1 rounded font-sans uppercase tracking-wide">
+                  <Shield className="w-3 h-3" />
+                  Admin
+                </span>
+              )}
+            </div>
+            <p className="text-muted-foreground font-sans">{formatDate(event.start_at)}</p>
 
-        {/* Your Status Badge */}
-        {attendeeId && currentAttendee && (
-          <div className="mt-4">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground/50 mb-2">
-              Your Status
-            </p>
-            <Badge variant="secondary" className="text-xs font-medium">
-              {statusBadge}
-            </Badge>
-          </div>
-        )}
-      </header>
-
-      {/* Recap Content */}
-      <section className="px-6 py-6 border-t border-border/30">
-        <h2 className="text-xl font-medium text-foreground mb-2">
-          {recap.content}
-        </h2>
-        <p className="text-muted-foreground">
-          {attendeeCount} {attendeeCount === 1 ? "attendee" : "attendees"}
-        </p>
-      </section>
-
-      {/* Admin SMS Button */}
-      {canSendSms && (
-        <section className="px-6 py-6 border-t border-border/30">
-          {hasSent ? (
-            <p className="text-sm text-muted-foreground">Recap sent to attendees.</p>
-          ) : (
-            <Button
-              onClick={handleSendSms}
-              disabled={isSending}
-              variant="secondary"
-              className="gap-2"
-            >
-              <Send className="h-4 w-4" />
-              {isSending ? "Sending..." : "Send Recap via SMS"}
-            </Button>
-          )}
-        </section>
-      )}
-
-      {/* Recent Messages */}
-      {recentMessages.length > 0 && (
-        <section className="px-6 py-6 border-t border-border/30">
-          <h3 className="text-xs uppercase tracking-widest text-muted-foreground/50 mb-4">
-            Recent Messages
-          </h3>
-          <div className="space-y-4">
-            {recentMessages.map((msg) => (
-              <div key={msg.id}>
-                <div className="flex items-baseline gap-3">
-                  <span className="text-sm font-medium text-primary capitalize">
-                    {msg.role}
-                  </span>
-                  <span className="text-xs text-muted-foreground/40">
-                    {formatTime(msg.created_at)}
-                  </span>
-                </div>
-                <p className="text-foreground mt-1 leading-relaxed">
-                  {msg.message}
+            {/* Your Status Badge */}
+            {attendeeId && currentAttendee && (
+              <div className="mt-4">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground/50 mb-2 font-sans">
+                  Your Status
                 </p>
+                <Badge className="bg-primary text-primary-foreground font-sans text-xs font-medium">
+                  {statusBadge}
+                </Badge>
               </div>
-            ))}
-          </div>
-        </section>
-      )}
+            )}
+          </header>
+
+          {/* Recap Content Panel */}
+          <section className="rounded-xl border-2 border-primary bg-background p-6 mb-6">
+            <h2 className="text-sm font-medium text-primary font-sans uppercase tracking-wide mb-3">
+              Event Recap
+            </h2>
+            <p className="text-xl font-medium text-foreground font-sans mb-2">
+              {recap.content}
+            </p>
+            <p className="text-muted-foreground font-sans">
+              {attendeeCount} {attendeeCount === 1 ? "attendee" : "attendees"}
+            </p>
+          </section>
+
+          {/* Admin SMS Button */}
+          {canSendSms && (
+            <section className="rounded-xl border-2 border-primary bg-background p-6 mb-6">
+              <h2 className="text-sm font-medium text-primary font-sans uppercase tracking-wide mb-3">
+                Admin Actions
+              </h2>
+              {hasSent ? (
+                <p className="text-sm text-muted-foreground font-sans">Recap sent to attendees.</p>
+              ) : (
+                <Button
+                  onClick={handleSendSms}
+                  disabled={isSending}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 font-sans gap-2"
+                >
+                  <Send className="h-4 w-4" />
+                  {isSending ? "Sending..." : "Send Recap via SMS"}
+                </Button>
+              )}
+            </section>
+          )}
+
+          {/* Recent Messages */}
+          {recentMessages.length > 0 && (
+            <section className="rounded-xl border-2 border-primary bg-background p-6">
+              <h2 className="text-sm font-medium text-primary font-sans uppercase tracking-wide mb-4">
+                Recent Messages
+              </h2>
+              <div className="space-y-4">
+                {recentMessages.map((msg) => (
+                  <div key={msg.id}>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-sm font-medium text-primary capitalize font-sans">
+                        {msg.role}
+                      </span>
+                      <span className="text-xs text-muted-foreground/40 font-sans">
+                        {formatTime(msg.created_at)}
+                      </span>
+                    </div>
+                    <p className="text-foreground mt-1 leading-relaxed font-sans">
+                      {msg.message}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 };
