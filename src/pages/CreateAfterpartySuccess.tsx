@@ -232,7 +232,7 @@ const CreateAfterpartySuccess = () => {
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-primary/30">
-                <Link to={`/after-party/${event.id}`} className="flex-1">
+                <Link to={`/after-party/${event.id}/room`} className="flex-1">
                   <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-sans">View Your After Party</Button>
                 </Link>
                 <Link to="/find-after-party" className="flex-1">
