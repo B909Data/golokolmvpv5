@@ -109,23 +109,24 @@ const CreateAfterpartySuccess = () => {
       <Navbar />
       <main className="flex-1 pt-24 pb-20">
         <div className="container mx-auto px-4 max-w-xl">
+          {/* Success Header */}
           <div className="text-center mb-8">
-            <div className="rounded-full bg-green-500/20 w-20 h-20 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="h-10 w-10 text-green-500" />
+            <div className="rounded-full bg-primary/20 w-20 h-20 flex items-center justify-center mx-auto mb-6 border-2 border-primary">
+              <CheckCircle className="h-10 w-10 text-primary" />
             </div>
-            <h1 className="font-display text-4xl text-foreground mb-2">
+            <h1 className="font-display text-4xl text-primary mb-2">
               You're Live!
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground font-sans">
               Your After Party is now listed and discoverable.
             </p>
           </div>
 
           {event && (
-            <div className="rounded-xl border border-border bg-card p-6 space-y-6">
+            <div className="rounded-xl border-2 border-primary bg-background p-6 space-y-6">
               <div>
-                <h2 className="font-display text-2xl text-foreground">{event.title}</h2>
-                <p className="text-muted-foreground">
+                <h2 className="font-display text-2xl text-primary">{event.title}</h2>
+                <p className="text-muted-foreground font-sans">
                   {event.artist_name} · {event.city}, {event.venue_name}
                 </p>
               </div>
@@ -133,58 +134,60 @@ const CreateAfterpartySuccess = () => {
               <div className="space-y-4">
                 {/* Public RSVP Link */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
+                  <label className="text-sm font-medium text-foreground font-sans">
                     Public RSVP Link
                   </label>
                   <div className="flex gap-2">
                     <input
                       readOnly
                       value={publicRsvpUrl}
-                      className="flex-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex-1 h-10 rounded-md border-2 border-primary bg-background px-3 py-2 text-sm text-foreground font-sans"
                     />
                     <Button
                       variant="outline"
                       size="icon"
                       onClick={() => copyToClipboard(publicRsvpUrl, "Public RSVP link")}
+                      className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="icon" asChild>
+                    <Button variant="outline" size="icon" asChild className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                       <a href={publicRsvpUrl} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground font-sans">
                     Share this with fans to let them RSVP.
                   </p>
                 </div>
 
                 {/* Admin Recap Link */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
+                  <label className="text-sm font-medium text-foreground font-sans">
                     Admin Recap Link
                   </label>
                   <div className="flex gap-2">
                     <input
                       readOnly
                       value={adminRecapUrl}
-                      className="flex-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="flex-1 h-10 rounded-md border-2 border-primary bg-background px-3 py-2 text-sm text-foreground font-sans"
                     />
                     <Button
                       variant="outline"
                       size="icon"
                       onClick={() => copyToClipboard(adminRecapUrl, "Admin recap link")}
+                      className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="icon" asChild>
+                    <Button variant="outline" size="icon" asChild className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                       <a href={adminRecapUrl} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground font-sans">
                     Use this to access the event recap after it ends.
                   </p>
                 </div>
@@ -192,41 +195,42 @@ const CreateAfterpartySuccess = () => {
                 {/* Artist Controls Link */}
                 {artistControlsUrl && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
+                    <label className="text-sm font-medium text-foreground font-sans">
                       Artist Controls Link
                     </label>
                     <div className="flex gap-2">
                       <input
                         readOnly
                         value={artistControlsUrl}
-                        className="flex-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="flex-1 h-10 rounded-md border-2 border-primary bg-background px-3 py-2 text-sm text-foreground font-sans"
                       />
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={() => copyToClipboard(artistControlsUrl, "Artist controls link")}
+                        className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="icon" asChild>
+                      <Button variant="outline" size="icon" asChild className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                         <a href={artistControlsUrl} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-4 w-4" />
                         </a>
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground font-sans">
                       Private link to manage your event, pin messages, and moderate chat.
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-primary/30">
                 <Link to={`/after-party/${event.id}`} className="flex-1">
-                  <Button className="w-full">View Your After Party</Button>
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-sans">View Your After Party</Button>
                 </Link>
                 <Link to="/find-after-party" className="flex-1">
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-sans">
                     Browse All Events
                   </Button>
                 </Link>
