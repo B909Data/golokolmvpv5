@@ -505,13 +505,13 @@ const CreateAfterparty = () => {
   );
 
   const renderNavButtons = () => (
-    <div className="flex gap-3 mt-8">
+    <div className="flex justify-end gap-3 mt-8">
       {currentStep > 1 && (
         <Button
           type="button"
           variant="outline"
           onClick={handleBack}
-          className="flex-1 h-14 text-base font-sans bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
+          className="h-11 px-6 font-display font-bold text-base bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
         >
           <ChevronLeft className="mr-1 h-4 w-4" />
           Back
@@ -522,7 +522,7 @@ const CreateAfterparty = () => {
         <Button
           type="button"
           onClick={handleNext}
-          className="flex-1 h-14 text-base font-sans bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+          className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90"
         >
           Next
           <ChevronRight className="ml-1 h-4 w-4" />
@@ -530,7 +530,7 @@ const CreateAfterparty = () => {
       ) : (
         <Button
           type="submit"
-          className="flex-1 h-14 text-base font-sans bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+          className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
