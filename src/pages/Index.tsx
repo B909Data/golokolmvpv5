@@ -10,18 +10,18 @@ const Index = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         {/* Background placeholder for hero artwork */}
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-muted" />
         <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center opacity-30" />
         
-        <div className="container relative z-10 mx-auto px-4 py-20">
+        <div className="container relative z-10 mx-auto px-4 py-16">
           <div className="max-w-4xl">
-            <h1 className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-foreground mb-8 leading-[0.95]">
+            <h1 className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-foreground mb-6 leading-[0.95]">
               A better way <span className="text-primary">to take fans home</span> after the show.
             </h1>
 
-            <div className="mt-10">
+            <div className="mt-8">
               <Link to="/create-afterparty">
                 <Button variant="secondary" size="lg">
                   Create an After Party
@@ -34,7 +34,7 @@ const Index = () => {
       </section>
 
       {/* What's an After Party Section */}
-      <section className="py-20 bg-background">
+      <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="mb-8">
             <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
@@ -64,22 +64,22 @@ const Index = () => {
       </section>
 
       {/* Large Image Hero Section 1 - "Never shout your instagram" */}
-      <section className="relative min-h-[80vh] flex items-end overflow-hidden">
+      <section className="relative min-h-[60vh] flex items-end overflow-hidden">
         {/* Background placeholder for poster artwork */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
         <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center" />
         
-        <div className="container relative z-20 mx-auto px-4 py-20">
+        <div className="container relative z-20 mx-auto px-4 py-14">
           <div className="max-w-4xl">
-            <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl text-foreground leading-[0.95]">
+            <h2 className="font-display font-bold text-3xl md:text-5xl lg:text-6xl text-foreground leading-[0.95]">
               never shout <span className="text-primary">your instagram from the</span> stage again.
-            </h1>
+            </h2>
           </div>
         </div>
       </section>
 
       {/* How to Throw an After Party Section */}
-      <section className="py-20 bg-background">
+      <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="mb-10">
             <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
@@ -135,23 +135,23 @@ const Index = () => {
       </section>
 
       {/* Large Image Hero Section 2 - "The future of music is local" */}
-      <section className="relative min-h-[80vh] flex items-end overflow-hidden">
+      <section className="relative min-h-[60vh] flex items-end overflow-hidden">
         {/* Background placeholder for poster artwork */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
         <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center" />
         
-        <div className="container relative z-20 mx-auto px-4 py-20">
+        <div className="container relative z-20 mx-auto px-4 py-14">
           <div className="max-w-3xl">
-            <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl text-foreground leading-[0.95]">
-              the future<span className="text-primary">of music</span><br />
+            <h2 className="font-display font-bold text-3xl md:text-5xl lg:text-6xl text-foreground leading-[0.95]">
+              the future <span className="text-primary">of music</span><br />
               <span className="text-primary">is local.</span>
-            </h1>
+            </h2>
           </div>
         </div>
       </section>
 
       {/* Lokol Listening Sessions Section */}
-      <section className="py-20 bg-background border-t border-border">
+      <section className="py-16 bg-background border-t border-border">
         <div className="container mx-auto px-4">
           <div className="mb-8">
             <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
@@ -203,11 +203,11 @@ const Index = () => {
   );
 };
 
-// Checklist item component with green checkmark
+// Checklist item component with yellow checkmark on black background
 const ChecklistItem = ({ children }: { children: React.ReactNode }) => (
-  <div className="flex items-start gap-4">
-    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shrink-0 mt-0.5">
-      <Check className="w-4 h-4 text-white" />
+  <div className="flex items-start gap-3">
+    <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center shrink-0 mt-0.5">
+      <Check className="w-4 h-4 text-primary" />
     </div>
     <p className="text-foreground text-lg leading-relaxed">{children}</p>
   </div>
