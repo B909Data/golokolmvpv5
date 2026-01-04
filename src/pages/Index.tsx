@@ -53,7 +53,7 @@ const Index = () => {
             </div>
 
             {/* Checklist */}
-            <div className="space-y-5">
+            <div className="space-y-3">
               <ChecklistItem>An exclusive room online. Only the fans who attend shows get access.</ChecklistItem>
               <ChecklistItem>Get to know your true fans and they get to know each other.</ChecklistItem>
               <ChecklistItem>Create an experience that reflects your music, imagination and capacity.</ChecklistItem>
@@ -90,46 +90,35 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-2">
-            {/* Left column - Text items */}
-            <div className="space-y-8">
-              <div className="space-y-2">
-                <ChecklistItem>Answer questions, crack jokes, take roll call! Talk about what happened at the show last night.</ChecklistItem>
-              </div>
+          <div className="grid gap-8 lg:grid-cols-2 items-start">
+            {/* Left column - Text items + CTAs */}
+            <div className="space-y-3">
+              <ChecklistItem>Answer questions, crack jokes, take roll call! Talk about what happened at the show last night.</ChecklistItem>
+              <ChecklistItem>Write a song with fans.</ChecklistItem>
+              <ChecklistItem>Livestream from the studio, or the kitchen or somewhere local near by.</ChecklistItem>
+              <ChecklistItem>Plan a stunt together for the next show.</ChecklistItem>
               
-              <div className="space-y-2">
-                <ChecklistItem>Write a song with fans.</ChecklistItem>
-              </div>
-              
-              <div className="space-y-2">
-                <ChecklistItem>Livestream from the studio, or the kitchen or somewhere local near by.</ChecklistItem>
-              </div>
-              
-              <div className="space-y-2">
-                <ChecklistItem>Plan a stunt together for the next show.</ChecklistItem>
+              {/* CTAs */}
+              <div className="flex flex-wrap gap-4 pt-4">
+                <Link to="/create-afterparty">
+                  <Button variant="secondary" size="lg">
+                    Create an After Party
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link to="/shows">
+                  <Button size="lg">
+                    Find an After Party
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
               </div>
             </div>
 
-            {/* Right column - Image placeholder */}
-            <div className="aspect-square w-full bg-secondary rounded-lg flex items-center justify-center">
+            {/* Right column - Image placeholder (same aspect ratio as explainer video) */}
+            <div className="aspect-video w-full bg-secondary rounded-lg flex items-center justify-center">
               <span className="text-muted-foreground text-sm">Illustration Placeholder</span>
             </div>
-          </div>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-4 mt-12">
-            <Link to="/create-afterparty">
-              <Button variant="secondary" size="lg">
-                Create an After Party
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/shows">
-              <Button size="lg">
-                Find an After Party
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
@@ -151,38 +140,38 @@ const Index = () => {
       </section>
 
       {/* Lokol Listening Sessions Section */}
-      <section className="py-16 bg-background border-t border-border">
+      <section className="py-16 bg-[hsl(60,10%,95%)]">
         <div className="container mx-auto px-4">
           <div className="mb-8">
-            <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
+            <h2 className="font-display text-3xl md:text-5xl text-[hsl(0,0%,10%)] mb-3">
               LOKOL LISTENING SESSIONS
             </h2>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-[hsl(0,0%,30%)] text-lg">
               A dj event and youtube series featuring the emerging sounds of a city.
             </p>
           </div>
 
           <div className="grid gap-10 lg:grid-cols-2 items-start">
             {/* Left column - Description + CTA */}
-            <div className="space-y-6">
-              <p className="text-foreground text-lg leading-relaxed">
+            <div className="space-y-4">
+              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
                 A dj event and youtube series featuring the emerging sounds of a city. Music discovery the right way. In-person and on Youtube screens at the same time.
               </p>
-              <p className="text-foreground text-lg leading-relaxed">
+              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
                 Local fans and artists turn up when their song come on.
               </p>
-              <p className="text-foreground text-lg leading-relaxed">
+              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
                 We launch this February in Atlanta at Handlebar on Edgewood. Only Atlanta based music for now.
               </p>
 
-              <div className="pt-4">
+              <div className="pt-2">
                 <Link to="/submit-song">
                   <Button variant="secondary" size="lg">
                     Submit a Song
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
-                <p className="text-muted-foreground text-sm mt-2">$5 per submission</p>
+                <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$5 per submission</p>
               </div>
             </div>
 
@@ -203,11 +192,11 @@ const Index = () => {
   );
 };
 
-// Checklist item component with yellow checkmark on black background
+// Checklist item component with yellow circle and black check icon
 const ChecklistItem = ({ children }: { children: React.ReactNode }) => (
   <div className="flex items-start gap-3">
-    <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center shrink-0 mt-0.5">
-      <Check className="w-4 h-4 text-primary" />
+    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0 mt-0.5">
+      <Check className="w-4 h-4 text-foreground" />
     </div>
     <p className="text-foreground text-lg leading-relaxed">{children}</p>
   </div>
