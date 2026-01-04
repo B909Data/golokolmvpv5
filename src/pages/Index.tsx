@@ -31,7 +31,7 @@ const Index = () => {
               <span>Supporting Local Music Since 2025</span>
             </div>
 
-            <h1 className="font-display text-6xl md:text-8xl text-foreground mb-6 leading-[0.9] animate-slide-up text-glow">
+            <h1 className="font-display font-black text-6xl md:text-8xl text-foreground mb-6 leading-[0.9] animate-slide-up text-glow">
               THE FUTURE OF <br />
               <span className="text-primary">MUSIC IS LOCAL</span>
             </h1>
