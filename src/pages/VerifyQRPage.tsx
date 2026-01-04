@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,11 +15,14 @@ const VerifyQRPage = () => {
     "loading" | "unauthorized" | "invalid" | "already_checked_in" | "success"
   >("loading");
   const [attendeeName, setAttendeeName] = useState<string>("");
+  
+  // Prevent double execution
+  const hasRun = useRef(false);
 
   // Check if user has admin access (either via ?admin=1 or role=artist)
   const attendeeId = eventId ? localStorage.getItem(`attendee_${eventId}`) : null;
 
-  const { data: attendeeRole } = useQuery({
+  const { data: attendeeRole, isLoading: isLoadingRole } = useQuery({
     queryKey: ["verify-attendee-role", attendeeId],
     queryFn: async () => {
       if (!attendeeId) return null;
@@ -38,6 +41,10 @@ const VerifyQRPage = () => {
 
   useEffect(() => {
     const verifyAttendee = async () => {
+      // Prevent double execution
+      if (hasRun.current) return;
+      hasRun.current = true;
+
       if (!eventId || !qrToken) {
         setVerificationStatus("invalid");
         return;
@@ -64,7 +71,7 @@ const VerifyQRPage = () => {
 
         setAttendeeName(attendee.display_name || "Guest");
 
-        // Check if already checked in
+        // QR verification idempotency: if already checked in, don't update or send SMS
         if (attendee.checked_in_at) {
           setVerificationStatus("already_checked_in");
           return;
@@ -87,9 +94,9 @@ const VerifyQRPage = () => {
           .from("events")
           .select("title")
           .eq("id", eventId)
-          .single();
+          .maybeSingle();
 
-        // Send access granted SMS
+        // Send access granted SMS only on state transition (first check-in)
         if (attendee.phone) {
           const roomUrl = `${window.location.origin}/after-party/${eventId}/room`;
           await supabase.functions.invoke("send-checkin-sms", {
@@ -108,11 +115,11 @@ const VerifyQRPage = () => {
       }
     };
 
-    // Wait for auth check to complete
-    if (isAdmin || attendeeRole !== undefined) {
+    // Wait for auth check to complete before running
+    if (isAdmin || (!isLoadingRole && attendeeRole !== undefined)) {
       verifyAttendee();
     }
-  }, [eventId, qrToken, isAuthorized, isAdmin, attendeeRole]);
+  }, [eventId, qrToken, isAuthorized, isAdmin, attendeeRole, isLoadingRole]);
 
   if (verificationStatus === "loading") {
     return (
