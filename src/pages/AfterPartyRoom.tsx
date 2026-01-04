@@ -34,6 +34,7 @@ const AfterPartyRoom = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isAdminMode = searchParams.get("admin") === "1";
+  const urlToken = searchParams.get("token");
   
   const [viewMode, setViewMode] = useState<ViewMode>("welcome");
   const [messageText, setMessageText] = useState("");
@@ -42,30 +43,58 @@ const AfterPartyRoom = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatScrollRef = useRef<number>(0);
 
-  const attendeeId = eventId ? localStorage.getItem(`attendee_${eventId}`) : null;
-  const qrToken = eventId ? localStorage.getItem(`attendee_qr_${eventId}`) : null;
+  // Token resolution: URL token first, then localStorage
+  const storedAttendeeId = eventId ? localStorage.getItem(`attendee_${eventId}`) : null;
+  const storedQrToken = eventId ? localStorage.getItem(`attendee_qr_${eventId}`) : null;
 
-  // Hard gate: Check if attendee exists AND is checked in
+  // Resolve attendee by URL token or stored attendeeId
   const { data: attendeeData, isLoading: isCheckingIn, error: attendeeError } = useQuery({
-    queryKey: ["attendee-checkin", attendeeId],
+    queryKey: ["attendee-checkin", eventId, urlToken, storedAttendeeId],
     queryFn: async () => {
-      if (!attendeeId) return null;
-      const { data, error } = await supabase
-        .from("attendees")
-        .select("id, checked_in_at, qr_token, display_name")
-        .eq("id", attendeeId)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
+      // If URL token, resolve by qr_token
+      if (urlToken) {
+        const { data, error } = await supabase
+          .from("attendees")
+          .select("id, checked_in_at, qr_token, display_name")
+          .eq("event_id", eventId)
+          .eq("qr_token", urlToken)
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      
+      // Otherwise use stored attendeeId
+      if (storedAttendeeId) {
+        const { data, error } = await supabase
+          .from("attendees")
+          .select("id, checked_in_at, qr_token, display_name")
+          .eq("id", storedAttendeeId)
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      
+      return null;
     },
-    enabled: !!attendeeId,
+    enabled: !!eventId && (!!urlToken || !!storedAttendeeId),
   });
+
+  // Store attendee info from URL token if found
+  useEffect(() => {
+    if (urlToken && eventId && attendeeData) {
+      localStorage.setItem(`attendee_${eventId}`, attendeeData.id);
+      localStorage.setItem(`attendee_qr_${eventId}`, attendeeData.qr_token || urlToken);
+    }
+  }, [urlToken, eventId, attendeeData]);
+
+  const attendeeId = attendeeData?.id || storedAttendeeId;
+  const qrToken = attendeeData?.qr_token || urlToken || storedQrToken;
 
   // Hard gate room access
   useEffect(() => {
     if (!eventId) return;
 
-    if (!attendeeId) {
+    if (!urlToken && !storedAttendeeId) {
       navigate(`/after-party/${eventId}/rsvp`, { replace: true });
       return;
     }
@@ -83,12 +112,12 @@ const AfterPartyRoom = () => {
     if (!isCheckingIn && attendeeData && !attendeeData.checked_in_at) {
       const token = attendeeData.qr_token || qrToken;
       if (token) {
-        navigate(`/after-party/${eventId}/qr/${token}`, { replace: true });
+        navigate(`/after-party/${eventId}/pass?token=${token}`, { replace: true });
       } else {
         navigate(`/after-party/${eventId}/rsvp`, { replace: true });
       }
     }
-  }, [attendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn]);
+  }, [urlToken, storedAttendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn]);
 
   const { data: event, isLoading, error: eventError } = useQuery({
     queryKey: ["event-room", eventId],
@@ -215,7 +244,20 @@ const AfterPartyRoom = () => {
     );
   }
 
-  if (!attendeeId || isCheckingIn || !attendeeData?.checked_in_at) {
+  if (!urlToken && !storedAttendeeId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">You need to RSVP or be checked in to access this After Party.</p>
+          <Button variant="outline" onClick={() => navigate(`/after-party/${eventId}/rsvp`)}>
+            Go to RSVP
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isCheckingIn || !attendeeData?.checked_in_at) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Checking access...</p>

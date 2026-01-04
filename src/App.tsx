@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
 import Songs from "./pages/Songs";
@@ -13,9 +13,10 @@ import AfterParty from "./pages/AfterParty";
 import AfterPartyRoom from "./pages/AfterPartyRoom";
 import AfterPartyRecap from "./pages/AfterPartyRecap";
 import RSVPAfterParty from "./pages/RSVPAfterParty";
-import RSVPConfirmed from "./pages/RSVPConfirmed";
+import AfterPartyPass from "./pages/AfterPartyPass";
 import QRDisplayPage from "./pages/QRDisplayPage";
 import VerifyQRPage from "./pages/VerifyQRPage";
+import WalkInIntro from "./pages/WalkInIntro";
 import CreateAfterparty from "./pages/CreateAfterparty";
 import CreateAfterpartySuccess from "./pages/CreateAfterpartySuccess";
 import Checkin from "./pages/Checkin";
@@ -51,9 +52,11 @@ const App = () => (
           <Route path="/afterparty/:slug" element={<AfterpartyDetail />} />
           <Route path="/after-party/:eventId" element={<AfterParty />} />
           <Route path="/after-party/:eventId/rsvp" element={<RSVPAfterParty />} />
-          <Route path="/after-party/:eventId/rsvp/confirmed" element={<RSVPConfirmed />} />
+          <Route path="/after-party/:eventId/rsvp/confirmed" element={<Navigate to="../pass" replace />} />
+          <Route path="/after-party/:eventId/pass" element={<AfterPartyPass />} />
           <Route path="/after-party/:eventId/qr/:qrToken" element={<QRDisplayPage />} />
           <Route path="/after-party/:eventId/verify/:qrToken" element={<VerifyQRPage />} />
+          <Route path="/after-party/:eventId/intro" element={<WalkInIntro />} />
           <Route path="/after-party/:eventId/room" element={<AfterPartyRoom />} />
           <Route path="/after-party/:eventId/recap" element={<AfterPartyRecap />} />
           <Route path="/create-afterparty" element={<CreateAfterparty />} />

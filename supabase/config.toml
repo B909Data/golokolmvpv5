@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.artist-delete-message]
 verify_jwt = false
+
+[functions.artist-checkin-attendee]
+verify_jwt = false

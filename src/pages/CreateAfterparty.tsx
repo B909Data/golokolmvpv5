@@ -65,7 +65,6 @@ const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
 
 const formSchema = z.object({
   artist_name: z.string().min(1, "Artist/Band name is required"),
-  contact_phone: z.string().min(10, "Valid phone number required"),
   contact_email: z.string().email("Valid email required"),
   title: z.string().min(1, "Event title is required"),
   start_date: z.date({ required_error: "Start date is required" }),
@@ -126,7 +125,7 @@ const CreateAfterparty = () => {
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
   // Step validation
-  const step1Fields = ["artist_name", "contact_phone", "contact_email"] as const;
+  const step1Fields = ["artist_name", "contact_email"] as const;
   const step2Fields = ["title", "start_date", "start_time", "city", "venue_name"] as const;
   const step3Fields = ["genres"] as const;
 
@@ -168,7 +167,6 @@ const CreateAfterparty = () => {
 
       const payload = {
         artist_name: data.artist_name,
-        contact_phone: data.contact_phone,
         contact_email: data.contact_email,
         title: data.title,
         start_at: startDate.toISOString(),
@@ -256,48 +254,34 @@ const CreateAfterparty = () => {
         <p className="text-primary-foreground/70 text-base font-sans mt-1">Tell us about yourself</p>
       </div>
 
-      <div className="space-y-5">
-        <div className="space-y-2">
-          <Label htmlFor="artist_name" className="text-primary-foreground text-base font-sans">Artist / Band Name *</Label>
-          <Input
-            id="artist_name"
-            {...register("artist_name")}
-            placeholder="Your artist or band name"
-            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
-          />
-          {errors.artist_name && (
-            <p className="text-sm text-destructive font-sans">{errors.artist_name.message}</p>
-          )}
-        </div>
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="artist_name" className="text-primary-foreground text-base font-sans">Artist / Band Name *</Label>
+            <Input
+              id="artist_name"
+              {...register("artist_name")}
+              placeholder="Your artist or band name"
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
+            />
+            {errors.artist_name && (
+              <p className="text-sm text-destructive font-sans">{errors.artist_name.message}</p>
+            )}
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="contact_phone" className="text-primary-foreground text-base font-sans">Contact Phone *</Label>
-          <Input
-            id="contact_phone"
-            type="tel"
-            {...register("contact_phone")}
-            placeholder="(555) 123-4567"
-            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
-          />
-          {errors.contact_phone && (
-            <p className="text-sm text-destructive font-sans">{errors.contact_phone.message}</p>
-          )}
+          <div className="space-y-2">
+            <Label htmlFor="contact_email" className="text-primary-foreground text-base font-sans">Contact Email *</Label>
+            <Input
+              id="contact_email"
+              type="email"
+              {...register("contact_email")}
+              placeholder="you@example.com"
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
+            />
+            {errors.contact_email && (
+              <p className="text-sm text-destructive font-sans">{errors.contact_email.message}</p>
+            )}
+          </div>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="contact_email" className="text-primary-foreground text-base font-sans">Contact Email *</Label>
-          <Input
-            id="contact_email"
-            type="email"
-            {...register("contact_email")}
-            placeholder="you@example.com"
-            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
-          />
-          {errors.contact_email && (
-            <p className="text-sm text-destructive font-sans">{errors.contact_email.message}</p>
-          )}
-        </div>
-      </div>
     </div>
   );
 
