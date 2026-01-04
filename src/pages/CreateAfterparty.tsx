@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Music, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Music, Loader2, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -43,32 +47,29 @@ const GENRE_OPTIONS = [
 ];
 
 const CITY_OPTIONS = [
-  "Austin",
-  "Los Angeles",
-  "New York",
-  "Nashville",
-  "Chicago",
   "Atlanta",
-  "Miami",
-  "Seattle",
-  "Denver",
-  "Portland",
-  "Houston",
-  "Dallas",
-  "Philadelphia",
-  "Detroit",
+  "Athens",
   "New Orleans",
-  "Other",
 ];
+
+const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
+  const hours = Math.floor(i / 4);
+  const minutes = (i % 4) * 15;
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+  const label = `${displayHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+  const value = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+  return { label, value };
+});
 
 const formSchema = z.object({
   artist_name: z.string().min(1, "Artist/Band name is required"),
   contact_phone: z.string().min(10, "Valid phone number required"),
   contact_email: z.string().email("Valid email required"),
   title: z.string().min(1, "Event title is required"),
-  start_at: z.string().min(1, "Start date/time is required"),
+  start_date: z.date({ required_error: "Start date is required" }),
+  start_time: z.string().min(1, "Start time is required"),
   city: z.string().min(1, "City is required"),
-  custom_city: z.string().optional(),
   venue_name: z.string().min(1, "Venue name is required"),
   ticket_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   genres: z.array(z.string()).min(1, "Select at least 1 genre").max(2, "Maximum 2 genres"),
@@ -100,7 +101,6 @@ const CreateAfterparty = () => {
     mode: "onChange",
   });
 
-  const selectedCity = watch("city");
   const selectedGenres = watch("genres") || [];
   const youtubeUrl = watch("youtube_url");
   const imageUrl = watch("image_url");
@@ -121,7 +121,7 @@ const CreateAfterparty = () => {
 
   // Step validation
   const step1Fields = ["artist_name", "contact_phone", "contact_email"] as const;
-  const step2Fields = ["title", "start_at", "city", "venue_name"] as const;
+  const step2Fields = ["title", "start_date", "start_time", "city", "venue_name"] as const;
   const step3Fields = ["genres"] as const;
 
   const validateStep = async (step: number): Promise<boolean> => {
@@ -155,15 +155,18 @@ const CreateAfterparty = () => {
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     try {
-      const city = data.city === "Other" && data.custom_city ? data.custom_city : data.city;
+      // Combine date and time into a single ISO string
+      const startDate = data.start_date;
+      const [hours, minutes] = data.start_time.split(":").map(Number);
+      startDate.setHours(hours, minutes, 0, 0);
 
       const payload = {
         artist_name: data.artist_name,
         contact_phone: data.contact_phone,
         contact_email: data.contact_email,
         title: data.title,
-        start_at: new Date(data.start_at).toISOString(),
-        city,
+        start_at: startDate.toISOString(),
+        city: data.city,
         venue_name: data.venue_name,
         ticket_url: data.ticket_url || undefined,
         genres: data.genres,
@@ -292,100 +295,132 @@ const CreateAfterparty = () => {
     </div>
   );
 
-  const renderStep2 = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="font-display text-2xl text-foreground">Event Details</h2>
-        <p className="text-muted-foreground text-sm mt-1">Where and when is it happening?</p>
-      </div>
+  const renderStep2 = () => {
+    const selectedDate = watch("start_date");
+    const selectedTime = watch("start_time");
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="title">Event Title *</Label>
-          <Input
-            id="title"
-            {...register("title")}
-            placeholder="e.g., Summer Vibes After Party"
-            className="h-12"
-          />
-          {errors.title && (
-            <p className="text-sm text-destructive">{errors.title.message}</p>
-          )}
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-6">
+          <h2 className="font-display text-2xl text-foreground">Event Details</h2>
+          <p className="text-muted-foreground text-sm mt-1">Where and when is it happening?</p>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="start_at">Start Date & Time *</Label>
-          <Input
-            id="start_at"
-            type="datetime-local"
-            {...register("start_at")}
-            className="h-12"
-          />
-          {errors.start_at && (
-            <p className="text-sm text-destructive">{errors.start_at.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="city">City *</Label>
-          <select
-            id="city"
-            {...register("city")}
-            className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <option value="">Select a city</option>
-            {CITY_OPTIONS.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
-          {errors.city && (
-            <p className="text-sm text-destructive">{errors.city.message}</p>
-          )}
-        </div>
-
-        {selectedCity === "Other" && (
+        <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="custom_city">Enter City *</Label>
+            <Label htmlFor="title">Event Title *</Label>
             <Input
-              id="custom_city"
-              {...register("custom_city")}
-              placeholder="City name"
+              id="title"
+              {...register("title")}
+              placeholder="e.g., Summer Vibes After Party"
               className="h-12"
             />
+            {errors.title && (
+              <p className="text-sm text-destructive">{errors.title.message}</p>
+            )}
           </div>
-        )}
 
-        <div className="space-y-2">
-          <Label htmlFor="venue_name">Venue Name *</Label>
-          <Input
-            id="venue_name"
-            {...register("venue_name")}
-            placeholder="e.g., The Blue Room"
-            className="h-12"
-          />
-          {errors.venue_name && (
-            <p className="text-sm text-destructive">{errors.venue_name.message}</p>
-          )}
-        </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Start Date *</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "h-12 w-full justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "MMM d, yyyy") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => setValue("start_date", date as Date, { shouldValidate: true })}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+              {errors.start_date && (
+                <p className="text-sm text-destructive">{errors.start_date.message}</p>
+              )}
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="ticket_url">Ticket URL (optional)</Label>
-          <Input
-            id="ticket_url"
-            type="url"
-            {...register("ticket_url")}
-            placeholder="https://tickets.example.com/your-event"
-            className="h-12"
-          />
-          {errors.ticket_url && (
-            <p className="text-sm text-destructive">{errors.ticket_url.message}</p>
-          )}
+            <div className="space-y-2">
+              <Label>Start Time *</Label>
+              <select
+                value={selectedTime || ""}
+                onChange={(e) => setValue("start_time", e.target.value, { shouldValidate: true })}
+                className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="">Select time</option>
+                {TIME_OPTIONS.map((time) => (
+                  <option key={time.value} value={time.value}>
+                    {time.label}
+                  </option>
+                ))}
+              </select>
+              {errors.start_time && (
+                <p className="text-sm text-destructive">{errors.start_time.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="city">City *</Label>
+            <select
+              id="city"
+              {...register("city")}
+              className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="">Select a city</option>
+              {CITY_OPTIONS.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+            {errors.city && (
+              <p className="text-sm text-destructive">{errors.city.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="venue_name">Venue Name *</Label>
+            <Input
+              id="venue_name"
+              {...register("venue_name")}
+              placeholder="e.g., The Blue Room"
+              className="h-12"
+            />
+            {errors.venue_name && (
+              <p className="text-sm text-destructive">{errors.venue_name.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="ticket_url">Ticket URL (optional)</Label>
+            <Input
+              id="ticket_url"
+              type="url"
+              {...register("ticket_url")}
+              placeholder="https://tickets.example.com/your-event"
+              className="h-12"
+            />
+            {errors.ticket_url && (
+              <p className="text-sm text-destructive">{errors.ticket_url.message}</p>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderStep3 = () => (
     <div className="space-y-6">
