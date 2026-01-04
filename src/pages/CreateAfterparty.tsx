@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Music, Loader2, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -84,6 +84,11 @@ const CreateAfterparty = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const canceled = searchParams.get("canceled") === "true";
+
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const {
     register,
