@@ -26,7 +26,7 @@ const RSVPAfterParty = () => {
         .from("events")
         .select("id, title, start_at, city, venue_name, ticket_url")
         .eq("id", eventId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -51,16 +51,52 @@ const RSVPAfterParty = () => {
     setIsSubmitting(true);
 
     try {
-      // Generate QR token
+      const normalizedPhone = phone.trim();
+
+      // Check for existing attendee by event_id + phone (deduplication)
+      const { data: existingAttendee, error: checkError } = await supabase
+        .from("attendees")
+        .select("id, qr_token")
+        .eq("event_id", eventId)
+        .eq("phone", normalizedPhone)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (existingAttendee) {
+        // Already RSVP'd - resend SMS and show message
+        const qrUrl = `${window.location.origin}/after-party/${eventId}/qr/${existingAttendee.qr_token}`;
+        
+        await supabase.functions.invoke("send-rsvp-sms", {
+          body: {
+            phone: normalizedPhone,
+            eventTitle: event?.title || "After Party",
+            qrUrl,
+          },
+        });
+
+        // Store attendee info for this session
+        localStorage.setItem(`attendee_${eventId}`, existingAttendee.id);
+        localStorage.setItem(`attendee_qr_${eventId}`, existingAttendee.qr_token || "");
+
+        toast({
+          title: "You're already RSVP'd",
+          description: "Check your texts for your QR code.",
+        });
+
+        navigate(`/after-party/${eventId}/rsvp/confirmed`);
+        return;
+      }
+
+      // New RSVP - generate QR token and insert
       const qrToken = crypto.randomUUID();
 
-      // Insert attendee with qr_token
       const { data: attendee, error: insertError } = await supabase
         .from("attendees")
         .insert({
           event_id: eventId,
           display_name: displayName.trim(),
-          phone: phone.trim(),
+          phone: normalizedPhone,
           checkin_method: "qr",
           qr_token: qrToken,
         })
@@ -74,7 +110,7 @@ const RSVPAfterParty = () => {
       
       await supabase.functions.invoke("send-rsvp-sms", {
         body: {
-          phone: phone.trim(),
+          phone: normalizedPhone,
           eventTitle: event?.title || "After Party",
           qrUrl,
         },
@@ -90,7 +126,7 @@ const RSVPAfterParty = () => {
       console.error("RSVP error:", error);
       toast({
         title: "RSVP failed",
-        description: error.message || "Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {

@@ -21,6 +21,17 @@ serve(async (req) => {
       throw new Error("Missing session_id");
     }
 
+    // Create Supabase client with service role for secure operations
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    // Stripe idempotency: Check if this session was already processed
+    // Look for an event that has after_party_enabled=true and was created from this session
+    // We need to check the metadata to see if this session was already processed
+    // Since events don't store stripe_session_id, we'll check by fetching the session first
+    
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -39,18 +50,10 @@ serve(async (req) => {
       throw new Error("No event_id in session metadata");
     }
 
-    console.log("Enabling after party for event:", eventId);
-
-    // Create Supabase client with service role for secure update
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
-
-    // First, fetch current event to check if token exists
+    // Fetch the event to check current state
     const { data: existingEvent, error: fetchError } = await supabaseAdmin
       .from("events")
-      .select("artist_access_token")
+      .select("id, title, artist_name, start_at, city, venue_name, after_party_enabled, artist_access_token")
       .eq("id", eventId)
       .single();
 
@@ -59,7 +62,30 @@ serve(async (req) => {
       throw new Error(`Failed to fetch event: ${fetchError.message}`);
     }
 
-    // Only generate token if one doesn't exist
+    // Stripe idempotency: If already enabled, return success without side effects
+    if (existingEvent.after_party_enabled) {
+      console.log("Event already enabled, returning existing data (idempotent)");
+      return new Response(JSON.stringify({ 
+        success: true, 
+        already_processed: true,
+        event: {
+          id: existingEvent.id,
+          title: existingEvent.title,
+          artist_name: existingEvent.artist_name,
+          start_at: existingEvent.start_at,
+          city: existingEvent.city,
+          venue_name: existingEvent.venue_name,
+          artist_access_token: existingEvent.artist_access_token,
+        }
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    console.log("Enabling after party for event:", eventId);
+
+    // Artist access token stability: Only generate if null, never overwrite
     const artistAccessToken = existingEvent.artist_access_token || crypto.randomUUID();
 
     // Update event to enable after party and set artist token (if new)

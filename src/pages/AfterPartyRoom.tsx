@@ -30,13 +30,14 @@ const AfterPartyRoom = () => {
   const [messageText, setMessageText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isCreatingRecap, setIsCreatingRecap] = useState(false);
+  const [accessError, setAccessError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const attendeeId = eventId ? localStorage.getItem(`attendee_${eventId}`) : null;
   const qrToken = eventId ? localStorage.getItem(`attendee_qr_${eventId}`) : null;
 
-  // Check if attendee is checked in
-  const { data: attendeeData, isLoading: isCheckingIn } = useQuery({
+  // Hard gate: Check if attendee exists AND is checked in
+  const { data: attendeeData, isLoading: isCheckingIn, error: attendeeError } = useQuery({
     queryKey: ["attendee-checkin", attendeeId],
     queryFn: async () => {
       if (!attendeeId) return null;
@@ -51,15 +52,30 @@ const AfterPartyRoom = () => {
     enabled: !!attendeeId,
   });
 
+  // Hard gate room access: redirect if not verified
   useEffect(() => {
-    // If no attendee ID, redirect to RSVP
-    if (!attendeeId && eventId) {
+    if (!eventId) return;
+
+    // No attendee ID - redirect to RSVP
+    if (!attendeeId) {
       navigate(`/after-party/${eventId}/rsvp`, { replace: true });
       return;
     }
 
-    // If attendee exists but not checked in, redirect to QR page
-    if (attendeeData && !attendeeData.checked_in_at && eventId) {
+    // If we finished checking and attendee doesn't exist in DB
+    if (!isCheckingIn && attendeeError) {
+      setAccessError("Unable to verify access. Please try again.");
+      return;
+    }
+
+    // If we finished checking and attendee record doesn't exist
+    if (!isCheckingIn && !attendeeData) {
+      navigate(`/after-party/${eventId}/rsvp`, { replace: true });
+      return;
+    }
+
+    // If attendee exists but not checked in
+    if (!isCheckingIn && attendeeData && !attendeeData.checked_in_at) {
       const token = attendeeData.qr_token || qrToken;
       if (token) {
         navigate(`/after-party/${eventId}/qr/${token}`, { replace: true });
@@ -67,9 +83,9 @@ const AfterPartyRoom = () => {
         navigate(`/after-party/${eventId}/rsvp`, { replace: true });
       }
     }
-  }, [attendeeId, attendeeData, eventId, qrToken, navigate]);
+  }, [attendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn]);
 
-  const { data: event, isLoading } = useQuery({
+  const { data: event, isLoading, error: eventError } = useQuery({
     queryKey: ["event", eventId],
     queryFn: async (): Promise<EventData> => {
       const { data, error } = await supabase
@@ -81,7 +97,7 @@ const AfterPartyRoom = () => {
       if (error) throw error;
       return data as EventData;
     },
-    enabled: !!eventId && !!attendeeId,
+    enabled: !!eventId && !!attendeeId && !!attendeeData?.checked_in_at,
   });
 
   const { data: attendeeCount = 0 } = useQuery({
@@ -95,7 +111,7 @@ const AfterPartyRoom = () => {
       if (error) throw error;
       return count || 0;
     },
-    enabled: !!eventId && !!attendeeId,
+    enabled: !!eventId && !!attendeeId && !!attendeeData?.checked_in_at,
   });
 
   const { data: attendeeRole } = useQuery({
@@ -112,7 +128,7 @@ const AfterPartyRoom = () => {
       if (error) return null;
       return data?.role || null;
     },
-    enabled: !!attendeeId,
+    enabled: !!attendeeId && !!attendeeData?.checked_in_at,
   });
 
   const canCreateRecap = isAdminMode || attendeeRole === "artist";
@@ -129,7 +145,7 @@ const AfterPartyRoom = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!eventId && !!attendeeId,
+    enabled: !!eventId && !!attendeeId && !!attendeeData?.checked_in_at,
   });
 
   const scrollToBottom = () => {
@@ -144,18 +160,21 @@ const AfterPartyRoom = () => {
     if (!messageText.trim() || !eventId || !attendeeId) return;
 
     setIsSending(true);
-    const { error } = await supabase.from("after_party_messages").insert({
-      event_id: eventId,
-      attendee_id: attendeeId,
-      role: "fan",
-      message: messageText.trim(),
-    });
+    try {
+      const { error } = await supabase.from("after_party_messages").insert({
+        event_id: eventId,
+        attendee_id: attendeeId,
+        role: "fan",
+        message: messageText.trim(),
+      });
 
-    setIsSending(false);
-
-    if (!error) {
+      if (error) throw error;
       setMessageText("");
       refetchMessages();
+    } catch (err: any) {
+      console.error("Send message error:", err);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -163,17 +182,19 @@ const AfterPartyRoom = () => {
     if (!eventId || !event) return;
 
     setIsCreatingRecap(true);
-    const headline = `After Party — ${event.title}`;
+    try {
+      const headline = `After Party — ${event.title}`;
 
-    const { error } = await supabase.from("recaps").insert({
-      event_id: eventId,
-      content: headline,
-    });
+      const { error } = await supabase.from("recaps").insert({
+        event_id: eventId,
+        content: headline,
+      });
 
-    setIsCreatingRecap(false);
-
-    if (!error) {
+      if (error) throw error;
       navigate(`/after-party/${eventId}/recap`);
+    } catch (err: any) {
+      console.error("Create recap error:", err);
+      setIsCreatingRecap(false);
     }
   };
 
@@ -186,7 +207,21 @@ const AfterPartyRoom = () => {
     }
   };
 
-  // Don't render if not checked in
+  // Show error state
+  if (accessError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-destructive mb-4">{accessError}</p>
+          <Button variant="outline" onClick={() => navigate(`/after-party/${eventId}/rsvp`)}>
+            Go to RSVP
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not checked in (waiting for redirect)
   if (!attendeeId || isCheckingIn || !attendeeData?.checked_in_at) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -199,6 +234,14 @@ const AfterPartyRoom = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (eventError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <p className="text-destructive">Failed to load event. Please try again.</p>
       </div>
     );
   }
