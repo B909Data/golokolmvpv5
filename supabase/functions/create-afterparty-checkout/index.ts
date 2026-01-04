@@ -9,7 +9,6 @@ const corsHeaders = {
 
 interface AfterPartyFormData {
   artist_name: string;
-  contact_phone: string;
   contact_email: string;
   title: string;
   start_at: string;
@@ -32,7 +31,7 @@ serve(async (req) => {
     console.log("Received form data:", formData);
 
     // Validate required fields
-    if (!formData.artist_name || !formData.contact_phone || !formData.contact_email || 
+    if (!formData.artist_name || !formData.contact_email || 
         !formData.title || !formData.start_at || !formData.city || !formData.venue_name || 
         !formData.genres || formData.genres.length === 0) {
       throw new Error("Missing required fields");
@@ -54,7 +53,6 @@ serve(async (req) => {
       .insert({
         title: formData.title,
         artist_name: formData.artist_name,
-        contact_phone: formData.contact_phone,
         contact_email: formData.contact_email,
         start_at: formData.start_at,
         city: formData.city,

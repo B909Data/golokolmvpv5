@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-import { Lock, Save, Trash2, RefreshCw } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { Lock, Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Html5Qrcode } from "html5-qrcode";
 
 interface EventData {
   id: string;
@@ -33,6 +34,7 @@ interface Message {
 const ArtistEvent = () => {
   const { eventId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const token = searchParams.get("token");
 
   const [event, setEvent] = useState<EventData | null>(null);
@@ -45,6 +47,15 @@ const ArtistEvent = () => {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [livestreamUrl, setLivestreamUrl] = useState("");
+
+  // Door check-in state
+  const [checkedInCount, setCheckedInCount] = useState(0);
+  const [isScanning, setIsScanning] = useState(false);
+  const [showWalkInForm, setShowWalkInForm] = useState(false);
+  const [walkInName, setWalkInName] = useState("");
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scannerContainerRef = useRef<HTMLDivElement>(null);
 
   const fetchEvent = async () => {
     if (!eventId || !token) return;
@@ -72,9 +83,29 @@ const ArtistEvent = () => {
     }
   };
 
+  const fetchCheckedInCount = async () => {
+    if (!eventId) return;
+    const { count } = await supabase
+      .from("attendees")
+      .select("*", { count: "exact", head: true })
+      .eq("event_id", eventId)
+      .not("checked_in_at", "is", null);
+    setCheckedInCount(count || 0);
+  };
+
   useEffect(() => {
     fetchEvent();
+    fetchCheckedInCount();
   }, [eventId, token]);
+
+  // Cleanup scanner on unmount
+  useEffect(() => {
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.stop().catch(() => {});
+      }
+    };
+  }, []);
 
   const handleSave = async () => {
     if (!eventId || !token) return;
@@ -112,6 +143,109 @@ const ArtistEvent = () => {
     } catch (err) {
       console.error("Delete error:", err);
       toast.error("Failed to delete message");
+    }
+  };
+
+  const startScanner = async () => {
+    if (!scannerContainerRef.current) return;
+    
+    setIsScanning(true);
+    
+    try {
+      const scanner = new Html5Qrcode("qr-scanner");
+      scannerRef.current = scanner;
+
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        async (decodedText) => {
+          // Stop scanner immediately after successful scan
+          await scanner.stop();
+          setIsScanning(false);
+          
+          // Extract qr_token from URL
+          // Expected format: /after-party/:eventId/verify/:qrToken
+          const match = decodedText.match(/\/after-party\/[^/]+\/verify\/([^/?]+)/);
+          if (match && match[1]) {
+            await handleQRCheckin(match[1]);
+          } else {
+            toast.error("Invalid QR code format");
+          }
+        },
+        () => {} // Ignore scan errors
+      );
+    } catch (err) {
+      console.error("Scanner error:", err);
+      toast.error("Could not start camera");
+      setIsScanning(false);
+    }
+  };
+
+  const stopScanner = async () => {
+    if (scannerRef.current) {
+      await scannerRef.current.stop().catch(() => {});
+      scannerRef.current = null;
+    }
+    setIsScanning(false);
+  };
+
+  const handleQRCheckin = async (qrToken: string) => {
+    if (!eventId || !token) return;
+    
+    setIsCheckingIn(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("artist-checkin-attendee", {
+        body: {
+          event_id: eventId,
+          token,
+          qr_token: qrToken,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.already_checked_in) {
+        toast.info(`${data.attendee.display_name || "Guest"} is already checked in`);
+      } else {
+        toast.success(`Checked in: ${data.attendee.display_name || "Guest"}`);
+        fetchCheckedInCount();
+      }
+    } catch (err: any) {
+      console.error("Check-in error:", err);
+      toast.error(err.message || "Check-in failed");
+    } finally {
+      setIsCheckingIn(false);
+    }
+  };
+
+  const handleWalkInSubmit = async () => {
+    if (!eventId || !token) return;
+    
+    setIsCheckingIn(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("artist-checkin-attendee", {
+        body: {
+          event_id: eventId,
+          token,
+          walk_in: true,
+          display_name: walkInName.trim() || undefined,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success(`Walk-in checked in: ${data.attendee.display_name || "Guest"}`);
+      fetchCheckedInCount();
+      setShowWalkInForm(false);
+      setWalkInName("");
+
+      // Navigate walk-in to intro page
+      navigate(`/after-party/${eventId}/intro?token=${data.attendee.qr_token}`);
+    } catch (err: any) {
+      console.error("Walk-in error:", err);
+      toast.error(err.message || "Walk-in failed");
+    } finally {
+      setIsCheckingIn(false);
     }
   };
 
@@ -169,6 +303,67 @@ const ArtistEvent = () => {
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Door Check-In Section */}
+      <section className="px-4 pb-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="border-2 border-primary rounded-xl p-6 bg-background space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-xl text-primary uppercase tracking-wide">Door Check-In</h2>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Users className="w-4 h-4" />
+                <span className="font-sans">{checkedInCount} checked in</span>
+              </div>
+            </div>
+
+            {/* Scanner Area */}
+            {isScanning ? (
+              <div className="space-y-4">
+                <div id="qr-scanner" ref={scannerContainerRef} className="w-full max-w-sm mx-auto rounded-lg overflow-hidden" />
+                <Button variant="outline" onClick={stopScanner} className="w-full">
+                  <X className="w-4 h-4 mr-2" />
+                  Stop Scanner
+                </Button>
+              </div>
+            ) : showWalkInForm ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-primary mb-2 font-sans font-medium">Name (optional)</label>
+                  <Input
+                    value={walkInName}
+                    onChange={(e) => setWalkInName(e.target.value)}
+                    placeholder="Walk-in guest name"
+                    className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleWalkInSubmit}
+                    disabled={isCheckingIn}
+                    className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {isCheckingIn ? "Adding..." : "Add Walk-In"}
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowWalkInForm(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                <Button onClick={startScanner} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <QrCode className="w-4 h-4 mr-2" />
+                  Scan QR
+                </Button>
+                <Button variant="outline" onClick={() => setShowWalkInForm(true)} className="flex-1">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Add Walk-In
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </section>

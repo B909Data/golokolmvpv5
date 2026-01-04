@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle, XCircle, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -59,7 +60,7 @@ const VerifyQRPage = () => {
         // Fetch attendee by eventId + qr_token
         const { data: attendee, error } = await supabase
           .from("attendees")
-          .select("id, display_name, phone, checked_in_at")
+          .select("id, display_name, checked_in_at")
           .eq("event_id", eventId)
           .eq("qr_token", qrToken)
           .maybeSingle();
@@ -71,7 +72,7 @@ const VerifyQRPage = () => {
 
         setAttendeeName(attendee.display_name || "Guest");
 
-        // QR verification idempotency: if already checked in, don't update or send SMS
+        // QR verification idempotency: if already checked in, don't update
         if (attendee.checked_in_at) {
           setVerificationStatus("already_checked_in");
           return;
@@ -89,25 +90,6 @@ const VerifyQRPage = () => {
           return;
         }
 
-        // Fetch event title for SMS
-        const { data: event } = await supabase
-          .from("events")
-          .select("title")
-          .eq("id", eventId)
-          .maybeSingle();
-
-        // Send access granted SMS only on state transition (first check-in)
-        if (attendee.phone) {
-          const roomUrl = `${window.location.origin}/after-party/${eventId}/room`;
-          await supabase.functions.invoke("send-checkin-sms", {
-            body: {
-              phone: attendee.phone,
-              eventTitle: event?.title || "After Party",
-              roomUrl,
-            },
-          });
-        }
-
         setVerificationStatus("success");
       } catch (err) {
         console.error("Verification error:", err);
@@ -120,6 +102,8 @@ const VerifyQRPage = () => {
       verifyAttendee();
     }
   }, [eventId, qrToken, isAuthorized, isAdmin, attendeeRole, isLoadingRole]);
+
+  const roomUrl = `/after-party/${eventId}/room?token=${qrToken}`;
 
   if (verificationStatus === "loading") {
     return (
@@ -178,9 +162,12 @@ const VerifyQRPage = () => {
             <CheckCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-foreground mb-2">Already checked in</h1>
             <p className="text-lg text-muted-foreground mb-2">{attendeeName}</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-6">
               This attendee was already verified.
             </p>
+            <Link to={roomUrl}>
+              <Button>Enter After Party</Button>
+            </Link>
           </div>
         </main>
         <Footer />
@@ -195,7 +182,10 @@ const VerifyQRPage = () => {
         <div className="text-center">
           <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">Checked in: {attendeeName}</h1>
-          <p className="text-muted-foreground">Access SMS sent.</p>
+          <p className="text-muted-foreground mb-6">You're all set!</p>
+          <Link to={roomUrl}>
+            <Button size="lg">Enter After Party</Button>
+          </Link>
         </div>
       </main>
       <Footer />

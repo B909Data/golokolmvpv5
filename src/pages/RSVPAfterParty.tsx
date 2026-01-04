@@ -17,7 +17,6 @@ const RSVPAfterParty = () => {
   const { toast } = useToast();
   
   const [displayName, setDisplayName] = useState("");
-  const [phone, setPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
@@ -48,66 +47,19 @@ const RSVPAfterParty = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!displayName.trim() || !phone.trim()) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in your name and phone number.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (!eventId) return;
 
     setIsSubmitting(true);
 
     try {
-      const normalizedPhone = phone.trim();
-
-      // Check for existing attendee by event_id + phone (deduplication)
-      const { data: existingAttendee, error: checkError } = await supabase
-        .from("attendees")
-        .select("id, qr_token")
-        .eq("event_id", eventId)
-        .eq("phone", normalizedPhone)
-        .maybeSingle();
-
-      if (checkError) throw checkError;
-
-      if (existingAttendee) {
-        // Already RSVP'd - resend SMS and show message
-        const qrUrl = `${window.location.origin}/after-party/${eventId}/qr/${existingAttendee.qr_token}`;
-        
-        await supabase.functions.invoke("send-rsvp-sms", {
-          body: {
-            phone: normalizedPhone,
-            eventTitle: event?.title || "After Party",
-            qrUrl,
-          },
-        });
-
-        // Store attendee info for this session
-        localStorage.setItem(`attendee_${eventId}`, existingAttendee.id);
-        localStorage.setItem(`attendee_qr_${eventId}`, existingAttendee.qr_token || "");
-
-        toast({
-          title: "You are already on the list",
-          description: "Check your texts for your QR code.",
-        });
-
-        navigate(`/after-party/${eventId}/rsvp/confirmed`);
-        return;
-      }
-
-      // New RSVP - generate QR token and insert
+      // Generate QR token client-side
       const qrToken = crypto.randomUUID();
 
       const { data: attendee, error: insertError } = await supabase
         .from("attendees")
         .insert({
           event_id: eventId,
-          display_name: displayName.trim(),
-          phone: normalizedPhone,
+          display_name: displayName.trim() || null,
           checkin_method: "qr",
           qr_token: qrToken,
         })
@@ -116,23 +68,12 @@ const RSVPAfterParty = () => {
 
       if (insertError) throw insertError;
 
-      // Send RSVP SMS with QR link
-      const qrUrl = `${window.location.origin}/after-party/${eventId}/qr/${qrToken}`;
-      
-      await supabase.functions.invoke("send-rsvp-sms", {
-        body: {
-          phone: normalizedPhone,
-          eventTitle: event?.title || "After Party",
-          qrUrl,
-        },
-      });
-
       // Store attendee ID and qr_token for later use
       localStorage.setItem(`attendee_${eventId}`, attendee.id);
       localStorage.setItem(`attendee_qr_${eventId}`, qrToken);
 
-      // Navigate to confirmation
-      navigate(`/after-party/${eventId}/rsvp/confirmed`);
+      // Navigate to pass page with token
+      navigate(`/after-party/${eventId}/pass?token=${qrToken}`);
     } catch (error: any) {
       console.error("RSVP error:", error);
       toast({
@@ -187,14 +128,14 @@ const RSVPAfterParty = () => {
               Find me on GoLokol after my next show.
             </p>
             
-            {/* Value Bullets */}
+          {/* Value Bullets */}
             <div className="text-left space-y-4 mb-8">
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
                   <CheckCircle className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <p className="text-foreground font-sans">
-                  RSVP and receive an SMS QR code.
+                  RSVP to get your digital pass.
                 </p>
               </div>
               
@@ -203,7 +144,7 @@ const RSVPAfterParty = () => {
                   <CheckCircle className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <p className="text-foreground font-sans">
-                  I will scan it after the show.
+                  Show your QR code at the door after the show.
                 </p>
               </div>
               
@@ -240,32 +181,15 @@ const RSVPAfterParty = () => {
               <h2 className="font-display text-xl text-primary mb-4 uppercase">Complete Your RSVP</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="displayName" className="text-foreground font-sans">Your Name</Label>
+                  <Label htmlFor="displayName" className="text-foreground font-sans">Your Name (optional)</Label>
                   <Input
                     id="displayName"
                     type="text"
                     placeholder="Enter your name"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    required
                     className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
                   />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-foreground font-sans">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+1 555 123 4567"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                    className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
-                  />
-                  <p className="text-xs text-muted-foreground font-sans">
-                    We will text you your QR code and event link.
-                  </p>
                 </div>
 
                 <Button
@@ -273,7 +197,7 @@ const RSVPAfterParty = () => {
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-sans"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Submitting..." : "RSVP"}
+                  {isSubmitting ? "Getting your pass..." : "Get My Pass"}
                 </Button>
               </form>
             </div>
