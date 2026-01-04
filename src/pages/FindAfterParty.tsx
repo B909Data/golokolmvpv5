@@ -118,10 +118,11 @@ const FindAfterParty = () => {
         <div className="container mx-auto px-4">
           {/* Page Header */}
           <div className="mb-10">
-            <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
-              Find an After Party
+            <h1 className="font-display text-3xl md:text-4xl lowercase mb-2">
+              <span className="text-foreground">find an </span>
+              <span className="text-primary">after party</span>
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-lg font-sans">
               Discover upcoming After Parties by city and genre. RSVP to connect with artists and fans.
             </p>
           </div>
@@ -131,7 +132,7 @@ const FindAfterParty = () => {
             <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-10 rounded-md border-2 border-primary bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus:bg-primary/10 [&>option]:bg-background [&>option]:text-foreground [&>option:hover]:bg-primary [&>option:checked]:bg-primary/20"
             >
               <option value="">All Cities</option>
               {CITY_OPTIONS.map((city) => (
@@ -144,7 +145,7 @@ const FindAfterParty = () => {
             <select
               value={genreFilter}
               onChange={(e) => setGenreFilter(e.target.value)}
-              className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-10 rounded-md border-2 border-primary bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus:bg-primary/10 [&>option]:bg-background [&>option]:text-foreground [&>option:hover]:bg-primary [&>option:checked]:bg-primary/20"
             >
               <option value="">All Genres</option>
               {GENRE_OPTIONS.map((genre) => (
@@ -162,6 +163,7 @@ const FindAfterParty = () => {
                   setCityFilter("");
                   setGenreFilter("");
                 }}
+                className="text-foreground hover:text-primary"
               >
                 Clear Filters
               </Button>
@@ -224,10 +226,10 @@ const FindAfterParty = () => {
                 return (
                   <div
                     key={event.id}
-                    className="rounded-xl border border-border bg-card overflow-hidden flex flex-col group hover:border-primary/50 transition-colors"
+                    className="rounded-xl overflow-hidden flex flex-col group bg-primary"
                   >
                     {/* Media Section */}
-                    <div className="aspect-video relative bg-muted">
+                    <div className="aspect-video relative bg-primary/80">
                       {isPlaying && videoId ? (
                         <>
                           <iframe
@@ -254,8 +256,8 @@ const FindAfterParty = () => {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                              <Music className="h-12 w-12 text-primary/40" />
+                            <div className="w-full h-full flex items-center justify-center bg-primary/60">
+                              <Music className="h-12 w-12 text-primary-foreground/40" />
                             </div>
                           )}
                           
@@ -266,7 +268,7 @@ const FindAfterParty = () => {
                               className="absolute inset-0 flex items-center justify-center bg-background/20 hover:bg-background/30 transition-colors cursor-pointer"
                               aria-label="Play video"
                             >
-                              <PlayCircle className="w-16 h-16 text-primary drop-shadow-lg" />
+                              <PlayCircle className="w-16 h-16 text-primary-foreground drop-shadow-lg" />
                             </button>
                           )}
 
@@ -276,7 +278,7 @@ const FindAfterParty = () => {
                               {event.genres.slice(0, 2).map((genre) => (
                                 <span
                                   key={genre}
-                                  className="px-2 py-0.5 rounded-full bg-background/90 text-foreground text-xs font-medium"
+                                  className="px-2 py-0.5 rounded-full bg-primary/80 text-primary-foreground text-xs font-sans"
                                 >
                                   {genre}
                                 </span>
@@ -288,21 +290,21 @@ const FindAfterParty = () => {
                     </div>
 
                     {/* Card Content */}
-                    <div className="p-5 flex flex-col gap-4 flex-1">
-                      {/* Primary info: Title and Artist */}
+                    <div className="p-5 flex flex-col gap-4 flex-1 bg-primary">
+                      {/* Primary info: Artist name in Breul Grotesk */}
                       <div>
-                        <h2 className="font-display text-xl text-foreground leading-tight mb-1">
+                        <h2 className="font-display text-xl text-primary-foreground leading-tight mb-1">
                           {event.artist_name || event.title}
                         </h2>
                         {event.artist_name && event.title !== event.artist_name && (
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-base font-sans text-primary-foreground/80">
                             {event.title}
                           </p>
                         )}
                       </div>
 
-                      {/* Secondary info: Date and Location */}
-                      <div className="flex flex-col gap-1.5 text-sm text-muted-foreground">
+                      {/* Secondary info: Date and Location in Roboto */}
+                      <div className="flex flex-col gap-1.5 text-base font-sans text-primary-foreground/80">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 shrink-0" />
                           <span>
@@ -317,9 +319,9 @@ const FindAfterParty = () => {
                         )}
                       </div>
 
-                      {/* Primary CTA */}
+                      {/* Primary CTA - Black bg with yellow text */}
                       <Link to={`/after-party/${event.id}/rsvp`} className="mt-auto">
-                        <Button variant="default" className="w-full">
+                        <Button className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-sans">
                           RSVP
                         </Button>
                       </Link>
