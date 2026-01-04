@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Music, Loader2, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
+import { ArrowLeft, Loader2, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import golokolLogo from "@/assets/golokol-logo.svg";
 
 const GENRE_OPTIONS = [
   "Hip-Hop",
@@ -226,20 +227,20 @@ const CreateAfterparty = () => {
       {[1, 2, 3].map((step) => (
         <div key={step} className="flex items-center">
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-sans font-semibold transition-colors ${
               step === currentStep
-                ? "bg-primary text-primary-foreground"
+                ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background"
                 : step < currentStep
-                ? "bg-primary/20 text-primary"
-                : "bg-muted text-muted-foreground"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted/30 text-muted-foreground border border-muted-foreground/30"
             }`}
           >
             {step}
           </div>
           {step < 3 && (
             <div
-              className={`w-12 h-0.5 mx-1 ${
-                step < currentStep ? "bg-primary/40" : "bg-muted"
+              className={`w-12 h-1 mx-2 rounded ${
+                step < currentStep ? "bg-primary" : "bg-muted/30"
               }`}
             />
           )}
@@ -251,49 +252,49 @@ const CreateAfterparty = () => {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="font-display text-2xl text-foreground">Artist Info</h2>
-        <p className="text-muted-foreground text-sm mt-1">Tell us about yourself</p>
+        <h2 className="font-display text-2xl text-primary-foreground">Artist Info</h2>
+        <p className="text-primary-foreground/70 text-base font-sans mt-1">Tell us about yourself</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="artist_name">Artist / Band Name *</Label>
+          <Label htmlFor="artist_name" className="text-primary-foreground text-base font-sans">Artist / Band Name *</Label>
           <Input
             id="artist_name"
             {...register("artist_name")}
             placeholder="Your artist or band name"
-            className="h-12"
+            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
           />
           {errors.artist_name && (
-            <p className="text-sm text-destructive">{errors.artist_name.message}</p>
+            <p className="text-sm text-destructive font-sans">{errors.artist_name.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contact_phone">Contact Phone *</Label>
+          <Label htmlFor="contact_phone" className="text-primary-foreground text-base font-sans">Contact Phone *</Label>
           <Input
             id="contact_phone"
             type="tel"
             {...register("contact_phone")}
             placeholder="(555) 123-4567"
-            className="h-12"
+            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
           />
           {errors.contact_phone && (
-            <p className="text-sm text-destructive">{errors.contact_phone.message}</p>
+            <p className="text-sm text-destructive font-sans">{errors.contact_phone.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contact_email">Contact Email *</Label>
+          <Label htmlFor="contact_email" className="text-primary-foreground text-base font-sans">Contact Email *</Label>
           <Input
             id="contact_email"
             type="email"
             {...register("contact_email")}
             placeholder="you@example.com"
-            className="h-12"
+            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
           />
           {errors.contact_email && (
-            <p className="text-sm text-destructive">{errors.contact_email.message}</p>
+            <p className="text-sm text-destructive font-sans">{errors.contact_email.message}</p>
           )}
         </div>
       </div>
@@ -307,33 +308,33 @@ const CreateAfterparty = () => {
     return (
       <div className="space-y-6">
         <div className="text-center mb-6">
-          <h2 className="font-display text-2xl text-foreground">Event Details</h2>
-          <p className="text-muted-foreground text-sm mt-1">Where and when is it happening?</p>
+          <h2 className="font-display text-2xl text-primary-foreground">Event Details</h2>
+          <p className="text-primary-foreground/70 text-base font-sans mt-1">Where and when is it happening?</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="title">Event Title *</Label>
+            <Label htmlFor="title" className="text-primary-foreground text-base font-sans">Event Title *</Label>
             <Input
               id="title"
               {...register("title")}
               placeholder="e.g., Summer Vibes After Party"
-              className="h-12"
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
             />
             {errors.title && (
-              <p className="text-sm text-destructive">{errors.title.message}</p>
+              <p className="text-sm text-destructive font-sans">{errors.title.message}</p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label>Start Date *</Label>
+              <Label className="text-primary-foreground text-base font-sans">Start Date *</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "h-12 w-full justify-start text-left font-normal",
+                      "h-14 w-full justify-start text-left font-sans text-base bg-background text-foreground border-primary-foreground/50 hover:bg-background/90",
                       !selectedDate && "text-muted-foreground"
                     )}
                   >
@@ -353,16 +354,16 @@ const CreateAfterparty = () => {
                 </PopoverContent>
               </Popover>
               {errors.start_date && (
-                <p className="text-sm text-destructive">{errors.start_date.message}</p>
+                <p className="text-sm text-destructive font-sans">{errors.start_date.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label>Start Time *</Label>
+              <Label className="text-primary-foreground text-base font-sans">Start Time *</Label>
               <select
                 value={selectedTime || ""}
                 onChange={(e) => setValue("start_time", e.target.value, { shouldValidate: true })}
-                className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <option value="">Select time</option>
                 {TIME_OPTIONS.map((time) => (
@@ -372,17 +373,17 @@ const CreateAfterparty = () => {
                 ))}
               </select>
               {errors.start_time && (
-                <p className="text-sm text-destructive">{errors.start_time.message}</p>
+                <p className="text-sm text-destructive font-sans">{errors.start_time.message}</p>
               )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="city">City *</Label>
+            <Label htmlFor="city" className="text-primary-foreground text-base font-sans">City *</Label>
             <select
               id="city"
               {...register("city")}
-              className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <option value="">Select a city</option>
               {CITY_OPTIONS.map((city) => (
@@ -392,34 +393,34 @@ const CreateAfterparty = () => {
               ))}
             </select>
             {errors.city && (
-              <p className="text-sm text-destructive">{errors.city.message}</p>
+              <p className="text-sm text-destructive font-sans">{errors.city.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="venue_name">Venue Name *</Label>
+            <Label htmlFor="venue_name" className="text-primary-foreground text-base font-sans">Venue Name *</Label>
             <Input
               id="venue_name"
               {...register("venue_name")}
               placeholder="e.g., The Blue Room"
-              className="h-12"
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
             />
             {errors.venue_name && (
-              <p className="text-sm text-destructive">{errors.venue_name.message}</p>
+              <p className="text-sm text-destructive font-sans">{errors.venue_name.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="ticket_url">Ticket URL (optional)</Label>
+            <Label htmlFor="ticket_url" className="text-primary-foreground text-base font-sans">Ticket URL (optional)</Label>
             <Input
               id="ticket_url"
               type="url"
               {...register("ticket_url")}
               placeholder="https://tickets.example.com/your-event"
-              className="h-12"
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
             />
             {errors.ticket_url && (
-              <p className="text-sm text-destructive">{errors.ticket_url.message}</p>
+              <p className="text-sm text-destructive font-sans">{errors.ticket_url.message}</p>
             )}
           </div>
         </div>
@@ -430,14 +431,14 @@ const CreateAfterparty = () => {
   const renderStep3 = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="font-display text-2xl text-foreground">Genre & Media</h2>
-        <p className="text-muted-foreground text-sm mt-1">Help fans discover your event</p>
+        <h2 className="font-display text-2xl text-primary-foreground">Genre & Media</h2>
+        <p className="text-primary-foreground/70 text-base font-sans mt-1">Help fans discover your event</p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-3">
-          <Label>
-            Genres * <span className="text-muted-foreground">(select up to 2)</span>
+          <Label className="text-primary-foreground text-base font-sans">
+            Genres * <span className="text-primary-foreground/60">(select up to 2)</span>
           </Label>
           <div className="flex flex-wrap gap-2">
             {GENRE_OPTIONS.map((genre) => (
@@ -445,10 +446,10 @@ const CreateAfterparty = () => {
                 key={genre}
                 type="button"
                 onClick={() => toggleGenre(genre)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                className={`px-3 py-2 rounded-full text-sm font-sans font-medium transition-colors ${
                   selectedGenres.includes(genre)
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    ? "bg-background text-foreground ring-2 ring-background"
+                    : "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"
                 }`}
               >
                 {genre}
@@ -456,46 +457,46 @@ const CreateAfterparty = () => {
             ))}
           </div>
           {errors.genres && (
-            <p className="text-sm text-destructive">{errors.genres.message}</p>
+            <p className="text-sm text-destructive font-sans">{errors.genres.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="youtube_url">YouTube URL (optional)</Label>
+          <Label htmlFor="youtube_url" className="text-primary-foreground text-base font-sans">YouTube URL (optional)</Label>
           <Input
             id="youtube_url"
             type="url"
             {...register("youtube_url")}
             placeholder="https://youtube.com/watch?v=..."
-            className="h-12"
+            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-primary-foreground/60 font-sans">
             Used for event thumbnail
           </p>
           {errors.youtube_url && (
-            <p className="text-sm text-destructive">{errors.youtube_url.message}</p>
+            <p className="text-sm text-destructive font-sans">{errors.youtube_url.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="image_url">Image URL (optional)</Label>
+          <Label htmlFor="image_url" className="text-primary-foreground text-base font-sans">Image URL (optional)</Label>
           <Input
             id="image_url"
             type="url"
             {...register("image_url")}
             placeholder="https://example.com/your-image.jpg"
-            className="h-12"
+            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-primary-foreground/60 font-sans">
             Fallback if no YouTube URL provided
           </p>
           {errors.image_url && (
-            <p className="text-sm text-destructive">{errors.image_url.message}</p>
+            <p className="text-sm text-destructive font-sans">{errors.image_url.message}</p>
           )}
         </div>
 
         {!youtubeUrl && !imageUrl && (
-          <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+          <p className="text-base text-primary-foreground/80 bg-primary-foreground/10 p-4 rounded-lg font-sans">
             💡 Adding a YouTube URL or image helps your event stand out to fans.
           </p>
         )}
@@ -510,7 +511,7 @@ const CreateAfterparty = () => {
           type="button"
           variant="outline"
           onClick={handleBack}
-          className="flex-1 h-12"
+          className="flex-1 h-14 text-base font-sans bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
         >
           <ChevronLeft className="mr-1 h-4 w-4" />
           Back
@@ -521,7 +522,7 @@ const CreateAfterparty = () => {
         <Button
           type="button"
           onClick={handleNext}
-          className="flex-1 h-12"
+          className="flex-1 h-14 text-base font-sans bg-primary-foreground text-primary hover:bg-primary-foreground/90"
         >
           Next
           <ChevronRight className="ml-1 h-4 w-4" />
@@ -529,7 +530,7 @@ const CreateAfterparty = () => {
       ) : (
         <Button
           type="submit"
-          className="flex-1 h-12"
+          className="flex-1 h-14 text-base font-sans bg-primary-foreground text-primary hover:bg-primary-foreground/90"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
@@ -587,29 +588,31 @@ const CreateAfterparty = () => {
 
           <div className="max-w-md mx-auto">
             <div className="text-center mb-6">
-              <div className="rounded-full bg-primary/20 w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Music className="h-8 w-8 text-primary" />
+              <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <img src={golokolLogo} alt="GoLokol" className="h-12 w-12" />
               </div>
               <h1 className="font-display text-3xl md:text-4xl text-foreground mb-1">
                 CREATE AN <span className="text-primary">AFTER PARTY</span>
               </h1>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-base font-sans">
                 $49 one-time fee to list your event
               </p>
             </div>
 
-            <p className="text-center text-sm text-muted-foreground mb-6">
+            <p className="text-center text-base font-sans text-muted-foreground mb-6">
               Step {currentStep} of 3
             </p>
 
             {renderStepIndicator()}
 
-            <form onSubmit={handleSubmit(onSubmit)}>
-              {currentStep === 1 && renderStep1()}
-              {currentStep === 2 && renderStep2()}
-              {currentStep === 3 && renderStep3()}
-              {renderNavButtons()}
-            </form>
+            <div className="bg-primary rounded-2xl p-6 md:p-8">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                {currentStep === 1 && renderStep1()}
+                {currentStep === 2 && renderStep2()}
+                {currentStep === 3 && renderStep3()}
+                {renderNavButtons()}
+              </form>
+            </div>
           </div>
         </div>
       </main>

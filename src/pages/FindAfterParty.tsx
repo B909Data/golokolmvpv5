@@ -118,9 +118,9 @@ const FindAfterParty = () => {
         <div className="container mx-auto px-4">
           {/* Page Header */}
           <div className="mb-10">
-            <h1 className="font-display text-3xl md:text-4xl lowercase mb-2">
-              <span className="text-foreground">find an </span>
-              <span className="text-primary">after party</span>
+            <h1 className="font-display text-3xl md:text-4xl uppercase mb-2">
+              <span className="text-foreground">FIND AN </span>
+              <span className="text-primary">AFTER PARTY</span>
             </h1>
             <p className="text-muted-foreground text-lg font-sans">
               Discover upcoming After Parties by city and genre. RSVP to connect with artists and fans.
@@ -268,7 +268,7 @@ const FindAfterParty = () => {
                               className="absolute inset-0 flex items-center justify-center bg-background/20 hover:bg-background/30 transition-colors cursor-pointer"
                               aria-label="Play video"
                             >
-                              <PlayCircle className="w-16 h-16 text-primary-foreground drop-shadow-lg" />
+                              <PlayCircle className="w-16 h-16 text-primary drop-shadow-lg" />
                             </button>
                           )}
 
