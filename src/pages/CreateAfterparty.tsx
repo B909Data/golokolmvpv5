@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Music, Loader2 } from "lucide-react";
+import { ArrowLeft, Music, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -81,6 +81,7 @@ type FormData = z.infer<typeof formSchema>;
 const CreateAfterparty = () => {
   const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
   const canceled = searchParams.get("canceled") === "true";
 
   const {
@@ -88,6 +89,7 @@ const CreateAfterparty = () => {
     handleSubmit,
     watch,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -95,17 +97,20 @@ const CreateAfterparty = () => {
       genres: [],
       city: "",
     },
+    mode: "onChange",
   });
 
   const selectedCity = watch("city");
   const selectedGenres = watch("genres") || [];
+  const youtubeUrl = watch("youtube_url");
+  const imageUrl = watch("image_url");
 
   const toggleGenre = (genre: string) => {
     const current = selectedGenres;
     if (current.includes(genre)) {
-      setValue("genres", current.filter((g) => g !== genre));
+      setValue("genres", current.filter((g) => g !== genre), { shouldValidate: true });
     } else if (current.length < 2) {
-      setValue("genres", [...current, genre]);
+      setValue("genres", [...current, genre], { shouldValidate: true });
     } else {
       toast.error("Maximum 2 genres allowed");
     }
@@ -114,15 +119,40 @@ const CreateAfterparty = () => {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
+  // Step validation
+  const step1Fields = ["artist_name", "contact_phone", "contact_email"] as const;
+  const step2Fields = ["title", "start_at", "city", "venue_name"] as const;
+  const step3Fields = ["genres"] as const;
+
+  const validateStep = async (step: number): Promise<boolean> => {
+    let fieldsToValidate: readonly (keyof FormData)[] = [];
+    if (step === 1) fieldsToValidate = step1Fields;
+    if (step === 2) fieldsToValidate = step2Fields;
+    if (step === 3) fieldsToValidate = step3Fields;
+
+    const result = await trigger(fieldsToValidate as (keyof FormData)[]);
+    return result;
+  };
+
+  const handleNext = async () => {
+    const isValid = await validateStep(currentStep);
+    if (isValid) {
+      setCurrentStep((prev) => Math.min(prev + 1, 3));
+    }
+  };
+
+  const handleBack = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
+
   const onSubmit = async (data: FormData) => {
-    // Prevent double submission
     if (isSubmitting) return;
     
     setIsSubmitting(true);
     setCheckoutError(null);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     try {
       const city = data.city === "Other" && data.custom_city ? data.custom_city : data.city;
@@ -156,10 +186,8 @@ const CreateAfterparty = () => {
       }
 
       if (response?.url) {
-        // Open in new tab to avoid iframe navigation restrictions
         const newWindow = window.open(response.url, '_blank', 'noopener,noreferrer');
         if (!newWindow) {
-          // Popup was blocked - show fallback link
           setCheckoutUrl(response.url);
           toast.error("Popup blocked — please allow popups or use the link below");
         } else {
@@ -184,6 +212,298 @@ const CreateAfterparty = () => {
       setIsSubmitting(false);
     }
   };
+
+  const renderStepIndicator = () => (
+    <div className="flex items-center justify-center gap-2 mb-8">
+      {[1, 2, 3].map((step) => (
+        <div key={step} className="flex items-center">
+          <div
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+              step === currentStep
+                ? "bg-primary text-primary-foreground"
+                : step < currentStep
+                ? "bg-primary/20 text-primary"
+                : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {step}
+          </div>
+          {step < 3 && (
+            <div
+              className={`w-12 h-0.5 mx-1 ${
+                step < currentStep ? "bg-primary/40" : "bg-muted"
+              }`}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderStep1 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="font-display text-2xl text-foreground">Artist Info</h2>
+        <p className="text-muted-foreground text-sm mt-1">Tell us about yourself</p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="artist_name">Artist / Band Name *</Label>
+          <Input
+            id="artist_name"
+            {...register("artist_name")}
+            placeholder="Your artist or band name"
+            className="h-12"
+          />
+          {errors.artist_name && (
+            <p className="text-sm text-destructive">{errors.artist_name.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="contact_phone">Contact Phone *</Label>
+          <Input
+            id="contact_phone"
+            type="tel"
+            {...register("contact_phone")}
+            placeholder="(555) 123-4567"
+            className="h-12"
+          />
+          {errors.contact_phone && (
+            <p className="text-sm text-destructive">{errors.contact_phone.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="contact_email">Contact Email *</Label>
+          <Input
+            id="contact_email"
+            type="email"
+            {...register("contact_email")}
+            placeholder="you@example.com"
+            className="h-12"
+          />
+          {errors.contact_email && (
+            <p className="text-sm text-destructive">{errors.contact_email.message}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStep2 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="font-display text-2xl text-foreground">Event Details</h2>
+        <p className="text-muted-foreground text-sm mt-1">Where and when is it happening?</p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="title">Event Title *</Label>
+          <Input
+            id="title"
+            {...register("title")}
+            placeholder="e.g., Summer Vibes After Party"
+            className="h-12"
+          />
+          {errors.title && (
+            <p className="text-sm text-destructive">{errors.title.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="start_at">Start Date & Time *</Label>
+          <Input
+            id="start_at"
+            type="datetime-local"
+            {...register("start_at")}
+            className="h-12"
+          />
+          {errors.start_at && (
+            <p className="text-sm text-destructive">{errors.start_at.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="city">City *</Label>
+          <select
+            id="city"
+            {...register("city")}
+            className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="">Select a city</option>
+            {CITY_OPTIONS.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
+          {errors.city && (
+            <p className="text-sm text-destructive">{errors.city.message}</p>
+          )}
+        </div>
+
+        {selectedCity === "Other" && (
+          <div className="space-y-2">
+            <Label htmlFor="custom_city">Enter City *</Label>
+            <Input
+              id="custom_city"
+              {...register("custom_city")}
+              placeholder="City name"
+              className="h-12"
+            />
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Label htmlFor="venue_name">Venue Name *</Label>
+          <Input
+            id="venue_name"
+            {...register("venue_name")}
+            placeholder="e.g., The Blue Room"
+            className="h-12"
+          />
+          {errors.venue_name && (
+            <p className="text-sm text-destructive">{errors.venue_name.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="ticket_url">Ticket URL (optional)</Label>
+          <Input
+            id="ticket_url"
+            type="url"
+            {...register("ticket_url")}
+            placeholder="https://tickets.example.com/your-event"
+            className="h-12"
+          />
+          {errors.ticket_url && (
+            <p className="text-sm text-destructive">{errors.ticket_url.message}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStep3 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="font-display text-2xl text-foreground">Genre & Media</h2>
+        <p className="text-muted-foreground text-sm mt-1">Help fans discover your event</p>
+      </div>
+
+      <div className="space-y-6">
+        <div className="space-y-3">
+          <Label>
+            Genres * <span className="text-muted-foreground">(select up to 2)</span>
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {GENRE_OPTIONS.map((genre) => (
+              <button
+                key={genre}
+                type="button"
+                onClick={() => toggleGenre(genre)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  selectedGenres.includes(genre)
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                {genre}
+              </button>
+            ))}
+          </div>
+          {errors.genres && (
+            <p className="text-sm text-destructive">{errors.genres.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="youtube_url">YouTube URL (optional)</Label>
+          <Input
+            id="youtube_url"
+            type="url"
+            {...register("youtube_url")}
+            placeholder="https://youtube.com/watch?v=..."
+            className="h-12"
+          />
+          <p className="text-xs text-muted-foreground">
+            Used for event thumbnail
+          </p>
+          {errors.youtube_url && (
+            <p className="text-sm text-destructive">{errors.youtube_url.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="image_url">Image URL (optional)</Label>
+          <Input
+            id="image_url"
+            type="url"
+            {...register("image_url")}
+            placeholder="https://example.com/your-image.jpg"
+            className="h-12"
+          />
+          <p className="text-xs text-muted-foreground">
+            Fallback if no YouTube URL provided
+          </p>
+          {errors.image_url && (
+            <p className="text-sm text-destructive">{errors.image_url.message}</p>
+          )}
+        </div>
+
+        {!youtubeUrl && !imageUrl && (
+          <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+            💡 Adding a YouTube URL or image helps your event stand out to fans.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderNavButtons = () => (
+    <div className="flex gap-3 mt-8">
+      {currentStep > 1 && (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleBack}
+          className="flex-1 h-12"
+        >
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Back
+        </Button>
+      )}
+      
+      {currentStep < 3 ? (
+        <Button
+          type="button"
+          onClick={handleNext}
+          className="flex-1 h-12"
+        >
+          Next
+          <ChevronRight className="ml-1 h-4 w-4" />
+        </Button>
+      ) : (
+        <Button
+          type="submit"
+          className="flex-1 h-12"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Continue to Payment — $49"
+          )}
+        </Button>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -225,231 +545,30 @@ const CreateAfterparty = () => {
             </div>
           )}
 
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="rounded-full bg-primary/20 w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                <Music className="h-10 w-10 text-primary" />
+          <div className="max-w-md mx-auto">
+            <div className="text-center mb-6">
+              <div className="rounded-full bg-primary/20 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Music className="h-8 w-8 text-primary" />
               </div>
-              <h1 className="font-display text-4xl md:text-5xl text-foreground mb-2">
+              <h1 className="font-display text-3xl md:text-4xl text-foreground mb-1">
                 CREATE AN <span className="text-primary">AFTER PARTY</span>
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 $49 one-time fee to list your event
               </p>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="rounded-xl bg-gradient-to-br from-background to-primary/5 border border-border p-6 space-y-5">
-                <h2 className="font-display text-xl text-foreground border-b border-border pb-3">
-                  Artist Info
-                </h2>
+            <p className="text-center text-sm text-muted-foreground mb-6">
+              Step {currentStep} of 3
+            </p>
 
-                <div className="space-y-2">
-                  <Label htmlFor="artist_name">Artist / Band Name *</Label>
-                  <Input
-                    id="artist_name"
-                    {...register("artist_name")}
-                    placeholder="Your artist or band name"
-                  />
-                  {errors.artist_name && (
-                    <p className="text-sm text-destructive">{errors.artist_name.message}</p>
-                  )}
-                </div>
+            {renderStepIndicator()}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="contact_phone">Contact Phone *</Label>
-                    <Input
-                      id="contact_phone"
-                      type="tel"
-                      {...register("contact_phone")}
-                      placeholder="(555) 123-4567"
-                    />
-                    {errors.contact_phone && (
-                      <p className="text-sm text-destructive">{errors.contact_phone.message}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="contact_email">Contact Email *</Label>
-                    <Input
-                      id="contact_email"
-                      type="email"
-                      {...register("contact_email")}
-                      placeholder="you@example.com"
-                    />
-                    {errors.contact_email && (
-                      <p className="text-sm text-destructive">{errors.contact_email.message}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-xl bg-gradient-to-br from-background to-primary/5 border border-border p-6 space-y-5">
-                <h2 className="font-display text-xl text-foreground border-b border-border pb-3">
-                  Event Details
-                </h2>
-
-                <div className="space-y-2">
-                  <Label htmlFor="title">Event Title *</Label>
-                  <Input
-                    id="title"
-                    {...register("title")}
-                    placeholder="e.g., Summer Vibes After Party"
-                  />
-                  {errors.title && (
-                    <p className="text-sm text-destructive">{errors.title.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="start_at">Start Date & Time *</Label>
-                  <Input
-                    id="start_at"
-                    type="datetime-local"
-                    {...register("start_at")}
-                  />
-                  {errors.start_at && (
-                    <p className="text-sm text-destructive">{errors.start_at.message}</p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City *</Label>
-                    <select
-                      id="city"
-                      {...register("city")}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      <option value="">Select a city</option>
-                      {CITY_OPTIONS.map((city) => (
-                        <option key={city} value={city}>
-                          {city}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.city && (
-                      <p className="text-sm text-destructive">{errors.city.message}</p>
-                    )}
-                  </div>
-
-                  {selectedCity === "Other" && (
-                    <div className="space-y-2">
-                      <Label htmlFor="custom_city">Enter City *</Label>
-                      <Input
-                        id="custom_city"
-                        {...register("custom_city")}
-                        placeholder="City name"
-                      />
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label htmlFor="venue_name">Venue Name *</Label>
-                    <Input
-                      id="venue_name"
-                      {...register("venue_name")}
-                      placeholder="e.g., The Blue Room"
-                    />
-                    {errors.venue_name && (
-                      <p className="text-sm text-destructive">{errors.venue_name.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="ticket_url">Ticket URL (optional)</Label>
-                  <Input
-                    id="ticket_url"
-                    type="url"
-                    {...register("ticket_url")}
-                    placeholder="https://tickets.example.com/your-event"
-                  />
-                  {errors.ticket_url && (
-                    <p className="text-sm text-destructive">{errors.ticket_url.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="rounded-xl bg-gradient-to-br from-background to-primary/5 border border-border p-6 space-y-5">
-                <h2 className="font-display text-xl text-foreground border-b border-border pb-3">
-                  Genre & Media
-                </h2>
-
-                <div className="space-y-3">
-                  <Label>
-                    Genres * <span className="text-muted-foreground">(select up to 2)</span>
-                  </Label>
-                  <div className="flex flex-wrap gap-2">
-                    {GENRE_OPTIONS.map((genre) => (
-                      <button
-                        key={genre}
-                        type="button"
-                        onClick={() => toggleGenre(genre)}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                          selectedGenres.includes(genre)
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                      >
-                        {genre}
-                      </button>
-                    ))}
-                  </div>
-                  {errors.genres && (
-                    <p className="text-sm text-destructive">{errors.genres.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="youtube_url">YouTube URL (optional)</Label>
-                  <Input
-                    id="youtube_url"
-                    type="url"
-                    {...register("youtube_url")}
-                    placeholder="https://youtube.com/watch?v=..."
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Used for event thumbnail
-                  </p>
-                  {errors.youtube_url && (
-                    <p className="text-sm text-destructive">{errors.youtube_url.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="image_url">Image URL (optional)</Label>
-                  <Input
-                    id="image_url"
-                    type="url"
-                    {...register("image_url")}
-                    placeholder="https://example.com/your-image.jpg"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Fallback if no YouTube URL provided
-                  </p>
-                  {errors.image_url && (
-                    <p className="text-sm text-destructive">{errors.image_url.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  "Continue to Payment — $49"
-                )}
-              </Button>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              {currentStep === 1 && renderStep1()}
+              {currentStep === 2 && renderStep2()}
+              {currentStep === 3 && renderStep3()}
+              {renderNavButtons()}
             </form>
           </div>
         </div>
