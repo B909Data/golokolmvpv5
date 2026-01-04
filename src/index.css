@@ -145,6 +145,13 @@
   }
 
   /* Headers - Breul Grotesk display font */
+  /* Disable OpenType decorative features (ligatures, contextual/stylistic alternates) */
+  h1, h2, h3, h4 {
+    font-feature-settings: "liga" 0, "calt" 0, "salt" 0;
+    -webkit-font-feature-settings: "liga" 0, "calt" 0, "salt" 0;
+    -moz-font-feature-settings: "liga" 0, "calt" 0, "salt" 0;
+  }
+
   h1 {
     @apply font-display text-[32px] md:text-[44px] leading-[1.1] tracking-[-0.02em];
     font-weight: 700;
