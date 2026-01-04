@@ -45,7 +45,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid gap-10 lg:grid-cols-2 items-start">
+          <div className="grid gap-10 lg:grid-cols-2 items-stretch">
             {/* Video Placeholder */}
             <div className="aspect-video w-full bg-secondary rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group">
               <PlayCircle className="w-20 h-20 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 mb-3" />
@@ -53,7 +53,7 @@ const Index = () => {
             </div>
 
             {/* Checklist */}
-            <div className="space-y-3">
+            <div className="flex flex-col justify-between h-full space-y-5">
               <ChecklistItem>An exclusive room online. Only the fans who attend shows get access.</ChecklistItem>
               <ChecklistItem>Get to know your true fans and they get to know each other.</ChecklistItem>
               <ChecklistItem>Create an experience that reflects your music, imagination and capacity.</ChecklistItem>
@@ -90,16 +90,18 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-2 items-start">
+          <div className="grid gap-8 lg:grid-cols-2 items-stretch">
             {/* Left column - Text items + CTAs */}
-            <div className="space-y-3">
-              <ChecklistItem>Answer questions, crack jokes, take roll call! Talk about what happened at the show last night.</ChecklistItem>
-              <ChecklistItem>Write a song with fans.</ChecklistItem>
-              <ChecklistItem>Livestream from the studio, or the kitchen or somewhere local near by.</ChecklistItem>
-              <ChecklistItem>Plan a stunt together for the next show.</ChecklistItem>
+            <div className="flex flex-col justify-between">
+              <div className="space-y-5">
+                <ChecklistItem>Answer questions, crack jokes, take roll call! Talk about what happened at the show last night.</ChecklistItem>
+                <ChecklistItem>Write a song with fans.</ChecklistItem>
+                <ChecklistItem>Livestream from the studio, or the kitchen or somewhere local near by.</ChecklistItem>
+                <ChecklistItem>Plan a stunt together for the next show.</ChecklistItem>
+              </div>
               
               {/* CTAs */}
-              <div className="flex flex-wrap gap-4 pt-4">
+              <div className="flex flex-wrap gap-4 pt-6">
                 <Link to="/create-afterparty">
                   <Button variant="secondary" size="lg">
                     Create an After Party
@@ -196,7 +198,7 @@ const Index = () => {
 const ChecklistItem = ({ children }: { children: React.ReactNode }) => (
   <div className="flex items-start gap-3">
     <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0 mt-0.5">
-      <Check className="w-4 h-4 text-foreground" />
+      <Check className="w-4 h-4 text-background" />
     </div>
     <p className="text-foreground text-lg leading-relaxed">{children}</p>
   </div>
