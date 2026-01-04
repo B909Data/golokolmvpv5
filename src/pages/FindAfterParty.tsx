@@ -70,12 +70,8 @@ const FindAfterParty = () => {
     },
   });
 
-  // Extract unique cities from events
-  const cities = useMemo(() => {
-    if (!events) return [];
-    const uniqueCities = [...new Set(events.map((e) => e.city).filter(Boolean))];
-    return uniqueCities.sort();
-  }, [events]);
+  // Fixed city options
+  const CITY_OPTIONS = ["Atlanta", "Athens", "New Orleans"];
 
   // Filter events client-side
   const filteredEvents = useMemo(() => {
@@ -116,8 +112,8 @@ const FindAfterParty = () => {
                 className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <option value="">All Cities</option>
-                {cities.map((city) => (
-                  <option key={city} value={city!}>
+                {CITY_OPTIONS.map((city) => (
+                  <option key={city} value={city}>
                     {city}
                   </option>
                 ))}
@@ -155,14 +151,34 @@ const FindAfterParty = () => {
             <div className="text-muted-foreground">Loading...</div>
           ) : !filteredEvents || filteredEvents.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground mb-4">
-                {events && events.length > 0
-                  ? "No events match your filters."
-                  : "No upcoming after parties found."}
-              </p>
-              <Link to="/create-afterparty">
-                <Button>Create an After Party</Button>
-              </Link>
+              {cityFilter ? (
+                <>
+                  <p className="text-foreground text-lg mb-4">
+                    Be the first to throw a GoLokol After Party in {cityFilter}.
+                  </p>
+                  <Link to="/create-afterparty">
+                    <Button>Create an After Party</Button>
+                  </Link>
+                </>
+              ) : events && events.length > 0 ? (
+                <>
+                  <p className="text-muted-foreground mb-4">
+                    No events match your filters.
+                  </p>
+                  <Link to="/create-afterparty">
+                    <Button>Create an After Party</Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <p className="text-muted-foreground mb-4">
+                    No upcoming after parties found.
+                  </p>
+                  <Link to="/create-afterparty">
+                    <Button>Create an After Party</Button>
+                  </Link>
+                </>
+              )}
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
