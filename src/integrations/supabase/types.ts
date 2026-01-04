@@ -239,6 +239,24 @@ export type Database = {
           },
         ]
       }
+      short_links: {
+        Row: {
+          code: string
+          created_at: string
+          target_url: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          target_url: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          target_url?: string
+        }
+        Relationships: []
+      }
       submissions: {
         Row: {
           admin_notes: string | null

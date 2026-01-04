@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,19 @@ interface SendRsvpSmsRequest {
   phone: string;
   eventTitle: string;
   qrUrl: string;
+  debugNoLink?: boolean; // If true, send no link (deliverability test)
+}
+
+/**
+ * Generate a URL-safe short code (8 chars)
+ */
+function generateShortCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let result = "";
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 }
 
 /**
@@ -50,16 +64,15 @@ const handler = async (req: Request): Promise<Response> => {
     const requestBody = await req.json();
     console.log("[REQUEST] Raw body:", JSON.stringify(requestBody));
     
-    const { phone, eventTitle, qrUrl }: SendRsvpSmsRequest = requestBody;
+    const { phone, eventTitle, qrUrl, debugNoLink }: SendRsvpSmsRequest = requestBody;
 
-    if (!phone || !eventTitle || !qrUrl) {
+    if (!phone || !eventTitle) {
       console.error("[VALIDATION] Missing required fields:", { 
         phone: !!phone, 
-        eventTitle: !!eventTitle, 
-        qrUrl: !!qrUrl 
+        eventTitle: !!eventTitle
       });
       return new Response(
-        JSON.stringify({ ok: false, error: "phone, eventTitle, and qrUrl are required" }),
+        JSON.stringify({ ok: false, error: "phone and eventTitle are required" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
@@ -111,12 +124,81 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const messageBody = `GoLokol: You're RSVP'd for ${eventTitle}. Show this QR at the door to unlock the After Party: ${qrUrl}`;
+    let messageBody: string;
+    let shortCode: string | null = null;
+
+    if (debugNoLink) {
+      // Debug mode: no link, just deliverability test
+      console.log("[DEBUG] debugNoLink=true, sending without link");
+      messageBody = `GoLokol: RSVP confirmed for ${eventTitle}. Reply STOP to opt out.`;
+    } else {
+      // Production mode: create short link and include it
+      if (!qrUrl) {
+        console.error("[VALIDATION] qrUrl required when debugNoLink is false");
+        return new Response(
+          JSON.stringify({ ok: false, error: "qrUrl is required" }),
+          { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      // Create Supabase client with service role for INSERT
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      
+      if (!supabaseUrl || !supabaseServiceKey) {
+        console.error("[SUPABASE] Missing credentials for short link creation");
+        return new Response(
+          JSON.stringify({ ok: false, error: "Supabase credentials missing" }),
+          { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Generate and insert short code
+      shortCode = generateShortCode();
+      console.log("[SHORT_LINK] Generated code:", shortCode, "for URL:", qrUrl);
+      
+      const { error: insertError } = await supabase
+        .from("short_links")
+        .insert({
+          code: shortCode,
+          target_url: qrUrl
+        });
+      
+      if (insertError) {
+        console.error("[SHORT_LINK] Insert failed:", insertError);
+        // Try once more with a new code in case of collision
+        shortCode = generateShortCode();
+        const { error: retryError } = await supabase
+          .from("short_links")
+          .insert({
+            code: shortCode,
+            target_url: qrUrl
+          });
+        
+        if (retryError) {
+          console.error("[SHORT_LINK] Retry insert failed:", retryError);
+          return new Response(
+            JSON.stringify({ ok: false, error: "Failed to create short link" }),
+            { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+          );
+        }
+      }
+      
+      console.log("[SHORT_LINK] Successfully created:", shortCode);
+      
+      // Use domain-branded short URL
+      const shortUrl = `https://golokol.app/q/${shortCode}`;
+      messageBody = `GoLokol: You're RSVP'd for ${eventTitle}. Show this at the door: ${shortUrl}. Reply STOP to opt out.`;
+    }
     
     console.log("[TWILIO] Sending SMS:", {
       to: normalizedPhone,
       sender: senderConfig,
-      bodyLength: messageBody.length
+      bodyLength: messageBody.length,
+      debugNoLink: !!debugNoLink,
+      shortCode
     });
 
     const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
@@ -149,7 +231,12 @@ const handler = async (req: Request): Promise<Response> => {
         const result = JSON.parse(responseText);
         console.log("[TWILIO] SUCCESS - Message SID:", result.sid);
         return new Response(
-          JSON.stringify({ ok: true, to: normalizedPhone, sid: result.sid }),
+          JSON.stringify({ 
+            ok: true, 
+            to: normalizedPhone, 
+            sid: result.sid,
+            shortCode: shortCode || undefined
+          }),
           { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
         );
       } else {

@@ -26,6 +26,7 @@ import Admin from "./pages/Admin";
 import AdminLLS from "./pages/AdminLLS";
 import AdminAfterParties from "./pages/AdminAfterParties";
 import ArtistEvent from "./pages/ArtistEvent";
+import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +61,7 @@ const App = () => (
           <Route path="/checkin/:qr_token" element={<Checkin />} />
           <Route path="/submit-song" element={<SubmitSong />} />
           <Route path="/how-to-golokol" element={<HowToGoLokol />} />
+          <Route path="/q/:code" element={<ShortLinkRedirect />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
