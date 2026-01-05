@@ -26,6 +26,9 @@ type Message = {
   message: string | null;
   created_at: string | null;
   attendee_id: string;
+  attendees: {
+    display_name: string | null;
+  } | null;
 };
 
 type ViewMode = "welcome" | "chat";
@@ -165,7 +168,7 @@ const AfterPartyRoom = () => {
     queryFn: async (): Promise<Message[]> => {
       const { data, error } = await supabase
         .from("after_party_messages")
-        .select("id, role, message, created_at, attendee_id")
+        .select("id, role, message, created_at, attendee_id, attendees(display_name)")
         .eq("event_id", eventId)
         .order("created_at", { ascending: true });
 
@@ -540,8 +543,9 @@ const ChatView = ({
             {messages.map((msg) => {
               const isArtist = msg.role === "artist";
               const isOwn = msg.attendee_id === currentAttendeeId;
-              const senderName = isArtist ? artistName : isOwn ? "You" : "Fan";
-              const initials = isArtist ? getInitials(artistName, "A") : isOwn ? "ME" : "FN";
+              const displayName = msg.attendees?.display_name;
+              const senderName = isArtist ? artistName : isOwn ? "You" : (displayName || "Fan");
+              const initials = isArtist ? getInitials(artistName, "A") : isOwn ? "ME" : getInitials(displayName, "FN");
               
               return (
                 <div
