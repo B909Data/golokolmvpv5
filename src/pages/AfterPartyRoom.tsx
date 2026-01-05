@@ -137,7 +137,7 @@ const AfterPartyRoom = () => {
     }
   }, [urlToken, storedAttendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn]);
 
-  const { data: event, isLoading, error: eventError } = useQuery({
+  const { data: event, isLoading, error: eventError, refetch: refetchEvent } = useQuery({
     queryKey: ["event-room", eventId],
     queryFn: async (): Promise<EventData> => {
       const { data, error } = await supabase
@@ -151,6 +151,31 @@ const AfterPartyRoom = () => {
     },
     enabled: !!eventId && !!attendeeId && !!attendeeData?.checked_in_at,
   });
+
+  // Realtime subscription for event updates (livestream, pinned message, etc.)
+  useEffect(() => {
+    if (!eventId || !attendeeId || !attendeeData?.checked_in_at) return;
+
+    const channel = supabase
+      .channel(`event-updates-${eventId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'events',
+          filter: `id=eq.${eventId}`,
+        },
+        () => {
+          refetchEvent();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [eventId, attendeeId, attendeeData?.checked_in_at, refetchEvent]);
 
   const { data: attendeeCount = 0 } = useQuery({
     queryKey: ["attendee-count", eventId],
