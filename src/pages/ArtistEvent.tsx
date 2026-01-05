@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Lock, Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check } from "lucide-react";
+import { Lock, Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, Pin, MessageSquare, CheckCircle2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,22 @@ interface Message {
   created_at: string;
   attendee_id: string;
 }
+
+// Status Card Component
+const StatusCard = ({ icon: Icon, label, value, accent = false }: { 
+  icon: React.ElementType; 
+  label: string; 
+  value: number | string;
+  accent?: boolean;
+}) => (
+  <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${accent ? 'bg-primary text-primary-foreground' : 'bg-muted/30 border border-border/50'}`}>
+    <Icon className={`w-5 h-5 ${accent ? 'text-primary-foreground' : 'text-primary'}`} />
+    <div>
+      <p className={`text-xs font-sans uppercase tracking-wide ${accent ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>{label}</p>
+      <p className={`text-lg font-display font-bold ${accent ? 'text-primary-foreground' : 'text-foreground'}`}>{value}</p>
+    </div>
+  </div>
+);
 
 const ArtistEvent = () => {
   const { eventId } = useParams();
@@ -132,7 +148,7 @@ const ArtistEvent = () => {
         },
       });
       if (error) throw error;
-      toast.success("Event updated");
+      toast.success("Settings saved");
     } catch (err) {
       console.error("Save error:", err);
       toast.error("Failed to save");
@@ -149,7 +165,7 @@ const ArtistEvent = () => {
       });
       if (error) throw error;
       setMessages((prev) => prev.filter((m) => m.id !== messageId));
-      toast.success("Message deleted");
+      toast.success("Message removed");
     } catch (err) {
       console.error("Delete error:", err);
       toast.error("Failed to delete message");
@@ -157,11 +173,9 @@ const ArtistEvent = () => {
   };
 
   const startScanner = () => {
-    // Reset error state
     setScannerError(null);
     setIsScanning(true);
     
-    // Use setTimeout to ensure the DOM element is rendered before starting scanner
     setTimeout(async () => {
       try {
         const scanner = new Html5Qrcode("qr-scanner");
@@ -171,13 +185,10 @@ const ArtistEvent = () => {
           { facingMode: "environment" },
           { fps: 10, qrbox: { width: 250, height: 250 } },
           async (decodedText) => {
-            // Stop scanner immediately after successful scan
             await scanner.stop();
             scannerRef.current = null;
             setIsScanning(false);
             
-            // Extract qr_token from URL
-            // Expected format: /after-party/:eventId/verify/:qrToken
             const match = decodedText.match(/\/after-party\/[^/]+\/verify\/([^/?]+)/);
             if (match && match[1]) {
               await handleQRCheckin(match[1]);
@@ -185,14 +196,13 @@ const ArtistEvent = () => {
               toast.error("Invalid QR code format");
             }
           },
-          () => {} // Ignore scan errors
+          () => {}
         );
       } catch (err: any) {
         console.error("Scanner error:", err);
         scannerRef.current = null;
         setIsScanning(false);
         
-        // Handle specific error types
         if (err.name === "NotAllowedError" || err.message?.includes("Permission")) {
           setScannerError("Camera access blocked. Enable camera for this site and reload.");
         } else if (err.message?.includes("secure context") || err.message?.includes("HTTPS")) {
@@ -236,7 +246,7 @@ const ArtistEvent = () => {
       if (data.already_checked_in) {
         toast.info(`${data.attendee.display_name || "Guest"} is already checked in`);
       } else {
-        toast.success(`Checked in: ${data.attendee.display_name || "Guest"}`);
+        toast.success(`${data.attendee.display_name || "Guest"} checked in`);
         fetchCheckedInCount();
       }
     } catch (err: any) {
@@ -263,12 +273,11 @@ const ArtistEvent = () => {
 
       if (error) throw error;
 
-      toast.success(`Walk-in checked in: ${data.attendee.display_name || "Guest"}`);
+      toast.success(`Walk-in added: ${data.attendee.display_name || "Guest"}`);
       fetchCheckedInCount();
       setShowWalkInForm(false);
       setWalkInName("");
 
-      // Show walk-in pass modal instead of navigating away
       setWalkInPassData({
         qrToken: data.attendee.qr_token,
         displayName: data.attendee.display_name || "Guest",
@@ -295,7 +304,7 @@ const ArtistEvent = () => {
     const url = getWalkInPassUrl();
     await navigator.clipboard.writeText(url);
     setLinkCopied(true);
-    toast.success("Link copied!");
+    toast.success("Link copied");
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
@@ -303,6 +312,9 @@ const ArtistEvent = () => {
     setWalkInPassData(null);
     setLinkCopied(false);
   };
+
+  // Derived counts
+  const pinnedCount = pinnedMessage.trim() ? 1 : 0;
 
   if (!token || !authorized) {
     return (
@@ -337,16 +349,17 @@ const ArtistEvent = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <section className="pt-32 pb-8 px-4">
+      {/* Header */}
+      <section className="pt-32 pb-6 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Lock className="w-6 h-6 text-primary" />
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="font-display text-3xl text-foreground">{event?.title}</h1>
-                  <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded font-sans uppercase tracking-wide">
-                    Private Link
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="font-display text-2xl md:text-3xl text-foreground">{event?.title}</h1>
+                  <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded font-sans uppercase tracking-wide font-medium">
+                    Artist Controls
                   </span>
                 </div>
                 <p className="text-muted-foreground text-sm font-sans">
@@ -362,17 +375,38 @@ const ArtistEvent = () => {
         </div>
       </section>
 
+      {/* Status Summary */}
+      <section className="px-4 pb-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-3 gap-3">
+            <StatusCard icon={CheckCircle2} label="Checked In" value={checkedInCount} accent />
+            <StatusCard icon={Users} label="In Room" value={checkedInCount} />
+            <StatusCard icon={Pin} label="Pinned" value={pinnedCount} />
+          </div>
+        </div>
+      </section>
+
       {/* Door Check-In Section */}
-      <section className="px-4 pb-12">
+      <section className="px-4 pb-8">
         <div className="max-w-4xl mx-auto">
           <div className="border-2 border-primary rounded-xl p-6 bg-background space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-xl text-primary uppercase tracking-wide">Door Check-In</h2>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Users className="w-4 h-4" />
-                <span className="font-sans">{checkedInCount} checked in</span>
+              <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-sans font-medium">
+                {checkedInCount} tonight
               </div>
             </div>
+
+            {/* Empty State */}
+            {checkedInCount === 0 && !isScanning && !showWalkInForm && (
+              <div className="bg-muted/20 rounded-lg p-6 text-center border border-border/30">
+                <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <p className="text-foreground font-sans font-medium mb-1">No fans checked in yet</p>
+                <p className="text-muted-foreground text-sm font-sans">
+                  Scan a QR code or add a walk-in to start the After Party.
+                </p>
+              </div>
+            )}
 
             {/* Scanner Error Display */}
             {scannerError && (
@@ -420,7 +454,7 @@ const ArtistEvent = () => {
                   <QrCode className="w-4 h-4 mr-2" />
                   Scan QR
                 </Button>
-                <Button variant="outline" onClick={() => setShowWalkInForm(true)} className="flex-1">
+                <Button variant="outline" onClick={() => setShowWalkInForm(true)} className="flex-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                   <UserPlus className="w-4 h-4 mr-2" />
                   Add Walk-In
                 </Button>
@@ -430,10 +464,11 @@ const ArtistEvent = () => {
         </div>
       </section>
 
-      <section className="px-4 pb-12">
+      {/* Event Settings Section */}
+      <section className="px-4 pb-8">
         <div className="max-w-4xl mx-auto">
-          <div className="border-2 border-primary rounded-xl p-6 bg-background space-y-6">
-            <h2 className="font-display text-xl text-primary uppercase tracking-wide">Event Settings</h2>
+          <div className="border-2 border-border/50 rounded-xl p-6 bg-background space-y-6">
+            <h2 className="font-display text-xl text-foreground uppercase tracking-wide">Event Settings</h2>
 
             <div className="space-y-4">
               <div>
@@ -441,10 +476,15 @@ const ArtistEvent = () => {
                 <Textarea
                   value={pinnedMessage}
                   onChange={(e) => setPinnedMessage(e.target.value)}
-                  placeholder="A message that will be pinned in the chat room..."
+                  placeholder="Pin important info so fans see it first..."
                   rows={3}
                   className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
                 />
+                {!pinnedMessage.trim() && (
+                  <p className="text-muted-foreground text-xs mt-1 font-sans">
+                    Tip: Pin important info so fans see it first.
+                  </p>
+                )}
               </div>
 
               <div>
@@ -486,30 +526,46 @@ const ArtistEvent = () => {
         </div>
       </section>
 
+      {/* Chat Messages Section */}
       <section className="px-4 pb-24">
         <div className="max-w-4xl mx-auto">
-          <div className="border-2 border-primary rounded-xl p-6 bg-background">
-            <h2 className="font-display text-xl text-primary mb-4 uppercase tracking-wide">Chat Messages ({messages.length})</h2>
+          <div className="border-2 border-border/50 rounded-xl p-6 bg-background">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-xl text-foreground uppercase tracking-wide">Messages</h2>
+              <div className="bg-muted/30 text-muted-foreground px-3 py-1 rounded-full text-sm font-sans">
+                {messages.length} total
+              </div>
+            </div>
 
             {messages.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8 font-sans">No messages yet.</p>
+              <div className="bg-muted/20 rounded-lg p-8 text-center border border-border/30">
+                <MessageSquare className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <p className="text-foreground font-sans font-medium mb-1">No messages yet</p>
+                <p className="text-muted-foreground text-sm font-sans">
+                  Say hello or pin an announcement to get things started.
+                </p>
+              </div>
             ) : (
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className="flex items-start justify-between gap-4 p-3 bg-muted/20 rounded-lg border border-border/30"
+                    className="flex items-start justify-between gap-4 p-4 bg-muted/20 rounded-lg border border-border/30 group"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-foreground text-sm break-words font-sans">{msg.message || "(empty)"}</p>
-                      <p className="text-xs text-muted-foreground mt-1 font-sans">
-                        {msg.role} · {new Date(msg.created_at).toLocaleString()}
+                      <p className="text-xs text-muted-foreground mt-2 font-sans">
+                        <span className={`${msg.role === 'artist' ? 'text-primary font-medium' : ''}`}>
+                          {msg.role === 'artist' ? 'Artist' : 'Fan'}
+                        </span>
+                        {' · '}
+                        {new Date(msg.created_at).toLocaleString()}
                       </p>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
+                      className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity"
                       onClick={() => handleDeleteMessage(msg.id)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -527,12 +583,16 @@ const ArtistEvent = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-xl text-center">
-              Walk-In Pass: {walkInPassData?.displayName}
+              Walk-In Pass
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center space-y-6 py-4">
+            <div className="bg-primary/10 text-primary px-4 py-2 rounded-full font-sans font-medium text-center">
+              {walkInPassData?.displayName}
+            </div>
+            
             {/* QR Code */}
-            <div className="bg-white p-4 rounded-xl">
+            <div className="bg-white p-4 rounded-xl shadow-lg">
               <QRCodeSVG
                 value={getWalkInVerifyUrl()}
                 size={200}
@@ -540,17 +600,21 @@ const ArtistEvent = () => {
               />
             </div>
             
+            <p className="text-muted-foreground text-sm font-sans text-center">
+              Hand this to the fan to scan or screenshot
+            </p>
+            
             {/* Link Text */}
             <div className="w-full">
               <p className="text-xs text-muted-foreground mb-1 font-sans">Pass Link:</p>
-              <p className="text-sm text-foreground break-all bg-muted/30 p-2 rounded font-mono">
+              <p className="text-sm text-foreground break-all bg-muted/30 p-3 rounded-lg font-mono border border-border/30">
                 {getWalkInPassUrl()}
               </p>
             </div>
 
             {/* Action Buttons */}
             <div className="flex gap-3 w-full">
-              <Button onClick={handleCopyLink} variant="outline" className="flex-1">
+              <Button onClick={handleCopyLink} variant="outline" className="flex-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                 {linkCopied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
                 {linkCopied ? "Copied!" : "Copy Link"}
               </Button>
