@@ -399,26 +399,96 @@ const WelcomeDashboard = ({
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownloadBadge = async (): Promise<void> => {
-    if (!flyerImageUrl) return;
-    
     setIsDownloading(true);
     try {
-      const response = await fetch(flyerImageUrl, { mode: 'cors' });
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement("a");
-      const safeTitle = eventTitle.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
-      link.download = `golokol-badge-${safeTitle}.png`;
-      link.href = url;
-      link.click();
-      
-      URL.revokeObjectURL(url);
-      toast.success("Badge saved to photos!");
+      const canvasSize = 800;
+      const canvas = document.createElement("canvas");
+      canvas.width = canvasSize;
+      canvas.height = canvasSize;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas context not available");
+
+      // Load badge frame
+      const frameImg = new Image();
+      frameImg.crossOrigin = "anonymous";
+      await new Promise<void>((resolve, reject) => {
+        frameImg.onload = () => resolve();
+        frameImg.onerror = reject;
+        frameImg.src = badgeFrame;
+      });
+
+      // Draw badge frame as background
+      ctx.drawImage(frameImg, 0, 0, canvasSize, canvasSize);
+
+      // Load and draw flyer image if available
+      if (flyerImageUrl) {
+        const flyerImg = new Image();
+        flyerImg.crossOrigin = "anonymous";
+        await new Promise<void>((resolve, reject) => {
+          flyerImg.onload = () => resolve();
+          flyerImg.onerror = reject;
+          flyerImg.src = flyerImageUrl;
+        });
+
+        // Calculate flyer circle position (60% size, top: 42%)
+        const flyerSize = canvasSize * 0.6;
+        const flyerX = (canvasSize - flyerSize) / 2;
+        const flyerY = canvasSize * 0.42 - flyerSize / 2;
+        const flyerRadius = flyerSize / 2;
+        const flyerCenterX = flyerX + flyerRadius;
+        const flyerCenterY = flyerY + flyerRadius;
+
+        // Draw circular flyer with border
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(flyerCenterX, flyerCenterY, flyerRadius, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        // Draw the flyer image to cover the circle
+        const imgAspect = flyerImg.width / flyerImg.height;
+        let drawWidth = flyerSize;
+        let drawHeight = flyerSize;
+        if (imgAspect > 1) {
+          drawHeight = flyerSize;
+          drawWidth = flyerSize * imgAspect;
+        } else {
+          drawWidth = flyerSize;
+          drawHeight = flyerSize / imgAspect;
+        }
+        const drawX = flyerCenterX - drawWidth / 2;
+        const drawY = flyerCenterY - drawHeight / 2;
+        ctx.drawImage(flyerImg, drawX, drawY, drawWidth, drawHeight);
+        ctx.restore();
+
+        // Draw black border around flyer circle
+        ctx.beginPath();
+        ctx.arc(flyerCenterX, flyerCenterY, flyerRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 8;
+        ctx.stroke();
+      }
+
+      // Convert canvas to blob and download
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          toast.error("Failed to create badge image");
+          setIsDownloading(false);
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const safeTitle = eventTitle.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+        link.download = `golokol-badge-${safeTitle}.png`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        toast.success("Badge saved to photos!");
+        setIsDownloading(false);
+      }, "image/png");
     } catch (error) {
       console.error("Failed to download badge:", error);
       toast.error("Failed to download badge");
-    } finally {
       setIsDownloading(false);
     }
   };
