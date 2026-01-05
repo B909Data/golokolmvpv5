@@ -3,9 +3,9 @@ import { ArrowRight, PlayCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import heroImage from "@/assets/hero.jpg";
-import sectionAImage from "@/assets/section-a.jpg";
-import sectionBImage from "@/assets/section-b.jpg";
+import heroImage from "@/assets/hero.png";
+import sectionAImage from "@/assets/section-a.png";
+import sectionBImage from "@/assets/section-b.png";
 
 const Index = () => {
   return (
