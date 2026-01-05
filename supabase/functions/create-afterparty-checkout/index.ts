@@ -80,7 +80,7 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Create Checkout session with inline price_data ($49 USD flat)
+    // Create Checkout session with inline price_data ($11.99 USD flat)
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
@@ -90,7 +90,7 @@ serve(async (req) => {
               name: "After Party Listing",
               description: `Create your After Party: ${formData.title}`,
             },
-            unit_amount: 4900, // $49.00 in cents
+            unit_amount: 1199, // $11.99 in cents
           },
           quantity: 1,
         },

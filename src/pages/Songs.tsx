@@ -245,10 +245,10 @@ const Songs = () => {
             <div className="pt-4">
               <Button type="submit" size="lg" disabled={isSubmitting} className="w-full md:w-auto">
                 <ExternalLink className="w-4 h-4 mr-2" />
-                {isSubmitting ? "Loading..." : "Submit & Pay ($25)"}
+                {isSubmitting ? "Loading..." : "Submit & Pay ($15)"}
               </Button>
               <p className="text-xs text-muted-foreground mt-3">
-                You'll be redirected to Stripe to complete payment. Submission fee is $25 USD.
+                You'll be redirected to Stripe to complete payment. Submission fee is $15 USD.
               </p>
             </div>
           </form>

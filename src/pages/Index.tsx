@@ -6,7 +6,6 @@ import Footer from "@/components/Footer";
 import heroImage from "@/assets/hero.png";
 import sectionAImage from "@/assets/section-a.png";
 import sectionBImage from "@/assets/section-b.png";
-import illustrationImage from "@/assets/illustration-placeholder.png";
 import llsPlaceholder from "@/assets/lls-placeholder.png";
 
 const Index = () => {
@@ -116,7 +115,7 @@ const Index = () => {
       {/* How to throw an After Party Section */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
-          <div className="mb-10">
+          <div className="mb-8">
             <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
               HOW TO THROW AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
@@ -125,29 +124,19 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 items-stretch">
-            {/* Left column - Text items + CTAs */}
-            <div className="flex flex-col justify-between">
-              <div className="space-y-5">
-                <ChecklistItem>Promote your next show with your After Party link</ChecklistItem>
-                <ChecklistItem>Fans RSVP and save their pass. You scan them in at the show.</ChecklistItem>
-                <ChecklistItem>24-hours to Livestream. Chat. Debut. Sell. Build. Poof!</ChecklistItem>
-              </div>
-              
-              {/* CTAs */}
-              <div className="flex flex-wrap gap-4 pt-6">
-                <Link to="/create-afterparty">
-                  <Button variant="secondary" size="lg">
-                    Create an After Party
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Right column - Illustration image */}
-            <div className="aspect-square w-full rounded-lg overflow-hidden">
-              <img src={illustrationImage} alt="GoLokol Artists" className="w-full h-full object-cover" />
+          <div className="flex flex-col justify-between h-full space-y-5">
+            <ChecklistItem>Promote your next show with your After Party link</ChecklistItem>
+            <ChecklistItem>Fans RSVP and save their pass. You scan them in at the show.</ChecklistItem>
+            <ChecklistItem>24-hours to Livestream. Chat. Debut. Sell. Build. Poof!</ChecklistItem>
+            
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-4 pt-4">
+              <Link to="/create-afterparty">
+                <Button variant="secondary" size="lg">
+                  Create an After Party
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -162,7 +151,7 @@ const Index = () => {
           style={{ backgroundImage: `url(${sectionBImage})` }}
         />
         
-        <div className="container relative z-20 mx-auto px-4 py-14">
+        <div className="container relative z-20 mx-auto px-4 pb-[calc(3.5rem+20px)] pt-14">
           <div className="max-w-3xl">
             <h2 className="font-display font-bold text-3xl md:text-5xl lg:text-6xl text-foreground leading-[0.95]">
               the future <span className="text-primary">of music</span><br />

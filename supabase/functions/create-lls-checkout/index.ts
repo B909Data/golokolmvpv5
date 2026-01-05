@@ -30,7 +30,7 @@ serve(async (req) => {
         {
           price_data: {
             currency: "usd",
-            unit_amount: 2500, // $25.00
+            unit_amount: 1500, // $15.00
             product_data: {
               name: "Lokol Listening Sessions Submission",
               description: `Song: ${song_title} by ${artist_name}`,
