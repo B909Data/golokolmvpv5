@@ -11,7 +11,7 @@ import SongDetail from "./pages/SongDetail";
 import AfterpartyDetail from "./pages/AfterpartyDetail";
 import AfterParty from "./pages/AfterParty";
 import AfterPartyRoom from "./pages/AfterPartyRoom";
-import AfterPartyRecap from "./pages/AfterPartyRecap";
+
 import RSVPAfterParty from "./pages/RSVPAfterParty";
 import AfterPartyPass from "./pages/AfterPartyPass";
 import QRDisplayPage from "./pages/QRDisplayPage";
@@ -58,7 +58,7 @@ const App = () => (
           <Route path="/after-party/:eventId/verify/:qrToken" element={<VerifyQRPage />} />
           <Route path="/after-party/:eventId/intro" element={<WalkInIntro />} />
           <Route path="/after-party/:eventId/room" element={<AfterPartyRoom />} />
-          <Route path="/after-party/:eventId/recap" element={<AfterPartyRecap />} />
+          
           <Route path="/create-afterparty" element={<CreateAfterparty />} />
           <Route path="/create-afterparty/success" element={<CreateAfterpartySuccess />} />
           <Route path="/checkin/:qr_token" element={<Checkin />} />

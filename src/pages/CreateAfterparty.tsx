@@ -74,7 +74,7 @@ const formSchema = z.object({
   ticket_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   genres: z.array(z.string()).min(1, "Select at least 1 genre").max(2, "Maximum 2 genres"),
   youtube_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  image_url: z.string().url("Flyer image is required").min(1, "Flyer image is required"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -463,27 +463,21 @@ const CreateAfterparty = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="image_url" className="text-primary-foreground text-base font-sans">Image URL (optional)</Label>
+          <Label htmlFor="image_url" className="text-primary-foreground text-base font-sans">Flyer Image URL *</Label>
           <Input
             id="image_url"
             type="url"
             {...register("image_url")}
-            placeholder="https://example.com/your-image.jpg"
+            placeholder="https://example.com/your-flyer.jpg"
             className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
           />
           <p className="text-sm text-primary-foreground/60 font-sans">
-            Fallback if no YouTube URL provided
+            Used for your After Party thumbnail and badge
           </p>
           {errors.image_url && (
             <p className="text-sm text-destructive font-sans">{errors.image_url.message}</p>
           )}
         </div>
-
-        {!youtubeUrl && !imageUrl && (
-          <p className="text-base text-primary-foreground/80 bg-primary-foreground/10 p-4 rounded-lg font-sans">
-            💡 Adding a YouTube URL or image helps your event stand out to fans.
-          </p>
-        )}
       </div>
     </div>
   );
