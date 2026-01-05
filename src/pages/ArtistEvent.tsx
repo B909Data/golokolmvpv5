@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { Lock, Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X } from "lucide-react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { Lock, Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Html5Qrcode } from "html5-qrcode";
+import { QRCodeSVG } from "qrcode.react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface EventData {
   id: string;
@@ -34,7 +41,6 @@ interface Message {
 const ArtistEvent = () => {
   const { eventId } = useParams();
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const token = searchParams.get("token");
 
   const [event, setEvent] = useState<EventData | null>(null);
@@ -51,11 +57,15 @@ const ArtistEvent = () => {
   // Door check-in state
   const [checkedInCount, setCheckedInCount] = useState(0);
   const [isScanning, setIsScanning] = useState(false);
+  const [scannerError, setScannerError] = useState<string | null>(null);
   const [showWalkInForm, setShowWalkInForm] = useState(false);
   const [walkInName, setWalkInName] = useState("");
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
-  const scannerContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Walk-in pass modal state
+  const [walkInPassData, setWalkInPassData] = useState<{ qrToken: string; displayName: string } | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const fetchEvent = async () => {
     if (!eventId || !token) return;
@@ -146,47 +156,66 @@ const ArtistEvent = () => {
     }
   };
 
-  const startScanner = async () => {
-    if (!scannerContainerRef.current) return;
-    
+  const startScanner = () => {
+    // Reset error state
+    setScannerError(null);
     setIsScanning(true);
     
-    try {
-      const scanner = new Html5Qrcode("qr-scanner");
-      scannerRef.current = scanner;
+    // Use setTimeout to ensure the DOM element is rendered before starting scanner
+    setTimeout(async () => {
+      try {
+        const scanner = new Html5Qrcode("qr-scanner");
+        scannerRef.current = scanner;
 
-      await scanner.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        async (decodedText) => {
-          // Stop scanner immediately after successful scan
-          await scanner.stop();
-          setIsScanning(false);
-          
-          // Extract qr_token from URL
-          // Expected format: /after-party/:eventId/verify/:qrToken
-          const match = decodedText.match(/\/after-party\/[^/]+\/verify\/([^/?]+)/);
-          if (match && match[1]) {
-            await handleQRCheckin(match[1]);
-          } else {
-            toast.error("Invalid QR code format");
-          }
-        },
-        () => {} // Ignore scan errors
-      );
-    } catch (err) {
-      console.error("Scanner error:", err);
-      toast.error("Could not start camera");
-      setIsScanning(false);
-    }
+        await scanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          async (decodedText) => {
+            // Stop scanner immediately after successful scan
+            await scanner.stop();
+            scannerRef.current = null;
+            setIsScanning(false);
+            
+            // Extract qr_token from URL
+            // Expected format: /after-party/:eventId/verify/:qrToken
+            const match = decodedText.match(/\/after-party\/[^/]+\/verify\/([^/?]+)/);
+            if (match && match[1]) {
+              await handleQRCheckin(match[1]);
+            } else {
+              toast.error("Invalid QR code format");
+            }
+          },
+          () => {} // Ignore scan errors
+        );
+      } catch (err: any) {
+        console.error("Scanner error:", err);
+        scannerRef.current = null;
+        setIsScanning(false);
+        
+        // Handle specific error types
+        if (err.name === "NotAllowedError" || err.message?.includes("Permission")) {
+          setScannerError("Camera access blocked. Enable camera for this site and reload.");
+        } else if (err.message?.includes("secure context") || err.message?.includes("HTTPS")) {
+          setScannerError("Camera requires HTTPS.");
+        } else {
+          setScannerError("Could not start camera. Please try again.");
+        }
+      }
+    }, 100);
   };
 
   const stopScanner = async () => {
     if (scannerRef.current) {
-      await scannerRef.current.stop().catch(() => {});
+      try {
+        await scannerRef.current.stop();
+        scannerRef.current.clear();
+      } catch (e) {
+        // Ignore cleanup errors
+      }
       scannerRef.current = null;
     }
     setIsScanning(false);
+    setScannerError(null);
   };
 
   const handleQRCheckin = async (qrToken: string) => {
@@ -239,14 +268,40 @@ const ArtistEvent = () => {
       setShowWalkInForm(false);
       setWalkInName("");
 
-      // Navigate walk-in to intro page
-      navigate(`/after-party/${eventId}/intro?token=${data.attendee.qr_token}`);
+      // Show walk-in pass modal instead of navigating away
+      setWalkInPassData({
+        qrToken: data.attendee.qr_token,
+        displayName: data.attendee.display_name || "Guest",
+      });
     } catch (err: any) {
       console.error("Walk-in error:", err);
       toast.error(err.message || "Walk-in failed");
     } finally {
       setIsCheckingIn(false);
     }
+  };
+
+  const getWalkInPassUrl = () => {
+    if (!walkInPassData || !eventId) return "";
+    return `${window.location.origin}/after-party/${eventId}/intro?token=${walkInPassData.qrToken}`;
+  };
+
+  const getWalkInVerifyUrl = () => {
+    if (!walkInPassData || !eventId) return "";
+    return `${window.location.origin}/after-party/${eventId}/verify/${walkInPassData.qrToken}`;
+  };
+
+  const handleCopyLink = async () => {
+    const url = getWalkInPassUrl();
+    await navigator.clipboard.writeText(url);
+    setLinkCopied(true);
+    toast.success("Link copied!");
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const closeWalkInPassModal = () => {
+    setWalkInPassData(null);
+    setLinkCopied(false);
   };
 
   if (!token || !authorized) {
@@ -319,13 +374,20 @@ const ArtistEvent = () => {
               </div>
             </div>
 
+            {/* Scanner Error Display */}
+            {scannerError && (
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive text-sm font-sans">
+                {scannerError}
+              </div>
+            )}
+
             {/* Scanner Area */}
             {isScanning ? (
               <div className="space-y-4">
-                <div id="qr-scanner" ref={scannerContainerRef} className="w-full max-w-sm mx-auto rounded-lg overflow-hidden" />
+                <div id="qr-scanner" className="w-full max-w-sm mx-auto rounded-lg overflow-hidden bg-muted/20 min-h-[280px]" />
                 <Button variant="outline" onClick={stopScanner} className="w-full">
                   <X className="w-4 h-4 mr-2" />
-                  Stop Scanner
+                  Stop Scanning
                 </Button>
               </div>
             ) : showWalkInForm ? (
@@ -459,6 +521,46 @@ const ArtistEvent = () => {
           </div>
         </div>
       </section>
+
+      {/* Walk-In Pass Modal */}
+      <Dialog open={!!walkInPassData} onOpenChange={(open) => !open && closeWalkInPassModal()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl text-center">
+              Walk-In Pass: {walkInPassData?.displayName}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center space-y-6 py-4">
+            {/* QR Code */}
+            <div className="bg-white p-4 rounded-xl">
+              <QRCodeSVG
+                value={getWalkInVerifyUrl()}
+                size={200}
+                level="H"
+              />
+            </div>
+            
+            {/* Link Text */}
+            <div className="w-full">
+              <p className="text-xs text-muted-foreground mb-1 font-sans">Pass Link:</p>
+              <p className="text-sm text-foreground break-all bg-muted/30 p-2 rounded font-mono">
+                {getWalkInPassUrl()}
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 w-full">
+              <Button onClick={handleCopyLink} variant="outline" className="flex-1">
+                {linkCopied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                {linkCopied ? "Copied!" : "Copy Link"}
+              </Button>
+              <Button onClick={closeWalkInPassModal} className="flex-1 bg-primary text-primary-foreground">
+                Done
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
