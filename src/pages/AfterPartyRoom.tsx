@@ -620,7 +620,7 @@ const WelcomeDashboard = ({
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
-              <span>{roomClosureInfo || "This room stays open for 3 days"}</span>
+              <span>{roomClosureInfo || "This room stays open for 24 hours"}</span>
             </li>
           </ul>
         </div>
