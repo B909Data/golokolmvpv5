@@ -5,8 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { format, differenceInDays, addDays } from "date-fns";
-import { Send, MessageCircle, Home, Pin, ChevronLeft, Users } from "lucide-react";
+import { Send, MessageCircle, Home, Pin, ChevronLeft, Users, Download } from "lucide-react";
 import { extractYouTubeId } from "@/lib/youtube";
+import { toast } from "sonner";
+import html2canvas from "html2canvas";
+import badgeFrame from "@/assets/golokol-badge-frame.svg";
 
 type EventData = {
   id: string;
@@ -18,6 +21,7 @@ type EventData = {
   after_party_opens_at: string | null;
   pinned_message: string | null;
   livestream_url: string | null;
+  image_url: string | null;
 } | null;
 
 type Message = {
@@ -138,7 +142,7 @@ const AfterPartyRoom = () => {
     queryFn: async (): Promise<EventData> => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, artist_name, status, start_at, city, after_party_opens_at, pinned_message, livestream_url")
+        .select("id, title, artist_name, status, start_at, city, after_party_opens_at, pinned_message, livestream_url, image_url")
         .eq("id", eventId)
         .maybeSingle();
 
@@ -345,6 +349,7 @@ const AfterPartyRoom = () => {
           pinnedMessage={event.pinned_message}
           livestreamId={livestreamId}
           roomClosureInfo={roomClosureInfo}
+          flyerImageUrl={event.image_url}
           onGoToChat={() => setViewMode("chat")}
           onBackToEvent={() => navigate(`/after-party/${eventId}/rsvp`)}
         />
@@ -376,6 +381,7 @@ interface WelcomeDashboardProps {
   pinnedMessage: string | null;
   livestreamId: string | null;
   roomClosureInfo: string | null;
+  flyerImageUrl: string | null;
   onGoToChat: () => void;
   onBackToEvent: () => void;
 }
@@ -386,23 +392,44 @@ const WelcomeDashboard = ({
   pinnedMessage,
   livestreamId,
   roomClosureInfo,
+  flyerImageUrl,
   onGoToChat,
   onBackToEvent,
 }: WelcomeDashboardProps) => {
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadBadge = async () => {
+    if (!badgeRef.current) return;
+    
+    setIsDownloading(true);
+    try {
+      const canvas = await html2canvas(badgeRef.current, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+      
+      const link = document.createElement("a");
+      const safeTitle = eventTitle.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+      link.download = `golokol-badge-${safeTitle}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      
+      toast.success("Badge saved to photos!");
+    } catch (error) {
+      console.error("Failed to download badge:", error);
+      toast.error("Failed to download badge");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <main className="flex-1 overflow-y-auto pb-24">
       <div className="max-w-[640px] mx-auto px-4 py-6 space-y-4">
-        {/* Hero Card - Yellow */}
-        <div className="bg-primary rounded-xl p-6">
-          <h2 className="font-display font-bold text-primary-foreground text-2xl uppercase tracking-tight">
-            After Party
-          </h2>
-          <p className="text-primary-foreground/80 font-sans mt-2">
-            This room is only for fans who were checked in tonight.
-          </p>
-        </div>
-
-        {/* Pinned Message Card */}
+        {/* Pinned Message Card - Top Priority */}
         {pinnedMessage && (
           <div className="bg-[#1A1A1A] border border-primary/30 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-3">
@@ -418,6 +445,77 @@ const WelcomeDashboard = ({
             </p>
           </div>
         )}
+
+        {/* Badge Section - Prominent Reward */}
+        <div className="bg-[#0B0B0B] border-2 border-primary/40 rounded-xl p-6 shadow-[0_0_20px_rgba(255,229,0,0.15)]">
+          <div className="text-center mb-4">
+            <h3 className="font-display font-bold text-foreground text-lg">
+              Your 1st {artistName} After Party Badge
+            </h3>
+            <p className="text-muted-foreground text-sm font-sans mt-1">
+              Collect and share them.
+            </p>
+          </div>
+          
+          {/* Badge Visual */}
+          <div className="flex justify-center mb-4">
+            <div 
+              ref={badgeRef}
+              className="relative w-60 h-60 md:w-72 md:h-72"
+            >
+              {/* Badge Frame - SVG overlay */}
+              <img 
+                src={badgeFrame} 
+                alt="Badge frame" 
+                className="absolute inset-0 w-full h-full z-10 pointer-events-none"
+              />
+              
+              {/* Flyer Image - Centered behind frame */}
+              {flyerImageUrl && (
+                <div className="absolute inset-[15%] rounded-full overflow-hidden">
+                  <img 
+                    src={flyerImageUrl} 
+                    alt={eventTitle}
+                    className="w-full h-full object-cover"
+                    crossOrigin="anonymous"
+                  />
+                </div>
+              )}
+              
+              {/* Fallback if no flyer */}
+              {!flyerImageUrl && (
+                <div className="absolute inset-[15%] rounded-full bg-[#1A1A1A] flex items-center justify-center">
+                  <span className="text-muted-foreground text-sm font-sans">No Flyer</span>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Download Button */}
+          <div className="flex flex-col items-center gap-2">
+            <Button
+              onClick={handleDownloadBadge}
+              disabled={isDownloading}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-sans font-medium px-6 py-3"
+            >
+              <Download size={18} className="mr-2" />
+              {isDownloading ? "Saving..." : "Download Badge"}
+            </Button>
+            <p className="text-muted-foreground text-xs font-sans">
+              Save to your photos to share later.
+            </p>
+          </div>
+        </div>
+
+        {/* Hero Card - Yellow */}
+        <div className="bg-primary rounded-xl p-6">
+          <h2 className="font-display font-bold text-primary-foreground text-2xl uppercase tracking-tight">
+            After Party
+          </h2>
+          <p className="text-primary-foreground/80 font-sans mt-2">
+            This room is only for fans who were checked in tonight.
+          </p>
+        </div>
 
         {/* House Rules Card */}
         <div className="bg-[#1A1A1A] rounded-xl p-5">
