@@ -231,16 +231,17 @@ const AfterPartyRoom = () => {
     }
   };
 
-  // Calculate room closure time (3 days from after_party_opens_at)
+  // Calculate room closure time (24 hours from after_party_opens_at)
   const getRoomClosureInfo = () => {
     if (!event?.after_party_opens_at) return null;
     const openedAt = new Date(event.after_party_opens_at);
-    const closesAt = addDays(openedAt, 3);
-    const daysRemaining = differenceInDays(closesAt, new Date());
+    const closesAt = addDays(openedAt, 1);
+    const hoursRemaining = Math.max(0, Math.floor((closesAt.getTime() - Date.now()) / (1000 * 60 * 60)));
     
-    if (daysRemaining <= 0) return "Closing soon";
-    if (daysRemaining === 1) return "Closes in 1 day";
-    return `Closes in ${daysRemaining} days`;
+    if (hoursRemaining <= 0) return "Closing soon";
+    if (hoursRemaining === 1) return "Closes in 1 hour";
+    if (hoursRemaining < 24) return `Closes in ${hoursRemaining} hours`;
+    return "Closes in 24 hours";
   };
 
   // Validate YouTube livestream URL

@@ -61,7 +61,6 @@ const CreateAfterpartySuccess = () => {
   };
 
   const publicRsvpUrl = event ? `${PUBLIC_BASE_URL}/after-party/${event.id}/rsvp` : "";
-  const adminRecapUrl = event ? `${PUBLIC_BASE_URL}/after-party/${event.id}/recap` : "";
   const artistControlsUrl = event?.artist_access_token 
     ? `${PUBLIC_BASE_URL}/artist/event/${event.id}?token=${event.artist_access_token}` 
     : "";
@@ -117,11 +116,8 @@ const CreateAfterpartySuccess = () => {
             <h1 className="font-display text-4xl text-primary mb-2">
               You are Live
             </h1>
-            <p className="text-muted-foreground font-sans mb-2">
-              Your After Party is now listed and discoverable.
-            </p>
-            <p className="text-foreground font-sans font-medium">
-              We emailed these links to you. Save that email.
+            <p className="text-muted-foreground font-sans">
+              Your After Party is now listed and discoverable. Save these links.
             </p>
           </div>
 
@@ -194,33 +190,6 @@ const CreateAfterpartySuccess = () => {
                   </div>
                 )}
 
-                {/* Admin Recap Link */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-primary font-sans uppercase tracking-wide">
-                    Admin Recap Link
-                  </label>
-                  <div className="flex gap-2">
-                    <div className="flex-1 h-10 rounded-md border-2 border-primary bg-background px-3 py-2 text-sm text-foreground font-sans flex items-center overflow-hidden">
-                      <span className="truncate">{adminRecapUrl}</span>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => copyToClipboard(adminRecapUrl, "Admin recap link")}
-                      className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shrink-0"
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" asChild className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shrink-0">
-                      <a href={adminRecapUrl} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground font-sans">
-                    Use this to access the event recap after it ends.
-                  </p>
-                </div>
               </div>
 
               {/* Support Line */}
