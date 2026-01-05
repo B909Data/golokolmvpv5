@@ -50,7 +50,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid gap-10 lg:grid-cols-2 items-stretch">
+          <div className="grid gap-10 md:grid-cols-2 items-stretch">
             {/* Video Placeholder */}
             <div className="aspect-video w-full bg-secondary rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group">
               <PlayCircle className="w-20 h-20 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 mb-3" />
@@ -98,7 +98,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-2 items-stretch">
+          <div className="grid gap-8 md:grid-cols-2 items-stretch">
             {/* Left column - Text items + CTAs */}
             <div className="flex flex-col justify-between">
               <div className="space-y-5">
@@ -164,7 +164,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid gap-10 lg:grid-cols-2 items-start">
+          <div className="grid gap-10 md:grid-cols-2 items-start">
             {/* Left column - Description + CTA */}
             <div className="space-y-4">
               <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
