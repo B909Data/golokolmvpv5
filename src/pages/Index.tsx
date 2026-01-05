@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, PlayCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,8 +8,28 @@ import heroImage from "@/assets/hero-revised.jpg";
 import sectionAImage from "@/assets/sectiona-revised.png";
 import sectionBImage from "@/assets/sectionb-revised.png";
 import llsPlaceholder from "@/assets/lls-placeholder.png";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Index = () => {
+  const [isLoadingTicket, setIsLoadingTicket] = useState(false);
+
+  const handleBuyTicket = async () => {
+    setIsLoadingTicket(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-lls-ticket-checkout");
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (err) {
+      console.error("Error creating ticket checkout:", err);
+      toast.error("Failed to start checkout. Please try again.");
+    } finally {
+      setIsLoadingTicket(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -183,21 +204,30 @@ const Index = () => {
                 We launch this February in Atlanta.
               </p>
 
-              <div className="flex flex-wrap gap-3 pt-2">
-                <Link to="/submit-song">
-                  <Button variant="secondary" size="lg">
-                    Submit a Song
+              <div className="flex flex-wrap gap-4 pt-2">
+                <div className="flex flex-col">
+                  <Link to="/submit-song">
+                    <Button variant="secondary" size="lg">
+                      Submit a Song
+                      <ArrowRight className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$15 each submission</p>
+                </div>
+                <div className="flex flex-col">
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
+                    className="border-[hsl(0,0%,10%)] text-[hsl(0,0%,10%)] hover:bg-[hsl(0,0%,10%)] hover:text-white"
+                    onClick={handleBuyTicket}
+                    disabled={isLoadingTicket}
+                  >
+                    {isLoadingTicket ? "Loading..." : "Buy a Ticket"}
                     <ArrowRight className="h-5 w-5" />
                   </Button>
-                </Link>
-                <a href="https://tickets.example.com" target="_blank" rel="noopener noreferrer">
-                  <Button size="lg" variant="outline" className="border-[hsl(0,0%,10%)] text-[hsl(0,0%,10%)] hover:bg-[hsl(0,0%,10%)] hover:text-white">
-                    Buy a Ticket
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </a>
+                  <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$15 limited capacity</p>
+                </div>
               </div>
-              <p className="text-[hsl(0,0%,40%)] text-sm">$5 each submission. $15 limited supply.</p>
             </div>
 
             {/* Right column - LLS Placeholder image */}
