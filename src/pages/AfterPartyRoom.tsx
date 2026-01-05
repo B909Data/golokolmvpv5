@@ -457,13 +457,13 @@ const WelcomeDashboard = ({
           {/* Badge Visual */}
           <div className="flex justify-center mb-4">
             <div className="relative w-60 h-60 md:w-72 md:h-72">
-              {/* Flyer Image - Clipped inside circular window */}
+          {/* Flyer Image - Clipped inside circular window */}
               {flyerImageUrl && (
                 <div 
                   className="absolute overflow-hidden rounded-full z-0"
                   style={{
-                    width: '65%',
-                    height: '65%',
+                    width: '52%',
+                    height: '52%',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
@@ -483,8 +483,8 @@ const WelcomeDashboard = ({
                 <div 
                   className="absolute overflow-hidden rounded-full bg-muted/20 flex items-center justify-center z-0"
                   style={{
-                    width: '65%',
-                    height: '65%',
+                    width: '52%',
+                    height: '52%',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
