@@ -51,6 +51,11 @@ const VerifyQRPage = () => {
         return;
       }
 
+      // Wait for role check if not admin
+      if (!isAdmin && isLoadingRole) {
+        return;
+      }
+
       if (!isAuthorized) {
         setVerificationStatus("unauthorized");
         return;
@@ -97,8 +102,10 @@ const VerifyQRPage = () => {
       }
     };
 
-    // Wait for auth check to complete before running
-    if (isAdmin || (!isLoadingRole && attendeeRole !== undefined)) {
+    // Run immediately if admin, otherwise wait for role check to complete
+    if (isAdmin) {
+      verifyAttendee();
+    } else if (!isLoadingRole) {
       verifyAttendee();
     }
   }, [eventId, qrToken, isAuthorized, isAdmin, attendeeRole, isLoadingRole]);
