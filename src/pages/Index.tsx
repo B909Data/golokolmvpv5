@@ -3,6 +3,9 @@ import { ArrowRight, PlayCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import heroImage from "@/assets/hero.jpg";
+import sectionAImage from "@/assets/section-a.jpg";
+import sectionBImage from "@/assets/section-b.jpg";
 
 const Index = () => {
   return (
@@ -11,9 +14,11 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-        {/* Background placeholder for hero artwork */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-muted" />
-        <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center opacity-30" />
+        {/* Background image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${heroImage})` }}
+        />
         
         <div className="container relative z-10 mx-auto px-4 py-16">
           <div className="max-w-4xl">
@@ -65,9 +70,12 @@ const Index = () => {
 
       {/* Large Image Hero Section 1 - "Never shout your instagram" */}
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
-        {/* Background placeholder for poster artwork */}
+        {/* Background image */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
-        <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${sectionAImage})` }}
+        />
         
         <div className="container relative z-20 mx-auto px-4 py-14">
           <div className="max-w-4xl">
@@ -127,9 +135,12 @@ const Index = () => {
 
       {/* Large Image Hero Section 2 - "The future of music is local" */}
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
-        {/* Background placeholder for poster artwork */}
+        {/* Background image */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
-        <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${sectionBImage})` }}
+        />
         
         <div className="container relative z-20 mx-auto px-4 py-14">
           <div className="max-w-3xl">
