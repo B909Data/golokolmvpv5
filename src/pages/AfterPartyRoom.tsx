@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { format, differenceInDays, addDays } from "date-fns";
-import { Send, MessageCircle, Home, Users, Pin } from "lucide-react";
+import { Send, MessageCircle, Home, Pin, ChevronLeft, Users } from "lucide-react";
 import { extractYouTubeId } from "@/lib/youtube";
 
 type EventData = {
@@ -14,6 +14,7 @@ type EventData = {
   artist_name: string | null;
   status: string;
   start_at: string;
+  city: string | null;
   after_party_opens_at: string | null;
   pinned_message: string | null;
   livestream_url: string | null;
@@ -28,6 +29,16 @@ type Message = {
 };
 
 type ViewMode = "welcome" | "chat";
+
+// Helper to get initials from display name or fallback
+const getInitials = (name: string | null, fallback: string = "F"): string => {
+  if (!name) return fallback;
+  const parts = name.trim().split(" ");
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+};
 
 const AfterPartyRoom = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -124,7 +135,7 @@ const AfterPartyRoom = () => {
     queryFn: async (): Promise<EventData> => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, artist_name, status, start_at, after_party_opens_at, pinned_message, livestream_url")
+        .select("id, title, artist_name, status, start_at, city, after_party_opens_at, pinned_message, livestream_url")
         .eq("id", eventId)
         .maybeSingle();
 
@@ -205,6 +216,14 @@ const AfterPartyRoom = () => {
     }
   };
 
+  const formatEventDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), "MMM d, yyyy");
+    } catch {
+      return "";
+    }
+  };
+
   // Calculate room closure time (3 days from after_party_opens_at)
   const getRoomClosureInfo = () => {
     if (!event?.after_party_opens_at) return null;
@@ -212,16 +231,15 @@ const AfterPartyRoom = () => {
     const closesAt = addDays(openedAt, 3);
     const daysRemaining = differenceInDays(closesAt, new Date());
     
-    if (daysRemaining <= 0) return "This room is closing soon";
-    if (daysRemaining === 1) return "This room closes in 1 day";
-    return `This room closes in ${daysRemaining} days`;
+    if (daysRemaining <= 0) return "Closing soon";
+    if (daysRemaining === 1) return "Closes in 1 day";
+    return `Closes in ${daysRemaining} days`;
   };
 
   // Validate YouTube livestream URL
   const getValidLivestreamId = () => {
     if (!event?.livestream_url) return null;
     
-    // Only accept YouTube watch URLs
     const url = event.livestream_url;
     if (!url.includes("youtube.com/watch") && !url.includes("youtu.be/")) {
       return null;
@@ -233,10 +251,13 @@ const AfterPartyRoom = () => {
   // Error states
   if (accessError) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-destructive mb-4">{accessError}</p>
-          <Button variant="outline" onClick={() => navigate(`/after-party/${eventId}/rsvp`)}>
+          <p className="text-destructive mb-4 font-sans">{accessError}</p>
+          <Button 
+            onClick={() => navigate(`/after-party/${eventId}/rsvp`)}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
             Go to RSVP
           </Button>
         </div>
@@ -246,10 +267,13 @@ const AfterPartyRoom = () => {
 
   if (!urlToken && !storedAttendeeId) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">You need to RSVP or be checked in to access this After Party.</p>
-          <Button variant="outline" onClick={() => navigate(`/after-party/${eventId}/rsvp`)}>
+          <p className="text-muted-foreground mb-4 font-sans">You need to RSVP or be checked in to access this After Party.</p>
+          <Button 
+            onClick={() => navigate(`/after-party/${eventId}/rsvp`)}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
             Go to RSVP
           </Button>
         </div>
@@ -259,24 +283,24 @@ const AfterPartyRoom = () => {
 
   if (isCheckingIn || !attendeeData?.checked_in_at) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Checking access...</p>
+      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center">
+        <p className="text-muted-foreground font-sans">Checking access...</p>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center">
+        <p className="text-muted-foreground font-sans">Loading...</p>
       </div>
     );
   }
 
   if (eventError || !event) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <p className="text-destructive">Failed to load event.</p>
+      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
+        <p className="text-destructive font-sans">Failed to load event.</p>
       </div>
     );
   }
@@ -284,9 +308,32 @@ const AfterPartyRoom = () => {
   const artistName = event.artist_name || "Artist";
   const livestreamId = getValidLivestreamId();
   const roomClosureInfo = getRoomClosureInfo();
+  const eventSubtitle = [event.city, formatEventDate(event.start_at)].filter(Boolean).join(" • ");
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#0B0B0B] flex flex-col">
+      {/* Sticky Top Bar */}
+      <header className="sticky top-0 z-50 bg-[#0B0B0B]/95 backdrop-blur-sm border-b border-border/20">
+        <div className="max-w-[640px] mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex-1 min-w-0">
+            <h1 className="font-display font-bold text-foreground text-lg truncate">
+              {event.title}
+            </h1>
+            {eventSubtitle && (
+              <p className="text-muted-foreground text-sm font-sans truncate">
+                {eventSubtitle}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-2 ml-3">
+            <div className="bg-primary text-primary-foreground px-3 py-1.5 rounded-full flex items-center gap-1.5">
+              <Users size={14} />
+              <span className="text-sm font-sans font-medium">{attendeeCount}</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* View Content */}
       {viewMode === "welcome" ? (
         <WelcomeDashboard
@@ -295,7 +342,8 @@ const AfterPartyRoom = () => {
           pinnedMessage={event.pinned_message}
           livestreamId={livestreamId}
           roomClosureInfo={roomClosureInfo}
-          attendeeCount={attendeeCount}
+          onGoToChat={() => setViewMode("chat")}
+          onBackToEvent={() => navigate(`/after-party/${eventId}/rsvp`)}
         />
       ) : (
         <ChatView
@@ -306,9 +354,9 @@ const AfterPartyRoom = () => {
           isSending={isSending}
           formatTime={formatTime}
           messagesEndRef={messagesEndRef}
-          attendeeCount={attendeeCount}
           artistName={artistName}
-          currentAttendeeId={attendeeId}
+          currentAttendeeId={attendeeId || ""}
+          pinnedMessage={event.pinned_message}
         />
       )}
 
@@ -325,7 +373,8 @@ interface WelcomeDashboardProps {
   pinnedMessage: string | null;
   livestreamId: string | null;
   roomClosureInfo: string | null;
-  attendeeCount: number;
+  onGoToChat: () => void;
+  onBackToEvent: () => void;
 }
 
 const WelcomeDashboard = ({
@@ -334,52 +383,63 @@ const WelcomeDashboard = ({
   pinnedMessage,
   livestreamId,
   roomClosureInfo,
-  attendeeCount,
+  onGoToChat,
+  onBackToEvent,
 }: WelcomeDashboardProps) => {
   return (
     <main className="flex-1 overflow-y-auto pb-24">
-      {/* Header Section */}
-      <header className="px-6 pt-10 pb-6">
-        <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground tracking-tight">
-          {artistName}
-        </h1>
-        <p className="text-muted-foreground mt-1 font-sans">{eventTitle}</p>
-        {roomClosureInfo && (
-          <p className="text-muted-foreground/60 text-sm mt-3 font-sans">
-            {roomClosureInfo}
+      <div className="max-w-[640px] mx-auto px-4 py-6 space-y-4">
+        {/* Hero Card - Yellow */}
+        <div className="bg-primary rounded-xl p-6">
+          <h2 className="font-display font-bold text-primary-foreground text-2xl uppercase tracking-tight">
+            After Party
+          </h2>
+          <p className="text-primary-foreground/80 font-sans mt-2">
+            This room is only for fans who were checked in tonight.
           </p>
-        )}
-      </header>
-
-      {/* Fan count indicator */}
-      <div className="px-6 pb-4">
-        <div className="flex items-center gap-2 text-muted-foreground/70">
-          <Users size={16} />
-          <span className="text-sm font-sans">
-            {attendeeCount} {attendeeCount === 1 ? "fan" : "fans"} inside
-          </span>
         </div>
-      </div>
 
-      {/* Pinned Message / Artist Message */}
-      <section className="px-6 py-4">
-        <div className="bg-muted/30 border border-border/40 rounded-lg p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <Pin size={14} className="text-primary" />
-            <span className="text-xs uppercase tracking-widest text-primary font-sans">
-              Artist Message
-            </span>
+        {/* Pinned Message Card */}
+        {pinnedMessage && (
+          <div className="bg-[#1A1A1A] border border-primary/30 rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="bg-primary/20 p-1.5 rounded">
+                <Pin size={14} className="text-primary" />
+              </div>
+              <span className="text-xs uppercase tracking-widest text-primary font-sans font-medium">
+                Pinned
+              </span>
+            </div>
+            <p className="text-foreground font-sans leading-relaxed">
+              {pinnedMessage}
+            </p>
           </div>
-          <p className="text-foreground font-sans leading-relaxed">
-            {pinnedMessage || "Welcome to the After Party. Glad you made it."}
-          </p>
-        </div>
-      </section>
+        )}
 
-      {/* Livestream Area */}
-      <section className="px-6 py-4">
-        <div className="bg-muted/20 border border-border/30 rounded-lg overflow-hidden">
-          {livestreamId ? (
+        {/* House Rules Card */}
+        <div className="bg-[#1A1A1A] rounded-xl p-5">
+          <h3 className="font-display font-bold text-foreground text-lg mb-3">
+            House Rules
+          </h3>
+          <ul className="space-y-2 text-muted-foreground font-sans text-sm">
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Be respectful to everyone in the room</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>No spam or self-promotion</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>{roomClosureInfo || "This room stays open for 3 days"}</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Livestream Area */}
+        {livestreamId && (
+          <div className="bg-[#1A1A1A] rounded-xl overflow-hidden">
             <div className="aspect-video">
               <iframe
                 src={`https://www.youtube.com/embed/${livestreamId}?rel=0&modestbranding=1`}
@@ -389,15 +449,27 @@ const WelcomeDashboard = ({
                 allowFullScreen
               />
             </div>
-          ) : (
-            <div className="aspect-video flex items-center justify-center">
-              <p className="text-muted-foreground/50 text-sm font-sans">
-                No livestream right now
-              </p>
-            </div>
-          )}
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="space-y-3 pt-2">
+          <Button
+            onClick={onGoToChat}
+            className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-sans font-medium py-6 text-base"
+          >
+            Go to Chat
+          </Button>
+          <Button
+            onClick={onBackToEvent}
+            variant="outline"
+            className="w-full border-primary text-primary hover:bg-primary/10 font-sans py-6 text-base"
+          >
+            <ChevronLeft size={18} className="mr-1" />
+            Back to Event
+          </Button>
         </div>
-      </section>
+      </div>
     </main>
   );
 };
@@ -411,9 +483,9 @@ interface ChatViewProps {
   isSending: boolean;
   formatTime: (dateString: string | null) => string;
   messagesEndRef: React.RefObject<HTMLDivElement>;
-  attendeeCount: number;
   artistName: string;
   currentAttendeeId: string;
+  pinnedMessage: string | null;
 }
 
 const ChatView = ({
@@ -424,82 +496,98 @@ const ChatView = ({
   isSending,
   formatTime,
   messagesEndRef,
-  attendeeCount,
   artistName,
   currentAttendeeId,
+  pinnedMessage,
 }: ChatViewProps) => {
   return (
-    <div className="flex-1 flex flex-col pb-36">
-      {/* Chat Header */}
-      <header className="px-6 py-4 border-b border-border/30 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {/* Artist avatar placeholder */}
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-display font-bold text-sm">
-              {artistName.charAt(0).toUpperCase()}
-            </span>
-          </div>
-          {/* Fan identicons */}
-          <div className="flex -space-x-2">
-            {[...Array(Math.min(attendeeCount, 4))].map((_, i) => (
-              <div
-                key={i}
-                className="w-7 h-7 rounded-full bg-muted border-2 border-background"
-                style={{
-                  background: `hsl(${(i * 60) % 360}, 40%, 50%)`,
-                }}
-              />
-            ))}
-            {attendeeCount > 4 && (
-              <div className="w-7 h-7 rounded-full bg-muted border-2 border-background flex items-center justify-center">
-                <span className="text-xs text-muted-foreground">+{attendeeCount - 4}</span>
-              </div>
-            )}
+    <div className="flex-1 flex flex-col pb-36 max-w-[640px] mx-auto w-full">
+      {/* Pinned Message Banner */}
+      {pinnedMessage && (
+        <div className="sticky top-[65px] z-40 bg-[#0B0B0B] px-4 py-2">
+          <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 flex items-start gap-3">
+            <div className="bg-primary/20 p-1 rounded shrink-0 mt-0.5">
+              <Pin size={12} className="text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-xs text-primary font-sans font-medium uppercase tracking-wide">Pinned</span>
+              <p className="text-foreground font-sans text-sm mt-0.5 line-clamp-2">
+                {pinnedMessage}
+              </p>
+            </div>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground/70 font-sans">
-          {attendeeCount} {attendeeCount === 1 ? "fan" : "fans"} inside
-        </p>
-      </header>
+      )}
 
       {/* Message Feed */}
-      <main className="flex-1 overflow-y-auto px-6 py-6">
+      <main className="flex-1 overflow-y-auto px-4 py-4">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground/50 text-center font-sans">
-              No messages yet. Start the conversation.
-            </p>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-[#1A1A1A] flex items-center justify-center mx-auto mb-4">
+                <MessageCircle size={24} className="text-muted-foreground/50" />
+              </div>
+              <p className="text-muted-foreground font-sans">
+                No messages yet
+              </p>
+              <p className="text-muted-foreground/60 font-sans text-sm mt-1">
+                Start the conversation
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-4">
             {messages.map((msg) => {
               const isArtist = msg.role === "artist";
               const isOwn = msg.attendee_id === currentAttendeeId;
+              const senderName = isArtist ? artistName : isOwn ? "You" : "Fan";
+              const initials = isArtist ? getInitials(artistName, "A") : isOwn ? "ME" : "FN";
               
               return (
                 <div
                   key={msg.id}
-                  className={`${isArtist ? "bg-primary/10 -mx-2 px-2 py-3 rounded-lg" : ""}`}
+                  className={`flex gap-3 ${isOwn ? "flex-row-reverse" : ""}`}
                 >
-                  <div className="flex items-baseline gap-3">
-                    <span
-                      className={`text-sm font-sans ${
-                        isArtist
-                          ? "text-primary font-medium"
-                          : isOwn
-                          ? "text-foreground/80"
-                          : "text-muted-foreground"
+                  {/* Avatar */}
+                  <div 
+                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                      isArtist 
+                        ? "bg-primary text-primary-foreground" 
+                        : isOwn 
+                        ? "bg-[#2A2A2A] text-muted-foreground" 
+                        : "bg-primary text-primary-foreground"
+                    }`}
+                  >
+                    <span className="text-xs font-sans font-medium">{initials}</span>
+                  </div>
+                  
+                  {/* Message Content */}
+                  <div className={`flex-1 max-w-[75%] ${isOwn ? "flex flex-col items-end" : ""}`}>
+                    {/* Sender Name */}
+                    <div className={`flex items-center gap-2 mb-1 ${isOwn ? "flex-row-reverse" : ""}`}>
+                      <span className={`text-xs font-sans ${
+                        isArtist ? "text-primary font-medium" : "text-muted-foreground"
+                      }`}>
+                        {senderName}
+                      </span>
+                      <span className="text-xs text-muted-foreground/40 font-sans">
+                        {formatTime(msg.created_at)}
+                      </span>
+                    </div>
+                    
+                    {/* Message Bubble */}
+                    <div
+                      className={`px-4 py-3 rounded-2xl font-sans text-[16px] leading-relaxed ${
+                        isOwn
+                          ? "bg-primary text-primary-foreground rounded-tr-md"
+                          : isArtist
+                          ? "bg-primary/20 text-foreground border border-primary/30 rounded-tl-md"
+                          : "bg-[#1A1A1A] text-foreground rounded-tl-md"
                       }`}
                     >
-                      {isArtist ? artistName : isOwn ? "You" : "Fan"}
-                    </span>
-                    <span className="text-xs text-muted-foreground/40 font-sans">
-                      {formatTime(msg.created_at)}
-                    </span>
+                      {msg.message}
+                    </div>
                   </div>
-                  <p className="text-foreground mt-1 leading-relaxed font-sans">
-                    {msg.message}
-                  </p>
                 </div>
               );
             })}
@@ -508,9 +596,9 @@ const ChatView = ({
         )}
       </main>
 
-      {/* Input Area */}
-      <div className="fixed bottom-20 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/30 px-4 py-3">
-        <div className="flex items-center gap-3 max-w-4xl mx-auto">
+      {/* Input Area - Text Only */}
+      <div className="fixed bottom-20 left-0 right-0 bg-[#0B0B0B]/95 backdrop-blur-sm border-t border-border/20 px-4 py-3">
+        <div className="flex items-center gap-3 max-w-[640px] mx-auto">
           <Input
             placeholder="Type a message..."
             value={messageText}
@@ -522,15 +610,15 @@ const ChatView = ({
               }
             }}
             disabled={isSending}
-            className="flex-1 bg-muted/50 border-border/50 focus-visible:ring-primary/50 placeholder:text-muted-foreground/40 font-sans"
+            className="flex-1 bg-[#1A1A1A] border-transparent focus:border-primary focus-visible:ring-primary/50 placeholder:text-muted-foreground/40 font-sans text-[16px] py-6"
           />
           <Button
             onClick={handleSendMessage}
             disabled={!messageText.trim() || isSending}
             size="icon"
-            className="shrink-0"
+            className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-12"
           >
-            <Send size={18} />
+            <Send size={20} />
           </Button>
         </div>
       </div>
@@ -546,14 +634,14 @@ interface ViewToggleProps {
 
 const ViewToggle = ({ viewMode, setViewMode }: ViewToggleProps) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border/40 px-4 py-3 safe-area-pb">
+    <div className="fixed bottom-0 left-0 right-0 bg-[#0B0B0B] border-t border-border/20 px-4 py-3 safe-area-pb">
       <div className="flex justify-center gap-2 max-w-xs mx-auto">
         <button
           onClick={() => setViewMode("welcome")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-sans text-sm transition-colors ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all ${
             viewMode === "welcome"
               ? "bg-primary text-primary-foreground"
-              : "bg-muted/50 text-muted-foreground hover:bg-muted"
+              : "bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
           }`}
         >
           <Home size={18} />
@@ -561,10 +649,10 @@ const ViewToggle = ({ viewMode, setViewMode }: ViewToggleProps) => {
         </button>
         <button
           onClick={() => setViewMode("chat")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-sans text-sm transition-colors ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all ${
             viewMode === "chat"
               ? "bg-primary text-primary-foreground"
-              : "bg-muted/50 text-muted-foreground hover:bg-muted"
+              : "bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
           }`}
         >
           <MessageCircle size={18} />
