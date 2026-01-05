@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import heroImage from "@/assets/hero.png";
 import sectionAImage from "@/assets/section-a.png";
 import sectionBImage from "@/assets/section-b.png";
+import illustrationImage from "@/assets/illustration-placeholder.png";
+import llsPlaceholder from "@/assets/lls-placeholder.png";
 
 const Index = () => {
   return (
@@ -125,9 +127,9 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right column - Image placeholder (same aspect ratio as explainer video) */}
-            <div className="aspect-video w-full bg-secondary rounded-lg flex items-center justify-center">
-              <span className="text-muted-foreground text-sm">Illustration Placeholder</span>
+            {/* Right column - Illustration image */}
+            <div className="aspect-square w-full rounded-lg overflow-hidden">
+              <img src={illustrationImage} alt="GoLokol Artists" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -188,13 +190,9 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right column - Video/Image placeholder */}
-            <div className="space-y-4">
-              <div className="aspect-video w-full bg-secondary rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group">
-                <PlayCircle className="w-16 h-16 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 mb-2" />
-                <span className="text-sm text-muted-foreground">Lokol Listening Sessions</span>
-                <span className="text-xs text-muted-foreground">Coming Soon</span>
-              </div>
+            {/* Right column - LLS Placeholder image */}
+            <div className="aspect-video w-full rounded-lg overflow-hidden">
+              <img src={llsPlaceholder} alt="Lokol Listening Sessions Coming 2026" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
