@@ -195,7 +195,7 @@ const AfterPartyPass = () => {
 
               {/* Event Info */}
               <p className="text-muted-foreground font-sans text-sm text-center">
-                Show this QR code at the door after the show
+                Show this to band at merch table to get checked in
               </p>
             </div>
           </div>
@@ -254,10 +254,6 @@ const AfterPartyPass = () => {
             </Button>
           </div>
 
-          {/* Footer Note */}
-          <p className="text-xs text-muted-foreground/60 font-sans text-center mt-8">
-            Email backup coming soon.
-          </p>
         </div>
       </main>
       <Footer />
