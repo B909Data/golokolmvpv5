@@ -135,7 +135,7 @@ const RSVPAfterParty = () => {
                   <CheckCircle className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <p className="text-foreground font-sans">
-                  RSVP to get your digital pass.
+                  RSVP. download your access pass.
                 </p>
               </div>
               
@@ -144,7 +144,7 @@ const RSVPAfterParty = () => {
                   <CheckCircle className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <p className="text-foreground font-sans">
-                  Show this to band at merch table to get checked in.
+                  Show your pass at the show.
                 </p>
               </div>
               
@@ -153,7 +153,7 @@ const RSVPAfterParty = () => {
                   <CheckCircle className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <p className="text-foreground font-sans">
-                  Get access to a private fan chat. It lasts 24 hours, then disappears.
+                  Get access to 24 hours of after show glow.
                 </p>
               </div>
             </div>
@@ -178,7 +178,7 @@ const RSVPAfterParty = () => {
           {/* RSVP Form - Shows after clicking RSVP on card */}
           {showForm && (
             <div id="rsvp-form" className="rounded-xl border-2 border-primary bg-background p-6">
-              <h2 className="font-display text-xl text-primary mb-4 uppercase">Complete Your RSVP</h2>
+              <h2 className="font-display text-xl text-primary mb-4 uppercase">Put your name on the list</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="displayName" className="text-foreground font-sans">Your Name (optional)</Label>
