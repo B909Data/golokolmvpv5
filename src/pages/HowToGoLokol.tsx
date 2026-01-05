@@ -199,7 +199,7 @@ const HowToGoLokol = () => {
 
                 <h4 className="font-display text-lg md:text-xl font-bold text-[#0E0E0E] mt-8 mb-3">For your fans and new fans</h4>
                 <ul className="space-y-3 text-[#0E0E0E] mb-6">
-                  <CheckBullet>Invite new fans from the stage to your After Party. You can hook them up too.</CheckBullet>
+                  <CheckBullet>Invite new fans from the stage to your after party. You can hook them up too.</CheckBullet>
                   <CheckBullet>
                     Tell your fans who RSVP to meet you at the merch table to get access to your After Party.
                   </CheckBullet>

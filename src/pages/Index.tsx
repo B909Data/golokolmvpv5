@@ -162,7 +162,7 @@ const Index = () => {
               LOKOL LISTENING SESSIONS
             </h2>
             <p className="text-[hsl(0,0%,30%)] text-lg">
-              A dj event and youtube series featuring the emerging sounds of a city.
+              A DJ event and YouTube series featuring the emerging sounds of a city.
             </p>
           </div>
 
@@ -170,7 +170,7 @@ const Index = () => {
             {/* Left column - Description + CTA */}
             <div className="space-y-4">
               <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
-                A dj event and youtube series featuring the emerging sounds of a city. Music discovery the right way. In-person and on Youtube screens at the same time.
+                A DJ event and YouTube series featuring the emerging sounds of a city. Music discovery the right way. In-person and on YouTube screens at the same time.
               </p>
               <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
                 Local fans and artists turn up when their song come on.
