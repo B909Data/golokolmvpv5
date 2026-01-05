@@ -40,15 +40,15 @@ const Index = () => {
         </div>
       </section>
 
-      {/* What's an After Party Section */}
+      {/* What is an After Party? Section */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="mb-8">
             <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
-              WHAT'S AN <span className="text-primary">AFTER PARTY?</span>
+              WHAT IS AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl">
-              Keep them in the palm of your hands after the adrenaline wears off.
+              A private, pop up space for new fans to stay connected after the show.
             </p>
           </div>
 
@@ -61,10 +61,25 @@ const Index = () => {
 
             {/* Checklist */}
             <div className="flex flex-col justify-between h-full space-y-5">
-              <ChecklistItem>An exclusive room online. Only the fans who attend shows get access.</ChecklistItem>
-              <ChecklistItem>Get to know your true fans and they get to know each other.</ChecklistItem>
-              <ChecklistItem>Create an experience that reflects your music, imagination and capacity.</ChecklistItem>
-              <ChecklistItem>In 24 hours the moment disappears, like the show but not the data.</ChecklistItem>
+              <ChecklistItem>An exclusive 24-hour chat for fans who attended</ChecklistItem>
+              <ChecklistItem>A fun, easy way to create your music community one show at a time.</ChecklistItem>
+              <ChecklistItem>Transform each show into true momentum</ChecklistItem>
+              
+              {/* CTAs */}
+              <div className="flex flex-wrap gap-4 pt-4">
+                <Link to="/create-afterparty">
+                  <Button variant="secondary" size="lg">
+                    Create an After Party
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link to="/find-after-party">
+                  <Button size="lg">
+                    Find an After Party
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -84,11 +99,21 @@ const Index = () => {
             <h2 className="font-display font-bold text-3xl md:text-5xl lg:text-6xl text-foreground leading-[0.95]">
               never shout <span className="text-primary">your instagram from the</span> stage again.
             </h2>
+            
+            <div className="mt-6">
+              <Link to="/create-afterparty">
+                <Button variant="secondary" size="lg">
+                  Create an After Party
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+              <p className="text-muted-foreground text-sm mt-2">$11.99 per party. No Subscription.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* How to Throw an After Party Section */}
+      {/* How to throw an After Party Section */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="mb-10">
@@ -96,7 +121,7 @@ const Index = () => {
               HOW TO THROW AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
             <p className="text-muted-foreground text-lg">
-              Be an artist. As much or as little as you want.
+              Make every show count.
             </p>
           </div>
 
@@ -104,10 +129,9 @@ const Index = () => {
             {/* Left column - Text items + CTAs */}
             <div className="flex flex-col justify-between">
               <div className="space-y-5">
-                <ChecklistItem>Answer questions, crack jokes, take roll call! Talk about what happened at the show last night.</ChecklistItem>
-                <ChecklistItem>Write a song with fans.</ChecklistItem>
-                <ChecklistItem>Livestream from the studio, or the kitchen or somewhere local near by.</ChecklistItem>
-                <ChecklistItem>Plan a stunt together for the next show.</ChecklistItem>
+                <ChecklistItem>Promote your next show with your After Party link</ChecklistItem>
+                <ChecklistItem>Fans RSVP and save their pass. You scan them in at the show.</ChecklistItem>
+                <ChecklistItem>24-hours to Livestream. Chat. Debut. Sell. Build. Poof!</ChecklistItem>
               </div>
               
               {/* CTAs */}
@@ -115,12 +139,6 @@ const Index = () => {
                 <Link to="/create-afterparty">
                   <Button variant="secondary" size="lg">
                     Create an After Party
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link to="/shows">
-                  <Button size="lg">
-                    Find an After Party
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
@@ -162,7 +180,7 @@ const Index = () => {
               LOKOL LISTENING SESSIONS
             </h2>
             <p className="text-[hsl(0,0%,30%)] text-lg">
-              A DJ event and YouTube series featuring the emerging sounds of a city.
+              A dj event and YouTube series featuring the emerging sounds of a city.
             </p>
           </div>
 
@@ -170,24 +188,27 @@ const Index = () => {
             {/* Left column - Description + CTA */}
             <div className="space-y-4">
               <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
-                A DJ event and YouTube series featuring the emerging sounds of a city. Music discovery the right way. In-person and on YouTube screens at the same time.
+                Music discovery the right way. At a party and on YouTube screens at the same time. Local fans and artists turn up when their song comes on.
               </p>
               <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
-                Local fans and artists turn up when their song come on.
-              </p>
-              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
-                We launch this February in Atlanta at Handlebar on Edgewood. Only Atlanta based music for now.
+                We launch this February in Atlanta.
               </p>
 
-              <div className="pt-2">
+              <div className="flex flex-wrap gap-3 pt-2">
                 <Link to="/submit-song">
                   <Button variant="secondary" size="lg">
                     Submit a Song
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
-                <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$5 per submission · No Subscription</p>
+                <a href="https://tickets.example.com" target="_blank" rel="noopener noreferrer">
+                  <Button size="lg" variant="outline" className="border-[hsl(0,0%,10%)] text-[hsl(0,0%,10%)] hover:bg-[hsl(0,0%,10%)] hover:text-white">
+                    Buy a Ticket
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </a>
               </div>
+              <p className="text-[hsl(0,0%,40%)] text-sm">$5 each submission. $15 limited supply.</p>
             </div>
 
             {/* Right column - LLS Placeholder image */}

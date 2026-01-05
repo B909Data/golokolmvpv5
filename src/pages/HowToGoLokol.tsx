@@ -45,7 +45,7 @@ const AccordionItem = ({ id, title, children, isOpen, onToggle }: AccordionItemP
     <div
       className={cn(
         "overflow-hidden transition-all duration-300 ease-in-out",
-        isOpen ? "max-h-[2000px] opacity-100 pb-6" : "max-h-0 opacity-0"
+        isOpen ? "max-h-[3000px] opacity-100 pb-6" : "max-h-0 opacity-0"
       )}
     >
       {children}
@@ -54,12 +54,16 @@ const AccordionItem = ({ id, title, children, isOpen, onToggle }: AccordionItemP
 );
 
 const SECTIONS = [
-  { id: "join-after-party", title: "For Fans: How do I join an After Party?" },
-  { id: "get-checked-in", title: "For Fans: How do I get checked in?" },
-  { id: "create-after-party", title: "For Artists: How do I create an After Party?" },
-  { id: "check-in-fans", title: "For Artists: How do I check in fans?" },
-  { id: "what-is-badge", title: "What is a badge?" },
-  { id: "troubleshooting", title: "Troubleshooting / FAQs" },
+  { id: "after-parties-what-is-it", title: "After Parties? What is it?" },
+  { id: "how-artists-use", title: "How Artists Use After Parties?" },
+  { id: "what-can-you-offer", title: "What Can You Offer at After Parties?" },
+  { id: "how-to-set-up-livestream", title: "How to set up a livestream?" },
+  { id: "how-fans-use", title: "How Fans Use After Parties?" },
+  { id: "what-after-parties-arent", title: "What After Parties Aren't?" },
+  { id: "lls-what-is-it", title: "LLS? What is it" },
+  { id: "what-fans-expect-lls", title: "What fans can expect at LLS" },
+  { id: "what-artists-expect-lls", title: "What artists can expect at LLS" },
+  { id: "why-we-built-golokol", title: "WHY WE BUILT GOLOKOL" },
 ];
 
 const HowToGoLokol = () => {
@@ -98,11 +102,17 @@ const HowToGoLokol = () => {
           <article className="max-w-3xl mx-auto">
             {/* Page Header */}
             <header className="mb-10">
-              <h1 className="font-display text-4xl md:text-5xl font-black text-[#0E0E0E] mb-6">How GoLokol Works</h1>
-              <p className="text-xl md:text-2xl text-[#555555] leading-relaxed font-medium">
-                A better way to take fans home after the show.
+              <h1 className="font-display text-4xl md:text-5xl font-black text-[#0E0E0E] mb-6">HOW TO GOLOKOL</h1>
+              <p className="text-lg md:text-xl text-[#555555] leading-relaxed">
+                GoLokol is in Baby Beta mode folks. Please share your thoughts, issues and suggestions to help us better help our emerging artist community. Email us at backstage@golokol.app
               </p>
             </header>
+
+            {/* Section Header */}
+            <div className="mb-6">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-[#0E0E0E] mb-2">GOLOKOL AFTER PARTIES (FAQ)</h2>
+              <p className="text-lg text-[#555555]">A better way to take fans home after the show.</p>
+            </div>
 
             {/* Jump To Links */}
             <nav className="mb-10 p-4 bg-[#F5F5F5] rounded-lg">
@@ -114,7 +124,7 @@ const HowToGoLokol = () => {
                     onClick={() => scrollToSection(section.id)}
                     className="text-sm text-[#0E0E0E] bg-white border border-[#CCCCCC] rounded-full px-3 py-1.5 hover:bg-primary hover:text-[#0E0E0E] hover:border-primary transition-colors"
                   >
-                    {section.title.replace("For Fans: ", "").replace("For Artists: ", "")}
+                    {section.title}
                   </button>
                 ))}
               </div>
@@ -122,154 +132,194 @@ const HowToGoLokol = () => {
 
             {/* Accordion Sections */}
             <div className="border-t border-[#CCCCCC]">
-              {/* Section 1: For Fans - Join After Party */}
+              {/* After Parties? What is it? */}
               <AccordionItem
-                id="join-after-party"
-                title="For Fans: How do I join an After Party?"
-                isOpen={openSections.has("join-after-party")}
-                onToggle={() => toggleSection("join-after-party")}
+                id="after-parties-what-is-it"
+                title="After Parties? What is it?"
+                isOpen={openSections.has("after-parties-what-is-it")}
+                onToggle={() => toggleSection("after-parties-what-is-it")}
               >
                 <Paragraph>
-                  After Parties are temporary, event-only group chats that open after a show and close in 24 hours.
+                  After Parties are temporary, event-only group chats that open after a show and disappear 24-hours later.
                 </Paragraph>
-                <Paragraph>
-                  They're not public feeds.
-                  <br />
-                  They're not permanent communities.
-                  <br />
-                  They're only for those who were there.
-                </Paragraph>
-                <ol className="list-decimal list-outside ml-6 space-y-3 text-[#0E0E0E] mb-6">
-                  <li className="pl-2">
-                    RSVP to an After Party. Save your digital pass.
-                  </li>
-                  <li className="pl-2">Show up and check in with the artist at the merch table or in the crowd.</li>
-                  <li className="pl-2">Once your code is scanned by the artist you get access to the After Party.</li>
-                </ol>
-                <h4 className="font-display text-lg md:text-xl font-bold text-[#0E0E0E] mt-8 mb-3">Inside the After Party:</h4>
-                <ul className="space-y-3 text-[#0E0E0E] mb-6">
-                  <CheckBullet>Show afterglow with the artist</CheckBullet>
-                  <CheckBullet>Conversation with other fans who were there</CheckBullet>
-                  <CheckBullet>Exclusive drops, livestream links, or whatever the band imagines</CheckBullet>
+                <ul className="space-y-2 text-[#0E0E0E] mb-4">
+                  <li>• They're not public feeds.</li>
+                  <li>• They're not permanent communities.</li>
+                  <li>• They're only for those who were there.</li>
                 </ul>
               </AccordionItem>
 
-              {/* Section 2: For Fans - Get Checked In */}
+              {/* How Artists Use After Parties? */}
               <AccordionItem
-                id="get-checked-in"
-                title="For Fans: How do I get checked in?"
-                isOpen={openSections.has("get-checked-in")}
-                onToggle={() => toggleSection("get-checked-in")}
+                id="how-artists-use"
+                title="How Artists Use After Parties?"
+                isOpen={openSections.has("how-artists-use")}
+                onToggle={() => toggleSection("how-artists-use")}
               >
-                <ol className="list-decimal list-outside ml-6 space-y-3 text-[#0E0E0E] mb-6">
-                  <li className="pl-2">After RSVPing, save your digital pass to your phone.</li>
-                  <li className="pl-2">Show this to the band at the merch table to get checked in.</li>
-                  <li className="pl-2">The artist scans your QR code and you're in.</li>
-                </ol>
+                <h4 className="font-display text-lg font-bold text-[#0E0E0E] mb-3">For artists: How After Parties work?</h4>
                 <Paragraph>
-                  Your digital pass is your key. Keep it handy at the show.
-                </Paragraph>
-              </AccordionItem>
-
-              {/* Section 3: For Artists - Create After Party */}
-              <AccordionItem
-                id="create-after-party"
-                title="For Artists: How do I create an After Party?"
-                isOpen={openSections.has("create-after-party")}
-                onToggle={() => toggleSection("create-after-party")}
-              >
-                <Paragraph>
-                  After setting up and paying for an After Party ($49 one-time fee. No Subscription), you'll receive:
+                  After setting up and paying for an after party (only $11.99), as needed. No subscriptions. You'll receive:
                 </Paragraph>
                 <ul className="space-y-3 text-[#0E0E0E] mb-6">
-                  <CheckBullet>
-                    A promo link to your RSVP page to share with your fans on your socials, website, or flyer.
-                  </CheckBullet>
-                  <CheckBullet>
-                    Authentic and automated ways to notify and incentivize their return to the next show.
-                  </CheckBullet>
-                </ul>
-
-                {/* Poster Placeholder */}
-                <div className="my-10 flex justify-center">
-                  <div className="w-full max-w-md aspect-[3/4] bg-[#F0F0F0] border-2 border-dashed border-[#CCCCCC] rounded-lg flex items-center justify-center">
-                    <span className="text-[#888888] text-sm">[insert poster sample]</span>
-                  </div>
-                </div>
-
-                <h4 className="font-display text-lg md:text-xl font-bold text-[#0E0E0E] mt-8 mb-3">For your fans and new fans</h4>
-                <ul className="space-y-3 text-[#0E0E0E] mb-6">
+                  <CheckBullet>A promo link. Promote your show and After party at the same time.</CheckBullet>
+                  <CheckBullet>A link to Artist Control. Use it to manage your After Party.</CheckBullet>
+                  <CheckBullet>People RSVP and get verified at the show. Meet them at the merchtable.</CheckBullet>
                   <CheckBullet>Invite new fans from the stage to your after party. You can hook them up too.</CheckBullet>
-                  <CheckBullet>
-                    Tell your fans who RSVP to meet you at the merch table to get access to your After Party.
-                  </CheckBullet>
-                  <CheckBullet>Scan their QR Code to give them access.</CheckBullet>
-                  <CheckBullet>
-                    The day of the show you're sent a link. When you check in, the After Party begins.
-                  </CheckBullet>
-                </ul>
-              </AccordionItem>
-
-              {/* Section 4: For Artists - Check In Fans */}
-              <AccordionItem
-                id="check-in-fans"
-                title="For Artists: How do I check in fans?"
-                isOpen={openSections.has("check-in-fans")}
-                onToggle={() => toggleSection("check-in-fans")}
-              >
-                <Paragraph>
-                  You have two ways to check fans in:
-                </Paragraph>
-                <ul className="space-y-3 text-[#0E0E0E] mb-6">
-                  <CheckBullet>
-                    <strong>QR Scan:</strong> Use your Artist Portal to scan their digital pass QR code.
-                  </CheckBullet>
-                  <CheckBullet>
-                    <strong>Walk-In:</strong> Add fans manually by name if they don't have a pass.
-                  </CheckBullet>
+                  <CheckBullet>The party starts when the first fan walks in.</CheckBullet>
+                  <CheckBullet>It ends 24-hours after that.</CheckBullet>
                 </ul>
                 <Paragraph>
-                  Walk-ins get a QR code on screen that takes them straight into the room. No texting required.
+                  We make it easy and fun to cultivate a true fanbase one show at a time.
                 </Paragraph>
               </AccordionItem>
 
-              {/* Section 5: What is a Badge? */}
+              {/* What Can You Offer at After Parties? */}
               <AccordionItem
-                id="what-is-badge"
-                title="What is a badge?"
-                isOpen={openSections.has("what-is-badge")}
-                onToggle={() => toggleSection("what-is-badge")}
+                id="what-can-you-offer"
+                title="What Can You Offer at After Parties?"
+                isOpen={openSections.has("what-can-you-offer")}
+                onToggle={() => toggleSection("what-can-you-offer")}
+              >
+                <ul className="space-y-3 text-[#0E0E0E] mb-6">
+                  <CheckBullet>Write a pinned message to fans at the parties Welcome page</CheckBullet>
+                  <CheckBullet>Set up a YouTube Livestream with fans</CheckBullet>
+                  <CheckBullet>Chat with fans</CheckBullet>
+                </ul>
+                
+                <h4 className="font-display text-lg font-bold text-[#0E0E0E] mt-6 mb-3">Coming Soon</h4>
+                <Paragraph>
+                  sell merch, share show photos, opt-ins for future show notifications and more
+                </Paragraph>
+                <Paragraph>
+                  You're an artist. Use your imagination, your music. That's what matters when you Golokol.
+                </Paragraph>
+              </AccordionItem>
+
+              {/* How to set up a livestream? */}
+              <AccordionItem
+                id="how-to-set-up-livestream"
+                title="How to set up a livestream?"
+                isOpen={openSections.has("how-to-set-up-livestream")}
+                onToggle={() => toggleSection("how-to-set-up-livestream")}
               >
                 <Paragraph>
-                  Badges are visual rewards for fans who attend After Parties. They appear in the After Party room and can be downloaded and shared.
+                  We are only YouTube Live compatible at the time. To go live on YouTube, you must first enable and verify your channel (might take 24 hours), then use the YouTube app (tap '+', then 'Go Live') or YouTube Studio on a computer (click 'Create' &gt; 'Go live') to set up your stream with a title, description, and privacy settings, and finally start broadcasting, using the provided stream key for advanced setups or just hitting the "Go Live" button for simpler streams. Your unique live stream link appears in the Live Control Room once you schedule or start your stream, allowing you to share it with your audience.
                 </Paragraph>
+
+                <h4 className="font-display text-lg font-bold text-[#0E0E0E] mt-6 mb-3">How to go live using your desktop?</h4>
+                <a href="https://youtu.be/Rdta45g_hg8?si=iWDAKoAvAUAzp7Gr" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline block mb-4">
+                  https://youtu.be/Rdta45g_hg8?si=iWDAKoAvAUAzp7Gr
+                </a>
+
+                <h4 className="font-display text-lg font-bold text-[#0E0E0E] mt-6 mb-3">How to go live using your Phone?</h4>
+                <a href="https://youtu.be/Rdta45g_hg8?si=BcfC4T6z9JHujnZu" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline block mb-4">
+                  https://youtu.be/Rdta45g_hg8?si=BcfC4T6z9JHujnZu
+                </a>
+
+                <h4 className="font-display text-lg font-bold text-[#0E0E0E] mt-6 mb-3">REMEMBER:</h4>
                 <ul className="space-y-3 text-[#0E0E0E] mb-6">
-                  <CheckBullet>Each badge features the event flyer and the GoLokol badge frame.</CheckBullet>
-                  <CheckBullet>Collect badges from different shows to build your fan history.</CheckBullet>
+                  <CheckBullet>Uncheck Live Chat (Chat happens on GoLokol)</CheckBullet>
+                  <CheckBullet>Make Private or unlisted and share links with GoLokol. You can share when creating After Party or on your Artist Control page</CheckBullet>
                 </ul>
               </AccordionItem>
 
-              {/* Section 6: Troubleshooting / FAQs */}
+              {/* How Fans Use After Parties? */}
               <AccordionItem
-                id="troubleshooting"
-                title="Troubleshooting / FAQs"
-                isOpen={openSections.has("troubleshooting")}
-                onToggle={() => toggleSection("troubleshooting")}
+                id="how-fans-use"
+                title="How Fans Use After Parties?"
+                isOpen={openSections.has("how-fans-use")}
+                onToggle={() => toggleSection("how-fans-use")}
               >
-                <h4 className="font-display text-lg font-bold text-[#0E0E0E] mb-3">A few important things to know</h4>
-                <ul className="space-y-3 text-[#0E0E0E] mb-6">
-                  <CheckBullet>There are no feeds to maintain.</CheckBullet>
-                  <CheckBullet>No pressure to be other than who you want to be to your fans.</CheckBullet>
-                  <CheckBullet>After Parties are not social media.</CheckBullet>
-                  <CheckBullet>After Parties appear, happen, and disappear right on GoLokol.</CheckBullet>
-                  <CheckBullet>After Parties close in 24 hours.</CheckBullet>
-                </ul>
-
-                <h4 className="font-display text-lg font-bold text-[#0E0E0E] mt-8 mb-3">Why we built it this way</h4>
+                <h4 className="font-display text-lg font-bold text-[#0E0E0E] mb-3">For fans: How After Parties Work?</h4>
+                <ol className="list-decimal list-outside ml-6 space-y-3 text-[#0E0E0E] mb-6">
+                  <li className="pl-2">You RSVP to an after party. Receive a QR Code. Save it.</li>
+                  <li className="pl-2">Show up and check in with the artist at the merch table or in the crowd</li>
+                  <li className="pl-2">Once your code is scanned by the artist you get access to the After Party</li>
+                  <li className="pl-2">If you forgot to RSVP, ask the artist at the show to walk-you-in.</li>
+                  <li className="pl-2">Every show and after party you attend you receive a badge to collect and share.</li>
+                </ol>
                 <Paragraph>
-                  Local music scenes don't grow from attention.
-                  <br />
-                  They grow from relationships, repetition, and shared experiences.
+                  Get to know the artists and other fans who were there. This is where fans become a community.
+                </Paragraph>
+              </AccordionItem>
+
+              {/* What After Parties Aren't? */}
+              <AccordionItem
+                id="what-after-parties-arent"
+                title="What After Parties Aren't?"
+                isOpen={openSections.has("what-after-parties-arent")}
+                onToggle={() => toggleSection("what-after-parties-arent")}
+              >
+                <Paragraph>There are no feeds to maintain.</Paragraph>
+                <Paragraph>No pressure to be other than who you are.</Paragraph>
+                <Paragraph>After Parties are not social media.</Paragraph>
+              </AccordionItem>
+
+              {/* LLS? What is it */}
+              <AccordionItem
+                id="lls-what-is-it"
+                title="LLS? What is it"
+                isOpen={openSections.has("lls-what-is-it")}
+                onToggle={() => toggleSection("lls-what-is-it")}
+              >
+                <div className="mb-4">
+                  <h3 className="font-display text-xl font-bold text-[#0E0E0E] mb-2">GOLOKOL LOKOL LISTENING SESSIONS (FAQ)</h3>
+                </div>
+                <Paragraph>
+                  Lokol Listening Sessions are live, curated listening events that spotlight local music inside real spaces and community gatherings.
+                </Paragraph>
+                <Paragraph>Think:</Paragraph>
+                <ul className="space-y-3 text-[#0E0E0E] mb-6">
+                  <CheckBullet>A DJ or host playing local artists alongside familiar records</CheckBullet>
+                  <CheckBullet>A real crowd, in a real room</CheckBullet>
+                  <CheckBullet>Recorded and edited for an ongoing YouTube Series</CheckBullet>
+                  <CheckBullet>A new way for artists to promote their music and music fans to support their local sounds.</CheckBullet>
+                </ul>
+              </AccordionItem>
+
+              {/* What fans can expect at LLS */}
+              <AccordionItem
+                id="what-fans-expect-lls"
+                title="What fans can expect at LLS"
+                isOpen={openSections.has("what-fans-expect-lls")}
+                onToggle={() => toggleSection("what-fans-expect-lls")}
+              >
+                <ul className="space-y-3 text-[#0E0E0E] mb-6">
+                  <CheckBullet>Dress to represent your scene and city</CheckBullet>
+                  <CheckBullet>Come to dance, turn up and engage with the DJ set and crowd</CheckBullet>
+                  <CheckBullet>Advance tix $15, At Door $20. Free tickets are available through featured artists.</CheckBullet>
+                  <CheckBullet>If you're on your phone you won't be on camera.</CheckBullet>
+                </ul>
+              </AccordionItem>
+
+              {/* What artists can expect at LLS */}
+              <AccordionItem
+                id="what-artists-expect-lls"
+                title="What artists can expect at LLS"
+                isOpen={openSections.has("what-artists-expect-lls")}
+                onToggle={() => toggleSection("what-artists-expect-lls")}
+              >
+                <ul className="space-y-3 text-[#0E0E0E] mb-6">
+                  <CheckBullet>Real listener feedback, not vanity metrics</CheckBullet>
+                  <CheckBullet>Songs selected by local curatorial partners.</CheckBullet>
+                  <CheckBullet>If selected for the live taping, your music placed intentionally, not randomly</CheckBullet>
+                  <CheckBullet>The full taping shared freely via YouTube</CheckBullet>
+                  <CheckBullet>A new way to engage with your fanbase (we give you free tix to give away how you feel)</CheckBullet>
+                </ul>
+                <Paragraph>
+                  LLS is not pay-to-play. It's about alignment, timing, and community fit.
+                </Paragraph>
+              </AccordionItem>
+
+              {/* WHY WE BUILT GOLOKOL */}
+              <AccordionItem
+                id="why-we-built-golokol"
+                title="WHY WE BUILT GOLOKOL"
+                isOpen={openSections.has("why-we-built-golokol")}
+                onToggle={() => toggleSection("why-we-built-golokol")}
+              >
+                <Paragraph>
+                  Local music scenes don't grow from attention. They grow from relationships, repetition, and shared experiences.
                 </Paragraph>
                 <Paragraph>GoLokol exists to:</Paragraph>
                 <ul className="space-y-3 text-[#0E0E0E] mb-6">
@@ -277,10 +327,6 @@ const HowToGoLokol = () => {
                   <CheckBullet>Help fans find music and community.</CheckBullet>
                   <CheckBullet>Protect moments from becoming content mills.</CheckBullet>
                 </ul>
-
-                <p className="text-xl md:text-2xl text-[#555555] leading-relaxed font-medium mt-12 mb-8">
-                  Good music lives here — if you're willing to show up.
-                </p>
               </AccordionItem>
             </div>
           </article>

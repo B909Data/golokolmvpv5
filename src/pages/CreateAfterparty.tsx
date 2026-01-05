@@ -517,7 +517,7 @@ const CreateAfterparty = () => {
               Processing...
             </>
           ) : (
-            "Continue to Payment — $49"
+            "Continue to Payment — $11.99"
           )}
         </Button>
       )}
@@ -573,7 +573,10 @@ const CreateAfterparty = () => {
                 CREATE AN <span className="text-primary">AFTER PARTY</span>
               </h1>
               <p className="text-muted-foreground text-base font-sans">
-                $49 one-time fee · No Subscription
+                $11.99 per party. No Subscription.
+              </p>
+              <p className="text-muted-foreground text-sm font-sans mt-1">
+                Promote your show and Afterparty.
               </p>
             </div>
 
