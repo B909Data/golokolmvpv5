@@ -8,7 +8,7 @@ import { format, differenceInDays, addDays } from "date-fns";
 import { Send, MessageCircle, Home, Pin, ChevronLeft, Users, Download } from "lucide-react";
 import { extractYouTubeId } from "@/lib/youtube";
 import { toast } from "sonner";
-import html2canvas from "html2canvas";
+
 import badgeFrame from "@/assets/golokol-badge-frame.svg";
 
 type EventData = {
@@ -396,27 +396,24 @@ const WelcomeDashboard = ({
   onGoToChat,
   onBackToEvent,
 }: WelcomeDashboardProps) => {
-  const badgeRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleDownloadBadge = async () => {
-    if (!badgeRef.current) return;
+  const handleDownloadBadge = async (): Promise<void> => {
+    if (!flyerImageUrl) return;
     
     setIsDownloading(true);
     try {
-      const canvas = await html2canvas(badgeRef.current, {
-        backgroundColor: null,
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-      });
+      const response = await fetch(flyerImageUrl, { mode: 'cors' });
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
       
       const link = document.createElement("a");
       const safeTitle = eventTitle.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
       link.download = `golokol-badge-${safeTitle}.png`;
-      link.href = canvas.toDataURL("image/png");
+      link.href = url;
       link.click();
       
+      URL.revokeObjectURL(url);
       toast.success("Badge saved to photos!");
     } catch (error) {
       console.error("Failed to download badge:", error);
@@ -459,10 +456,7 @@ const WelcomeDashboard = ({
           
           {/* Badge Visual */}
           <div className="flex justify-center mb-4">
-            <div 
-              ref={badgeRef}
-              className="relative w-60 h-60 md:w-72 md:h-72"
-            >
+            <div className="relative w-60 h-60 md:w-72 md:h-72">
               {/* Badge Frame - SVG overlay */}
               <img 
                 src={badgeFrame} 
