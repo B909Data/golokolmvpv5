@@ -295,9 +295,10 @@ const ArtistEvent = () => {
     return `${window.location.origin}/after-party/${eventId}/intro?token=${walkInPassData.qrToken}`;
   };
 
-  const getWalkInVerifyUrl = () => {
+  // Walk-in QR encodes the intro URL (not verify) since they're already checked in
+  const getWalkInQRUrl = () => {
     if (!walkInPassData || !eventId) return "";
-    return `${window.location.origin}/after-party/${eventId}/verify/${walkInPassData.qrToken}`;
+    return `${window.location.origin}/after-party/${eventId}/intro?token=${walkInPassData.qrToken}`;
   };
 
   const handleCopyLink = async () => {
@@ -594,7 +595,7 @@ const ArtistEvent = () => {
             {/* QR Code */}
             <div className="bg-white p-4 rounded-xl shadow-lg">
               <QRCodeSVG
-                value={getWalkInVerifyUrl()}
+                value={getWalkInQRUrl()}
                 size={200}
                 level="H"
               />
