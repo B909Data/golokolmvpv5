@@ -144,7 +144,7 @@ const RSVPAfterParty = () => {
                   <CheckCircle className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <p className="text-foreground font-sans">
-                  Show your QR code at the door after the show.
+                  Show this to band at merch table to get checked in.
                 </p>
               </div>
               
@@ -153,7 +153,7 @@ const RSVPAfterParty = () => {
                   <CheckCircle className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <p className="text-foreground font-sans">
-                  Get access to a private fan chat. It lasts 3 days, then disappears.
+                  Get access to a private fan chat. It lasts 24 hours, then disappears.
                 </p>
               </div>
             </div>

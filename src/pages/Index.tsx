@@ -64,7 +64,7 @@ const Index = () => {
               <ChecklistItem>An exclusive room online. Only the fans who attend shows get access.</ChecklistItem>
               <ChecklistItem>Get to know your true fans and they get to know each other.</ChecklistItem>
               <ChecklistItem>Create an experience that reflects your music, imagination and capacity.</ChecklistItem>
-              <ChecklistItem>In 3 days the moment disappears, like the show but not the data.</ChecklistItem>
+              <ChecklistItem>In 24 hours the moment disappears, like the show but not the data.</ChecklistItem>
             </div>
           </div>
         </div>
@@ -186,7 +186,7 @@ const Index = () => {
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
-                <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$5 per submission</p>
+                <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$5 per submission · No Subscription</p>
               </div>
             </div>
 

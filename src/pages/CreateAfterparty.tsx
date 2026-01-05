@@ -573,7 +573,7 @@ const CreateAfterparty = () => {
                 CREATE AN <span className="text-primary">AFTER PARTY</span>
               </h1>
               <p className="text-muted-foreground text-base font-sans">
-                $49 one-time fee to list your event
+                $49 one-time fee · No Subscription
               </p>
             </div>
 
