@@ -471,7 +471,7 @@ const WelcomeDashboard = ({
                   style={{
                     width: '60%',
                     height: '60%',
-                    top: '46%',
+                    top: '44%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     border: '4px solid #000',
@@ -494,7 +494,7 @@ const WelcomeDashboard = ({
                   style={{
                     width: '60%',
                     height: '60%',
-                    top: '46%',
+                    top: '44%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     border: '4px solid #000',
