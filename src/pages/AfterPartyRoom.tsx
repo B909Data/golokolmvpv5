@@ -457,16 +457,25 @@ const WelcomeDashboard = ({
           {/* Badge Visual */}
           <div className="flex justify-center mb-4">
             <div className="relative w-60 h-60 md:w-72 md:h-72">
-          {/* Flyer Image - Clipped inside circular window */}
+              {/* Badge Frame - SVG behind the flyer */}
+              <img 
+                src={badgeFrame} 
+                alt="Badge frame" 
+                className="absolute inset-0 w-full h-full z-0 pointer-events-none"
+              />
+              
+              {/* Flyer Image - In front of the badge frame */}
               {flyerImageUrl && (
                 <div 
-                  className="absolute overflow-hidden rounded-full z-0"
+                  className="absolute overflow-hidden rounded-full z-20"
                   style={{
-                    width: '52%',
-                    height: '52%',
-                    top: '50%',
+                    width: '60%',
+                    height: '60%',
+                    top: '46%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
+                    border: '4px solid #000',
+                    boxShadow: '0 6px 18px rgba(0,0,0,0.35)',
                   }}
                 >
                   <img 
@@ -481,25 +490,20 @@ const WelcomeDashboard = ({
               {/* Fallback if no flyer */}
               {!flyerImageUrl && (
                 <div 
-                  className="absolute overflow-hidden rounded-full bg-muted/20 flex items-center justify-center z-0"
+                  className="absolute overflow-hidden rounded-full bg-muted/20 flex items-center justify-center z-20"
                   style={{
-                    width: '52%',
-                    height: '52%',
-                    top: '50%',
+                    width: '60%',
+                    height: '60%',
+                    top: '46%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
+                    border: '4px solid #000',
+                    boxShadow: '0 6px 18px rgba(0,0,0,0.35)',
                   }}
                 >
                   <span className="text-muted-foreground text-sm font-sans">No Flyer</span>
                 </div>
               )}
-              
-              {/* Badge Frame - SVG overlay on top */}
-              <img 
-                src={badgeFrame} 
-                alt="Badge frame" 
-                className="absolute inset-0 w-full h-full z-10 pointer-events-none"
-              />
             </div>
           </div>
           
