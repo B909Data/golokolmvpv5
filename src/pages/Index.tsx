@@ -66,7 +66,7 @@ const Index = () => {
               WHAT IS AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl">
-              A private, pop up space for new fans to stay connected after the show.
+              A private, temporary space for new fans to stay connected after the show.
             </p>
           </div>
 
@@ -91,11 +91,9 @@ const Index = () => {
 
             {/* Checklist */}
             <div className="flex flex-col justify-between h-full space-y-5">
-              <ChecklistItem>A 24 hours post-show window to reward the fans who showed up.</ChecklistItem>
-              <ChecklistItem>After-show marketing new fans will share and remember. </ChecklistItem>
-              <ChecklistItem>
-                Build real community one show at a time without the burden of another platform.
-              </ChecklistItem>
+              <ChecklistItem>A 24 hour window to reward the fans who showed up.</ChecklistItem>
+              <ChecklistItem>Something new fans will share and remember without the burden of another platform to manage.</ChecklistItem>
+              <ChecklistItem>Build real community one show at a time</ChecklistItem>
 
               {/* CTAs */}
               <div className="flex flex-wrap gap-4 pt-4">
