@@ -91,11 +91,9 @@ const Index = () => {
 
             {/* Checklist */}
             <div className="flex flex-col justify-between h-full space-y-5">
-              <ChecklistItem>A 24 hours post-show window to reward the fans who showed up.</ChecklistItem>
-              <ChecklistItem>After-show marketing new fans will share and remember.</ChecklistItem>
-              <ChecklistItem>
-                Build real community one show at a time without the burden of another overwhelming platform.
-              </ChecklistItem>
+              <ChecklistItem>An exclusive 24-hour chat for fans who attended</ChecklistItem>
+              <ChecklistItem>A fun, easy way to create your music community one show at a time.</ChecklistItem>
+              <ChecklistItem>Transform each show into true momentum</ChecklistItem>
 
               {/* CTAs */}
               <div className="flex flex-wrap gap-4 pt-4">
@@ -155,7 +153,7 @@ const Index = () => {
           <div className="flex flex-col justify-between h-full space-y-5">
             <ChecklistItem>Promote your next show with your After Party link</ChecklistItem>
             <ChecklistItem>Fans RSVP and save their pass. You scan them in at the show.</ChecklistItem>
-            <ChecklistItem>24-hours to Livestream. Chat. Debut. Sell. Build. Poof!</ChecklistItem>
+            <ChecklistItem>24-hours to Livestream. Chat. Debut. Sell. Build. Then Poof!</ChecklistItem>
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 pt-4">
