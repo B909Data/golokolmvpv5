@@ -33,14 +33,18 @@ const AfterPartyCard = ({
 }: AfterPartyCardProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Priority: flyer image first, fallback to YouTube thumbnail
   const getEventImage = (): string | null => {
+    if (imageUrl) {
+      return imageUrl;
+    }
     if (youtubeUrl) {
       const videoId = extractYouTubeId(youtubeUrl);
       if (videoId) {
         return getYouTubeThumbnail(videoId, "hq");
       }
     }
-    return imageUrl || null;
+    return null;
   };
 
   const hasVideo = (): boolean => {
@@ -66,7 +70,7 @@ const AfterPartyCard = ({
   return (
     <div className="rounded-xl overflow-hidden flex flex-col group bg-primary">
       {/* Media Section */}
-      <div className="aspect-video relative bg-primary/80">
+      <div className="aspect-[16/9] relative bg-primary/80 overflow-hidden">
         {isPlaying && videoId ? (
           <>
             <iframe
@@ -90,7 +94,7 @@ const AfterPartyCard = ({
               <img
                 src={eventImage}
                 alt={title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center block"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-primary/60">
