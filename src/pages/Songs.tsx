@@ -10,8 +10,6 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const YOUTUBE_TRAILER_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ";
-
 const Songs = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +51,7 @@ const Songs = () => {
           toast(
             <a href={data.url} target="_blank" rel="noopener noreferrer" className="underline text-primary">
               Open Stripe Checkout
-            </a>
+            </a>,
           );
         }
       } else {
@@ -110,12 +108,12 @@ const Songs = () => {
           </h2>
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
-              Lokol Listening Sessions is a live event where a curated group of artists perform their original music
-              in front of an audience of fans, curators, and fellow musicians.
+              Lokol Listening Sessions is a live event where a curated group of artists perform their original music in
+              front of an audience of fans, curators, and fellow musicians.
             </p>
             <p>
-              Each session features 5-8 artists selected from submissions. Artists get stage time, feedback,
-              and exposure to a supportive community.
+              Each session features 5-8 artists selected from submissions. Artists get stage time, feedback, and
+              exposure to a supportive community.
             </p>
           </div>
         </div>
