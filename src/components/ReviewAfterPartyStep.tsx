@@ -76,13 +76,11 @@ const ReviewAfterPartyStep = ({
         <Label className="text-primary-foreground text-base font-sans">What happens after you pay</Label>
         <div className="bg-background/10 rounded-xl p-4">
           <ol className="space-y-2 text-sm font-sans text-primary-foreground/90 list-decimal list-inside">
-            <li>Your After Party page is created instantly.</li>
+            <li>Your After Party page is created instantly. Use link to promote your show and after party.</li>
             <li>You'll get your Artist Control link (bookmark it).</li>
-            <li>Fans should show their pass to band at merch table to get checked in.</li>
-            <li>Use 'Door Check-In' to scan passes or let non rsvp fans in.</li>
-            <li>After Party opens when the first fan gets checked in.</li>
-            <li>The After Party stays open for 24 hours.</li>
-            <li>Use same Door Check in Controls to Chat, Livestream, Pin a post</li>
+            <li>Fans should show their pass to you at merch table to get checked in with a QR scan or give new fans access with "Walkin feature"</li>
+            <li>After Party opens when the first fan gets checked in and close 24 hours later.</li>
+            <li>Use Artist Controls to Chat, Livestream, Pin a post or ban fans.</li>
           </ol>
         </div>
       </div>
