@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const YOUTUBE_TRAILER_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ";
+
 
 const Songs = () => {
   const navigate = useNavigate();
@@ -86,20 +86,6 @@ const Songs = () => {
         </div>
       </section>
 
-      {/* Trailer Section */}
-      <section className="px-4 pb-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="aspect-video w-full rounded-lg overflow-hidden border border-border/30">
-            <iframe
-              src={YOUTUBE_TRAILER_URL}
-              title="Lokol Listening Sessions Trailer"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
-          </div>
-        </div>
-      </section>
 
       {/* What It Is Section */}
       <section className="px-4 pb-16">
@@ -172,7 +158,7 @@ const Songs = () => {
                   onChange={handleInputChange}
                   placeholder="Your artist/band name"
                   required
-                  className="bg-card/50 border-border/50"
+                  className="bg-input border-[hsl(var(--input-border))] focus-visible:ring-[hsl(var(--input-border))]"
                 />
               </div>
 
@@ -186,7 +172,7 @@ const Songs = () => {
                   onChange={handleInputChange}
                   placeholder="your@email.com"
                   required
-                  className="bg-card/50 border-border/50"
+                  className="bg-input border-[hsl(var(--input-border))] focus-visible:ring-[hsl(var(--input-border))]"
                 />
               </div>
             </div>
@@ -200,7 +186,7 @@ const Songs = () => {
                 onChange={handleInputChange}
                 placeholder="Name of the song you're submitting"
                 required
-                className="bg-card/50 border-border/50"
+                className="bg-input border-[hsl(var(--input-border))] focus-visible:ring-[hsl(var(--input-border))]"
               />
             </div>
 
@@ -213,7 +199,7 @@ const Songs = () => {
                 onChange={handleInputChange}
                 placeholder="https://open.spotify.com/track/..."
                 required
-                className="bg-card/50 border-border/50"
+                className="bg-input border-[hsl(var(--input-border))] focus-visible:ring-[hsl(var(--input-border))]"
               />
             </div>
 
@@ -225,7 +211,7 @@ const Songs = () => {
                 value={formData.youtube_url}
                 onChange={handleInputChange}
                 placeholder="https://youtube.com/watch?v=..."
-                className="bg-card/50 border-border/50"
+                className="bg-input border-[hsl(var(--input-border))] focus-visible:ring-[hsl(var(--input-border))]"
               />
             </div>
 
@@ -238,7 +224,7 @@ const Songs = () => {
                 onChange={handleInputChange}
                 placeholder="Anything else you'd like us to know..."
                 rows={4}
-                className="bg-card/50 border-border/50"
+                className="bg-input border-[hsl(var(--input-border))] focus-visible:ring-[hsl(var(--input-border))]"
               />
             </div>
 

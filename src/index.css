@@ -35,8 +35,12 @@
     --background-secondary: 0 0% 8.6%; /* #161616 - dark charcoal */
     --background-tertiary: 0 0% 12.2%; /* #1F1F1F - section separators */
     
-    --foreground: 0 0% 100%;          /* #FFFFFF - primary text on dark */
+    --foreground: 8 17% 95%;          /* #f5f1f1 - body text */
     --foreground-secondary: 0 0% 71%; /* #B5B5B5 - secondary text on dark */
+    
+    /* Form input styles */
+    --input-background: 0 0% 16%;     /* #282828 - form field background */
+    --input-border: 57 100% 50%;      /* #ffe500 - form field outline */
 
     /* Cards float on dark canvas - warm off-white */
     --card: 60 11% 96.5%;             /* #F7F7F5 - warm off-white */
@@ -68,8 +72,8 @@
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 20%;
-    --input: 0 0% 12.2%;
-    --ring: 57 100% 50%;
+    --input: 0 0% 16%;                /* #282828 - form field background */
+    --ring: 57 100% 50%;              /* #ffe500 - focus ring */
 
     --radius: 0.5rem;
 
