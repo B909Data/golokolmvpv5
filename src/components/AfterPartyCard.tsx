@@ -26,6 +26,7 @@ const AfterPartyCard = ({
   artistName,
   startAt,
   city,
+  venueName,
   genres,
   youtubeUrl,
   imageUrl,
@@ -154,10 +155,12 @@ const AfterPartyCard = ({
               {format(new Date(startAt), "EEE, MMM d · h:mm a")}
             </span>
           </div>
-          {city && (
+          {(city || venueName) && (
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 shrink-0" />
-              <span>{city}</span>
+              <span>
+                {venueName && city ? `${venueName}, ${city}` : venueName || city}
+              </span>
             </div>
           )}
         </div>
