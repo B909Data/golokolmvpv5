@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, PlayCircle, Check } from "lucide-react";
+import { ArrowRight, PlayCircle, Check, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,6 +8,7 @@ import heroImage from "@/assets/hero-revised.jpg";
 import sectionAImage from "@/assets/sectiona-revised.png";
 import sectionBImage from "@/assets/sectionb-revised.png";
 import llsPlaceholder from "@/assets/lls-placeholder.png";
+import videoPlaceholderBg from "@/assets/video-placeholder-bg.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -71,9 +72,25 @@ const Index = () => {
 
           <div className="grid gap-10 md:grid-cols-2 items-stretch">
             {/* Video Placeholder */}
-            <div className="aspect-video w-full bg-secondary rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group">
-              <PlayCircle className="w-20 h-20 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 mb-3" />
-              <span className="text-sm text-muted-foreground">After Party Explainer</span>
+            <div className="aspect-video w-full rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group">
+              {/* Blurred background image */}
+              <img 
+                src={videoPlaceholderBg} 
+                alt="" 
+                className="absolute inset-0 w-full h-full object-cover blur-sm"
+              />
+              {/* Dark overlay for readability */}
+              <div className="absolute inset-0 bg-background/60" />
+              
+              {/* Warning message */}
+              <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
+                <div className="flex items-center gap-2 mb-4 text-primary">
+                  <AlertTriangle className="w-5 h-5" />
+                  <span className="text-sm font-medium uppercase tracking-wide">Coming Soon</span>
+                </div>
+                <PlayCircle className="w-20 h-20 text-primary opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 mb-3" />
+                <span className="text-sm text-muted-foreground">Explainer video will go here (forthcoming)</span>
+              </div>
             </div>
 
             {/* Checklist */}
