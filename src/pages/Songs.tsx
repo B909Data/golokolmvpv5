@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const YOUTUBE_TRAILER_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ";
+
 const Songs = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
