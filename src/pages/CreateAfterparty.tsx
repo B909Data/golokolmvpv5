@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import ReviewAfterPartyStep from "@/components/ReviewAfterPartyStep";
 
 const GENRE_OPTIONS = [
   "Hip-Hop",
@@ -109,6 +110,9 @@ const CreateAfterparty = () => {
   const selectedGenres = watch("genres") || [];
   const youtubeUrl = watch("youtube_url");
   const imageUrl = watch("image_url");
+  
+  // Review step confirmation state
+  const [isReviewConfirmed, setIsReviewConfirmed] = useState(false);
 
   const toggleGenre = (genre: string) => {
     const current = selectedGenres;
@@ -127,7 +131,7 @@ const CreateAfterparty = () => {
   // Step validation
   const step1Fields = ["artist_name", "contact_email"] as const;
   const step2Fields = ["title", "start_date", "start_time", "city", "venue_name"] as const;
-  const step3Fields = ["genres"] as const;
+  const step3Fields = ["genres", "image_url"] as const;
 
   const validateStep = async (step: number): Promise<boolean> => {
     let fieldsToValidate: readonly (keyof FormData)[] = [];
@@ -142,7 +146,11 @@ const CreateAfterparty = () => {
   const handleNext = async () => {
     const isValid = await validateStep(currentStep);
     if (isValid) {
-      setCurrentStep((prev) => Math.min(prev + 1, 3));
+      // Reset confirmation when moving to review step
+      if (currentStep === 3) {
+        setIsReviewConfirmed(false);
+      }
+      setCurrentStep((prev) => Math.min(prev + 1, 4));
     }
   };
 
@@ -222,7 +230,7 @@ const CreateAfterparty = () => {
 
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center gap-2 mb-8">
-      {[1, 2, 3].map((step) => (
+      {[1, 2, 3, 4].map((step) => (
         <div key={step} className="flex items-center">
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-sans font-semibold transition-colors ${
@@ -235,9 +243,9 @@ const CreateAfterparty = () => {
           >
             {step}
           </div>
-          {step < 3 && (
+          {step < 4 && (
             <div
-              className={`w-12 h-1 mx-2 rounded ${
+              className={`w-8 h-1 mx-1 rounded ${
                 step < currentStep ? "bg-primary" : "bg-muted/30"
               }`}
             />
@@ -482,6 +490,29 @@ const CreateAfterparty = () => {
     </div>
   );
 
+  const renderStep4 = () => {
+    const formValues = watch();
+    return (
+      <ReviewAfterPartyStep
+        formData={{
+          artist_name: formValues.artist_name || "",
+          contact_email: formValues.contact_email || "",
+          title: formValues.title || "",
+          start_date: formValues.start_date || new Date(),
+          start_time: formValues.start_time || "",
+          city: formValues.city || "",
+          venue_name: formValues.venue_name || "",
+          ticket_url: formValues.ticket_url,
+          genres: formValues.genres || [],
+          youtube_url: formValues.youtube_url,
+          image_url: formValues.image_url || "",
+        }}
+        isConfirmed={isReviewConfirmed}
+        onConfirmChange={setIsReviewConfirmed}
+      />
+    );
+  };
+
   const renderNavButtons = () => (
     <div className="flex justify-end gap-3 mt-8">
       {currentStep > 1 && (
@@ -496,7 +527,7 @@ const CreateAfterparty = () => {
         </Button>
       )}
       
-      {currentStep < 3 ? (
+      {currentStep < 4 ? (
         <Button
           type="button"
           onClick={handleNext}
@@ -509,7 +540,7 @@ const CreateAfterparty = () => {
         <Button
           type="submit"
           className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !isReviewConfirmed}
         >
           {isSubmitting ? (
             <>
@@ -517,7 +548,7 @@ const CreateAfterparty = () => {
               Processing...
             </>
           ) : (
-            "Continue to Payment — $11.99"
+            "Pay — $11.99"
           )}
         </Button>
       )}
@@ -581,7 +612,7 @@ const CreateAfterparty = () => {
             </div>
 
             <p className="text-center text-base font-sans text-muted-foreground mb-6">
-              Step {currentStep} of 3
+              Step {currentStep} of 4
             </p>
 
             {renderStepIndicator()}
@@ -591,6 +622,7 @@ const CreateAfterparty = () => {
                 {currentStep === 1 && renderStep1()}
                 {currentStep === 2 && renderStep2()}
                 {currentStep === 3 && renderStep3()}
+                {currentStep === 4 && renderStep4()}
                 {renderNavButtons()}
               </form>
             </div>
