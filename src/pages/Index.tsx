@@ -4,7 +4,7 @@ import { ArrowRight, PlayCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import heroImage from "@/assets/hero-revised.jpg";
+import heroImage from "@/assets/hero-new.jpg";
 import sectionAImage from "@/assets/sectiona-revised.png";
 import sectionBImage from "@/assets/sectionb-revised.png";
 import llsPlaceholder from "@/assets/lls-placeholder.png";
@@ -45,7 +45,7 @@ const Index = () => {
         <div className="container relative z-10 mx-auto px-4 py-16">
           <div className="max-w-4xl">
             <h1 className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-foreground mb-6 leading-[0.95]">
-              A better way <span className="text-primary">to take fans home</span> after the show.
+              Make every show <span className="text-primary">count.</span>
             </h1>
 
             <div className="mt-8">
