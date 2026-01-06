@@ -51,7 +51,7 @@ const ReviewAfterPartyStep = ({
         </p>
       </div>
 
-      {/* A) RSVP Card Preview */}
+      {/* A) RSVP Card Preview with Disabled RSVP Button */}
       <div className="space-y-3">
         <Label className="text-primary-foreground text-base font-sans">Your RSVP Card Preview</Label>
         <div className="bg-background rounded-xl p-4">
@@ -65,84 +65,29 @@ const ReviewAfterPartyStep = ({
             genres={formData.genres}
             youtubeUrl={formData.youtube_url || null}
             imageUrl={formData.image_url || null}
-            showRsvpButton={false}
+            showRsvpButton={true}
+            isPreview={true}
           />
         </div>
       </div>
 
-      {/* B) Details Summary */}
-      <div className="space-y-3">
-        <Label className="text-primary-foreground text-base font-sans">Details Summary</Label>
-        <div className="bg-background/10 rounded-xl p-4 space-y-2">
-          <div className="grid gap-2 text-sm font-sans">
-            <div className="flex justify-between">
-              <span className="text-primary-foreground/70">Event Title</span>
-              <span className="text-primary-foreground font-medium">{formData.title}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-primary-foreground/70">Artist Name</span>
-              <span className="text-primary-foreground font-medium">{formData.artist_name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-primary-foreground/70">City</span>
-              <span className="text-primary-foreground font-medium">{formData.city}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-primary-foreground/70">Date & Time</span>
-              <span className="text-primary-foreground font-medium">
-                {format(formData.start_date, "MMM d, yyyy")} · {formatTime(formData.start_time)}
-              </span>
-            </div>
-            {formData.venue_name && (
-              <div className="flex justify-between">
-                <span className="text-primary-foreground/70">Venue</span>
-                <span className="text-primary-foreground font-medium">{formData.venue_name}</span>
-              </div>
-            )}
-            {formData.genres.length > 0 && (
-              <div className="flex justify-between">
-                <span className="text-primary-foreground/70">Genres</span>
-                <span className="text-primary-foreground font-medium">{formData.genres.join(", ")}</span>
-              </div>
-            )}
-            <div className="flex justify-between items-start">
-              <span className="text-primary-foreground/70">Flyer URL</span>
-              <span className="text-primary-foreground font-medium text-right break-all max-w-[60%]">
-                {formData.image_url}
-              </span>
-            </div>
-            {formData.youtube_url && (
-              <div className="flex justify-between items-start">
-                <span className="text-primary-foreground/70">YouTube URL</span>
-                <span className="text-primary-foreground font-medium text-right break-all max-w-[60%]">
-                  {formData.youtube_url}
-                </span>
-              </div>
-            )}
-            <div className="flex justify-between pt-2 border-t border-primary-foreground/20">
-              <span className="text-primary-foreground/70">Price</span>
-              <span className="text-primary-foreground font-medium">$11.99 — No Subscription</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* E) What happens after you pay */}
+      {/* What happens after you pay */}
       <div className="space-y-3">
         <Label className="text-primary-foreground text-base font-sans">What happens after you pay</Label>
         <div className="bg-background/10 rounded-xl p-4">
           <ol className="space-y-2 text-sm font-sans text-primary-foreground/90 list-decimal list-inside">
             <li>Your After Party page is created instantly.</li>
             <li>You'll get your Artist Control link (bookmark it).</li>
-            <li>Use 'Door Check-In' to scan passes or add walk-ins.</li>
-            <li>After Party opens when the first fan gets checked in.</li>
             <li>Fans should show their pass to band at merch table to get checked in.</li>
+            <li>Use 'Door Check-In' to scan passes or let non rsvp fans in.</li>
+            <li>After Party opens when the first fan gets checked in.</li>
             <li>The After Party stays open for 24 hours.</li>
+            <li>Use same Door Check in Controls to Chat, Livestream, Pin a post</li>
           </ol>
         </div>
       </div>
 
-      {/* C) Confirmation Checkbox */}
+      {/* Confirmation Checkbox */}
       <div className="flex items-start gap-3 pt-2">
         <Checkbox
           id="confirm-accurate"

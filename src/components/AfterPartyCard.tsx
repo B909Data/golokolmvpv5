@@ -17,6 +17,7 @@ interface AfterPartyCardProps {
   imageUrl?: string | null;
   showRsvpButton?: boolean;
   onRsvpClick?: () => void;
+  isPreview?: boolean;
 }
 
 const AfterPartyCard = ({
@@ -30,6 +31,7 @@ const AfterPartyCard = ({
   imageUrl,
   showRsvpButton = true,
   onRsvpClick,
+  isPreview = false,
 }: AfterPartyCardProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -162,7 +164,14 @@ const AfterPartyCard = ({
 
         {/* Primary CTA - Black bg with yellow text */}
         {showRsvpButton && (
-          onRsvpClick ? (
+          isPreview ? (
+            <Button 
+              disabled
+              className="w-full mt-auto bg-primary-foreground text-primary cursor-not-allowed opacity-70 font-sans"
+            >
+              RSVP
+            </Button>
+          ) : onRsvpClick ? (
             <Button 
               onClick={onRsvpClick}
               className="w-full mt-auto bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-sans"
