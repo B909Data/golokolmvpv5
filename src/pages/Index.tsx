@@ -66,7 +66,7 @@ const Index = () => {
               WHAT IS AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl">
-              A private, temporary space for new fans to stay connected after the show.
+              A private, pop up space for new fans to stay connected after the show.
             </p>
           </div>
 
@@ -74,14 +74,10 @@ const Index = () => {
             {/* Video Placeholder */}
             <div className="aspect-video w-full rounded-lg flex flex-col items-center justify-center relative overflow-hidden cursor-pointer group">
               {/* Blurred background image */}
-              <img 
-                src={videoPlaceholderBg} 
-                alt="" 
-                className="absolute inset-0 w-full h-full object-cover blur-sm"
-              />
+              <img src={videoPlaceholderBg} alt="" className="absolute inset-0 w-full h-full object-cover blur-sm" />
               {/* Dark overlay for readability */}
               <div className="absolute inset-0 bg-background/60" />
-              
+
               {/* Warning message */}
               <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
                 <div className="flex items-center gap-2 mb-4 text-primary">
@@ -95,9 +91,11 @@ const Index = () => {
 
             {/* Checklist */}
             <div className="flex flex-col justify-between h-full space-y-5">
-              <ChecklistItem>An exclusive disappearing space to chat or livestream with true fans.</ChecklistItem>
+              <ChecklistItem>A 24 hours post-show window to reward the fans who showed up.</ChecklistItem>
               <ChecklistItem>After-show marketing new fans will share and remember.</ChecklistItem>
-              <ChecklistItem>Build real community one show at a time without the burden of another platform.</ChecklistItem>
+              <ChecklistItem>
+                Build real community one show at a time without the burden of another overwhelming platform.
+              </ChecklistItem>
 
               {/* CTAs */}
               <div className="flex flex-wrap gap-4 pt-4">
