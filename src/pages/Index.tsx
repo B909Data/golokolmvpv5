@@ -153,7 +153,7 @@ const Index = () => {
           <div className="flex flex-col justify-between h-full space-y-5">
             <ChecklistItem>Promote your next show with your After Party link</ChecklistItem>
             <ChecklistItem>Fans RSVP and save their pass. You scan them in at the show.</ChecklistItem>
-            <ChecklistItem>24-hours to Livestream. Chat. Debut. Sell. Build. Then Poof!</ChecklistItem>
+            <ChecklistItem>24-hours to Livestream. Chat. Debut. Sell. Build. Then Poof! The Party ends!</ChecklistItem>
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 pt-4">
