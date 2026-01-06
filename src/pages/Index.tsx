@@ -37,11 +37,8 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         {/* Background image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        />
-        
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImage})` }} />
+
         <div className="container relative z-10 mx-auto px-4 py-16">
           <div className="max-w-4xl">
             <h1 className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-foreground mb-6 leading-[0.95]">
@@ -84,7 +81,7 @@ const Index = () => {
               <ChecklistItem>An exclusive 24-hour chat for fans who attended</ChecklistItem>
               <ChecklistItem>A fun, easy way to create your music community one show at a time.</ChecklistItem>
               <ChecklistItem>Transform each show into true momentum</ChecklistItem>
-              
+
               {/* CTAs */}
               <div className="flex flex-wrap gap-4 pt-4">
                 <Link to="/create-afterparty">
@@ -109,17 +106,14 @@ const Index = () => {
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/40 to-transparent z-10" />
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${sectionAImage})` }}
-        />
-        
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${sectionAImage})` }} />
+
         <div className="container relative z-20 mx-auto px-4 py-14">
           <div className="max-w-4xl">
             <h2 className="font-display font-bold text-3xl md:text-5xl lg:text-6xl text-foreground leading-[0.95]">
               never shout <span className="text-primary">your instagram from the</span> stage again.
             </h2>
-            
+
             <div className="mt-6">
               <Link to="/create-afterparty">
                 <Button variant="secondary" size="lg">
@@ -140,16 +134,14 @@ const Index = () => {
             <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
               HOW TO THROW AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
-            <p className="text-muted-foreground text-lg">
-              Make every show count.
-            </p>
+            <p className="text-muted-foreground text-lg">Make every show count.</p>
           </div>
 
           <div className="flex flex-col justify-between h-full space-y-5">
             <ChecklistItem>Promote your next show with your After Party link</ChecklistItem>
             <ChecklistItem>Fans RSVP and save their pass. You scan them in at the show.</ChecklistItem>
             <ChecklistItem>24-hours to Livestream. Chat. Debut. Sell. Build. Poof!</ChecklistItem>
-            
+
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 pt-4">
               <Link to="/create-afterparty">
@@ -167,15 +159,13 @@ const Index = () => {
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/40 to-transparent z-10" />
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${sectionBImage})` }}
-        />
-        
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${sectionBImage})` }} />
+
         <div className="container relative z-20 mx-auto px-4 pb-[calc(3.5rem+40px)] pt-14">
           <div className="max-w-3xl">
             <h2 className="font-display font-bold text-3xl md:text-5xl lg:text-6xl text-foreground leading-[0.95]">
-              the future <span className="text-primary">of music</span><br />
+              the future <span className="text-primary">of music</span>
+              <br />
               <span className="text-primary">is local.</span>
             </h2>
           </div>
@@ -186,11 +176,9 @@ const Index = () => {
       <section className="py-16 bg-[hsl(60,10%,95%)]">
         <div className="container mx-auto px-4">
           <div className="mb-8">
-            <h2 className="font-display text-3xl md:text-5xl text-[hsl(0,0%,10%)] mb-3">
-              LOKOL LISTENING SESSIONS
-            </h2>
+            <h2 className="font-display text-3xl md:text-5xl text-[hsl(0,0%,10%)] mb-3">LOKOL LISTENING SESSIONS</h2>
             <p className="text-[hsl(0,0%,30%)] text-lg">
-              A dj event and YouTube series featuring the emerging sounds of a city.
+              A dj event and YouTube series brought to you by GoLokol, featuring the emerging sounds of a city.
             </p>
           </div>
 
@@ -198,11 +186,10 @@ const Index = () => {
             {/* Left column - Description + CTA */}
             <div className="space-y-4">
               <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
-                Music discovery the right way. At a party and on YouTube screens at the same time. Local fans and artists turn up when their song comes on.
+                Music discovery the right way. At a party and on YouTube screens at the same time. Local fans and
+                artists turn up when their song comes on.
               </p>
-              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
-                We launch this February in Atlanta.
-              </p>
+              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">We launch this February in Atlanta.</p>
 
               <div className="flex flex-wrap gap-4 pt-2">
                 <div className="flex flex-col">
@@ -215,9 +202,9 @@ const Index = () => {
                   <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$15 each submission</p>
                 </div>
                 <div className="flex flex-col">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
+                  <Button
+                    size="lg"
+                    variant="outline"
                     className="border-[hsl(0,0%,10%)] text-[hsl(0,0%,10%)] hover:bg-[hsl(0,0%,10%)] hover:text-white"
                     onClick={handleBuyTicket}
                     disabled={isLoadingTicket}
@@ -232,7 +219,11 @@ const Index = () => {
 
             {/* Right column - LLS Placeholder image */}
             <div className="aspect-video w-full rounded-lg overflow-hidden">
-              <img src={llsPlaceholder} alt="Lokol Listening Sessions Coming 2026" className="w-full h-full object-cover" />
+              <img
+                src={llsPlaceholder}
+                alt="Lokol Listening Sessions Coming 2026"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </div>
