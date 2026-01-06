@@ -4,7 +4,7 @@ import { ArrowRight, PlayCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import heroImage from "@/assets/hero-new.jpg";
+import heroImage from "@/assets/hero-revised.jpg";
 import sectionAImage from "@/assets/sectiona-revised.png";
 import sectionBImage from "@/assets/sectionb-revised.png";
 import llsPlaceholder from "@/assets/lls-placeholder.png";
@@ -108,7 +108,7 @@ const Index = () => {
       {/* Large Image Hero Section 1 - "Never shout your instagram" */}
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
         {/* Background image */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/40 to-transparent z-10" />
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${sectionAImage})` }}
@@ -166,13 +166,13 @@ const Index = () => {
       {/* Large Image Hero Section 2 - "The future of music is local" */}
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
         {/* Background image */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/40 to-transparent z-10" />
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${sectionBImage})` }}
         />
         
-        <div className="container relative z-20 mx-auto px-4 pb-[calc(3.5rem+20px)] pt-14">
+        <div className="container relative z-20 mx-auto px-4 pb-[calc(3.5rem+40px)] pt-14">
           <div className="max-w-3xl">
             <h2 className="font-display font-bold text-3xl md:text-5xl lg:text-6xl text-foreground leading-[0.95]">
               the future <span className="text-primary">of music</span><br />
