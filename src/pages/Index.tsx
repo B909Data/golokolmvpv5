@@ -45,7 +45,7 @@ const Index = () => {
         <div className="container relative z-10 mx-auto px-4 py-16">
           <div className="max-w-4xl">
             <h1 className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-foreground mb-6 leading-[0.95]">
-              Make every show <span className="text-primary">count.</span>
+              Reward the fans <span className="text-primary">who were there.</span>
             </h1>
 
             <div className="mt-8">
@@ -55,8 +55,8 @@ const Index = () => {
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <p className="text-foreground text-sm mt-3 max-w-md">
-                Don't leave new fans in the crowd to the algorithm. Invite them to your online After party.
+              <p className="text-foreground text-lg font-medium mt-4 max-w-lg">
+                Host an invite-only After Party for the fans who showed up. No algorithm. No noise. No burnout.
               </p>
             </div>
           </div>
@@ -123,8 +123,10 @@ const Index = () => {
       {/* Large Image Hero Section 1 - "Never shout your instagram" */}
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
         {/* Background image */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/40 to-transparent z-10" />
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${sectionAImage})` }} />
+        {/* Light overlay for readability */}
+        <div className="absolute inset-0 bg-background/40 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/40 to-transparent z-10" />
 
         <div className="container relative z-20 mx-auto px-4 py-14">
           <div className="max-w-4xl">
@@ -176,8 +178,10 @@ const Index = () => {
       {/* Large Image Hero Section 2 - "The future of music is local" */}
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
         {/* Background image */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/40 to-transparent z-10" />
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${sectionBImage})` }} />
+        {/* Light overlay for readability */}
+        <div className="absolute inset-0 bg-background/40 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/40 to-transparent z-10" />
 
         <div className="container relative z-20 mx-auto px-4 pb-[calc(3.5rem+40px)] pt-14">
           <div className="max-w-3xl">
