@@ -172,19 +172,19 @@ const AfterPartyCard = ({
               disabled
               className="w-full mt-auto bg-primary-foreground text-primary cursor-not-allowed opacity-70 font-sans"
             >
-              RSVP
+              Get Access
             </Button>
           ) : onRsvpClick ? (
             <Button 
               onClick={onRsvpClick}
               className="w-full mt-auto bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-sans"
             >
-              RSVP
+              Get Access
             </Button>
           ) : (
             <Link to={`/after-party/${id}/rsvp`} className="mt-auto">
               <Button className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-sans">
-                RSVP
+                Get Access
               </Button>
             </Link>
           )

@@ -95,7 +95,7 @@ const FindAfterParty = () => {
               <span className="text-primary">AFTER PARTY</span>
             </h1>
             <p className="text-muted-foreground text-lg font-sans">
-              Discover upcoming After Parties by city and genre. RSVP to connect with artists and fans.
+              Download a pass. Show up. Get access to a 24 hour After Party with your favorite local band.
             </p>
           </div>
 
