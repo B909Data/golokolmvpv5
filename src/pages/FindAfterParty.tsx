@@ -17,6 +17,7 @@ const GENRE_OPTIONS = [
   "Blues",
   "Gospel",
   "Reggae",
+  "Ska",
   "Afrobeats",
   "Latin",
   "Pop",
