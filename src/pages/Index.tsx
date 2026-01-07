@@ -56,7 +56,7 @@ const Index = () => {
                 </Button>
               </Link>
               <p className="text-foreground text-lg font-medium mt-4 max-w-lg">
-                Host an invite-only After Party for the fans who showed up. No algorithm. No noise. No burnout.
+                Host an invite-only After Party for the fans who showed up.<br />No algorithm. No noise. No burnout.
               </p>
             </div>
           </div>
