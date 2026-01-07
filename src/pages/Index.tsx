@@ -39,6 +39,8 @@ const Index = () => {
       <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImage})` }} />
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-background/50" />
 
         <div className="container relative z-10 mx-auto px-4 py-16">
           <div className="max-w-4xl">
