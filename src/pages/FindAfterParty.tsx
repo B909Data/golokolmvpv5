@@ -94,9 +94,20 @@ const FindAfterParty = () => {
               <span className="text-foreground">FIND AN </span>
               <span className="text-primary">AFTER PARTY</span>
             </h1>
-            <p className="text-muted-foreground text-lg font-sans">
-              Download a pass. Show up. Get access to a 24 hour After Party with your favorite local band.
-            </p>
+            <ul className="space-y-2 text-lg font-sans">
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✓</span>
+                <span className="text-muted-foreground">Download an After Party Pass.</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✓</span>
+                <span className="text-muted-foreground">Attend and enjoy the show.</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✓</span>
+                <span className="text-muted-foreground">Get access to a 24 hour online After Party with the band.</span>
+              </li>
+            </ul>
           </div>
 
           {/* Filters */}
