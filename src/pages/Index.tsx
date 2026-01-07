@@ -42,8 +42,8 @@ const Index = () => {
         {/* Dark overlay for readability */}
         <div className="absolute inset-0 bg-background/50" />
 
-        <div className="container relative z-10 mx-auto px-4 py-16">
-          <div className="max-w-4xl">
+        <div className="container relative z-10 mx-auto px-4 pt-40 pb-16">
+          <div className="max-w-4xl mt-24">
             <h1 className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-foreground mb-6 leading-[0.95]">
               Reward the fans <span className="text-primary">who were there.</span>
             </h1>
