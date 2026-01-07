@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Lock, Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, Pin, MessageSquare, CheckCircle2 } from "lucide-react";
+import { Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, Pin, MessageSquare, CheckCircle2, Share2, Bookmark } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+const PUBLIC_BASE_URL = "https://golokol.app";
 
 interface EventData {
   id: string;
@@ -45,11 +47,11 @@ const StatusCard = ({ icon: Icon, label, value, accent = false }: {
   value: number | string;
   accent?: boolean;
 }) => (
-  <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${accent ? 'bg-primary text-primary-foreground' : 'bg-muted/30 border border-border/50'}`}>
+  <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${accent ? 'bg-primary text-primary-foreground' : 'bg-black/80 border border-primary/30'}`}>
     <Icon className={`w-5 h-5 ${accent ? 'text-primary-foreground' : 'text-primary'}`} />
     <div>
-      <p className={`text-xs font-sans uppercase tracking-wide ${accent ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>{label}</p>
-      <p className={`text-lg font-display font-bold ${accent ? 'text-primary-foreground' : 'text-foreground'}`}>{value}</p>
+      <p className={`text-xs font-sans uppercase tracking-wide ${accent ? 'text-primary-foreground/80' : 'text-primary/70'}`}>{label}</p>
+      <p className={`text-lg font-display font-bold ${accent ? 'text-primary-foreground' : 'text-primary'}`}>{value}</p>
     </div>
   </div>
 );
@@ -58,6 +60,7 @@ const ArtistEvent = () => {
   const { eventId } = useParams();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+  const isWelcome = searchParams.get("welcome") === "true";
 
   const [event, setEvent] = useState<EventData | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -82,6 +85,9 @@ const ArtistEvent = () => {
   // Walk-in pass modal state
   const [walkInPassData, setWalkInPassData] = useState<{ qrToken: string; displayName: string } | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
+  
+  // Share link copied state
+  const [shareLinkCopied, setShareLinkCopied] = useState(false);
 
   const fetchEvent = async () => {
     if (!eventId || !token) return;
@@ -123,6 +129,16 @@ const ArtistEvent = () => {
     fetchEvent();
     fetchCheckedInCount();
   }, [eventId, token]);
+
+  // Show welcome toast on first visit
+  useEffect(() => {
+    if (isWelcome && event) {
+      toast.success("Your After Party is live!", {
+        description: "Bookmark this page and share the link with your fans.",
+        duration: 5000,
+      });
+    }
+  }, [isWelcome, event]);
 
   // Cleanup scanner on unmount
   useEffect(() => {
@@ -314,6 +330,16 @@ const ArtistEvent = () => {
     setLinkCopied(false);
   };
 
+  // Share link functionality
+  const shareUrl = eventId ? `${PUBLIC_BASE_URL}/after-party/${eventId}/rsvp` : "";
+  
+  const handleCopyShareLink = async () => {
+    await navigator.clipboard.writeText(shareUrl);
+    setShareLinkCopied(true);
+    toast.success("Share link copied");
+    setTimeout(() => setShareLinkCopied(false), 2000);
+  };
+
   // Derived counts
   const pinnedCount = pinnedMessage.trim() ? 1 : 0;
 
@@ -346,38 +372,78 @@ const ArtistEvent = () => {
     );
   }
 
+  const artistName = event?.artist_name || "YOUR";
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Header */}
-      <section className="pt-32 pb-6 px-4">
+      {/* Header - Brutal Grotesk Style */}
+      <section className="pt-28 pb-4 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Lock className="w-6 h-6 text-primary" />
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="font-display text-2xl md:text-3xl text-foreground">{event?.title}</h1>
-                  <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded font-sans uppercase tracking-wide font-medium">
-                    Artist Controls
-                  </span>
-                </div>
-                <p className="text-muted-foreground text-sm font-sans">
-                  {event?.city} · {event?.start_at ? new Date(event.start_at).toLocaleDateString() : ""}
+          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-foreground uppercase tracking-tight leading-none">
+            <span className="text-primary">{artistName}</span>
+            <br />
+            <span className="text-foreground">AFTER PARTY</span>
+            <br />
+            <span className="text-primary">CONTROL ROOM</span>
+          </h1>
+          
+          {/* Bookmark Instruction */}
+          <div className="flex items-center gap-2 mt-4 text-muted-foreground">
+            <Bookmark className="w-4 h-4" />
+            <p className="text-sm font-sans">
+              Bookmark this page. This is your home base to promote and manage your After Party.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Share Section - Yellow Container */}
+      <section className="px-4 pb-6 pt-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-primary rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Share2 className="w-5 h-5 text-primary-foreground" />
+              <h2 className="font-display text-lg text-primary-foreground uppercase tracking-wide">
+                Share Your After Party
+              </h2>
+            </div>
+            
+            {/* Link Display - Black on Yellow */}
+            <div className="bg-black rounded-lg p-4 flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-primary font-mono text-sm md:text-base truncate">
+                  {shareUrl}
                 </p>
               </div>
+              <Button
+                onClick={handleCopyShareLink}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
+              >
+                {shareLinkCopied ? (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy
+                  </>
+                )}
+              </Button>
             </div>
-            <Button variant="outline" size="sm" onClick={fetchEvent} disabled={loading} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-sans">
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-              Refresh
-            </Button>
+            
+            <p className="text-primary-foreground/80 text-sm font-sans mt-3">
+              Share this link with your fans so they can get their pass.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Status Summary */}
-      <section className="px-4 pb-8">
+      <section className="px-4 pb-6">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-3 gap-3">
             <StatusCard icon={CheckCircle2} label="Checked In" value={checkedInCount} accent />
@@ -387,23 +453,32 @@ const ArtistEvent = () => {
         </div>
       </section>
 
-      {/* Door Check-In Section */}
-      <section className="px-4 pb-8">
+      {/* After Party Controls Label */}
+      <section className="px-4 pb-2">
         <div className="max-w-4xl mx-auto">
-          <div className="border-2 border-primary rounded-xl p-6 bg-background space-y-6">
+          <h2 className="font-display text-xl text-primary uppercase tracking-wide">
+            After Party Controls
+          </h2>
+        </div>
+      </section>
+
+      {/* Door Check-In Section - Dark Theme */}
+      <section className="px-4 pb-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-black border border-primary/30 rounded-xl p-6 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl text-primary uppercase tracking-wide">Door Check-In</h2>
-              <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-sans font-medium">
+              <h3 className="font-display text-lg text-primary uppercase tracking-wide">Door Check-In</h3>
+              <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-sans font-medium">
                 {checkedInCount} tonight
               </div>
             </div>
 
             {/* Empty State */}
             {checkedInCount === 0 && !isScanning && !showWalkInForm && (
-              <div className="bg-muted/20 rounded-lg p-6 text-center border border-border/30">
-                <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-foreground font-sans font-medium mb-1">No fans checked in yet</p>
-                <p className="text-muted-foreground text-sm font-sans">
+              <div className="bg-primary/10 rounded-lg p-6 text-center border border-primary/30">
+                <Users className="w-10 h-10 text-primary mx-auto mb-3" />
+                <p className="text-primary font-sans font-medium mb-1">No fans checked in yet</p>
+                <p className="text-primary/70 text-sm font-sans">
                   Scan a QR code or add a walk-in to start the After Party.
                 </p>
               </div>
@@ -419,8 +494,8 @@ const ArtistEvent = () => {
             {/* Scanner Area */}
             {isScanning ? (
               <div className="space-y-4">
-                <div id="qr-scanner" className="w-full max-w-sm mx-auto rounded-lg overflow-hidden bg-muted/20 min-h-[280px]" />
-                <Button variant="outline" onClick={stopScanner} className="w-full">
+                <div id="qr-scanner" className="w-full max-w-sm mx-auto rounded-lg overflow-hidden bg-black/50 min-h-[280px]" />
+                <Button variant="outline" onClick={stopScanner} className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                   <X className="w-4 h-4 mr-2" />
                   Stop Scanning
                 </Button>
@@ -433,7 +508,7 @@ const ArtistEvent = () => {
                     value={walkInName}
                     onChange={(e) => setWalkInName(e.target.value)}
                     placeholder="Walk-in guest name"
-                    className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
+                    className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans"
                   />
                 </div>
                 <div className="flex gap-3">
@@ -444,7 +519,7 @@ const ArtistEvent = () => {
                   >
                     {isCheckingIn ? "Adding..." : "Add Walk-In"}
                   </Button>
-                  <Button variant="outline" onClick={() => setShowWalkInForm(false)}>
+                  <Button variant="outline" onClick={() => setShowWalkInForm(false)} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                     Cancel
                   </Button>
                 </div>
@@ -465,11 +540,17 @@ const ArtistEvent = () => {
         </div>
       </section>
 
-      {/* Event Settings Section */}
-      <section className="px-4 pb-8">
+      {/* Event Settings Section - Dark Theme */}
+      <section className="px-4 pb-6">
         <div className="max-w-4xl mx-auto">
-          <div className="border-2 border-border/50 rounded-xl p-6 bg-background space-y-6">
-            <h2 className="font-display text-xl text-foreground uppercase tracking-wide">Event Settings</h2>
+          <div className="bg-black border border-primary/30 rounded-xl p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-lg text-primary uppercase tracking-wide">Event Settings</h3>
+              <Button variant="outline" size="sm" onClick={fetchEvent} disabled={loading} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-sans">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+            </div>
 
             <div className="space-y-4">
               <div>
@@ -479,10 +560,10 @@ const ArtistEvent = () => {
                   onChange={(e) => setPinnedMessage(e.target.value)}
                   placeholder="Pin important info so fans see it first..."
                   rows={3}
-                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
+                  className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans"
                 />
                 {!pinnedMessage.trim() && (
-                  <p className="text-muted-foreground text-xs mt-1 font-sans">
+                  <p className="text-primary/60 text-xs mt-1 font-sans">
                     Tip: Pin important info so fans see it first.
                   </p>
                 )}
@@ -494,7 +575,7 @@ const ArtistEvent = () => {
                   value={youtubeUrl}
                   onChange={(e) => setYoutubeUrl(e.target.value)}
                   placeholder="https://youtube.com/watch?v=..."
-                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
+                  className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans"
                 />
               </div>
 
@@ -504,7 +585,7 @@ const ArtistEvent = () => {
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://..."
-                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
+                  className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans"
                 />
               </div>
 
@@ -514,7 +595,7 @@ const ArtistEvent = () => {
                   value={livestreamUrl}
                   onChange={(e) => setLivestreamUrl(e.target.value)}
                   placeholder="https://..."
-                  className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
+                  className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans"
                 />
               </div>
 
@@ -527,22 +608,22 @@ const ArtistEvent = () => {
         </div>
       </section>
 
-      {/* Chat Messages Section */}
+      {/* Chat Messages Section - Dark Theme */}
       <section className="px-4 pb-24">
         <div className="max-w-4xl mx-auto">
-          <div className="border-2 border-border/50 rounded-xl p-6 bg-background">
+          <div className="bg-black border border-primary/30 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-xl text-foreground uppercase tracking-wide">Messages</h2>
-              <div className="bg-muted/30 text-muted-foreground px-3 py-1 rounded-full text-sm font-sans">
+              <h3 className="font-display text-lg text-primary uppercase tracking-wide">Messages</h3>
+              <div className="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm font-sans">
                 {messages.length} total
               </div>
             </div>
 
             {messages.length === 0 ? (
-              <div className="bg-muted/20 rounded-lg p-8 text-center border border-border/30">
-                <MessageSquare className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-foreground font-sans font-medium mb-1">No messages yet</p>
-                <p className="text-muted-foreground text-sm font-sans">
+              <div className="bg-primary/10 rounded-lg p-8 text-center border border-primary/30">
+                <MessageSquare className="w-10 h-10 text-primary mx-auto mb-3" />
+                <p className="text-primary font-sans font-medium mb-1">No messages yet</p>
+                <p className="text-primary/70 text-sm font-sans">
                   Say hello or pin an announcement to get things started.
                 </p>
               </div>
@@ -551,11 +632,11 @@ const ArtistEvent = () => {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className="flex items-start justify-between gap-4 p-4 bg-muted/20 rounded-lg border border-border/30 group"
+                    className="flex items-start justify-between gap-4 p-4 bg-primary/10 rounded-lg border border-primary/30 group"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-foreground text-sm break-words font-sans">{msg.message || "(empty)"}</p>
-                      <p className="text-xs text-muted-foreground mt-2 font-sans">
+                      <p className="text-xs text-primary/60 mt-2 font-sans">
                         <span className={`${msg.role === 'artist' ? 'text-primary font-medium' : ''}`}>
                           {msg.role === 'artist' ? 'Artist' : 'Fan'}
                         </span>
@@ -566,7 +647,7 @@ const ArtistEvent = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity"
+                      className="text-primary/50 hover:text-destructive hover:bg-destructive/10 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity"
                       onClick={() => handleDeleteMessage(msg.id)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -581,14 +662,14 @@ const ArtistEvent = () => {
 
       {/* Walk-In Pass Modal */}
       <Dialog open={!!walkInPassData} onOpenChange={(open) => !open && closeWalkInPassModal()}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-black border-primary">
           <DialogHeader>
-            <DialogTitle className="font-display text-xl text-center">
+            <DialogTitle className="font-display text-xl text-center text-primary">
               Walk-In Pass
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center space-y-6 py-4">
-            <div className="bg-primary/10 text-primary px-4 py-2 rounded-full font-sans font-medium text-center">
+            <div className="bg-primary text-primary-foreground px-4 py-2 rounded-full font-sans font-medium text-center">
               {walkInPassData?.displayName}
             </div>
             
@@ -601,14 +682,14 @@ const ArtistEvent = () => {
               />
             </div>
             
-            <p className="text-muted-foreground text-sm font-sans text-center">
+            <p className="text-primary/70 text-sm font-sans text-center">
               Hand this to the fan to scan or screenshot
             </p>
             
             {/* Link Text */}
             <div className="w-full">
-              <p className="text-xs text-muted-foreground mb-1 font-sans">Pass Link:</p>
-              <p className="text-sm text-foreground break-all bg-muted/30 p-3 rounded-lg font-mono border border-border/30">
+              <p className="text-xs text-primary/60 mb-1 font-sans">Pass Link:</p>
+              <p className="text-sm text-primary break-all bg-primary/10 p-3 rounded-lg font-mono border border-primary/30">
                 {getWalkInPassUrl()}
               </p>
             </div>

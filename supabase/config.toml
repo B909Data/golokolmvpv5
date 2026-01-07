@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.afterparty-upload-flyer]
 verify_jwt = false
+
+[functions.admin-get-artist-control-link]
+verify_jwt = false

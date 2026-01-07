@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Calendar, RefreshCw, ExternalLink, Copy, Check, Users } from "lucide-react";
+import { Calendar, RefreshCw, ExternalLink, Copy, Check, Users, DoorOpen } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const PUBLIC_BASE_URL = "https://golokol.app";
 
 interface Event {
   id: string;
@@ -27,6 +29,7 @@ const AdminAfterParties = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [creatingRecap, setCreatingRecap] = useState<string | null>(null);
   const [sendingSms, setSendingSms] = useState<string | null>(null);
+  const [openingControl, setOpeningControl] = useState<string | null>(null);
 
   const fetchEvents = async () => {
     if (!key) return;
@@ -49,16 +52,38 @@ const AdminAfterParties = () => {
     }
   }, [key]);
 
-  const copyArtistLink = (event: Event) => {
-    if (!event.artist_access_token) {
-      toast.error("No artist token for this event");
-      return;
+  const getArtistControlLink = async (eventId: string): Promise<string | null> => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        `admin-get-artist-control-link?key=${key}&event_id=${eventId}`
+      );
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data.artist_control_url;
+    } catch (err) {
+      console.error("Get artist control link error:", err);
+      toast.error("Failed to get artist control link");
+      return null;
     }
-    const link = `${window.location.origin}/artist/event/${event.id}?token=${event.artist_access_token}`;
-    navigator.clipboard.writeText(link);
-    setCopiedId(event.id);
-    toast.success("Artist link copied!");
-    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const openArtistControl = async (eventId: string) => {
+    setOpeningControl(eventId);
+    const url = await getArtistControlLink(eventId);
+    if (url) {
+      window.open(url, "_blank");
+    }
+    setOpeningControl(null);
+  };
+
+  const copyArtistControlLink = async (eventId: string) => {
+    const url = await getArtistControlLink(eventId);
+    if (url) {
+      navigator.clipboard.writeText(url);
+      setCopiedId(eventId);
+      toast.success("Artist control link copied!");
+      setTimeout(() => setCopiedId(null), 2000);
+    }
   };
 
   const createRecap = async (eventId: string) => {
@@ -183,6 +208,41 @@ const AdminAfterParties = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-2">
+                            {/* Artist Control Room Actions */}
+                            <Button
+                              variant="default"
+                              size="sm"
+                              className="h-7 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+                              onClick={() => openArtistControl(event.id)}
+                              disabled={openingControl === event.id}
+                            >
+                              {openingControl === event.id ? (
+                                "..."
+                              ) : (
+                                <>
+                                  <DoorOpen className="w-3 h-3 mr-1" />
+                                  Open Control Room
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => copyArtistControlLink(event.id)}
+                            >
+                              {copiedId === event.id ? (
+                                <>
+                                  <Check className="w-3 h-3 mr-1" />
+                                  Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3 mr-1" />
+                                  Copy Control Link
+                                </>
+                              )}
+                            </Button>
                             <a
                               href={`/after-party/${event.id}`}
                               target="_blank"
@@ -227,25 +287,6 @@ const AdminAfterParties = () => {
                               disabled={sendingSms === event.id}
                             >
                               {sendingSms === event.id ? "..." : "Send Recap SMS"}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-7 text-xs"
-                              onClick={() => copyArtistLink(event)}
-                              disabled={!event.artist_access_token}
-                            >
-                              {copiedId === event.id ? (
-                                <>
-                                  <Check className="w-3 h-3 mr-1" />
-                                  Copied
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="w-3 h-3 mr-1" />
-                                  Artist Link
-                                </>
-                              )}
                             </Button>
                           </div>
                         </td>
