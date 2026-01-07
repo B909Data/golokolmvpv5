@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import heroImage from "@/assets/hero-revised.jpg";
 import sectionAImage from "@/assets/sectiona-revised.png";
 import sectionBImage from "@/assets/sectionb-revised.png";
-import llsPlaceholder from "@/assets/lls-placeholder.png";
+import llsCover from "@/assets/lls-cover.jpg";
 import videoPlaceholderBg from "@/assets/video-placeholder-bg.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -71,7 +71,7 @@ const Index = () => {
               WHAT IS AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl">
-              A private, temporary space for new fans to stay connected after the show.
+              A private space for artists and the fans who showed up. Open for 24 hours. Then it disappears.
             </p>
           </div>
 
@@ -96,9 +96,9 @@ const Index = () => {
 
             {/* Checklist */}
             <div className="flex flex-col justify-between h-full space-y-5">
-              <ChecklistItem>A 24 hour window to reward the fans who showed up.</ChecklistItem>
-              <ChecklistItem>Something new fans will share and remember without the burden of another platform to manage.</ChecklistItem>
-              <ChecklistItem>Build real community one show at a time</ChecklistItem>
+              <ChecklistItem>Turn one night into a growing fan base w/o feeds, algorithms, or subscriptions.</ChecklistItem>
+              <ChecklistItem>Control who's there, how long it lasts, and how you show up.</ChecklistItem>
+              <ChecklistItem>Fans feel recognized, and learn to recognize each other.</ChecklistItem>
 
               {/* CTAs */}
               <div className="flex flex-wrap gap-4 pt-4">
@@ -115,6 +115,7 @@ const Index = () => {
                   </Button>
                 </Link>
               </div>
+              <p className="text-foreground text-base font-medium">This is how you build a fanbase that feels like community.</p>
             </div>
           </div>
         </div>
@@ -154,13 +155,13 @@ const Index = () => {
             <h2 className="font-display text-3xl md:text-5xl text-foreground mb-3">
               HOW TO THROW AN <span className="text-primary">AFTER PARTY?</span>
             </h2>
-            <p className="text-muted-foreground text-lg">Make every show count.</p>
+            <p className="text-muted-foreground text-lg">Invite fans behind the curtain, on your terms.</p>
           </div>
 
           <div className="flex flex-col justify-between h-full space-y-5">
-            <ChecklistItem>Promote your next show with your After Party link</ChecklistItem>
-            <ChecklistItem>Fans RSVP and save their pass. Scan them in at the show.</ChecklistItem>
-            <ChecklistItem>24-hours to Livestream. Chat. Debut. Sell. Build. Then Poof! The Party ends.</ChecklistItem>
+            <ChecklistItem>Talk about what happened at the show last night.</ChecklistItem>
+            <ChecklistItem>Jam with fans, preview new music, or explain the meaning behind songs.</ChecklistItem>
+            <ChecklistItem>You have 24 hours to explore your imagination and fan connection with chat and Youtube live.</ChecklistItem>
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 pt-4">
@@ -171,6 +172,7 @@ const Index = () => {
                 </Button>
               </Link>
             </div>
+            <p className="text-foreground text-base font-medium">Each week, GoLokol hosts and features one band's After Party live stream for GoLokol Live on Youtube.</p>
           </div>
         </div>
       </section>
@@ -211,7 +213,27 @@ const Index = () => {
                 Music discovery the right way. At a party and on YouTube screens at the same time. Local fans and
                 artists turn up when their song comes on.
               </p>
-              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">We launch this February in Atlanta.</p>
+              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed font-medium">All featured artists receive:</p>
+              <div className="space-y-2">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-[hsl(0,0%,10%)] flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-[hsl(0,0%,10%)] text-base leading-relaxed">A way to promote your music in a party setting and crowd reaction.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-[hsl(0,0%,10%)] flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-[hsl(0,0%,10%)] text-base leading-relaxed">A free After Party to promote and connect with the fans who show up and turn up for the camera.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-[hsl(0,0%,10%)] flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-[hsl(0,0%,10%)] text-base leading-relaxed">A YouTube collaboration link so the session shows up on your channel.</p>
+                </div>
+              </div>
 
               <div className="flex flex-wrap gap-4 pt-2">
                 <div className="flex flex-col">
@@ -239,11 +261,11 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right column - LLS Placeholder image */}
+            {/* Right column - LLS Cover image */}
             <div className="aspect-video w-full rounded-lg overflow-hidden">
               <img
-                src={llsPlaceholder}
-                alt="Lokol Listening Sessions Coming 2026"
+                src={llsCover}
+                alt="Lokol Listening Sessions Coming February 2026"
                 className="w-full h-full object-cover"
               />
             </div>
