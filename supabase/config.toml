@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.artist-checkin-attendee]
 verify_jwt = false
+
+[functions.afterparty-upload-flyer]
+verify_jwt = false

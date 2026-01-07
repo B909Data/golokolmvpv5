@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Loader2, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
+import { ArrowLeft, Loader2, ChevronLeft, ChevronRight, CalendarIcon, Upload, X, ChevronDown } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
@@ -75,10 +76,13 @@ const formSchema = z.object({
   ticket_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   genres: z.array(z.string()).min(1, "Select at least 1 genre").max(2, "Maximum 2 genres"),
   youtube_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  image_url: z.string().url("Flyer image is required").min(1, "Flyer image is required"),
+  image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png"];
 
 const CreateAfterparty = () => {
   const [searchParams] = useSearchParams();
@@ -86,10 +90,27 @@ const CreateAfterparty = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const canceled = searchParams.get("canceled") === "true";
 
+  // File upload state
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (filePreviewUrl) {
+        URL.revokeObjectURL(filePreviewUrl);
+      }
+    };
+  }, [filePreviewUrl]);
 
   const {
     register,
@@ -128,10 +149,10 @@ const CreateAfterparty = () => {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
-  // Step validation
+  // Step validation - Step 3 only requires genres now
   const step1Fields = ["artist_name", "contact_email"] as const;
   const step2Fields = ["title", "start_date", "start_time", "city", "venue_name"] as const;
-  const step3Fields = ["genres", "image_url"] as const;
+  const step3Fields = ["genres"] as const;
 
   const validateStep = async (step: number): Promise<boolean> => {
     let fieldsToValidate: readonly (keyof FormData)[] = [];
@@ -158,14 +179,71 @@ const CreateAfterparty = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
+  // File handling functions
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      toast.error("Please select a JPG or PNG image");
+      return;
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File too large. Maximum size is 3MB");
+      return;
+    }
+
+    // Clear any previous URL input
+    setValue("image_url", "");
+    setUploadError(null);
+
+    // Create preview URL
+    if (filePreviewUrl) {
+      URL.revokeObjectURL(filePreviewUrl);
+    }
+    const previewUrl = URL.createObjectURL(file);
+    setFilePreviewUrl(previewUrl);
+    setSelectedFile(file);
+  };
+
+  const handleRemoveFile = () => {
+    if (filePreviewUrl) {
+      URL.revokeObjectURL(filePreviewUrl);
+    }
+    setFilePreviewUrl(null);
+    setSelectedFile(null);
+    setUploadError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove data URL prefix (e.g., "data:image/png;base64,")
+        const base64 = result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+    });
+  };
+
   const onSubmit = async (data: FormData) => {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
     setCheckoutError(null);
+    setUploadError(null);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
       // Combine date and time into a single ISO string
@@ -173,6 +251,7 @@ const CreateAfterparty = () => {
       const [hours, minutes] = data.start_time.split(":").map(Number);
       startDate.setHours(hours, minutes, 0, 0);
 
+      // Build payload - only include image_url if using URL input (not file upload)
       const payload = {
         artist_name: data.artist_name,
         contact_email: data.contact_email,
@@ -183,9 +262,10 @@ const CreateAfterparty = () => {
         ticket_url: data.ticket_url || undefined,
         genres: data.genres,
         youtube_url: data.youtube_url || undefined,
-        image_url: data.image_url || undefined,
+        image_url: (!selectedFile && data.image_url) ? data.image_url : undefined,
       };
 
+      // Create event via create-afterparty-checkout
       const { data: response, error } = await supabase.functions.invoke(
         "create-afterparty-checkout",
         { body: payload }
@@ -200,10 +280,46 @@ const CreateAfterparty = () => {
         return;
       }
 
-      if (response?.url) {
-        const newWindow = window.open(response.url, '_blank', 'noopener,noreferrer');
+      const eventId = response?.event_id;
+      const checkoutUrlResponse = response?.url;
+
+      // If file selected, attempt upload (NON-BLOCKING)
+      if (selectedFile && eventId) {
+        setIsUploading(true);
+
+        try {
+          const base64 = await fileToBase64(selectedFile);
+
+          const { error: uploadErr } = await supabase.functions.invoke(
+            "afterparty-upload-flyer",
+            {
+              body: {
+                event_id: eventId,
+                file_base64: base64,
+                content_type: selectedFile.type,
+                filename: selectedFile.name,
+              },
+            }
+          );
+
+          if (uploadErr) {
+            // Show error but DON'T block checkout
+            setUploadError("Flyer upload failed. You can add it later.");
+            toast.error("Flyer upload failed, but you can still complete payment.");
+          }
+        } catch {
+          setUploadError("Flyer upload failed. You can add it later.");
+          toast.error("Flyer upload failed, but you can still complete payment.");
+        }
+
+        setIsUploading(false);
+      }
+
+      // Always redirect to Stripe checkout (even if upload failed)
+      if (checkoutUrlResponse) {
+        const newWindow = window.open(checkoutUrlResponse, '_blank', 'noopener,noreferrer');
         if (!newWindow) {
-          setCheckoutUrl(response.url);
+          setCheckoutUrl(checkoutUrlResponse);
           toast.error("Popup blocked — please allow popups or use the link below");
         } else {
           toast.success("Stripe Checkout opened in new tab");
@@ -215,11 +331,11 @@ const CreateAfterparty = () => {
         setCheckoutError("No checkout URL returned. Please try again.");
         toast.error("No checkout URL returned");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       clearTimeout(timeoutId);
-      const errMsg = err.name === "AbortError" 
+      const errMsg = err instanceof Error && err.name === "AbortError" 
         ? "Request timed out. Please try again."
-        : err.message || "Failed to start checkout";
+        : err instanceof Error ? err.message : "Failed to start checkout";
       console.error("Checkout error:", err);
       setCheckoutError(errMsg);
       toast.error(errMsg);
@@ -470,22 +586,86 @@ const CreateAfterparty = () => {
           )}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="image_url" className="text-primary-foreground text-base font-sans">Flyer Image URL *</Label>
-          <Input
-            id="image_url"
-            type="url"
-            {...register("image_url")}
-            placeholder="https://example.com/your-flyer.jpg"
-            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
+        {/* Flyer Upload Section */}
+        <div className="space-y-3">
+          <Label className="text-primary-foreground text-base font-sans">
+            Upload Show Flyer <span className="text-primary-foreground/60">(recommended)</span>
+          </Label>
+          
+          {!selectedFile ? (
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-primary-foreground/30 rounded-xl p-6 text-center cursor-pointer hover:border-primary-foreground/50 transition-colors bg-primary-foreground/5"
+            >
+              <Upload className="w-8 h-8 mx-auto mb-2 text-primary-foreground/60" />
+              <p className="text-primary-foreground font-sans text-sm">Click to upload or drag & drop</p>
+              <p className="text-primary-foreground/60 text-xs font-sans mt-1">JPG/PNG · max 3MB</p>
+            </div>
+          ) : (
+            <div className="relative rounded-xl overflow-hidden bg-primary-foreground/10 p-3">
+              <div className="flex items-center gap-3">
+                {filePreviewUrl && (
+                  <img
+                    src={filePreviewUrl}
+                    alt="Flyer preview"
+                    className="w-16 h-16 object-cover rounded-lg"
+                  />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-primary-foreground font-sans text-sm truncate">{selectedFile.name}</p>
+                  <p className="text-primary-foreground/60 text-xs font-sans">
+                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveFile}
+                  className="p-2 hover:bg-primary-foreground/20 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-primary-foreground" />
+                </button>
+              </div>
+            </div>
+          )}
+          
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".jpg,.jpeg,.png"
+            onChange={handleFileSelect}
+            className="hidden"
           />
-          <p className="text-sm text-primary-foreground/60 font-sans">
-            Used for your After Party thumbnail and badge
-          </p>
-          {errors.image_url && (
-            <p className="text-sm text-destructive font-sans">{errors.image_url.message}</p>
+
+          {uploadError && (
+            <p className="text-sm text-destructive font-sans">{uploadError}</p>
           )}
         </div>
+
+        {/* Advanced: Image URL (collapsed) */}
+        <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
+          <CollapsibleTrigger className="flex items-center gap-1 text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors font-sans">
+            <ChevronDown className={cn("w-4 h-4 transition-transform", isAdvancedOpen && "rotate-180")} />
+            Image URL (advanced)
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-2">
+            <Input
+              id="image_url"
+              type="url"
+              {...register("image_url")}
+              placeholder="https://example.com/your-flyer.jpg"
+              disabled={!!selectedFile}
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground disabled:opacity-50"
+            />
+            {selectedFile && (
+              <p className="text-xs text-primary-foreground/60 font-sans mt-1">
+                Remove uploaded file to use URL instead
+              </p>
+            )}
+            {errors.image_url && (
+              <p className="text-sm text-destructive font-sans">{errors.image_url.message}</p>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </div>
   );
@@ -505,7 +685,7 @@ const CreateAfterparty = () => {
           ticket_url: formValues.ticket_url,
           genres: formValues.genres || [],
           youtube_url: formValues.youtube_url,
-          image_url: formValues.image_url || "",
+          image_url: filePreviewUrl || formValues.image_url || "",
         }}
         isConfirmed={isReviewConfirmed}
         onConfirmChange={setIsReviewConfirmed}
@@ -540,12 +720,12 @@ const CreateAfterparty = () => {
         <Button
           type="submit"
           className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-          disabled={isSubmitting || !isReviewConfirmed}
+          disabled={isSubmitting || isUploading || !isReviewConfirmed}
         >
-          {isSubmitting ? (
+          {isSubmitting || isUploading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing...
+              {isUploading ? "Uploading..." : "Processing..."}
             </>
           ) : (
             "Pay — $11.99"
