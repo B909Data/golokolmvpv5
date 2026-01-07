@@ -212,7 +212,7 @@ const Index = () => {
                       <ArrowRight className="h-5 w-5" />
                     </Button>
                   </Link>
-                  <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$15 each submission</p>
+                  <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$5 each submission</p>
                 </div>
                 <div className="flex flex-col">
                   <Button
