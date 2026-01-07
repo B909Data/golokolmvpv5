@@ -53,7 +53,7 @@ const Index = () => {
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <p className="text-muted-foreground text-sm mt-3 max-w-md">
+              <p className="text-foreground text-sm mt-3 max-w-md">
                 Don't leave new fans in the crowd to the algorithm. Invite them to your online After party.
               </p>
             </div>
