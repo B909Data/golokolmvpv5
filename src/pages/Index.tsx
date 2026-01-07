@@ -219,7 +219,7 @@ const Index = () => {
                   <div className="w-6 h-6 rounded-full bg-[hsl(0,0%,10%)] flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="w-4 h-4 text-white" />
                   </div>
-                  <p className="text-[hsl(0,0%,10%)] text-base leading-relaxed">A way to promote your music in a party setting and crowd reaction.</p>
+                  <p className="text-[hsl(0,0%,10%)] text-base leading-relaxed">A way to promote your music in a party setting with crowd reaction.</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-[hsl(0,0%,10%)] flex items-center justify-center shrink-0 mt-0.5">
