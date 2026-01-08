@@ -80,18 +80,11 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Create Checkout session with inline price_data ($11.99 USD flat)
+    // Create Checkout session with live price ID ($11.99 USD flat)
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "After Party Listing",
-              description: `Create your After Party: ${formData.title}`,
-            },
-            unit_amount: 1199, // $11.99 in cents
-          },
+          price: "price_1SnP1UPKcGpNZUZR6ecFGpwY",
           quantity: 1,
         },
       ],
