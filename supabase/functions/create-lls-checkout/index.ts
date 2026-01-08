@@ -28,14 +28,7 @@ serve(async (req) => {
       customer_email: contact_email,
       line_items: [
         {
-          price_data: {
-            currency: "usd",
-            unit_amount: 500, // $5.00
-            product_data: {
-              name: "Lokol Listening Sessions Submission",
-              description: `Song: ${song_title} by ${artist_name}`,
-            },
-          },
+          price: "price_1SnP1BPKcGpNZUZR1TgWOwJd",
           quantity: 1,
         },
       ],
