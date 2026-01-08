@@ -53,7 +53,6 @@ const GENRE_OPTIONS = [
 const CITY_OPTIONS = [
   "Atlanta",
   "Athens",
-  "New Orleans",
 ];
 
 const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
