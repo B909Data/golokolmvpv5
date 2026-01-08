@@ -79,7 +79,7 @@ const Index = () => {
             {/* YouTube Video */}
             <div className="aspect-video w-full rounded-lg overflow-hidden">
               <iframe
-                src="https://www.youtube.com/embed/1gOtgr4xIUw?autoplay=1&mute=1&loop=1&playlist=1gOtgr4xIUw&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3"
+                src="https://www.youtube.com/embed/1gOtgr4xIUw?loop=1&playlist=1gOtgr4xIUw&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3"
                 title="What is an After Party?"
                 className="w-full h-full"
                 allow="autoplay; encrypted-media"
