@@ -39,7 +39,7 @@ const GENRE_OPTIONS = [
 ];
 
 // Fixed city options
-const CITY_OPTIONS = ["Atlanta", "Athens", "New Orleans"];
+const CITY_OPTIONS = ["Atlanta", "Athens"];
 
 interface Event {
   id: string;
