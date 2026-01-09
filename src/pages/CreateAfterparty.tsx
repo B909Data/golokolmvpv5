@@ -210,7 +210,7 @@ const CreateAfterparty = () => {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
-  // Validate discount code
+  // Validate discount code (including expiration check for partner codes)
   const validateDiscountCode = async (code: string) => {
     if (!code.trim()) {
       setDiscountValidation({ valid: false, type: null, checking: false });
@@ -222,19 +222,34 @@ const CreateAfterparty = () => {
     try {
       const { data, error } = await supabase
         .from("afterparty_discount_codes")
-        .select("discount_type, used_at")
+        .select("discount_type, used_at, expires_at")
         .eq("code", code.toUpperCase())
         .single();
 
-      if (error || !data || data.used_at) {
+      if (error || !data) {
         setDiscountValidation({ valid: false, type: null, checking: false });
-        if (code.trim()) toast.error("Invalid or already used code");
-      } else {
-        setDiscountValidation({ valid: true, type: data.discount_type, checking: false });
-        toast.success(data.discount_type === "free" ? "Free listing code applied!" : "50% discount applied!");
+        toast.error("Invalid code");
+        return;
       }
+
+      if (data.used_at) {
+        setDiscountValidation({ valid: false, type: null, checking: false });
+        toast.error("This code has already been used");
+        return;
+      }
+
+      // Check expiration for partner codes
+      if (data.expires_at && new Date(data.expires_at) < new Date()) {
+        setDiscountValidation({ valid: false, type: null, checking: false });
+        toast.error("This code has expired");
+        return;
+      }
+
+      setDiscountValidation({ valid: true, type: data.discount_type, checking: false });
+      toast.success(data.discount_type === "free" ? "Free listing code applied!" : "50% discount applied!");
     } catch {
       setDiscountValidation({ valid: false, type: null, checking: false });
+      toast.error("Failed to validate code");
     }
   };
 
