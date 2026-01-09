@@ -11,6 +11,12 @@ import { toast } from "sonner";
 
 import badgeFrame from "@/assets/golokol-badge-frame.svg";
 
+type PartnerInfo = {
+  id: string;
+  name: string;
+  type: string;
+} | null;
+
 type EventData = {
   id: string;
   title: string;
@@ -22,6 +28,12 @@ type EventData = {
   pinned_message: string | null;
   livestream_url: string | null;
   image_url: string | null;
+  curator_id: string | null;
+  venue_id: string | null;
+  curator_other_name: string | null;
+  venue_other_name: string | null;
+  curator: PartnerInfo;
+  venue: PartnerInfo;
 } | null;
 
 type Message = {
@@ -142,7 +154,13 @@ const AfterPartyRoom = () => {
     queryFn: async (): Promise<EventData> => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, artist_name, status, start_at, city, after_party_opens_at, pinned_message, livestream_url, image_url")
+        .select(`
+          id, title, artist_name, status, start_at, city, 
+          after_party_opens_at, pinned_message, livestream_url, image_url,
+          curator_id, venue_id, curator_other_name, venue_other_name,
+          curator:partners!events_curator_id_fkey(id, name, type),
+          venue:partners!events_venue_id_fkey(id, name, type)
+        `)
         .eq("id", eventId)
         .maybeSingle();
 
@@ -343,6 +361,11 @@ const AfterPartyRoom = () => {
   const roomClosureInfo = getRoomClosureInfo();
   const eventSubtitle = [event.city, formatEventDate(event.start_at)].filter(Boolean).join(" • ");
 
+  // Build attribution text from partner data
+  const curatorName = event.curator?.name || event.curator_other_name || null;
+  const venueName = event.venue?.name || event.venue_other_name || null;
+  const attributionText = buildAttribution(artistName, curatorName, venueName);
+
   return (
     <div className="min-h-screen bg-[#0B0B0B] flex flex-col">
       {/* Sticky Top Bar */}
@@ -376,6 +399,7 @@ const AfterPartyRoom = () => {
           livestreamId={livestreamId}
           roomClosureInfo={roomClosureInfo}
           flyerImageUrl={event.image_url}
+          attributionText={attributionText}
           onGoToChat={() => setViewMode("chat")}
           onBackToEvent={() => navigate(`/after-party/${eventId}/rsvp`)}
         />
@@ -400,6 +424,24 @@ const AfterPartyRoom = () => {
   );
 };
 
+// Helper to build attribution text
+const buildAttribution = (
+  artistName: string,
+  curatorName: string | null,
+  venueName: string | null
+): string | null => {
+  // If both curator and venue exist, show combined format
+  if (curatorName && venueName) {
+    return `This ${artistName} After Party is brought to you by ${curatorName} at ${venueName}.`;
+  }
+  // If only venue exists
+  if (venueName) {
+    return `This ${artistName} After Party is brought to you by ${venueName}.`;
+  }
+  // No attribution
+  return null;
+};
+
 // Welcome Dashboard View
 interface WelcomeDashboardProps {
   artistName: string;
@@ -408,6 +450,7 @@ interface WelcomeDashboardProps {
   livestreamId: string | null;
   roomClosureInfo: string | null;
   flyerImageUrl: string | null;
+  attributionText: string | null;
   onGoToChat: () => void;
   onBackToEvent: () => void;
 }
@@ -419,6 +462,7 @@ const WelcomeDashboard = ({
   livestreamId,
   roomClosureInfo,
   flyerImageUrl,
+  attributionText,
   onGoToChat,
   onBackToEvent,
 }: WelcomeDashboardProps) => {
@@ -522,6 +566,13 @@ const WelcomeDashboard = ({
   return (
     <main className="flex-1 overflow-y-auto pb-24">
       <div className="max-w-[640px] mx-auto px-4 py-6 space-y-4">
+        {/* Partner Attribution - Subtle secondary text */}
+        {attributionText && (
+          <p className="text-muted-foreground text-sm font-sans text-center leading-relaxed">
+            {attributionText}
+          </p>
+        )}
+
         {/* Pinned Message Card - Top Priority */}
         {pinnedMessage && (
           <div className="bg-[#1A1A1A] border border-primary/30 rounded-xl p-5">
