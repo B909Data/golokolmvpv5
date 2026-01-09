@@ -19,6 +19,11 @@ interface AfterPartyFormData {
   youtube_url?: string;
   image_url?: string;
   discount_code?: string;
+  // Partner references
+  curator_id?: string;
+  venue_id?: string;
+  curator_other_name?: string;
+  venue_other_name?: string;
 }
 
 serve(async (req) => {
@@ -65,6 +70,11 @@ serve(async (req) => {
         type: "after_party",
         status: "upcoming",
         after_party_enabled: false,
+        // Partner references
+        curator_id: formData.curator_id || null,
+        venue_id: formData.venue_id || null,
+        curator_other_name: formData.curator_other_name || null,
+        venue_other_name: formData.venue_other_name || null,
       })
       .select()
       .single();
