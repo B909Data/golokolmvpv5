@@ -656,7 +656,12 @@ const CreateAfterparty = () => {
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => setValue("start_date", date as Date, { shouldValidate: true })}
-                    disabled={(date) => date < new Date()}
+                    disabled={(date) => {
+                      // Allow same-day selection - only disable past dates
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today;
+                    }}
                     initialFocus
                     className="pointer-events-auto"
                   />
