@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from "react-router-dom";
-import { Shield, Music, Calendar, Ticket } from "lucide-react";
+import { Shield, Music, Calendar, Ticket, Building2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -70,6 +70,19 @@ const Admin = () => {
               </div>
               <p className="text-muted-foreground text-sm">
                 Generate one-time use discount codes for After Party listings.
+              </p>
+            </Link>
+
+            <Link
+              to={`/admin/partners?key=${key}`}
+              className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Building2 className="w-6 h-6 text-primary" />
+                <h2 className="font-display text-xl text-foreground">Partners</h2>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Manage curators, event series, and venues for After Party dropdowns.
               </p>
             </Link>
           </div>

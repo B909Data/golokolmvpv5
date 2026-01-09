@@ -180,6 +180,8 @@ export type Database = {
           contact_email: string | null
           contact_phone: string | null
           created_at: string | null
+          curator_id: string | null
+          curator_other_name: string | null
           ends_at: string | null
           genres: string[] | null
           id: string
@@ -191,7 +193,9 @@ export type Database = {
           ticket_url: string | null
           title: string
           type: Database["public"]["Enums"]["event_type"]
+          venue_id: string | null
           venue_name: string | null
+          venue_other_name: string | null
           youtube_url: string | null
         }
         Insert: {
@@ -203,6 +207,8 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
+          curator_id?: string | null
+          curator_other_name?: string | null
           ends_at?: string | null
           genres?: string[] | null
           id?: string
@@ -214,7 +220,9 @@ export type Database = {
           ticket_url?: string | null
           title: string
           type: Database["public"]["Enums"]["event_type"]
+          venue_id?: string | null
           venue_name?: string | null
+          venue_other_name?: string | null
           youtube_url?: string | null
         }
         Update: {
@@ -226,6 +234,8 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
+          curator_id?: string | null
+          curator_other_name?: string | null
           ends_at?: string | null
           genres?: string[] | null
           id?: string
@@ -237,8 +247,49 @@ export type Database = {
           ticket_url?: string | null
           title?: string
           type?: Database["public"]["Enums"]["event_type"]
+          venue_id?: string | null
           venue_name?: string | null
+          venue_other_name?: string | null
           youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_curator_id_fkey"
+            columns: ["curator_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partners: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["partner_type"]
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          type: Database["public"]["Enums"]["partner_type"]
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["partner_type"]
         }
         Relationships: []
       }
@@ -350,6 +401,7 @@ export type Database = {
       event_status: "upcoming" | "live" | "ended"
       event_type: "lls" | "after_party"
       message_role: "fan" | "artist"
+      partner_type: "curator" | "venue"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -482,6 +534,7 @@ export const Constants = {
       event_status: ["upcoming", "live", "ended"],
       event_type: ["lls", "after_party"],
       message_role: ["fan", "artist"],
+      partner_type: ["curator", "venue"],
     },
   },
 } as const

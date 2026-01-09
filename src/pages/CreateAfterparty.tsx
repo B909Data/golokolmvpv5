@@ -68,10 +68,17 @@ const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
 const formSchema = z.object({
   artist_name: z.string().min(1, "Artist/Band name is required"),
   contact_email: z.string().email("Valid email required"),
+  // Curator/Event Series selection
+  curator_id: z.string().optional(),
+  curator_other_name: z.string().optional(),
+  // Event title kept for display purposes
   title: z.string().min(1, "Event title is required"),
   start_date: z.date({ required_error: "Start date is required" }),
   start_time: z.string().min(1, "Start time is required"),
   city: z.string().min(1, "City is required"),
+  // Venue selection
+  venue_id: z.string().optional(),
+  venue_other_name: z.string().optional(),
   venue_name: z.string().min(1, "Venue name is required"),
   ticket_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   genres: z.array(z.string()).min(1, "Select at least 1 genre").max(2, "Maximum 2 genres"),
@@ -80,6 +87,13 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+interface Partner {
+  id: string;
+  name: string;
+  type: "curator" | "venue";
+  active: boolean;
+}
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png"];
@@ -107,9 +121,32 @@ const CreateAfterparty = () => {
     checking: boolean;
   }>({ valid: false, type: null, checking: false });
 
-  // Scroll to top on page load
+  // Partners state
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [partnersLoading, setPartnersLoading] = useState(true);
+
+  // Scroll to top on page load and fetch partners
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    const fetchPartners = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("partners")
+          .select("*")
+          .eq("active", true)
+          .order("name");
+        
+        if (error) throw error;
+        setPartners(data || []);
+      } catch (err) {
+        console.error("Failed to fetch partners:", err);
+      } finally {
+        setPartnersLoading(false);
+      }
+    };
+    
+    fetchPartners();
   }, []);
 
   // Cleanup preview URL on unmount
@@ -133,6 +170,10 @@ const CreateAfterparty = () => {
     defaultValues: {
       genres: [],
       city: "",
+      curator_id: "",
+      curator_other_name: "",
+      venue_id: "",
+      venue_other_name: "",
     },
     mode: "onChange",
   });
@@ -140,6 +181,13 @@ const CreateAfterparty = () => {
   const selectedGenres = watch("genres") || [];
   const youtubeUrl = watch("youtube_url");
   const imageUrl = watch("image_url");
+  const curatorId = watch("curator_id");
+  const venueId = watch("venue_id");
+  
+  // Derived lists
+  const curators = partners.filter((p) => p.type === "curator");
+  const venues = partners.filter((p) => p.type === "venue");
+
   
   // Review step confirmation state
   const [isReviewConfirmed, setIsReviewConfirmed] = useState(false);
@@ -288,7 +336,7 @@ const CreateAfterparty = () => {
       const [hours, minutes] = data.start_time.split(":").map(Number);
       startDate.setHours(hours, minutes, 0, 0);
 
-      // Build payload - only include image_url if using URL input (not file upload)
+      // Build payload - include partner IDs when not "other"
       const payload: Record<string, unknown> = {
         artist_name: data.artist_name,
         contact_email: data.contact_email,
@@ -300,6 +348,12 @@ const CreateAfterparty = () => {
         genres: data.genres,
         youtube_url: data.youtube_url || undefined,
         image_url: (!selectedFile && data.image_url) ? data.image_url : undefined,
+        // Partner references - only include if a real partner is selected (not "other")
+        curator_id: data.curator_id && data.curator_id !== "other" ? data.curator_id : undefined,
+        venue_id: data.venue_id && data.venue_id !== "other" ? data.venue_id : undefined,
+        // Manual text fields for "other" selections
+        curator_other_name: data.curator_id === "other" ? data.curator_other_name : undefined,
+        venue_other_name: data.venue_id === "other" ? data.venue_other_name : undefined,
       };
 
       // Add discount code if valid
@@ -462,6 +516,48 @@ const CreateAfterparty = () => {
   const renderStep2 = () => {
     const selectedDate = watch("start_date");
     const selectedTime = watch("start_time");
+    const curatorOtherName = watch("curator_other_name");
+    const venueOtherName = watch("venue_other_name");
+
+    // Handle curator dropdown change
+    const handleCuratorChange = (value: string) => {
+      setValue("curator_id", value, { shouldValidate: true });
+      if (value === "other") {
+        // Keep any existing manual text
+      } else {
+        // Clear manual text and set title from curator name
+        setValue("curator_other_name", "");
+        const curator = curators.find((c) => c.id === value);
+        setValue("title", curator?.name || "", { shouldValidate: true });
+      }
+    };
+
+    // Handle curator other name change
+    const handleCuratorOtherChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setValue("curator_other_name", value);
+      setValue("title", value, { shouldValidate: true });
+    };
+
+    // Handle venue dropdown change
+    const handleVenueChange = (value: string) => {
+      setValue("venue_id", value, { shouldValidate: true });
+      if (value === "other") {
+        // Keep any existing manual text
+      } else {
+        // Clear manual text and set venue_name from venue name
+        setValue("venue_other_name", "");
+        const venue = venues.find((v) => v.id === value);
+        setValue("venue_name", venue?.name || "", { shouldValidate: true });
+      }
+    };
+
+    // Handle venue other name change
+    const handleVenueOtherChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setValue("venue_other_name", value);
+      setValue("venue_name", value, { shouldValidate: true });
+    };
 
     return (
       <div className="space-y-6">
@@ -471,14 +567,31 @@ const CreateAfterparty = () => {
         </div>
 
         <div className="space-y-5">
+          {/* Name of Event (Curator/Series) */}
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-primary-foreground text-base font-sans">Event Title *</Label>
-            <Input
-              id="title"
-              {...register("title")}
-              placeholder="e.g., Summer Vibes After Party"
-              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
-            />
+            <Label className="text-primary-foreground text-base font-sans">Name of Event *</Label>
+            <select
+              value={curatorId || ""}
+              onChange={(e) => handleCuratorChange(e.target.value)}
+              className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              disabled={partnersLoading}
+            >
+              <option value="">Select event series</option>
+              {curators.map((curator) => (
+                <option key={curator.id} value={curator.id}>
+                  {curator.name}
+                </option>
+              ))}
+              <option value="other">Other</option>
+            </select>
+            {curatorId === "other" && (
+              <Input
+                value={curatorOtherName || ""}
+                onChange={handleCuratorOtherChange}
+                placeholder="Enter event name"
+                className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground mt-2"
+              />
+            )}
             {errors.title && (
               <p className="text-sm text-destructive font-sans">{errors.title.message}</p>
             )}
@@ -555,14 +668,31 @@ const CreateAfterparty = () => {
             )}
           </div>
 
+          {/* Venue */}
           <div className="space-y-2">
-            <Label htmlFor="venue_name" className="text-primary-foreground text-base font-sans">Venue Name *</Label>
-            <Input
-              id="venue_name"
-              {...register("venue_name")}
-              placeholder="e.g., The Blue Room"
-              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
-            />
+            <Label className="text-primary-foreground text-base font-sans">Venue *</Label>
+            <select
+              value={venueId || ""}
+              onChange={(e) => handleVenueChange(e.target.value)}
+              className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              disabled={partnersLoading}
+            >
+              <option value="">Select venue</option>
+              {venues.map((venue) => (
+                <option key={venue.id} value={venue.id}>
+                  {venue.name}
+                </option>
+              ))}
+              <option value="other">Other</option>
+            </select>
+            {venueId === "other" && (
+              <Input
+                value={venueOtherName || ""}
+                onChange={handleVenueOtherChange}
+                placeholder="Enter venue name"
+                className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground mt-2"
+              />
+            )}
             {errors.venue_name && (
               <p className="text-sm text-destructive font-sans">{errors.venue_name.message}</p>
             )}
