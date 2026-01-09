@@ -209,28 +209,40 @@ const AdminDiscountCodes = () => {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const exportPartnerCodes = () => {
+  const exportPartnerCodes = (unusedOnly: boolean = true) => {
     if (!selectedPartnerId || !selectedMonth) return;
     
-    const partnerCodes = codes.filter(
-      c => c.partner_id === selectedPartnerId && c.month_scope === selectedMonth && !c.used_at
+    const partnerCodesFiltered = codes.filter(
+      c => c.partner_id === selectedPartnerId && 
+           c.month_scope === selectedMonth && 
+           (unusedOnly ? !c.used_at : true)
     );
     
-    if (partnerCodes.length === 0) {
-      toast.error("No unused codes to export");
+    if (partnerCodesFiltered.length === 0) {
+      toast.error(unusedOnly ? "No unused codes to export" : "No codes to export");
       return;
     }
 
     const partner = partners.find(p => p.id === selectedPartnerId);
-    const csvContent = partnerCodes.map(c => c.code).join("\n");
-    const blob = new Blob([csvContent], { type: "text/plain" });
+    
+    // CSV header
+    const header = "code,partner_name,partner_type,month,status,expires_at";
+    const rows = partnerCodesFiltered.map(c => {
+      const status = c.used_at ? "used" : "unused";
+      const expiresAt = c.expires_at ? new Date(c.expires_at).toISOString().split("T")[0] : "";
+      return `${c.code},${partner?.name || ""},${partner?.type || ""},${c.month_scope || ""},${status},${expiresAt}`;
+    });
+    
+    const csvContent = [header, ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${partner?.name || "partner"}-${selectedMonth}-codes.txt`;
+    const suffix = unusedOnly ? "unused" : "all";
+    a.download = `${partner?.name || "partner"}-${selectedMonth}-${suffix}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${partnerCodes.length} codes`);
+    toast.success(`Exported ${partnerCodesFiltered.length} codes`);
   };
 
   const formatDiscountType = (type: string) => {
@@ -344,20 +356,25 @@ const AdminDiscountCodes = () => {
                   </div>
                   
                   <div>
-                    <label className="text-xs text-muted-foreground mb-1 block">Count</label>
+                    <label className="text-xs text-muted-foreground mb-1 block">
+                      Count {partnerCodeUsage && `(max ${partnerCodeUsage.cap - partnerCodeUsage.used})`}
+                    </label>
                     <Input
                       type="number"
                       min={1}
-                      max={50}
+                      max={partnerCodeUsage ? Math.max(1, partnerCodeUsage.cap - partnerCodeUsage.used) : 50}
                       value={codeCount}
-                      onChange={(e) => setCodeCount(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))}
+                      onChange={(e) => {
+                        const maxAllowed = partnerCodeUsage ? partnerCodeUsage.cap - partnerCodeUsage.used : 50;
+                        setCodeCount(Math.max(1, Math.min(maxAllowed, parseInt(e.target.value) || 1)));
+                      }}
                     />
                   </div>
                   
                   <div className="flex items-end gap-2">
                     <Button 
                       onClick={generatePartnerCodes} 
-                      disabled={generating || !selectedPartnerId || !selectedMonth}
+                      disabled={generating || !selectedPartnerId || !selectedMonth || (partnerCodeUsage && partnerCodeUsage.cap - partnerCodeUsage.used <= 0)}
                       className="flex-1"
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -382,12 +399,16 @@ const AdminDiscountCodes = () => {
                 </p>
               </div>
 
-              {/* Export button */}
+              {/* Export buttons */}
               {selectedPartnerId && selectedMonth && filteredPartnerCodes.length > 0 && (
-                <div className="flex justify-end">
-                  <Button variant="outline" size="sm" onClick={exportPartnerCodes}>
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" size="sm" onClick={() => exportPartnerCodes(true)}>
                     <Download className="w-4 h-4 mr-2" />
-                    Export Unused Codes
+                    Export Unused (CSV)
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => exportPartnerCodes(false)}>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export All (CSV)
                   </Button>
                 </div>
               )}
