@@ -106,6 +106,18 @@ serve(async (req) => {
       throw new Error(`Failed to enable after party: ${updateError.message}`);
     }
 
+    // Mark discount code as used if one was applied
+    const discountCode = session.metadata?.discount_code;
+    if (discountCode) {
+      const customerEmail = session.customer_email || session.customer_details?.email;
+      await supabaseAdmin
+        .from("afterparty_discount_codes")
+        .update({ used_at: new Date().toISOString(), used_by_email: customerEmail })
+        .eq("code", discountCode.toUpperCase())
+        .is("used_at", null);
+      console.log("Marked discount code as used:", discountCode);
+    }
+
     console.log("After party enabled for event:", event.id);
 
     return new Response(JSON.stringify({ 

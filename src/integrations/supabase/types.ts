@@ -56,6 +56,44 @@ export type Database = {
           },
         ]
       }
+      afterparty_discount_codes: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: string
+          event_id: string | null
+          id: string
+          used_at: string | null
+          used_by_email: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type: string
+          event_id?: string | null
+          id?: string
+          used_at?: string | null
+          used_by_email?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: string
+          event_id?: string | null
+          id?: string
+          used_at?: string | null
+          used_by_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "afterparty_discount_codes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendees: {
         Row: {
           checked_in_at: string | null
