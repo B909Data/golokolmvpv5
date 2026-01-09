@@ -28,7 +28,7 @@ serve(async (req) => {
       customer_email: contact_email,
       line_items: [
         {
-          price: "price_1SnP1BPKcGpNZUZR1TgWOwJd",
+          price: "price_1SnmYZPKcGpNZUZRTzMmQjUo", // Live mode: LLS Song Submission $5
           quantity: 1,
         },
       ],

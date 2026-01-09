@@ -166,7 +166,7 @@ serve(async (req) => {
     const sessionConfig: any = {
       line_items: [
         {
-          price: "price_1SnP1UPKcGpNZUZR6ecFGpwY",
+          price: "price_1SnmXSPKcGpNZUZRDmeIMJlh", // Live mode: After Party Listing $11.99
           quantity: 1,
         },
       ],

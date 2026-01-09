@@ -21,7 +21,7 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
-          price: "price_1SmLCEPKcGpNZUZRimUtMB53",
+          price: "price_1SnmYjPKcGpNZUZRgPLfrug8", // Live mode: LLS Ticket $15
           quantity: 1,
         },
       ],
