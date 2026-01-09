@@ -86,13 +86,17 @@ serve(async (req) => {
 
     console.log("Created event:", event.id);
 
-    // Check for discount code
+    // Check for discount code with enhanced validation
     let discountAmount = 0; // 0 = full price, 50 = 50% off, 100 = free
+    let validatedCode: string | null = null;
+    
     if (formData.discount_code) {
+      const codeToCheck = formData.discount_code.toUpperCase();
+      
       const { data: codeData, error: codeError } = await supabaseAdmin
         .from("afterparty_discount_codes")
         .select("*")
-        .eq("code", formData.discount_code.toUpperCase())
+        .eq("code", codeToCheck)
         .is("used_at", null)
         .single();
 
@@ -102,17 +106,37 @@ serve(async (req) => {
         throw new Error("Invalid or already used discount code");
       }
 
+      // Check expiration for partner codes
+      if (codeData.expires_at && new Date(codeData.expires_at) < new Date()) {
+        await supabaseAdmin.from("events").delete().eq("id", event.id);
+        throw new Error("This discount code has expired");
+      }
+
       discountAmount = codeData.discount_type === "free" ? 100 : 50;
+      validatedCode = codeData.code;
       console.log("Valid discount code:", codeData.code, "Discount:", discountAmount + "%");
     }
 
     // If 100% discount (free), skip Stripe and enable directly
-    if (discountAmount === 100) {
-      // Mark code as used
-      await supabaseAdmin
+    if (discountAmount === 100 && validatedCode) {
+      // Atomic update: Mark code as used with event_id (single-use enforcement)
+      const { data: updatedCode, error: updateCodeError } = await supabaseAdmin
         .from("afterparty_discount_codes")
-        .update({ used_at: new Date().toISOString(), used_by_email: formData.contact_email })
-        .eq("code", formData.discount_code!.toUpperCase());
+        .update({ 
+          used_at: new Date().toISOString(), 
+          used_by_email: formData.contact_email,
+          event_id: event.id
+        })
+        .eq("code", validatedCode)
+        .is("used_at", null) // Atomic: only update if still unused
+        .select()
+        .single();
+
+      if (updateCodeError || !updatedCode) {
+        // Code was used between validation and now - race condition
+        await supabaseAdmin.from("events").delete().eq("id", event.id);
+        throw new Error("This code was just used by someone else. Please try a different code.");
+      }
 
       // Generate artist access token and enable after party
       const token = crypto.randomUUID();
@@ -121,7 +145,7 @@ serve(async (req) => {
         .update({ after_party_enabled: true, artist_access_token: token })
         .eq("id", event.id);
 
-      console.log("Free listing activated for event:", event.id);
+      console.log("Free listing activated for event:", event.id, "using code:", validatedCode);
 
       return new Response(JSON.stringify({ 
         free: true, 
@@ -151,7 +175,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/create-afterparty?canceled=true`,
       metadata: {
         event_id: event.id,
-        discount_code: formData.discount_code || "",
+        discount_code: validatedCode || "",
       },
       customer_email: formData.contact_email,
     };

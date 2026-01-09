@@ -411,6 +411,7 @@ const AdminDiscountCodes = () => {
                           <th className="px-4 py-3 text-left text-muted-foreground font-medium">Partner</th>
                           <th className="px-4 py-3 text-left text-muted-foreground font-medium">Month</th>
                           <th className="px-4 py-3 text-left text-muted-foreground font-medium">Status</th>
+                          <th className="px-4 py-3 text-left text-muted-foreground font-medium">Redeemed</th>
                           <th className="px-4 py-3 text-left text-muted-foreground font-medium">Actions</th>
                         </tr>
                       </thead>
@@ -430,15 +431,30 @@ const AdminDiscountCodes = () => {
                             </td>
                             <td className="px-4 py-3">
                               {code.used_at ? (
-                                <div className="text-muted-foreground">
-                                  <span className="text-xs">Used by</span>
-                                  <br />
-                                  <span className="text-foreground text-xs">{code.used_by_email || "—"}</span>
-                                </div>
+                                <span className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded">
+                                  Used
+                                </span>
                               ) : (
                                 <span className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded">
                                   Available
                                 </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              {code.used_at ? (
+                                <div className="text-xs space-y-0.5">
+                                  <div className="text-foreground">{code.used_by_email || "—"}</div>
+                                  <div className="text-muted-foreground">
+                                    {new Date(code.used_at).toLocaleDateString()}
+                                  </div>
+                                  {code.event_id && (
+                                    <div className="text-muted-foreground truncate max-w-[120px]" title={code.event_id}>
+                                      Event: {code.event_id.slice(0, 8)}...
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">—</span>
                               )}
                             </td>
                             <td className="px-4 py-3">
