@@ -62,7 +62,10 @@ export type Database = {
           created_at: string
           discount_type: string
           event_id: string | null
+          expires_at: string | null
           id: string
+          month_scope: string | null
+          partner_id: string | null
           used_at: string | null
           used_by_email: string | null
         }
@@ -71,7 +74,10 @@ export type Database = {
           created_at?: string
           discount_type: string
           event_id?: string | null
+          expires_at?: string | null
           id?: string
+          month_scope?: string | null
+          partner_id?: string | null
           used_at?: string | null
           used_by_email?: string | null
         }
@@ -80,7 +86,10 @@ export type Database = {
           created_at?: string
           discount_type?: string
           event_id?: string | null
+          expires_at?: string | null
           id?: string
+          month_scope?: string | null
+          partner_id?: string | null
           used_at?: string | null
           used_by_email?: string | null
         }
@@ -90,6 +99,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "afterparty_discount_codes_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]
