@@ -93,6 +93,7 @@ interface Partner {
   name: string;
   type: "curator" | "venue";
   active: boolean;
+  flyer_image_url?: string | null;
 }
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
@@ -124,6 +125,9 @@ const CreateAfterparty = () => {
   // Partners state
   const [partners, setPartners] = useState<Partner[]>([]);
   const [partnersLoading, setPartnersLoading] = useState(true);
+  
+  // Curator flyer auto-populated state
+  const [curatorFlyerUrl, setCuratorFlyerUrl] = useState<string | null>(null);
 
   // Scroll to top on page load and fetch partners
   useEffect(() => {
@@ -336,6 +340,11 @@ const CreateAfterparty = () => {
       const [hours, minutes] = data.start_time.split(":").map(Number);
       startDate.setHours(hours, minutes, 0, 0);
 
+      // Determine image_url: priority is selectedFile (uploaded later), then manual URL, then curator flyer
+      const resolvedImageUrl = selectedFile 
+        ? undefined // Will be set after upload
+        : data.image_url || curatorFlyerUrl || undefined;
+
       // Build payload - include partner IDs when not "other"
       const payload: Record<string, unknown> = {
         artist_name: data.artist_name,
@@ -347,7 +356,7 @@ const CreateAfterparty = () => {
         ticket_url: data.ticket_url || undefined,
         genres: data.genres,
         youtube_url: data.youtube_url || undefined,
-        image_url: (!selectedFile && data.image_url) ? data.image_url : undefined,
+        image_url: resolvedImageUrl,
         // Partner references - only include if a real partner is selected (not "other")
         curator_id: data.curator_id && data.curator_id !== "other" ? data.curator_id : undefined,
         venue_id: data.venue_id && data.venue_id !== "other" ? data.venue_id : undefined,
@@ -523,12 +532,26 @@ const CreateAfterparty = () => {
     const handleCuratorChange = (value: string) => {
       setValue("curator_id", value, { shouldValidate: true });
       if (value === "other") {
+        // Clear curator flyer when "Other" selected
+        setCuratorFlyerUrl(null);
         // Keep any existing manual text
-      } else {
+      } else if (value) {
         // Clear manual text and set title from curator name
         setValue("curator_other_name", "");
         const curator = curators.find((c) => c.id === value);
         setValue("title", curator?.name || "", { shouldValidate: true });
+        
+        // Auto-populate curator flyer if available
+        if (curator?.flyer_image_url) {
+          setCuratorFlyerUrl(curator.flyer_image_url);
+          // Clear any manual file selection since curator flyer takes precedence
+          handleRemoveFile();
+          setValue("image_url", "");
+        } else {
+          setCuratorFlyerUrl(null);
+        }
+      } else {
+        setCuratorFlyerUrl(null);
       }
     };
 
@@ -766,60 +789,83 @@ const CreateAfterparty = () => {
           )}
         </div>
 
-        {/* Flyer Upload Section */}
-        <div className="space-y-3">
-          <Label className="text-primary-foreground text-base font-sans">
-            Upload Show Flyer <span className="text-primary-foreground/60">(recommended)</span>
-          </Label>
-          
-          {!selectedFile ? (
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-primary-foreground/30 rounded-xl p-6 text-center cursor-pointer hover:border-primary-foreground/50 transition-colors bg-primary-foreground/5"
-            >
-              <Upload className="w-8 h-8 mx-auto mb-2 text-primary-foreground/60" />
-              <p className="text-primary-foreground font-sans text-sm">Click to upload or drag & drop</p>
-              <p className="text-primary-foreground/60 text-xs font-sans mt-1">JPG/PNG · max 3MB</p>
-            </div>
-          ) : (
+        {/* Flyer Section - show curator flyer or upload option */}
+        {curatorFlyerUrl ? (
+          <div className="space-y-3">
+            <Label className="text-primary-foreground text-base font-sans">
+              Event Flyer <span className="text-green-400 text-sm">(auto-populated from series)</span>
+            </Label>
             <div className="relative rounded-xl overflow-hidden bg-primary-foreground/10 p-3">
               <div className="flex items-center gap-3">
-                {filePreviewUrl && (
-                  <img
-                    src={filePreviewUrl}
-                    alt="Flyer preview"
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                )}
+                <img
+                  src={curatorFlyerUrl}
+                  alt="Event series flyer"
+                  className="w-16 h-16 object-cover rounded-lg border border-primary-foreground/20"
+                />
                 <div className="flex-1 min-w-0">
-                  <p className="text-primary-foreground font-sans text-sm truncate">{selectedFile.name}</p>
+                  <p className="text-primary-foreground font-sans text-sm">Using series flyer</p>
                   <p className="text-primary-foreground/60 text-xs font-sans">
-                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    Provided by the event curator
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleRemoveFile}
-                  className="p-2 hover:bg-primary-foreground/20 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5 text-primary-foreground" />
-                </button>
               </div>
             </div>
-          )}
-          
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".jpg,.jpeg,.png"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <Label className="text-primary-foreground text-base font-sans">
+              Upload Show Flyer <span className="text-primary-foreground/60">(recommended)</span>
+            </Label>
+            
+            {!selectedFile ? (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-primary-foreground/30 rounded-xl p-6 text-center cursor-pointer hover:border-primary-foreground/50 transition-colors bg-primary-foreground/5"
+              >
+                <Upload className="w-8 h-8 mx-auto mb-2 text-primary-foreground/60" />
+                <p className="text-primary-foreground font-sans text-sm">Click to upload or drag & drop</p>
+                <p className="text-primary-foreground/60 text-xs font-sans mt-1">JPG/PNG · max 3MB</p>
+              </div>
+            ) : (
+              <div className="relative rounded-xl overflow-hidden bg-primary-foreground/10 p-3">
+                <div className="flex items-center gap-3">
+                  {filePreviewUrl && (
+                    <img
+                      src={filePreviewUrl}
+                      alt="Flyer preview"
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-primary-foreground font-sans text-sm truncate">{selectedFile.name}</p>
+                    <p className="text-primary-foreground/60 text-xs font-sans">
+                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveFile}
+                    className="p-2 hover:bg-primary-foreground/20 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5 text-primary-foreground" />
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
 
-          {uploadError && (
-            <p className="text-sm text-destructive font-sans">{uploadError}</p>
-          )}
-        </div>
+            {uploadError && (
+              <p className="text-sm text-destructive font-sans">{uploadError}</p>
+            )}
+          </div>
+        )}
 
         {/* Advanced: Image URL (collapsed) */}
         <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>

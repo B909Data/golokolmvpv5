@@ -273,6 +273,8 @@ export type Database = {
         Row: {
           active: boolean
           created_at: string
+          flyer_image_url: string | null
+          flyer_updated_at: string | null
           id: string
           name: string
           type: Database["public"]["Enums"]["partner_type"]
@@ -280,6 +282,8 @@ export type Database = {
         Insert: {
           active?: boolean
           created_at?: string
+          flyer_image_url?: string | null
+          flyer_updated_at?: string | null
           id?: string
           name: string
           type: Database["public"]["Enums"]["partner_type"]
@@ -287,6 +291,8 @@ export type Database = {
         Update: {
           active?: boolean
           created_at?: string
+          flyer_image_url?: string | null
+          flyer_updated_at?: string | null
           id?: string
           name?: string
           type?: Database["public"]["Enums"]["partner_type"]
