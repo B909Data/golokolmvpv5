@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Building2, RefreshCw, Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { Building2, RefreshCw, Plus, Trash2, ToggleLeft, ToggleRight, Upload, Image, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,12 @@ interface Partner {
   type: "curator" | "venue";
   active: boolean;
   created_at: string;
+  flyer_image_url?: string | null;
+  flyer_updated_at?: string | null;
 }
+
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png"];
 
 const AdminPartners = () => {
   const [searchParams] = useSearchParams();
@@ -32,6 +37,8 @@ const AdminPartners = () => {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [newType, setNewType] = useState<"curator" | "venue">("curator");
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const fetchPartners = async () => {
     if (!key) return;
@@ -117,6 +124,76 @@ const AdminPartners = () => {
     } catch (err) {
       console.error("Delete error:", err);
       toast.error("Failed to delete partner");
+    }
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  const handleFlyerUpload = async (partner: Partner, file: File) => {
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      toast.error("Please select a JPG or PNG image");
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File too large. Maximum size is 3MB");
+      return;
+    }
+
+    setUploadingId(partner.id);
+    try {
+      const base64 = await fileToBase64(file);
+
+      const { data, error } = await supabase.functions.invoke("admin-manage-partner", {
+        body: {
+          key,
+          action: "upload-flyer",
+          id: partner.id,
+          file_base64: base64,
+          content_type: file.type,
+          filename: file.name,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success("Flyer uploaded successfully");
+      fetchPartners();
+    } catch (err) {
+      console.error("Upload error:", err);
+      toast.error("Failed to upload flyer");
+    } finally {
+      setUploadingId(null);
+    }
+  };
+
+  const handleRemoveFlyer = async (partner: Partner) => {
+    if (!confirm("Remove this flyer?")) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-manage-partner", {
+        body: { key, action: "remove-flyer", id: partner.id },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success("Flyer removed");
+      fetchPartners();
+    } catch (err) {
+      console.error("Remove flyer error:", err);
+      toast.error("Failed to remove flyer");
     }
   };
 
@@ -207,6 +284,7 @@ const AdminPartners = () => {
                     <tr>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Name</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Status</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">Flyer</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Actions</th>
                     </tr>
                   </thead>
@@ -222,6 +300,58 @@ const AdminPartners = () => {
                           }`}>
                             {partner.active ? "Active" : "Inactive"}
                           </span>
+                        </td>
+                        {/* Flyer column for curators */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            {partner.flyer_image_url ? (
+                              <div className="flex items-center gap-2">
+                                <img
+                                  src={partner.flyer_image_url}
+                                  alt="Flyer"
+                                  className="w-10 h-10 object-cover rounded border border-border"
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 text-destructive hover:text-destructive"
+                                  onClick={() => handleRemoveFlyer(partner)}
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <>
+                                <input
+                                  type="file"
+                                  accept="image/jpeg,image/png"
+                                  className="hidden"
+                                  ref={(el) => (fileInputRefs.current[partner.id] = el)}
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleFlyerUpload(partner, file);
+                                    e.target.value = "";
+                                  }}
+                                />
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-7"
+                                  disabled={uploadingId === partner.id}
+                                  onClick={() => fileInputRefs.current[partner.id]?.click()}
+                                >
+                                  {uploadingId === partner.id ? (
+                                    <RefreshCw className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <>
+                                      <Upload className="w-4 h-4 mr-1" />
+                                      Upload
+                                    </>
+                                  )}
+                                </Button>
+                              </>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">

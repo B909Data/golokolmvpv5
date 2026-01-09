@@ -11,7 +11,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { key, action, id, name, type, active } = await req.json();
+    const body = await req.json();
+    const { key, action, id, name, type, active, file_base64, content_type, filename } = body;
     const ADMIN_KEY = Deno.env.get("ADMIN_KEY");
 
     if (!ADMIN_KEY || key !== ADMIN_KEY) {
@@ -98,6 +99,122 @@ Deno.serve(async (req) => {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "upload-flyer") {
+      if (!id || !file_base64 || !content_type) {
+        return new Response(JSON.stringify({ error: "ID, file_base64, and content_type required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Validate partner exists and is a curator
+      const { data: partner, error: partnerErr } = await supabase
+        .from("partners")
+        .select("id, type")
+        .eq("id", id)
+        .single();
+
+      if (partnerErr || !partner) {
+        return new Response(JSON.stringify({ error: "Partner not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (partner.type !== "curator") {
+        return new Response(JSON.stringify({ error: "Flyers are only for curators" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Decode base64 and upload to storage
+      const extension = content_type === "image/png" ? "png" : "jpg";
+      const storagePath = `${id}/flyer.${extension}`;
+
+      const binaryData = Uint8Array.from(atob(file_base64), (c) => c.charCodeAt(0));
+
+      const { error: uploadErr } = await supabase.storage
+        .from("partner_flyers")
+        .upload(storagePath, binaryData, {
+          contentType: content_type,
+          upsert: true,
+        });
+
+      if (uploadErr) {
+        console.error("Upload error:", uploadErr);
+        return new Response(JSON.stringify({ error: "Failed to upload flyer" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("partner_flyers")
+        .getPublicUrl(storagePath);
+
+      // Update partner record
+      const { error: updateErr } = await supabase
+        .from("partners")
+        .update({
+          flyer_image_url: urlData.publicUrl,
+          flyer_updated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+
+      if (updateErr) {
+        console.error("Update error:", updateErr);
+        return new Response(JSON.stringify({ error: "Failed to update partner" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      return new Response(JSON.stringify({ success: true, flyer_url: urlData.publicUrl }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "remove-flyer") {
+      if (!id) {
+        return new Response(JSON.stringify({ error: "ID required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Clear flyer URL from partner
+      const { error: updateErr } = await supabase
+        .from("partners")
+        .update({
+          flyer_image_url: null,
+          flyer_updated_at: null,
+        })
+        .eq("id", id);
+
+      if (updateErr) {
+        console.error("Update error:", updateErr);
+        return new Response(JSON.stringify({ error: "Failed to remove flyer" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Try to delete from storage (non-blocking)
+      try {
+        await supabase.storage
+          .from("partner_flyers")
+          .remove([`${id}/flyer.jpg`, `${id}/flyer.png`]);
+      } catch (e) {
+        console.warn("Storage delete failed:", e);
       }
 
       return new Response(JSON.stringify({ success: true }), {
