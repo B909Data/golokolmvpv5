@@ -18,6 +18,7 @@ interface AfterPartyFormData {
   genres: string[];
   youtube_url?: string;
   image_url?: string;
+  discount_code?: string;
 }
 
 serve(async (req) => {
@@ -75,13 +76,60 @@ serve(async (req) => {
 
     console.log("Created event:", event.id);
 
+    // Check for discount code
+    let discountAmount = 0; // 0 = full price, 50 = 50% off, 100 = free
+    if (formData.discount_code) {
+      const { data: codeData, error: codeError } = await supabaseAdmin
+        .from("afterparty_discount_codes")
+        .select("*")
+        .eq("code", formData.discount_code.toUpperCase())
+        .is("used_at", null)
+        .single();
+
+      if (codeError || !codeData) {
+        // Delete the event we just created since the code is invalid
+        await supabaseAdmin.from("events").delete().eq("id", event.id);
+        throw new Error("Invalid or already used discount code");
+      }
+
+      discountAmount = codeData.discount_type === "free" ? 100 : 50;
+      console.log("Valid discount code:", codeData.code, "Discount:", discountAmount + "%");
+    }
+
+    // If 100% discount (free), skip Stripe and enable directly
+    if (discountAmount === 100) {
+      // Mark code as used
+      await supabaseAdmin
+        .from("afterparty_discount_codes")
+        .update({ used_at: new Date().toISOString(), used_by_email: formData.contact_email })
+        .eq("code", formData.discount_code!.toUpperCase());
+
+      // Generate artist access token and enable after party
+      const token = crypto.randomUUID();
+      await supabaseAdmin
+        .from("events")
+        .update({ after_party_enabled: true, artist_access_token: token })
+        .eq("id", event.id);
+
+      console.log("Free listing activated for event:", event.id);
+
+      return new Response(JSON.stringify({ 
+        free: true, 
+        event_id: event.id,
+        artist_access_token: token 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Create Checkout session with live price ID ($11.99 USD flat)
-    const session = await stripe.checkout.sessions.create({
+    // Create Checkout session
+    const sessionConfig: any = {
       line_items: [
         {
           price: "price_1SnP1UPKcGpNZUZR6ecFGpwY",
@@ -93,9 +141,23 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/create-afterparty?canceled=true`,
       metadata: {
         event_id: event.id,
+        discount_code: formData.discount_code || "",
       },
       customer_email: formData.contact_email,
-    });
+    };
+
+    // Apply 50% coupon if discount code is valid
+    if (discountAmount === 50) {
+      // Create a one-time 50% coupon
+      const coupon = await stripe.coupons.create({
+        percent_off: 50,
+        duration: "once",
+        name: `Discount Code: ${formData.discount_code}`,
+      });
+      sessionConfig.discounts = [{ coupon: coupon.id }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     console.log("Created Stripe session:", session.id);
 

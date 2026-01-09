@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from "react-router-dom";
-import { Shield, Music, Calendar } from "lucide-react";
+import { Shield, Music, Calendar, Ticket } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -33,7 +33,7 @@ const Admin = () => {
             <h1 className="font-display text-3xl text-foreground">Admin Portal</h1>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Link
               to={`/admin/after-parties?key=${key}`}
               className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
@@ -57,6 +57,19 @@ const Admin = () => {
               </div>
               <p className="text-muted-foreground text-sm">
                 Review song submissions, update statuses, and manage notes.
+              </p>
+            </Link>
+
+            <Link
+              to={`/admin/discount-codes?key=${key}`}
+              className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Ticket className="w-6 h-6 text-primary" />
+                <h2 className="font-display text-xl text-foreground">Discount Codes</h2>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Generate one-time use discount codes for After Party listings.
               </p>
             </Link>
           </div>

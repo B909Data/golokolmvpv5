@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2, ChevronLeft, ChevronRight, CalendarIcon, Upload, X, ChevronDown } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -86,6 +86,7 @@ const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png"];
 
 const CreateAfterparty = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const canceled = searchParams.get("canceled") === "true";
@@ -97,6 +98,14 @@ const CreateAfterparty = () => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Discount code state
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountValidation, setDiscountValidation] = useState<{
+    valid: boolean;
+    type: string | null;
+    checking: boolean;
+  }>({ valid: false, type: null, checking: false });
 
   // Scroll to top on page load
   useEffect(() => {
@@ -148,6 +157,34 @@ const CreateAfterparty = () => {
 
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+
+  // Validate discount code
+  const validateDiscountCode = async (code: string) => {
+    if (!code.trim()) {
+      setDiscountValidation({ valid: false, type: null, checking: false });
+      return;
+    }
+
+    setDiscountValidation({ valid: false, type: null, checking: true });
+
+    try {
+      const { data, error } = await supabase
+        .from("afterparty_discount_codes")
+        .select("discount_type, used_at")
+        .eq("code", code.toUpperCase())
+        .single();
+
+      if (error || !data || data.used_at) {
+        setDiscountValidation({ valid: false, type: null, checking: false });
+        if (code.trim()) toast.error("Invalid or already used code");
+      } else {
+        setDiscountValidation({ valid: true, type: data.discount_type, checking: false });
+        toast.success(data.discount_type === "free" ? "Free listing code applied!" : "50% discount applied!");
+      }
+    } catch {
+      setDiscountValidation({ valid: false, type: null, checking: false });
+    }
+  };
 
   // Step validation - Step 3 only requires genres now
   const step1Fields = ["artist_name", "contact_email"] as const;
@@ -252,7 +289,7 @@ const CreateAfterparty = () => {
       startDate.setHours(hours, minutes, 0, 0);
 
       // Build payload - only include image_url if using URL input (not file upload)
-      const payload = {
+      const payload: Record<string, unknown> = {
         artist_name: data.artist_name,
         contact_email: data.contact_email,
         title: data.title,
@@ -264,6 +301,11 @@ const CreateAfterparty = () => {
         youtube_url: data.youtube_url || undefined,
         image_url: (!selectedFile && data.image_url) ? data.image_url : undefined,
       };
+
+      // Add discount code if valid
+      if (discountValidation.valid && discountCode.trim()) {
+        payload.discount_code = discountCode.trim().toUpperCase();
+      }
 
       // Create event via create-afterparty-checkout
       const { data: response, error } = await supabase.functions.invoke(
@@ -282,6 +324,7 @@ const CreateAfterparty = () => {
 
       const eventId = response?.event_id;
       const checkoutUrlResponse = response?.url;
+      const isFree = response?.free === true;
 
       // If file selected, attempt upload (NON-BLOCKING)
       if (selectedFile && eventId) {
@@ -315,7 +358,14 @@ const CreateAfterparty = () => {
         setIsUploading(false);
       }
 
-      // Always redirect to Stripe checkout (even if upload failed)
+      // Handle free listing - redirect directly to artist control room
+      if (isFree && response?.artist_access_token) {
+        toast.success("Your free listing is live!");
+        navigate(`/artist/event/${eventId}?token=${response.artist_access_token}&welcome=true`);
+        return;
+      }
+
+      // Redirect to Stripe checkout
       if (checkoutUrlResponse) {
         const newWindow = window.open(checkoutUrlResponse, '_blank', 'noopener,noreferrer');
         if (!newWindow) {
@@ -673,23 +723,59 @@ const CreateAfterparty = () => {
   const renderStep4 = () => {
     const formValues = watch();
     return (
-      <ReviewAfterPartyStep
-        formData={{
-          artist_name: formValues.artist_name || "",
-          contact_email: formValues.contact_email || "",
-          title: formValues.title || "",
-          start_date: formValues.start_date || new Date(),
-          start_time: formValues.start_time || "",
-          city: formValues.city || "",
-          venue_name: formValues.venue_name || "",
-          ticket_url: formValues.ticket_url,
-          genres: formValues.genres || [],
-          youtube_url: formValues.youtube_url,
-          image_url: filePreviewUrl || formValues.image_url || "",
-        }}
-        isConfirmed={isReviewConfirmed}
-        onConfirmChange={setIsReviewConfirmed}
-      />
+      <div className="space-y-6">
+        <ReviewAfterPartyStep
+          formData={{
+            artist_name: formValues.artist_name || "",
+            contact_email: formValues.contact_email || "",
+            title: formValues.title || "",
+            start_date: formValues.start_date || new Date(),
+            start_time: formValues.start_time || "",
+            city: formValues.city || "",
+            venue_name: formValues.venue_name || "",
+            ticket_url: formValues.ticket_url,
+            genres: formValues.genres || [],
+            youtube_url: formValues.youtube_url,
+            image_url: filePreviewUrl || formValues.image_url || "",
+          }}
+          isConfirmed={isReviewConfirmed}
+          onConfirmChange={setIsReviewConfirmed}
+        />
+
+        {/* Discount Code Input */}
+        <div className="space-y-2 pt-4 border-t border-primary-foreground/20">
+          <Label className="text-primary-foreground text-base font-sans">
+            Have a discount code?
+          </Label>
+          <div className="flex gap-2">
+            <Input
+              value={discountCode}
+              onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+              placeholder="Enter code"
+              className="h-12 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground uppercase"
+              maxLength={12}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => validateDiscountCode(discountCode)}
+              disabled={discountValidation.checking || !discountCode.trim()}
+              className="h-12 px-4 font-sans bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
+            >
+              {discountValidation.checking ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Apply"
+              )}
+            </Button>
+          </div>
+          {discountValidation.valid && (
+            <p className="text-sm text-green-400 font-sans">
+              ✓ {discountValidation.type === "free" ? "Free listing!" : "50% off applied!"}
+            </p>
+          )}
+        </div>
+      </div>
     );
   };
 
@@ -727,6 +813,10 @@ const CreateAfterparty = () => {
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               {isUploading ? "Uploading..." : "Processing..."}
             </>
+          ) : discountValidation.valid && discountValidation.type === "free" ? (
+            "Create Free Listing"
+          ) : discountValidation.valid && discountValidation.type === "50_percent" ? (
+            "Pay — $5.99"
           ) : (
             "Pay — $11.99"
           )}
