@@ -69,6 +69,8 @@ serve(async (req) => {
         start_at: event.start_at,
         city: event.city,
         venue_name: event.venue_name,
+        merch_link: event.merch_link,
+        music_link: event.music_link,
       },
       messages: messages || [],
     }), {

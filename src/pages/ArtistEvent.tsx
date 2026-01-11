@@ -30,6 +30,8 @@ interface EventData {
   start_at: string;
   city: string | null;
   venue_name: string | null;
+  merch_link: string | null;
+  music_link: string | null;
 }
 
 interface Message {
@@ -73,6 +75,8 @@ const ArtistEvent = () => {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [livestreamUrl, setLivestreamUrl] = useState("");
+  const [merchLink, setMerchLink] = useState("");
+  const [musicLink, setMusicLink] = useState("");
 
   // Door check-in state
   const [checkedInCount, setCheckedInCount] = useState(0);
@@ -108,6 +112,8 @@ const ArtistEvent = () => {
       setYoutubeUrl(data.event?.youtube_url || "");
       setImageUrl(data.event?.image_url || "");
       setLivestreamUrl(data.event?.livestream_url || "");
+      setMerchLink(data.event?.merch_link || "");
+      setMusicLink(data.event?.music_link || "");
     } catch (err) {
       console.error("Fetch error:", err);
       setAuthorized(false);
@@ -162,6 +168,8 @@ const ArtistEvent = () => {
           youtube_url: youtubeUrl,
           image_url: imageUrl,
           livestream_url: livestreamUrl,
+          merch_link: merchLink,
+          music_link: musicLink,
         },
       });
       if (error) throw error;
@@ -606,6 +614,26 @@ const ArtistEvent = () => {
                   value={livestreamUrl}
                   onChange={(e) => setLivestreamUrl(e.target.value)}
                   placeholder="https://..."
+                  className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-primary mb-2 font-sans font-medium">Merch link (optional)</label>
+                <Input
+                  value={merchLink}
+                  onChange={(e) => setMerchLink(e.target.value)}
+                  placeholder="https://your-merch-store.com"
+                  className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-primary mb-2 font-sans font-medium">Music link (optional)</label>
+                <Input
+                  value={musicLink}
+                  onChange={(e) => setMusicLink(e.target.value)}
+                  placeholder="https://spotify.com/artist/..."
                   className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans"
                 />
               </div>
