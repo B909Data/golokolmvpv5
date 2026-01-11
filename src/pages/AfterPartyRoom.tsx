@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { format, differenceInDays, addDays } from "date-fns";
-import { Send, MessageCircle, Home, Pin, ChevronLeft, Users, Download, Settings, ShoppingBag, Music, Mail } from "lucide-react";
+import { format, differenceInDays, addDays, isAfter } from "date-fns";
+import { Send, MessageCircle, Home, Pin, ChevronLeft, Users, Download, Settings, ShoppingBag, Music, Mail, Clock } from "lucide-react";
 import { extractYouTubeId } from "@/lib/youtube";
 import { toast } from "sonner";
 
@@ -253,6 +253,19 @@ const AfterPartyRoom = () => {
     enabled: !!eventId && (isArtistMode || (!!attendeeId && !!attendeeData?.checked_in_at)),
   });
 
+  // Check if fan has already opted in (for end-state display)
+  const { data: hasOptedIn = false } = useQuery({
+    queryKey: ["fan-optin-check", eventId, attendeeId],
+    queryFn: async () => {
+      // We'll check by looking for any email_optin for this event from localStorage email
+      // Since we don't have email stored, we check by emailSubmitted state in component
+      // Actually, we can just check if there's any record - but we need the email
+      // For now, return false and let the component's emailSubmitted state handle it
+      return false;
+    },
+    enabled: false, // Disabled - we'll use component state instead
+  });
+
   // Post system message when artist joins (once per session)
   useEffect(() => {
     if (!isArtistMode || !eventId || !event || artistJoinedRef.current) return;
@@ -421,6 +434,14 @@ const AfterPartyRoom = () => {
     return "Closes in 24 hours";
   };
 
+  // Check if the After Party has expired (24 hours after opening)
+  const isPartyExpired = (): boolean => {
+    if (!event?.after_party_opens_at) return false;
+    const openedAt = new Date(event.after_party_opens_at);
+    const closesAt = addDays(openedAt, 1);
+    return isAfter(new Date(), closesAt);
+  };
+
   // Validate YouTube livestream URL
   const getValidLivestreamId = () => {
     if (!event?.livestream_url) return null;
@@ -504,6 +525,7 @@ const AfterPartyRoom = () => {
   const livestreamId = getValidLivestreamId();
   const roomClosureInfo = getRoomClosureInfo();
   const eventSubtitle = [event.city, formatEventDate(event.start_at)].filter(Boolean).join(" • ");
+  const isExpired = isPartyExpired();
 
   // Build attribution text from partner data
   const curatorName = event.curator?.name || event.curator_other_name || null;
@@ -526,7 +548,12 @@ const AfterPartyRoom = () => {
             )}
           </div>
           <div className="flex items-center gap-2 ml-3">
-            {isArtistMode && (
+            {isExpired && (
+              <span className="bg-muted text-muted-foreground text-xs px-2 py-1 rounded font-sans">
+                Ended
+              </span>
+            )}
+            {isArtistMode && !isExpired && (
               <span className="bg-primary/20 text-primary text-xs px-2 py-1 rounded font-sans">
                 Artist Mode
               </span>
@@ -551,6 +578,7 @@ const AfterPartyRoom = () => {
           attributionText={attributionText}
           merchLink={event.merch_link}
           musicLink={event.music_link}
+          isExpired={isExpired}
           onGoToChat={() => setViewMode("chat")}
           onBackToEvent={() => navigate(`/after-party/${eventId}/rsvp`)}
         />
@@ -567,15 +595,18 @@ const AfterPartyRoom = () => {
           currentAttendeeId={attendeeId || ""}
           pinnedMessage={event.pinned_message}
           isArtistMode={isArtistMode}
+          isExpired={isExpired}
+          eventId={eventId || ""}
         />
       )}
 
-      {/* Persistent Bottom Toggle */}
+      {/* Persistent Bottom Toggle - Hide Artist Control when expired */}
       <ViewToggle 
         viewMode={viewMode} 
         setViewMode={setViewMode} 
         isArtistMode={isArtistMode}
         onGoToControl={handleGoToControl}
+        isExpired={isExpired}
       />
     </div>
   );
@@ -610,6 +641,7 @@ interface WelcomeDashboardProps {
   attributionText: string | null;
   merchLink: string | null;
   musicLink: string | null;
+  isExpired?: boolean;
   onGoToChat: () => void;
   onBackToEvent: () => void;
 }
@@ -624,6 +656,7 @@ const WelcomeDashboard = ({
   attributionText,
   merchLink,
   musicLink,
+  isExpired = false,
   onGoToChat,
   onBackToEvent,
 }: WelcomeDashboardProps) => {
@@ -1007,6 +1040,8 @@ interface ChatViewProps {
   currentAttendeeId: string;
   pinnedMessage: string | null;
   isArtistMode?: boolean;
+  isExpired?: boolean;
+  eventId?: string;
 }
 
 const ChatView = ({
@@ -1021,7 +1056,40 @@ const ChatView = ({
   currentAttendeeId,
   pinnedMessage,
   isArtistMode = false,
+  isExpired = false,
+  eventId = "",
 }: ChatViewProps) => {
+  const [endStateEmail, setEndStateEmail] = useState("");
+  const [isSubmittingEndEmail, setIsSubmittingEndEmail] = useState(false);
+  const [endEmailSubmitted, setEndEmailSubmitted] = useState(false);
+
+  const handleEndEmailSubmit = async () => {
+    if (!endStateEmail.trim() || !eventId) return;
+    
+    setIsSubmittingEndEmail(true);
+    try {
+      const { error } = await supabase
+        .from("email_optins")
+        .insert({ event_id: eventId, email: endStateEmail.trim() });
+      
+      if (error) {
+        if (error.code === "23505") {
+          toast.info("You're already signed up!");
+          setEndEmailSubmitted(true);
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success("You're on the list!");
+        setEndEmailSubmitted(true);
+      }
+    } catch (err: any) {
+      console.error("Email opt-in error:", err);
+      toast.error("Failed to sign up. Try again.");
+    } finally {
+      setIsSubmittingEndEmail(false);
+    }
+  };
   return (
     <div className="flex-1 flex flex-col pb-36 max-w-[640px] mx-auto w-full">
       {/* Pinned Message Banner */}
@@ -1122,32 +1190,102 @@ const ChatView = ({
         )}
       </main>
 
-      {/* Input Area - Text Only */}
-      <div className="fixed bottom-20 left-0 right-0 bg-[#0B0B0B]/95 backdrop-blur-sm border-t border-border/20 px-4 py-3">
-        <div className="flex items-center gap-3 max-w-[640px] mx-auto">
-          <Input
-            placeholder={isArtistMode ? "Message your fans..." : "Type a message..."}
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
-            disabled={isSending}
-            className="flex-1 bg-[#1A1A1A] border-transparent focus:border-primary focus-visible:ring-primary/50 placeholder:text-muted-foreground/40 font-sans text-[16px] py-6"
-          />
-          <Button
-            onClick={handleSendMessage}
-            disabled={!messageText.trim() || isSending}
-            size="icon"
-            className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-12"
-          >
-            <Send size={20} />
-          </Button>
+      {/* End State Overlay for Expired Parties */}
+      {isExpired && (
+        <div className="fixed inset-0 z-50 bg-[#0B0B0B]/95 flex items-center justify-center px-4">
+          <div className="max-w-md w-full text-center space-y-6">
+            {/* Artist or already opted-in fan - simple message */}
+            {(isArtistMode || endEmailSubmitted) ? (
+              <>
+                <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center mx-auto">
+                  <Clock size={28} className="text-muted-foreground" />
+                </div>
+                <h1 className="font-display font-bold text-foreground text-2xl">
+                  This After Party has ended.
+                </h1>
+                <p className="text-muted-foreground font-sans">
+                  Thanks for being here!
+                </p>
+              </>
+            ) : (
+              /* Fan who hasn't opted in - full opt-in overlay */
+              <>
+                <h1 className="font-display font-bold text-foreground text-3xl leading-tight">
+                  The Party is over!<br />See you at the next.
+                </h1>
+                <h2 className="font-display text-primary text-xl">
+                  Get notified of the next one?
+                </h2>
+                <ul className="text-foreground font-sans text-left space-y-2 max-w-xs mx-auto">
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">•</span>
+                    <span>New Show</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">•</span>
+                    <span>New badge status</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">•</span>
+                    <span>New Fans</span>
+                  </li>
+                </ul>
+                <div className="space-y-3 pt-2">
+                  <Input
+                    type="email"
+                    value={endStateEmail}
+                    onChange={(e) => setEndStateEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="bg-[#1A1A1A] border-border/30 focus:border-primary font-sans text-center"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleEndEmailSubmit();
+                      }
+                    }}
+                  />
+                  <Button
+                    onClick={handleEndEmailSubmit}
+                    disabled={!endStateEmail.trim() || isSubmittingEndEmail}
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-sans py-6 text-base"
+                  >
+                    {isSubmittingEndEmail ? "..." : "Let me know"}
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Input Area - Text Only (hidden when expired) */}
+      {!isExpired && (
+        <div className="fixed bottom-20 left-0 right-0 bg-[#0B0B0B]/95 backdrop-blur-sm border-t border-border/20 px-4 py-3">
+          <div className="flex items-center gap-3 max-w-[640px] mx-auto">
+            <Input
+              placeholder={isArtistMode ? "Message your fans..." : "Type a message..."}
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              disabled={isSending}
+              className="flex-1 bg-[#1A1A1A] border-transparent focus:border-primary focus-visible:ring-primary/50 placeholder:text-muted-foreground/40 font-sans text-[16px] py-6"
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={!messageText.trim() || isSending}
+              size="icon"
+              className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-12"
+            >
+              <Send size={20} />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1158,9 +1296,10 @@ interface ViewToggleProps {
   setViewMode: (mode: ViewMode) => void;
   isArtistMode?: boolean;
   onGoToControl?: () => void;
+  isExpired?: boolean;
 }
 
-const ViewToggle = ({ viewMode, setViewMode, isArtistMode = false, onGoToControl }: ViewToggleProps) => {
+const ViewToggle = ({ viewMode, setViewMode, isArtistMode = false, onGoToControl, isExpired = false }: ViewToggleProps) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-[#0B0B0B] border-t border-border/20 px-4 py-3 safe-area-pb">
       <div className="flex justify-center gap-2 max-w-xs mx-auto">
@@ -1192,7 +1331,7 @@ const ViewToggle = ({ viewMode, setViewMode, isArtistMode = false, onGoToControl
           </>
         )}
         
-        {/* Artists see Chat + Artist Control */}
+        {/* Artists see Chat + Artist Control (hide control when expired) */}
         {isArtistMode && (
           <>
             <button
@@ -1206,13 +1345,15 @@ const ViewToggle = ({ viewMode, setViewMode, isArtistMode = false, onGoToControl
               <MessageCircle size={18} />
               <span>Chat</span>
             </button>
-            <button
-              onClick={onGoToControl}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
-            >
-              <Settings size={18} />
-              <span>Artist Control</span>
-            </button>
+            {!isExpired && (
+              <button
+                onClick={onGoToControl}
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
+              >
+                <Settings size={18} />
+                <span>Artist Control</span>
+              </button>
+            )}
           </>
         )}
       </div>
