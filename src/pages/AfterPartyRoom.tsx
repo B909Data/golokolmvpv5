@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { format, differenceInDays, addDays } from "date-fns";
-import { Send, MessageCircle, Home, Pin, ChevronLeft, Users, Download, Settings } from "lucide-react";
+import { Send, MessageCircle, Home, Pin, ChevronLeft, Users, Download, Settings, ShoppingBag, Music, Mail } from "lucide-react";
 import { extractYouTubeId } from "@/lib/youtube";
 import { toast } from "sonner";
 
@@ -35,6 +35,8 @@ type EventData = {
   curator: PartnerInfo;
   venue: PartnerInfo;
   artist_access_token: string | null;
+  merch_link: string | null;
+  music_link: string | null;
 } | null;
 
 type Message = {
@@ -173,6 +175,7 @@ const AfterPartyRoom = () => {
           id, title, artist_name, status, start_at, city, 
           after_party_opens_at, pinned_message, livestream_url, image_url,
           curator_id, venue_id, curator_other_name, venue_other_name, artist_access_token,
+          merch_link, music_link,
           curator:partners!events_curator_id_fkey(id, name, type),
           venue:partners!events_venue_id_fkey(id, name, type)
         `)
@@ -540,12 +543,14 @@ const AfterPartyRoom = () => {
       {viewMode === "welcome" && !isArtistMode ? (
         <WelcomeDashboard
           artistName={artistName}
+          eventId={eventId || ""}
           eventTitle={event.title}
-          pinnedMessage={event.pinned_message}
           livestreamId={livestreamId}
           roomClosureInfo={roomClosureInfo}
           flyerImageUrl={event.image_url}
           attributionText={attributionText}
+          merchLink={event.merch_link}
+          musicLink={event.music_link}
           onGoToChat={() => setViewMode("chat")}
           onBackToEvent={() => navigate(`/after-party/${eventId}/rsvp`)}
         />
@@ -597,28 +602,64 @@ const buildAttribution = (
 // Welcome Dashboard View
 interface WelcomeDashboardProps {
   artistName: string;
+  eventId: string;
   eventTitle: string;
-  pinnedMessage: string | null;
   livestreamId: string | null;
   roomClosureInfo: string | null;
   flyerImageUrl: string | null;
   attributionText: string | null;
+  merchLink: string | null;
+  musicLink: string | null;
   onGoToChat: () => void;
   onBackToEvent: () => void;
 }
 
 const WelcomeDashboard = ({
   artistName,
+  eventId,
   eventTitle,
-  pinnedMessage,
   livestreamId,
   roomClosureInfo,
   flyerImageUrl,
   attributionText,
+  merchLink,
+  musicLink,
   onGoToChat,
   onBackToEvent,
 }: WelcomeDashboardProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+
+  const handleEmailSubmit = async () => {
+    if (!email.trim() || !eventId) return;
+    
+    setIsSubmittingEmail(true);
+    try {
+      const { error } = await supabase
+        .from("email_optins")
+        .insert({ event_id: eventId, email: email.trim() });
+      
+      if (error) {
+        // Check for duplicate
+        if (error.code === "23505") {
+          toast.info("You're already signed up!");
+          setEmailSubmitted(true);
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success("You're on the list!");
+        setEmailSubmitted(true);
+      }
+    } catch (err: any) {
+      console.error("Email opt-in error:", err);
+      toast.error("Failed to sign up. Try again.");
+    } finally {
+      setIsSubmittingEmail(false);
+    }
+  };
 
   const handleDownloadBadge = async (): Promise<void> => {
     setIsDownloading(true);
@@ -725,22 +766,99 @@ const WelcomeDashboard = ({
           </p>
         )}
 
-        {/* Pinned Message Card - Top Priority */}
-        {pinnedMessage && (
-          <div className="bg-[#1A1A1A] border border-primary/30 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="bg-primary/20 p-1.5 rounded">
-                <Pin size={14} className="text-primary" />
-              </div>
-              <span className="text-xs uppercase tracking-widest text-primary font-sans font-medium">
-                Pinned
-              </span>
+        {/* Section A: Livestream (Highest Priority) */}
+        {livestreamId ? (
+          <div className="bg-[#1A1A1A] rounded-xl overflow-hidden">
+            <div className="aspect-video">
+              <iframe
+                src={`https://www.youtube.com/embed/${livestreamId}?rel=0&modestbranding=1`}
+                title="Livestream"
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             </div>
-            <p className="text-foreground font-sans leading-relaxed">
-              {pinnedMessage}
+          </div>
+        ) : (
+          <div className="bg-[#1A1A1A] border border-border/30 rounded-xl p-6 text-center">
+            <p className="text-muted-foreground font-sans text-sm">
+              No livestream scheduled
             </p>
           </div>
         )}
+
+        {/* Section B: Gift Shop */}
+        {(merchLink || musicLink) && (
+          <div className="bg-[#1A1A1A] border border-primary/30 rounded-xl p-5">
+            <h3 className="font-display font-bold text-foreground text-lg mb-4">
+              {artistName} Gift Shop
+            </h3>
+            <div className="flex gap-3">
+              {merchLink && (
+                <a
+                  href={merchLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1"
+                >
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-sans">
+                    <ShoppingBag size={18} className="mr-2" />
+                    Merch
+                  </Button>
+                </a>
+              )}
+              {musicLink && (
+                <a
+                  href={musicLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1"
+                >
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-sans">
+                    <Music size={18} className="mr-2" />
+                    Music
+                  </Button>
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Section C: Email Opt-in */}
+        <div className="bg-[#1A1A1A] border border-border/30 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Mail size={16} className="text-primary" />
+            <h3 className="font-sans font-medium text-foreground text-sm">
+              Get notified about the next show & After Party
+            </h3>
+          </div>
+          {emailSubmitted ? (
+            <p className="text-primary font-sans text-sm">✓ You're on the list!</p>
+          ) : (
+            <div className="flex gap-2">
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="flex-1 bg-[#0B0B0B] border-border/30 focus:border-primary font-sans"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleEmailSubmit();
+                  }
+                }}
+              />
+              <Button
+                onClick={handleEmailSubmit}
+                disabled={!email.trim() || isSubmittingEmail}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-sans shrink-0"
+              >
+                {isSubmittingEmail ? "..." : "Sign Up"}
+              </Button>
+            </div>
+          )}
+        </div>
 
         {/* Badge Section - Prominent Reward */}
         <div className="bg-[#0B0B0B] border-2 border-primary/40 rounded-xl p-6 shadow-[0_0_20px_rgba(255,229,0,0.15)]">
@@ -853,20 +971,6 @@ const WelcomeDashboard = ({
           </ul>
         </div>
 
-        {/* Livestream Area */}
-        {livestreamId && (
-          <div className="bg-[#1A1A1A] rounded-xl overflow-hidden">
-            <div className="aspect-video">
-              <iframe
-                src={`https://www.youtube.com/embed/${livestreamId}?rel=0&modestbranding=1`}
-                title="Livestream"
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        )}
 
         {/* Action Buttons */}
         <div className="space-y-3 pt-2">

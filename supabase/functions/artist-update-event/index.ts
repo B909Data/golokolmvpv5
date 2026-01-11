@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { event_id, token, pinned_message, youtube_url, image_url, livestream_url } = await req.json();
+    const { event_id, token, pinned_message, youtube_url, image_url, livestream_url, merch_link, music_link } = await req.json();
 
     if (!event_id || !token) {
       throw new Error("Missing event_id or token");
@@ -47,6 +47,8 @@ serve(async (req) => {
     if (youtube_url !== undefined) updateData.youtube_url = youtube_url;
     if (image_url !== undefined) updateData.image_url = image_url;
     if (livestream_url !== undefined) updateData.livestream_url = livestream_url;
+    if (merch_link !== undefined) updateData.merch_link = merch_link;
+    if (music_link !== undefined) updateData.music_link = music_link;
 
     const { error: updateError } = await supabase
       .from("events")

@@ -186,6 +186,35 @@ export type Database = {
           },
         ]
       }
+      email_optins: {
+        Row: {
+          created_at: string
+          email: string
+          event_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_optins_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           after_party_enabled: boolean
@@ -203,6 +232,8 @@ export type Database = {
           id: string
           image_url: string | null
           livestream_url: string | null
+          merch_link: string | null
+          music_link: string | null
           pinned_message: string | null
           start_at: string
           status: Database["public"]["Enums"]["event_status"]
@@ -230,6 +261,8 @@ export type Database = {
           id?: string
           image_url?: string | null
           livestream_url?: string | null
+          merch_link?: string | null
+          music_link?: string | null
           pinned_message?: string | null
           start_at: string
           status?: Database["public"]["Enums"]["event_status"]
@@ -257,6 +290,8 @@ export type Database = {
           id?: string
           image_url?: string | null
           livestream_url?: string | null
+          merch_link?: string | null
+          music_link?: string | null
           pinned_message?: string | null
           start_at?: string
           status?: Database["public"]["Enums"]["event_status"]
