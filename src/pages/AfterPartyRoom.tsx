@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { format, differenceInDays, addDays } from "date-fns";
-import { Send, MessageCircle, Home, Pin, ChevronLeft, Users, Download } from "lucide-react";
+import { Send, MessageCircle, Home, Pin, ChevronLeft, Users, Download, Settings } from "lucide-react";
 import { extractYouTubeId } from "@/lib/youtube";
 import { toast } from "sonner";
 
@@ -34,6 +34,7 @@ type EventData = {
   venue_other_name: string | null;
   curator: PartnerInfo;
   venue: PartnerInfo;
+  artist_access_token: string | null;
 } | null;
 
 type Message = {
@@ -47,7 +48,7 @@ type Message = {
   } | null;
 };
 
-type ViewMode = "welcome" | "chat";
+type ViewMode = "welcome" | "chat" | "control";
 
 // Helper to get initials from display name or fallback
 const getInitials = (name: string | null, fallback: string = "F"): string => {
@@ -65,6 +66,7 @@ const AfterPartyRoom = () => {
   const [searchParams] = useSearchParams();
   const isAdminMode = searchParams.get("admin") === "1";
   const urlToken = searchParams.get("token");
+  const artistToken = searchParams.get("artist_token"); // Artist mode
   
   const [viewMode, setViewMode] = useState<ViewMode>("welcome");
   const [messageText, setMessageText] = useState("");
@@ -72,12 +74,16 @@ const AfterPartyRoom = () => {
   const [accessError, setAccessError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatScrollRef = useRef<number>(0);
+  const artistJoinedRef = useRef<boolean>(false); // Guard for artist join message
+
+  // Determine if in artist mode
+  const isArtistMode = !!artistToken;
 
   // Token resolution: URL token first, then localStorage
   const storedAttendeeId = eventId ? localStorage.getItem(`attendee_${eventId}`) : null;
   const storedQrToken = eventId ? localStorage.getItem(`attendee_qr_${eventId}`) : null;
 
-  // Resolve attendee by URL token or stored attendeeId
+  // For artist mode, we skip attendee checks
   const { data: attendeeData, isLoading: isCheckingIn, error: attendeeError } = useQuery({
     queryKey: ["attendee-checkin", eventId, urlToken, storedAttendeeId],
     queryFn: async () => {
@@ -106,7 +112,7 @@ const AfterPartyRoom = () => {
       
       return null;
     },
-    enabled: !!eventId && (!!urlToken || !!storedAttendeeId),
+    enabled: !!eventId && !isArtistMode && (!!urlToken || !!storedAttendeeId),
   });
 
   // Store attendee info from URL token if found
@@ -120,9 +126,9 @@ const AfterPartyRoom = () => {
   const attendeeId = attendeeData?.id || storedAttendeeId;
   const qrToken = attendeeData?.qr_token || urlToken || storedQrToken;
 
-  // Hard gate room access
+  // Hard gate room access - for fans only
   useEffect(() => {
-    if (!eventId) return;
+    if (!eventId || isArtistMode) return;
 
     if (!urlToken && !storedAttendeeId) {
       navigate(`/after-party/${eventId}/rsvp`, { replace: true });
@@ -147,17 +153,26 @@ const AfterPartyRoom = () => {
         navigate(`/after-party/${eventId}/rsvp`, { replace: true });
       }
     }
-  }, [urlToken, storedAttendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn]);
+  }, [urlToken, storedAttendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn, isArtistMode]);
+
+  // Set initial view mode based on role
+  useEffect(() => {
+    if (isArtistMode) {
+      setViewMode("chat"); // Artists start on chat
+    } else {
+      setViewMode("welcome"); // Fans start on welcome
+    }
+  }, [isArtistMode]);
 
   const { data: event, isLoading, error: eventError, refetch: refetchEvent } = useQuery({
-    queryKey: ["event-room", eventId],
+    queryKey: ["event-room", eventId, artistToken],
     queryFn: async (): Promise<EventData> => {
       const { data, error } = await supabase
         .from("events")
         .select(`
           id, title, artist_name, status, start_at, city, 
           after_party_opens_at, pinned_message, livestream_url, image_url,
-          curator_id, venue_id, curator_other_name, venue_other_name,
+          curator_id, venue_id, curator_other_name, venue_other_name, artist_access_token,
           curator:partners!events_curator_id_fkey(id, name, type),
           venue:partners!events_venue_id_fkey(id, name, type)
         `)
@@ -167,12 +182,22 @@ const AfterPartyRoom = () => {
       if (error) throw error;
       return data as EventData;
     },
-    enabled: !!eventId && !!attendeeId && !!attendeeData?.checked_in_at,
+    enabled: !!eventId && (isArtistMode || (!!attendeeId && !!attendeeData?.checked_in_at)),
   });
+
+  // Validate artist token
+  useEffect(() => {
+    if (isArtistMode && event) {
+      if (event.artist_access_token !== artistToken) {
+        setAccessError("Invalid artist access token");
+      }
+    }
+  }, [isArtistMode, event, artistToken]);
 
   // Realtime subscription for event updates (livestream, pinned message, etc.)
   useEffect(() => {
-    if (!eventId || !attendeeId || !attendeeData?.checked_in_at) return;
+    if (!eventId) return;
+    if (!isArtistMode && (!attendeeId || !attendeeData?.checked_in_at)) return;
 
     const channel = supabase
       .channel(`event-updates-${eventId}`)
@@ -193,7 +218,7 @@ const AfterPartyRoom = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [eventId, attendeeId, attendeeData?.checked_in_at, refetchEvent]);
+  }, [eventId, attendeeId, attendeeData?.checked_in_at, refetchEvent, isArtistMode]);
 
   const { data: attendeeCount = 0 } = useQuery({
     queryKey: ["attendee-count", eventId],
@@ -207,7 +232,7 @@ const AfterPartyRoom = () => {
       if (error) throw error;
       return count || 0;
     },
-    enabled: !!eventId && !!attendeeId && !!attendeeData?.checked_in_at,
+    enabled: !!eventId && (isArtistMode || (!!attendeeId && !!attendeeData?.checked_in_at)),
   });
 
   const { data: messages = [], refetch: refetchMessages } = useQuery({
@@ -222,8 +247,80 @@ const AfterPartyRoom = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!eventId && !!attendeeId && !!attendeeData?.checked_in_at,
+    enabled: !!eventId && (isArtistMode || (!!attendeeId && !!attendeeData?.checked_in_at)),
   });
+
+  // Post system message when artist joins (once per session)
+  useEffect(() => {
+    if (!isArtistMode || !eventId || !event || artistJoinedRef.current) return;
+
+    const postArtistJoinMessage = async () => {
+      // Check if artist join message was already posted in this session
+      const sessionKey = `artist_joined_${eventId}`;
+      if (sessionStorage.getItem(sessionKey)) {
+        artistJoinedRef.current = true;
+        return;
+      }
+
+      // Create a system attendee placeholder for the artist message
+      // We'll insert a message with a special identifier
+      try {
+        // First, we need an attendee_id - let's check if artist has one or create one
+        const { data: existingArtist } = await supabase
+          .from("attendees")
+          .select("id")
+          .eq("event_id", eventId)
+          .eq("display_name", "__ARTIST_SYSTEM__")
+          .maybeSingle();
+
+        let artistAttendeeId: string;
+
+        if (existingArtist) {
+          artistAttendeeId = existingArtist.id;
+        } else {
+          // Create a system attendee for artist messages
+          const { data: newArtist, error: createError } = await supabase
+            .from("attendees")
+            .insert({
+              event_id: eventId,
+              display_name: "__ARTIST_SYSTEM__",
+              qr_token: crypto.randomUUID(),
+              checked_in_at: new Date().toISOString(),
+            })
+            .select("id")
+            .single();
+
+          if (createError) {
+            console.error("Failed to create artist system attendee:", createError);
+            return;
+          }
+          artistAttendeeId = newArtist.id;
+        }
+
+        // Post the system message
+        const { error: msgError } = await supabase
+          .from("after_party_messages")
+          .insert({
+            event_id: eventId,
+            attendee_id: artistAttendeeId,
+            role: "artist",
+            message: "🎤 The artist just joined the chat",
+          });
+
+        if (msgError) {
+          console.error("Failed to post artist join message:", msgError);
+        } else {
+          sessionStorage.setItem(sessionKey, "true");
+          artistJoinedRef.current = true;
+          refetchMessages();
+        }
+      } catch (err) {
+        console.error("Error posting artist join message:", err);
+      }
+    };
+
+    postArtistJoinMessage();
+  }, [isArtistMode, eventId, event, refetchMessages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -236,14 +333,47 @@ const AfterPartyRoom = () => {
   }, [messages, viewMode]);
 
   const handleSendMessage = async () => {
-    if (!messageText.trim() || !eventId || !attendeeId) return;
+    if (!messageText.trim() || !eventId) return;
+
+    // For artist mode, we don't need attendeeId - we'll create/use a system attendee
+    if (!isArtistMode && !attendeeId) return;
 
     setIsSending(true);
     try {
+      let senderAttendeeId = attendeeId;
+
+      if (isArtistMode) {
+        // Get or create artist attendee
+        const { data: existingArtist } = await supabase
+          .from("attendees")
+          .select("id")
+          .eq("event_id", eventId)
+          .eq("display_name", "__ARTIST_SYSTEM__")
+          .maybeSingle();
+
+        if (existingArtist) {
+          senderAttendeeId = existingArtist.id;
+        } else {
+          const { data: newArtist, error: createError } = await supabase
+            .from("attendees")
+            .insert({
+              event_id: eventId,
+              display_name: "__ARTIST_SYSTEM__",
+              qr_token: crypto.randomUUID(),
+              checked_in_at: new Date().toISOString(),
+            })
+            .select("id")
+            .single();
+
+          if (createError) throw createError;
+          senderAttendeeId = newArtist.id;
+        }
+      }
+
       const { error } = await supabase.from("after_party_messages").insert({
         event_id: eventId,
-        attendee_id: attendeeId,
-        role: "fan",
+        attendee_id: senderAttendeeId,
+        role: isArtistMode ? "artist" : "fan",
         message: messageText.trim(),
       });
 
@@ -252,6 +382,7 @@ const AfterPartyRoom = () => {
       refetchMessages();
     } catch (err: any) {
       console.error("Send message error:", err);
+      toast.error("Failed to send message");
     } finally {
       setIsSending(false);
     }
@@ -299,6 +430,13 @@ const AfterPartyRoom = () => {
     return extractYouTubeId(url);
   };
 
+  // Navigate to artist control room
+  const handleGoToControl = () => {
+    if (eventId && artistToken) {
+      navigate(`/artist/event/${eventId}?token=${artistToken}`);
+    }
+  };
+
   // Error states
   if (accessError) {
     return (
@@ -316,28 +454,31 @@ const AfterPartyRoom = () => {
     );
   }
 
-  if (!urlToken && !storedAttendeeId) {
-    return (
-      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4 font-sans">You need to RSVP or be checked in to access this After Party.</p>
-          <Button 
-            onClick={() => navigate(`/after-party/${eventId}/rsvp`)}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Go to RSVP
-          </Button>
+  // Fan access checks (not for artist mode)
+  if (!isArtistMode) {
+    if (!urlToken && !storedAttendeeId) {
+      return (
+        <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4 font-sans">You need to RSVP or be checked in to access this After Party.</p>
+            <Button 
+              onClick={() => navigate(`/after-party/${eventId}/rsvp`)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Go to RSVP
+            </Button>
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (isCheckingIn || !attendeeData?.checked_in_at) {
-    return (
-      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center">
-        <p className="text-muted-foreground font-sans">Checking access...</p>
-      </div>
-    );
+    if (isCheckingIn || !attendeeData?.checked_in_at) {
+      return (
+        <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center">
+          <p className="text-muted-foreground font-sans">Checking access...</p>
+        </div>
+      );
+    }
   }
 
   if (isLoading) {
@@ -382,6 +523,11 @@ const AfterPartyRoom = () => {
             )}
           </div>
           <div className="flex items-center gap-2 ml-3">
+            {isArtistMode && (
+              <span className="bg-primary/20 text-primary text-xs px-2 py-1 rounded font-sans">
+                Artist Mode
+              </span>
+            )}
             <div className="bg-primary text-primary-foreground px-3 py-1.5 rounded-full flex items-center gap-1.5">
               <Users size={14} />
               <span className="text-sm font-sans font-medium">{attendeeCount}</span>
@@ -391,7 +537,7 @@ const AfterPartyRoom = () => {
       </header>
 
       {/* View Content */}
-      {viewMode === "welcome" ? (
+      {viewMode === "welcome" && !isArtistMode ? (
         <WelcomeDashboard
           artistName={artistName}
           eventTitle={event.title}
@@ -415,11 +561,17 @@ const AfterPartyRoom = () => {
           artistName={artistName}
           currentAttendeeId={attendeeId || ""}
           pinnedMessage={event.pinned_message}
+          isArtistMode={isArtistMode}
         />
       )}
 
       {/* Persistent Bottom Toggle */}
-      <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
+      <ViewToggle 
+        viewMode={viewMode} 
+        setViewMode={setViewMode} 
+        isArtistMode={isArtistMode}
+        onGoToControl={handleGoToControl}
+      />
     </div>
   );
 };
@@ -750,6 +902,7 @@ interface ChatViewProps {
   artistName: string;
   currentAttendeeId: string;
   pinnedMessage: string | null;
+  isArtistMode?: boolean;
 }
 
 const ChatView = ({
@@ -763,6 +916,7 @@ const ChatView = ({
   artistName,
   currentAttendeeId,
   pinnedMessage,
+  isArtistMode = false,
 }: ChatViewProps) => {
   return (
     <div className="flex-1 flex flex-col pb-36 max-w-[640px] mx-auto w-full">
@@ -803,10 +957,13 @@ const ChatView = ({
           <div className="space-y-4">
             {messages.map((msg) => {
               const isArtist = msg.role === "artist";
-              const isOwn = msg.attendee_id === currentAttendeeId;
+              const isOwn = isArtistMode ? isArtist : msg.attendee_id === currentAttendeeId;
               const displayName = msg.attendees?.display_name;
-              const senderName = isArtist ? artistName : isOwn ? "You" : (displayName || "Fan");
-              const initials = isArtist ? getInitials(artistName, "A") : isOwn ? "ME" : getInitials(displayName, "FN");
+              
+              // Hide "__ARTIST_SYSTEM__" display name
+              const cleanDisplayName = displayName === "__ARTIST_SYSTEM__" ? null : displayName;
+              const senderName = isArtist ? artistName : isOwn ? "You" : (cleanDisplayName || "Fan");
+              const initials = isArtist ? getInitials(artistName, "A") : isOwn ? "ME" : getInitials(cleanDisplayName, "FN");
               
               return (
                 <div
@@ -865,7 +1022,7 @@ const ChatView = ({
       <div className="fixed bottom-20 left-0 right-0 bg-[#0B0B0B]/95 backdrop-blur-sm border-t border-border/20 px-4 py-3">
         <div className="flex items-center gap-3 max-w-[640px] mx-auto">
           <Input
-            placeholder="Type a message..."
+            placeholder={isArtistMode ? "Message your fans..." : "Type a message..."}
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
             onKeyDown={(e) => {
@@ -895,34 +1052,65 @@ const ChatView = ({
 interface ViewToggleProps {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
+  isArtistMode?: boolean;
+  onGoToControl?: () => void;
 }
 
-const ViewToggle = ({ viewMode, setViewMode }: ViewToggleProps) => {
+const ViewToggle = ({ viewMode, setViewMode, isArtistMode = false, onGoToControl }: ViewToggleProps) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-[#0B0B0B] border-t border-border/20 px-4 py-3 safe-area-pb">
       <div className="flex justify-center gap-2 max-w-xs mx-auto">
-        <button
-          onClick={() => setViewMode("welcome")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all ${
-            viewMode === "welcome"
-              ? "bg-primary text-primary-foreground"
-              : "bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
-          }`}
-        >
-          <Home size={18} />
-          <span>Welcome</span>
-        </button>
-        <button
-          onClick={() => setViewMode("chat")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all ${
-            viewMode === "chat"
-              ? "bg-primary text-primary-foreground"
-              : "bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
-          }`}
-        >
-          <MessageCircle size={18} />
-          <span>Chat</span>
-        </button>
+        {/* Fans see Welcome + Chat */}
+        {!isArtistMode && (
+          <>
+            <button
+              onClick={() => setViewMode("welcome")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all ${
+                viewMode === "welcome"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
+              }`}
+            >
+              <Home size={18} />
+              <span>Welcome</span>
+            </button>
+            <button
+              onClick={() => setViewMode("chat")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all ${
+                viewMode === "chat"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
+              }`}
+            >
+              <MessageCircle size={18} />
+              <span>Chat</span>
+            </button>
+          </>
+        )}
+        
+        {/* Artists see Chat + Artist Control */}
+        {isArtistMode && (
+          <>
+            <button
+              onClick={() => setViewMode("chat")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all ${
+                viewMode === "chat"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
+              }`}
+            >
+              <MessageCircle size={18} />
+              <span>Chat</span>
+            </button>
+            <button
+              onClick={onGoToControl}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-sans text-sm transition-all bg-[#1A1A1A] text-muted-foreground hover:bg-[#252525]"
+            >
+              <Settings size={18} />
+              <span>Artist Control</span>
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

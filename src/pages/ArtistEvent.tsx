@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-import { Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, Pin, MessageSquare, CheckCircle2, Share2, Bookmark } from "lucide-react";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, Pin, MessageSquare, CheckCircle2, Share2, Bookmark, PartyPopper } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -59,6 +59,7 @@ const StatusCard = ({ icon: Icon, label, value, accent = false }: {
 const ArtistEvent = () => {
   const { eventId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const token = searchParams.get("token");
   const isWelcome = searchParams.get("welcome") === "true";
 
@@ -438,6 +439,16 @@ const ArtistEvent = () => {
             <p className="text-primary-foreground/80 text-sm font-sans mt-3">
               Share this link with your fans so they can get their pass.
             </p>
+            
+            {/* Enter After Party Button */}
+            <Button
+              onClick={() => navigate(`/after-party/${eventId}/room?artist_token=${token}`)}
+              variant="outline"
+              className="w-full mt-4 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-primary font-sans"
+            >
+              <PartyPopper className="w-4 h-4 mr-2" />
+              Enter After Party
+            </Button>
           </div>
         </div>
       </section>
