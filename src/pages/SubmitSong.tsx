@@ -1,182 +1,200 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Music, Upload, User, Link as LinkIcon, FileAudio, Image } from "lucide-react";
+import { ArrowLeft, Music, User, Link as LinkIcon, FileAudio, Image, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const SubmitSong = () => {
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    artistName: "",
-    songTitle: "",
-    genre: "",
-    streamingLink: "",
-    bio: "",
-    email: "",
+    artist_name: "",
+    contact_email: "",
+    song_title: "",
+    spotify_url: "",
+    youtube_url: "",
+    notes: "",
   });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    toast({
-      title: "Song Submitted!",
-      description: "We'll review your submission and get back to you soon.",
-    });
-  };
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.artist_name || !formData.contact_email || !formData.song_title || !formData.spotify_url) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("create-lls-checkout", {
+        body: formData,
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        const newWindow = window.open(data.url, "_blank");
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
+          toast.error("Popup blocked. Please click the link below.");
+          toast(
+            <a href={data.url} target="_blank" rel="noopener noreferrer" className="underline text-primary">
+              Open Stripe Checkout
+            </a>,
+          );
+        }
+      } else {
+        throw new Error("No checkout URL received");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast.error("Failed to start checkout. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-[hsl(60,10%,95%)]">
       <Navbar />
 
       <main className="flex-1 pt-24 pb-20">
         <div className="container mx-auto px-4">
           <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
+            to="/songs"
+            className="inline-flex items-center gap-2 text-[hsl(0,0%,40%)] hover:text-[hsl(0,0%,10%)] transition-colors mb-8"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            Back to Listening Sessions
           </Link>
 
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-10">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/20 mb-6">
-                <Music className="h-8 w-8 text-accent" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[hsl(0,0%,85%)] mb-6">
+                <Music className="h-8 w-8 text-[hsl(0,0%,10%)]" />
               </div>
-              <h1 className="font-display text-5xl md:text-6xl text-foreground mb-4">
-                SUBMIT A <span className="text-accent">LISTENING</span> SESSION
+              <h1 className="font-display text-5xl md:text-6xl text-[hsl(0,0%,10%)] mb-4">
+                SUBMIT A <span className="text-[hsl(0,0%,30%)]">LISTENING</span> SESSION
               </h1>
-              <p className="text-muted-foreground text-lg">
-                Your musc, get feedback and featured at the next Lokol Listening Sessions event. One Artist, One Song.
+              <p className="text-[hsl(0,0%,40%)] text-lg">
+                Your music, get feedback and featured at the next Lokol Listening Sessions event. One Artist, One Song.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="rounded-xl border border-border p-6 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
+              <div className="rounded-xl border border-[hsl(0,0%,80%)] p-6 relative overflow-hidden bg-white">
                 <div className="relative z-10 space-y-6">
                   {/* Artist Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="artistName" className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-accent" />
-                      Artist / Band Name
+                    <Label htmlFor="artist_name" className="flex items-center gap-2 text-[hsl(0,0%,10%)]">
+                      <User className="h-4 w-4 text-[hsl(0,0%,30%)]" />
+                      Artist / Band Name *
                     </Label>
                     <Input
-                      id="artistName"
+                      id="artist_name"
                       placeholder="Your artist or band name"
-                      value={formData.artistName}
-                      onChange={(e) => handleChange("artistName", e.target.value)}
-                      className="bg-secondary border-border"
+                      value={formData.artist_name}
+                      onChange={(e) => handleChange("artist_name", e.target.value)}
+                      className="bg-[hsl(60,10%,95%)] border-[hsl(0,0%,80%)] text-[hsl(0,0%,10%)]"
+                      required
+                    />
+                  </div>
+
+                  {/* Contact Email */}
+                  <div className="space-y-2">
+                    <Label htmlFor="contact_email" className="text-[hsl(0,0%,10%)]">Contact Email *</Label>
+                    <Input
+                      id="contact_email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={formData.contact_email}
+                      onChange={(e) => handleChange("contact_email", e.target.value)}
+                      className="bg-[hsl(60,10%,95%)] border-[hsl(0,0%,80%)] text-[hsl(0,0%,10%)]"
                       required
                     />
                   </div>
 
                   {/* Song Title */}
                   <div className="space-y-2">
-                    <Label htmlFor="songTitle" className="flex items-center gap-2">
-                      <FileAudio className="h-4 w-4 text-accent" />
-                      Song Title
+                    <Label htmlFor="song_title" className="flex items-center gap-2 text-[hsl(0,0%,10%)]">
+                      <FileAudio className="h-4 w-4 text-[hsl(0,0%,30%)]" />
+                      Song Title *
                     </Label>
                     <Input
-                      id="songTitle"
+                      id="song_title"
                       placeholder="Name of your track"
-                      value={formData.songTitle}
-                      onChange={(e) => handleChange("songTitle", e.target.value)}
-                      className="bg-secondary border-border"
+                      value={formData.song_title}
+                      onChange={(e) => handleChange("song_title", e.target.value)}
+                      className="bg-[hsl(60,10%,95%)] border-[hsl(0,0%,80%)] text-[hsl(0,0%,10%)]"
                       required
                     />
                   </div>
 
-                  {/* Genre */}
+                  {/* Spotify URL */}
                   <div className="space-y-2">
-                    <Label htmlFor="genre">Genre</Label>
-                    <Input
-                      id="genre"
-                      placeholder="e.g., Indie Rock, Hip-Hop, Electronic"
-                      value={formData.genre}
-                      onChange={(e) => handleChange("genre", e.target.value)}
-                      className="bg-secondary border-border"
-                      required
-                    />
-                  </div>
-
-                  {/* YouTube Link */}
-                  <div className="space-y-2">
-                    <Label htmlFor="youtubeLink" className="flex items-center gap-2">
-                      <LinkIcon className="h-4 w-4 text-accent" />
-                      YouTube Link
+                    <Label htmlFor="spotify_url" className="flex items-center gap-2 text-[hsl(0,0%,10%)]">
+                      <LinkIcon className="h-4 w-4 text-[hsl(0,0%,30%)]" />
+                      Spotify URL *
                     </Label>
                     <Input
-                      id="youtubeLink"
+                      id="spotify_url"
                       type="url"
-                      placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
-                      value={formData.streamingLink}
-                      onChange={(e) => handleChange("streamingLink", e.target.value)}
-                      className="bg-secondary border-border"
+                      placeholder="https://open.spotify.com/track/..."
+                      value={formData.spotify_url}
+                      onChange={(e) => handleChange("spotify_url", e.target.value)}
+                      className="bg-[hsl(60,10%,95%)] border-[hsl(0,0%,80%)] text-[hsl(0,0%,10%)]"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">Paste your YouTube video URL (youtube.com/watch?v=... or youtu.be/...)</p>
                   </div>
 
-                  {/* Song Image Upload */}
+                  {/* YouTube URL */}
                   <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Image className="h-4 w-4 text-accent" />
-                      Upload Song Img (Optional)
+                    <Label htmlFor="youtube_url" className="flex items-center gap-2 text-[hsl(0,0%,10%)]">
+                      <LinkIcon className="h-4 w-4 text-[hsl(0,0%,30%)]" />
+                      YouTube URL (optional)
                     </Label>
-                    <div className="border-2 border-dashed border-border rounded-lg p-8 text-center bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer">
-                      <Image className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-muted-foreground text-sm">Click to upload or drag and drop</p>
-                      <p className="text-muted-foreground text-xs mt-1">1MB max</p>
-                    </div>
-                  </div>
-
-                  {/* Bio */}
-                  <div className="space-y-2">
-                    <Label htmlFor="bio">About the Track</Label>
-                    <Textarea
-                      id="bio"
-                      placeholder="Tell us about your song, inspiration, or anything you'd like listeners to know..."
-                      value={formData.bio}
-                      onChange={(e) => handleChange("bio", e.target.value)}
-                      className="bg-secondary border-border min-h-[100px]"
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Contact Email</Label>
                     <Input
-                      id="email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={formData.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-                      className="bg-secondary border-border"
-                      required
+                      id="youtube_url"
+                      type="url"
+                      placeholder="https://youtube.com/watch?v=..."
+                      value={formData.youtube_url}
+                      onChange={(e) => handleChange("youtube_url", e.target.value)}
+                      className="bg-[hsl(60,10%,95%)] border-[hsl(0,0%,80%)] text-[hsl(0,0%,10%)]"
                     />
-                    <p className="text-xs text-muted-foreground">We'll use this to notify you about your submission</p>
+                  </div>
+
+                  {/* Notes */}
+                  <div className="space-y-2">
+                    <Label htmlFor="notes" className="text-[hsl(0,0%,10%)]">Notes (optional)</Label>
+                    <Textarea
+                      id="notes"
+                      placeholder="Anything else you'd like us to know..."
+                      value={formData.notes}
+                      onChange={(e) => handleChange("notes", e.target.value)}
+                      className="bg-[hsl(60,10%,95%)] border-[hsl(0,0%,80%)] text-[hsl(0,0%,10%)] min-h-[100px]"
+                    />
                   </div>
                 </div>
               </div>
 
-              <Button type="submit" size="lg" className="w-full">
-                SUBMIT SONG
-                <Music className="h-5 w-5" />
-              </Button>
-
-              <p className="text-center text-xs text-muted-foreground">
-                By submitting, you confirm that you have the rights to this music and agree to our terms.
-              </p>
+              <div className="pt-4">
+                <Button type="submit" size="lg" disabled={isSubmitting} className="w-full md:w-auto">
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  {isSubmitting ? "Loading..." : "Submit & Pay ($5)"}
+                </Button>
+                <p className="text-xs text-[hsl(0,0%,40%)] mt-3">
+                  You'll be redirected to Stripe to complete payment. Submission fee is $5 USD.
+                </p>
+              </div>
             </form>
           </div>
         </div>
