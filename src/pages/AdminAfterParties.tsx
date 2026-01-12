@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Calendar, RefreshCw, Copy, Check, Users, DoorOpen, MessageCircle } from "lucide-react";
+import { Calendar, RefreshCw, Copy, Check, Users, DoorOpen, MessageCircle, Download, Pause, Play, Archive } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ interface Event {
   after_party_enabled: boolean;
   artist_access_token: string | null;
   rsvp_count: number;
+  admin_state: "active" | "paused" | "archived";
 }
 
 const AdminAfterParties = () => {
@@ -29,6 +30,8 @@ const AdminAfterParties = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedPassId, setCopiedPassId] = useState<string | null>(null);
   const [openingControl, setOpeningControl] = useState<string | null>(null);
+  const [updatingState, setUpdatingState] = useState<string | null>(null);
+  const [exporting, setExporting] = useState<string | null>(null);
 
   const fetchEvents = async () => {
     if (!key) return;
@@ -86,11 +89,66 @@ const AdminAfterParties = () => {
   };
 
   const copyPassLink = (eventId: string) => {
-    const passUrl = `${PUBLIC_BASE_URL}/after-party/${eventId}`;
+    const passUrl = `${PUBLIC_BASE_URL}/after-party/${eventId}/rsvp`;
     navigator.clipboard.writeText(passUrl);
     setCopiedPassId(eventId);
     toast.success("Pass link copied!");
     setTimeout(() => setCopiedPassId(null), 2000);
+  };
+
+  const updateEventState = async (eventId: string, newState: "active" | "paused" | "archived") => {
+    setUpdatingState(eventId);
+    try {
+      const { data, error } = await supabase.functions.invoke(`admin-update-event-state?key=${key}`, {
+        method: "POST",
+        body: { event_id: eventId, admin_state: newState },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      
+      // Update local state
+      setEvents((prev) =>
+        prev.map((e) => (e.id === eventId ? { ...e, admin_state: newState } : e))
+      );
+      toast.success(`Event ${newState === "active" ? "activated" : newState === "paused" ? "paused" : "archived"}`);
+    } catch (err) {
+      console.error("Update state error:", err);
+      toast.error("Failed to update event state");
+    } finally {
+      setUpdatingState(null);
+    }
+  };
+
+  const exportEventData = async (eventId: string) => {
+    setExporting(eventId);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-export-event-data?key=${key}&event_id=${eventId}`,
+        { method: "GET" }
+      );
+      
+      if (!response.ok) {
+        throw new Error("Export failed");
+      }
+      
+      const csvContent = await response.text();
+      
+      // Download CSV
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `afterparty-${eventId}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      toast.success("Export downloaded");
+    } catch (err) {
+      console.error("Export error:", err);
+      toast.error("Failed to export data");
+    } finally {
+      setExporting(null);
+    }
   };
 
   if (!key) {
@@ -148,7 +206,7 @@ const AdminAfterParties = () => {
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Artist</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">City</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Date</th>
-                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">Enabled</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">State</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">RSVPs</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Actions</th>
                     </tr>
@@ -164,11 +222,13 @@ const AdminAfterParties = () => {
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                            event.after_party_enabled
+                            event.admin_state === "active"
                               ? "bg-primary/20 text-primary"
+                              : event.admin_state === "paused"
+                              ? "bg-orange-500/20 text-orange-400"
                               : "bg-muted text-muted-foreground"
                           }`}>
-                            {event.after_party_enabled ? "Yes" : "No"}
+                            {event.admin_state === "active" ? "Active" : event.admin_state === "paused" ? "Paused" : "Archived"}
                           </span>
                         </td>
                         <td className="px-4 py-3">
@@ -241,6 +301,56 @@ const AdminAfterParties = () => {
                               <MessageCircle className="w-3 h-3" />
                               Room
                             </a>
+                            
+                            {/* State Management */}
+                            {event.admin_state === "active" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
+                                onClick={() => updateEventState(event.id, "paused")}
+                                disabled={updatingState === event.id}
+                              >
+                                <Pause className="w-3 h-3 mr-1" />
+                                Pause
+                              </Button>
+                            )}
+                            {event.admin_state === "paused" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs border-primary/50 text-primary hover:bg-primary/10"
+                                onClick={() => updateEventState(event.id, "active")}
+                                disabled={updatingState === event.id}
+                              >
+                                <Play className="w-3 h-3 mr-1" />
+                                Activate
+                              </Button>
+                            )}
+                            {event.admin_state !== "archived" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs border-muted-foreground/50 text-muted-foreground hover:bg-muted/10"
+                                onClick={() => updateEventState(event.id, "archived")}
+                                disabled={updatingState === event.id}
+                              >
+                                <Archive className="w-3 h-3 mr-1" />
+                                Archive
+                              </Button>
+                            )}
+                            
+                            {/* Export */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => exportEventData(event.id)}
+                              disabled={exporting === event.id}
+                            >
+                              <Download className="w-3 h-3 mr-1" />
+                              {exporting === event.id ? "..." : "Export CSV"}
+                            </Button>
                           </div>
                         </td>
                       </tr>

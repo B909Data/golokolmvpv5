@@ -238,6 +238,7 @@ export type Database = {
       }
       events: {
         Row: {
+          admin_state: string
           after_party_enabled: boolean
           after_party_opens_at: string | null
           artist_access_token: string | null
@@ -267,6 +268,7 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          admin_state?: string
           after_party_enabled?: boolean
           after_party_opens_at?: string | null
           artist_access_token?: string | null
@@ -296,6 +298,7 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          admin_state?: string
           after_party_enabled?: boolean
           after_party_opens_at?: string | null
           artist_access_token?: string | null
