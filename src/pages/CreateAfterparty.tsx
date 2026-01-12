@@ -719,10 +719,6 @@ const CreateAfterparty = () => {
               <p className="text-sm text-destructive font-sans">{errors.city.message}</p>
             )}
           </div>
-            {errors.city && (
-              <p className="text-sm text-destructive font-sans">{errors.city.message}</p>
-            )}
-          </div>
 
           {/* Venue */}
           <div className="space-y-2">
