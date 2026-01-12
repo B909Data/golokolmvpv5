@@ -101,7 +101,7 @@ const FindAfterParty = () => {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-primary">✓</span>
-                <span className="text-muted-foreground">Get access to a 24 hour online After Party with the band.</span>
+                <span className="text-muted-foreground">Get access to an online After Party with the artist/band. 24 hours later it disappears.</span>
               </li>
             </ul>
           </div>
