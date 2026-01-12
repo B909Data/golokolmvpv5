@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Calendar, RefreshCw, ExternalLink, Copy, Check, Users, DoorOpen } from "lucide-react";
+import { Calendar, RefreshCw, Copy, Check, Users, DoorOpen, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -27,8 +27,7 @@ const AdminAfterParties = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [creatingRecap, setCreatingRecap] = useState<string | null>(null);
-  const [sendingSms, setSendingSms] = useState<string | null>(null);
+  const [copiedPassId, setCopiedPassId] = useState<string | null>(null);
   const [openingControl, setOpeningControl] = useState<string | null>(null);
 
   const fetchEvents = async () => {
@@ -86,40 +85,12 @@ const AdminAfterParties = () => {
     }
   };
 
-  const createRecap = async (eventId: string) => {
-    setCreatingRecap(eventId);
-    try {
-      const { data, error } = await supabase.functions.invoke(`admin-create-recap?key=${key}`, {
-        body: { event_id: eventId },
-      });
-      if (error) throw error;
-      if (data?.exists) {
-        toast.info("Recap already exists");
-      } else {
-        toast.success("Recap created");
-      }
-    } catch (err) {
-      console.error("Create recap error:", err);
-      toast.error("Failed to create recap");
-    } finally {
-      setCreatingRecap(null);
-    }
-  };
-
-  const sendRecapSms = async (eventId: string) => {
-    setSendingSms(eventId);
-    try {
-      const { error } = await supabase.functions.invoke("send-recap-sms", {
-        body: { event_id: eventId },
-      });
-      if (error) throw error;
-      toast.success("Recap SMS sent");
-    } catch (err) {
-      console.error("Send SMS error:", err);
-      toast.error("Failed to send recap SMS");
-    } finally {
-      setSendingSms(null);
-    }
+  const copyPassLink = (eventId: string) => {
+    const passUrl = `${PUBLIC_BASE_URL}/after-party/${eventId}`;
+    navigator.clipboard.writeText(passUrl);
+    setCopiedPassId(eventId);
+    toast.success("Pass link copied!");
+    setTimeout(() => setCopiedPassId(null), 2000);
   };
 
   if (!key) {
@@ -243,51 +214,33 @@ const AdminAfterParties = () => {
                                 </>
                               )}
                             </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => copyPassLink(event.id)}
+                            >
+                              {copiedPassId === event.id ? (
+                                <>
+                                  <Check className="w-3 h-3 mr-1" />
+                                  Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3 mr-1" />
+                                  Copy Pass Link
+                                </>
+                              )}
+                            </Button>
                             <a
-                              href={`/after-party/${event.id}`}
+                              href={`/after-party/${event.id}/room?admin=1`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-card/50 border border-border/50 rounded hover:bg-card transition-colors"
                             >
-                              <ExternalLink className="w-3 h-3" />
-                              RSVP
-                            </a>
-                            <a
-                              href={`/after-party/${event.id}/room`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-card/50 border border-border/50 rounded hover:bg-card transition-colors"
-                            >
-                              <ExternalLink className="w-3 h-3" />
+                              <MessageCircle className="w-3 h-3" />
                               Room
                             </a>
-                            <a
-                              href={`/after-party/${event.id}/recap`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-card/50 border border-border/50 rounded hover:bg-card transition-colors"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                              Recap
-                            </a>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-7 text-xs"
-                              onClick={() => createRecap(event.id)}
-                              disabled={creatingRecap === event.id}
-                            >
-                              {creatingRecap === event.id ? "..." : "Create Recap"}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-7 text-xs"
-                              onClick={() => sendRecapSms(event.id)}
-                              disabled={sendingSms === event.id}
-                            >
-                              {sendingSms === event.id ? "..." : "Send Recap SMS"}
-                            </Button>
                           </div>
                         </td>
                       </tr>
