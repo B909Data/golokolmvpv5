@@ -442,16 +442,12 @@ const AfterPartyRoom = () => {
     return isAfter(new Date(), closesAt);
   };
 
-  // Validate YouTube livestream URL
+  // Validate YouTube livestream URL - accepts all valid YouTube URL formats
   const getValidLivestreamId = () => {
     if (!event?.livestream_url) return null;
     
-    const url = event.livestream_url;
-    if (!url.includes("youtube.com/watch") && !url.includes("youtu.be/")) {
-      return null;
-    }
-    
-    return extractYouTubeId(url);
+    // extractYouTubeId handles all formats including youtube.com/live/
+    return extractYouTubeId(event.livestream_url);
   };
 
   // Navigate to artist control room
