@@ -37,6 +37,7 @@ type EventData = {
   artist_access_token: string | null;
   merch_link: string | null;
   music_link: string | null;
+  admin_state: "active" | "paused" | "archived" | null;
 } | null;
 
 type Message = {
@@ -176,7 +177,7 @@ const AfterPartyRoom = () => {
           id, title, artist_name, status, start_at, city, 
           after_party_opens_at, pinned_message, livestream_url, image_url,
           curator_id, venue_id, curator_other_name, venue_other_name, artist_access_token,
-          merch_link, music_link,
+          merch_link, music_link, admin_state,
           curator:partners!events_curator_id_fkey(id, name, type),
           venue:partners!events_venue_id_fkey(id, name, type)
         `)
@@ -563,8 +564,8 @@ const AfterPartyRoom = () => {
     );
   }
 
-  // Fan access checks (not for artist mode)
-  if (!isArtistMode) {
+  // Fan access checks (not for artist or admin mode)
+  if (!isPrivilegedMode) {
     if (!urlToken && !storedAttendeeId) {
       return (
         <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
@@ -611,11 +612,53 @@ const AfterPartyRoom = () => {
   const roomClosureInfo = getRoomClosureInfo();
   const eventSubtitle = [event.city, formatEventDate(event.start_at)].filter(Boolean).join(" • ");
   const isExpired = isPartyExpired();
+  const isPaused = event.admin_state === "paused";
+  const isArchived = event.admin_state === "archived";
 
   // Build attribution text from partner data
   const curatorName = event.curator?.name || event.curator_other_name || null;
   const venueName = event.venue?.name || event.venue_other_name || null;
   const attributionText = buildAttribution(artistName, curatorName, venueName);
+  // Paused/Archived overlays block access for both fans and artists
+  if (isPaused) {
+    return (
+      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center space-y-6">
+          <div className="w-16 h-16 rounded-full bg-orange-500/20 flex items-center justify-center mx-auto">
+            <Clock size={28} className="text-orange-400" />
+          </div>
+          <h1 className="font-display font-bold text-foreground text-xl leading-tight">
+            We have paused this After Party due to actions against Terms of Service.
+          </h1>
+          <p className="text-muted-foreground font-sans">
+            Artist or Band should contact GoLokol immediately at{" "}
+            <a href="mailto:backstage@golokol.app" className="text-primary underline">
+              backstage@golokol.app
+            </a>{" "}
+            to reinstate.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isArchived) {
+    return (
+      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center space-y-6">
+          <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center mx-auto">
+            <Clock size={28} className="text-muted-foreground" />
+          </div>
+          <h1 className="font-display font-bold text-foreground text-xl leading-tight">
+            This After Party has been closed.
+          </h1>
+          <p className="text-muted-foreground font-sans">
+            We hope to see you at the next one.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0B0B0B] flex flex-col">
