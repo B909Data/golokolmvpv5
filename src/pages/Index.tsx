@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,30 +6,8 @@ import Footer from "@/components/Footer";
 import heroImage from "@/assets/hero-revised.jpg";
 import sectionAImage from "@/assets/sectiona-revised.png";
 import sectionBImage from "@/assets/sectionb-revised.png";
-import llsCover from "@/assets/lls-cover.jpg";
-
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 const Index = () => {
-  const [isLoadingTicket, setIsLoadingTicket] = useState(false);
-
-  const handleBuyTicket = async () => {
-    setIsLoadingTicket(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-lls-ticket-checkout");
-      if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (err) {
-      console.error("Error creating ticket checkout:", err);
-      toast.error("Failed to start checkout. Please try again.");
-    } finally {
-      setIsLoadingTicket(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -185,83 +162,6 @@ const Index = () => {
               <br />
               <span className="text-primary">is local.</span>
             </h2>
-          </div>
-        </div>
-      </section>
-
-      {/* Lokol Listening Sessions Section */}
-      <section className="py-16 bg-[hsl(60,10%,95%)]">
-        <div className="container mx-auto px-4">
-          <div className="mb-8">
-            <h2 className="font-display text-3xl md:text-5xl text-[hsl(0,0%,10%)] mb-3">LOKOL LISTENING SESSIONS</h2>
-            <p className="text-[hsl(0,0%,30%)] text-lg">
-              A dj event and YouTube series brought to you by GoLokol, featuring the emerging sounds of a city.
-            </p>
-          </div>
-
-          <div className="grid gap-10 md:grid-cols-2 items-start">
-            {/* Left column - Description + CTA */}
-            <div className="space-y-4">
-              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed">
-                Music discovery the right way. At a party and on YouTube screens at the same time. Local fans and
-                artists turn up when their song comes on.
-              </p>
-              <p className="text-[hsl(0,0%,10%)] text-lg leading-relaxed font-medium">All featured artists receive:</p>
-              <div className="space-y-2">
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[hsl(0,0%,10%)] flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-[hsl(0,0%,10%)] text-base leading-relaxed">A way to promote your music in a party setting with crowd reaction.</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[hsl(0,0%,10%)] flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-[hsl(0,0%,10%)] text-base leading-relaxed">A free After Party to promote and connect with the fans who show up and turn up for the camera.</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[hsl(0,0%,10%)] flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-[hsl(0,0%,10%)] text-base leading-relaxed">A YouTube collaboration link so the session shows up on your channel.</p>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-4 pt-2">
-                <div className="flex flex-col">
-                  <Link to="/submit-song">
-                    <Button variant="secondary" size="lg">
-                      Submit a Song
-                      <ArrowRight className="h-5 w-5" />
-                    </Button>
-                  </Link>
-                  <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$5 each submission</p>
-                </div>
-                <div className="flex flex-col">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-[hsl(0,0%,10%)] text-[hsl(0,0%,10%)] hover:bg-[hsl(0,0%,10%)] hover:text-white"
-                    onClick={handleBuyTicket}
-                    disabled={isLoadingTicket}
-                  >
-                    {isLoadingTicket ? "Loading..." : "Buy a Ticket"}
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                  <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$15 limited capacity</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right column - LLS Cover image */}
-            <div className="aspect-video w-full rounded-lg overflow-hidden">
-              <img
-                src={llsCover}
-                alt="Lokol Listening Sessions Coming February 2026"
-                className="w-full h-full object-cover"
-              />
-            </div>
           </div>
         </div>
       </section>
