@@ -23,6 +23,14 @@ interface Partner {
   created_at: string;
   flyer_image_url?: string | null;
   flyer_updated_at?: string | null;
+  city_id?: string | null;
+  cities?: { name: string } | null;
+}
+
+interface City {
+  id: string;
+  name: string;
+  active: boolean;
 }
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
@@ -33,10 +41,12 @@ const AdminPartners = () => {
   const key = searchParams.get("key");
 
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [newType, setNewType] = useState<"curator" | "venue">("curator");
+  const [newCityId, setNewCityId] = useState<string>("");
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -44,13 +54,18 @@ const AdminPartners = () => {
     if (!key) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
-        `admin-list-partners?key=${key}`
-      );
+      const [partnersRes, citiesRes] = await Promise.all([
+        supabase.functions.invoke(`admin-list-partners?key=${key}`),
+        supabase.functions.invoke(`admin-list-cities?key=${key}`),
+      ]);
 
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      setPartners(data?.partners || []);
+      if (partnersRes.error) throw partnersRes.error;
+      if (partnersRes.data?.error) throw new Error(partnersRes.data.error);
+      setPartners(partnersRes.data?.partners || []);
+
+      if (!citiesRes.error && !citiesRes.data?.error) {
+        setCities(citiesRes.data?.cities || []);
+      }
     } catch (err) {
       console.error("Fetch error:", err);
       toast.error("Failed to load partners");
@@ -71,10 +86,15 @@ const AdminPartners = () => {
       return;
     }
 
+    if (!newCityId) {
+      toast.error("City is required");
+      return;
+    }
+
     setCreating(true);
     try {
       const { data, error } = await supabase.functions.invoke("admin-manage-partner", {
-        body: { key, action: "create", name: newName.trim(), type: newType },
+        body: { key, action: "create", name: newName.trim(), type: newType, city_id: newCityId },
       });
 
       if (error) throw error;
@@ -82,6 +102,7 @@ const AdminPartners = () => {
 
       toast.success(`${newType === "curator" ? "Curator" : "Venue"} created`);
       setNewName("");
+      setNewCityId("");
       fetchPartners();
     } catch (err) {
       console.error("Create error:", err);
@@ -256,13 +277,25 @@ const AdminPartners = () => {
                   <SelectItem value="venue">Venue</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={createPartner} disabled={creating || !newName.trim()}>
+              <Select value={newCityId} onValueChange={setNewCityId}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Select city" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((city) => (
+                    <SelectItem key={city.id} value={city.id}>
+                      {city.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button onClick={createPartner} disabled={creating || !newName.trim() || !newCityId}>
                 <Plus className="w-4 h-4 mr-2" />
                 {creating ? "Adding..." : "Add"}
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-3">
-              Partners appear in dropdowns on the Create After Party form.
+              Partners appear in dropdowns on the Create After Party form, filtered by city.
             </p>
           </div>
         </div>
@@ -283,6 +316,7 @@ const AdminPartners = () => {
                   <thead className="bg-card/50 border-b border-border/50">
                     <tr>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Name</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">City</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Status</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Flyer</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Actions</th>
@@ -292,6 +326,7 @@ const AdminPartners = () => {
                     {curators.map((partner) => (
                       <tr key={partner.id} className="border-b border-border/30 hover:bg-card/30">
                         <td className="px-4 py-3 text-foreground font-medium">{partner.name}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{partner.cities?.name || "—"}</td>
                         <td className="px-4 py-3">
                           <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                             partner.active
@@ -398,6 +433,7 @@ const AdminPartners = () => {
                   <thead className="bg-card/50 border-b border-border/50">
                     <tr>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Name</th>
+                      <th className="px-4 py-3 text-left text-muted-foreground font-medium">City</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Status</th>
                       <th className="px-4 py-3 text-left text-muted-foreground font-medium">Actions</th>
                     </tr>
@@ -406,6 +442,7 @@ const AdminPartners = () => {
                     {venues.map((partner) => (
                       <tr key={partner.id} className="border-b border-border/30 hover:bg-card/30">
                         <td className="px-4 py-3 text-foreground font-medium">{partner.name}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{partner.cities?.name || "—"}</td>
                         <td className="px-4 py-3">
                           <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                             partner.active

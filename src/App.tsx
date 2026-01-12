@@ -28,6 +28,7 @@ import AdminLLS from "./pages/AdminLLS";
 import AdminAfterParties from "./pages/AdminAfterParties";
 import AdminDiscountCodes from "./pages/AdminDiscountCodes";
 import AdminPartners from "./pages/AdminPartners";
+import AdminCities from "./pages/AdminCities";
 import ArtistEvent from "./pages/ArtistEvent";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/admin/after-parties" element={<AdminAfterParties />} />
           <Route path="/admin/discount-codes" element={<AdminDiscountCodes />} />
           <Route path="/admin/partners" element={<AdminPartners />} />
+          <Route path="/admin/cities" element={<AdminCities />} />
           <Route path="/artist/event/:eventId" element={<ArtistEvent />} />
           <Route path="/song/:slug" element={<SongDetail />} />
           <Route path="/afterparty/:slug" element={<AfterpartyDetail />} />

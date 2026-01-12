@@ -186,6 +186,27 @@ export type Database = {
           },
         ]
       }
+      cities: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       email_optins: {
         Row: {
           created_at: string
@@ -323,6 +344,7 @@ export type Database = {
       partners: {
         Row: {
           active: boolean
+          city_id: string | null
           created_at: string
           flyer_image_url: string | null
           flyer_updated_at: string | null
@@ -332,6 +354,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          city_id?: string | null
           created_at?: string
           flyer_image_url?: string | null
           flyer_updated_at?: string | null
@@ -341,6 +364,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          city_id?: string | null
           created_at?: string
           flyer_image_url?: string | null
           flyer_updated_at?: string | null
@@ -348,7 +372,15 @@ export type Database = {
           name?: string
           type?: Database["public"]["Enums"]["partner_type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "partners_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recaps: {
         Row: {

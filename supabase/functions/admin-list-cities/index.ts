@@ -27,21 +27,20 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { data: partners, error } = await supabase
-      .from("partners")
-      .select("*, cities(name)")
-      .order("type", { ascending: true })
+    const { data: cities, error } = await supabase
+      .from("cities")
+      .select("*")
       .order("name", { ascending: true });
 
     if (error) {
       console.error("Query error:", error);
-      return new Response(JSON.stringify({ error: "Failed to fetch partners" }), {
+      return new Response(JSON.stringify({ error: "Failed to fetch cities" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ partners }), {
+    return new Response(JSON.stringify({ cities }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
