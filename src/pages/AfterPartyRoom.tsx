@@ -78,14 +78,15 @@ const AfterPartyRoom = () => {
   const chatScrollRef = useRef<number>(0);
   const artistJoinedRef = useRef<boolean>(false); // Guard for artist join message
 
-  // Determine if in artist mode
+  // Determine if in artist mode or admin mode
   const isArtistMode = !!artistToken;
+  const isPrivilegedMode = isArtistMode || isAdminMode;
 
   // Token resolution: URL token first, then localStorage
   const storedAttendeeId = eventId ? localStorage.getItem(`attendee_${eventId}`) : null;
   const storedQrToken = eventId ? localStorage.getItem(`attendee_qr_${eventId}`) : null;
 
-  // For artist mode, we skip attendee checks
+  // For artist/admin mode, we skip attendee checks
   const { data: attendeeData, isLoading: isCheckingIn, error: attendeeError } = useQuery({
     queryKey: ["attendee-checkin", eventId, urlToken, storedAttendeeId],
     queryFn: async () => {
@@ -114,7 +115,7 @@ const AfterPartyRoom = () => {
       
       return null;
     },
-    enabled: !!eventId && !isArtistMode && (!!urlToken || !!storedAttendeeId),
+    enabled: !!eventId && !isPrivilegedMode && (!!urlToken || !!storedAttendeeId),
   });
 
   // Store attendee info from URL token if found
@@ -128,9 +129,9 @@ const AfterPartyRoom = () => {
   const attendeeId = attendeeData?.id || storedAttendeeId;
   const qrToken = attendeeData?.qr_token || urlToken || storedQrToken;
 
-  // Hard gate room access - for fans only
+  // Hard gate room access - for fans only (skip for artist/admin mode)
   useEffect(() => {
-    if (!eventId || isArtistMode) return;
+    if (!eventId || isPrivilegedMode) return;
 
     if (!urlToken && !storedAttendeeId) {
       navigate(`/after-party/${eventId}/rsvp`, { replace: true });
@@ -155,19 +156,19 @@ const AfterPartyRoom = () => {
         navigate(`/after-party/${eventId}/rsvp`, { replace: true });
       }
     }
-  }, [urlToken, storedAttendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn, isArtistMode]);
+  }, [urlToken, storedAttendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn, isPrivilegedMode]);
 
   // Set initial view mode based on role
   useEffect(() => {
-    if (isArtistMode) {
-      setViewMode("chat"); // Artists start on chat
+    if (isPrivilegedMode) {
+      setViewMode("chat"); // Artists and admins start on chat
     } else {
       setViewMode("welcome"); // Fans start on welcome
     }
-  }, [isArtistMode]);
+  }, [isPrivilegedMode]);
 
   const { data: event, isLoading, error: eventError, refetch: refetchEvent } = useQuery({
-    queryKey: ["event-room", eventId, artistToken],
+    queryKey: ["event-room", eventId, artistToken, isAdminMode],
     queryFn: async (): Promise<EventData> => {
       const { data, error } = await supabase
         .from("events")
@@ -185,7 +186,7 @@ const AfterPartyRoom = () => {
       if (error) throw error;
       return data as EventData;
     },
-    enabled: !!eventId && (isArtistMode || (!!attendeeId && !!attendeeData?.checked_in_at)),
+    enabled: !!eventId && (isPrivilegedMode || (!!attendeeId && !!attendeeData?.checked_in_at)),
   });
 
   // Validate artist token
@@ -278,10 +279,7 @@ const AfterPartyRoom = () => {
         return;
       }
 
-      // Create a system attendee placeholder for the artist message
-      // We'll insert a message with a special identifier
       try {
-        // First, we need an attendee_id - let's check if artist has one or create one
         const { data: existingArtist } = await supabase
           .from("attendees")
           .select("id")
@@ -294,7 +292,6 @@ const AfterPartyRoom = () => {
         if (existingArtist) {
           artistAttendeeId = existingArtist.id;
         } else {
-          // Create a system attendee for artist messages
           const { data: newArtist, error: createError } = await supabase
             .from("attendees")
             .insert({
@@ -313,7 +310,6 @@ const AfterPartyRoom = () => {
           artistAttendeeId = newArtist.id;
         }
 
-        // Post the system message
         const { error: msgError } = await supabase
           .from("after_party_messages")
           .insert({
@@ -338,6 +334,73 @@ const AfterPartyRoom = () => {
     postArtistJoinMessage();
   }, [isArtistMode, eventId, event, refetchMessages]);
 
+  // Post system message when admin (GoLokol Moderator) joins (once per session)
+  const adminJoinedRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (!isAdminMode || !eventId || !event || adminJoinedRef.current) return;
+
+    const postAdminJoinMessage = async () => {
+      const sessionKey = `admin_joined_${eventId}`;
+      if (sessionStorage.getItem(sessionKey)) {
+        adminJoinedRef.current = true;
+        return;
+      }
+
+      try {
+        const { data: existingAdmin } = await supabase
+          .from("attendees")
+          .select("id")
+          .eq("event_id", eventId)
+          .eq("display_name", "__ADMIN_MODERATOR__")
+          .maybeSingle();
+
+        let adminAttendeeId: string;
+
+        if (existingAdmin) {
+          adminAttendeeId = existingAdmin.id;
+        } else {
+          const { data: newAdmin, error: createError } = await supabase
+            .from("attendees")
+            .insert({
+              event_id: eventId,
+              display_name: "__ADMIN_MODERATOR__",
+              qr_token: crypto.randomUUID(),
+              checked_in_at: new Date().toISOString(),
+            })
+            .select("id")
+            .single();
+
+          if (createError) {
+            console.error("Failed to create admin moderator attendee:", createError);
+            return;
+          }
+          adminAttendeeId = newAdmin.id;
+        }
+
+        const { error: msgError } = await supabase
+          .from("after_party_messages")
+          .insert({
+            event_id: eventId,
+            attendee_id: adminAttendeeId,
+            role: "fan", // Moderator messages shown as fan role to differentiate from artist
+            message: "🛡️ GoLokol Moderator joined the chat",
+          });
+
+        if (msgError) {
+          console.error("Failed to post admin join message:", msgError);
+        } else {
+          sessionStorage.setItem(sessionKey, "true");
+          adminJoinedRef.current = true;
+          refetchMessages();
+        }
+      } catch (err) {
+        console.error("Error posting admin join message:", err);
+      }
+    };
+
+    postAdminJoinMessage();
+  }, [isAdminMode, eventId, event, refetchMessages]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -351,8 +414,8 @@ const AfterPartyRoom = () => {
   const handleSendMessage = async () => {
     if (!messageText.trim() || !eventId) return;
 
-    // For artist mode, we don't need attendeeId - we'll create/use a system attendee
-    if (!isArtistMode && !attendeeId) return;
+    // For artist/admin mode, we don't need attendeeId - we'll create/use a system attendee
+    if (!isPrivilegedMode && !attendeeId) return;
 
     setIsSending(true);
     try {
@@ -383,6 +446,32 @@ const AfterPartyRoom = () => {
 
           if (createError) throw createError;
           senderAttendeeId = newArtist.id;
+        }
+      } else if (isAdminMode) {
+        // Get or create admin moderator attendee
+        const { data: existingAdmin } = await supabase
+          .from("attendees")
+          .select("id")
+          .eq("event_id", eventId)
+          .eq("display_name", "__ADMIN_MODERATOR__")
+          .maybeSingle();
+
+        if (existingAdmin) {
+          senderAttendeeId = existingAdmin.id;
+        } else {
+          const { data: newAdmin, error: createError } = await supabase
+            .from("attendees")
+            .insert({
+              event_id: eventId,
+              display_name: "__ADMIN_MODERATOR__",
+              qr_token: crypto.randomUUID(),
+              checked_in_at: new Date().toISOString(),
+            })
+            .select("id")
+            .single();
+
+          if (createError) throw createError;
+          senderAttendeeId = newAdmin.id;
         }
       }
 
@@ -578,7 +667,6 @@ const AfterPartyRoom = () => {
             musicLink={event.music_link}
             isExpired={isExpired}
             onGoToChat={() => setViewMode("chat")}
-            onBackToEvent={() => navigate(`/after-party/${eventId}/rsvp`)}
           />
         </div>
       )}
@@ -645,7 +733,6 @@ interface WelcomeDashboardProps {
   musicLink: string | null;
   isExpired?: boolean;
   onGoToChat: () => void;
-  onBackToEvent: () => void;
 }
 
 const WelcomeDashboard = ({
@@ -660,7 +747,6 @@ const WelcomeDashboard = ({
   musicLink,
   isExpired = false,
   onGoToChat,
-  onBackToEvent,
 }: WelcomeDashboardProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [email, setEmail] = useState("");
@@ -975,22 +1061,20 @@ const WelcomeDashboard = ({
           </div>
         </div>
 
-        {/* Hero Card - Yellow */}
-        <div className="bg-primary rounded-xl p-6">
-          <h2 className="font-display font-bold text-primary-foreground text-2xl uppercase tracking-tight">
-            After Party
-          </h2>
-          <p className="text-primary-foreground/80 font-sans mt-2">
-            This room is only for fans who were checked in tonight.
-          </p>
-        </div>
-
         {/* House Rules Card */}
         <div className="bg-[#1A1A1A] rounded-xl p-5">
           <h3 className="font-display font-bold text-foreground text-lg mb-3">
             House Rules
           </h3>
           <ul className="space-y-2 text-muted-foreground font-sans text-sm">
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span><strong>This room is final exit. Keep tab open to stay in.</strong></span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span><strong>This room is only for fans who were checked in tonight</strong></span>
+            </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
               <span>Be respectful to everyone in the room</span>
@@ -1014,14 +1098,6 @@ const WelcomeDashboard = ({
             className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-sans font-medium py-6 text-base"
           >
             Go to Chat
-          </Button>
-          <Button
-            onClick={onBackToEvent}
-            variant="outline"
-            className="w-full border-primary text-primary hover:bg-primary/10 font-sans py-6 text-base"
-          >
-            <ChevronLeft size={18} className="mr-1" />
-            Back to Event
           </Button>
         </div>
       </div>
@@ -1134,10 +1210,23 @@ const ChatView = ({
               const isOwn = isArtistMode ? isArtist : msg.attendee_id === currentAttendeeId;
               const displayName = msg.attendees?.display_name;
               
-              // Hide "__ARTIST_SYSTEM__" display name
-              const cleanDisplayName = displayName === "__ARTIST_SYSTEM__" ? null : displayName;
-              const senderName = isArtist ? artistName : isOwn ? "You" : (cleanDisplayName || "Fan");
-              const initials = isArtist ? getInitials(artistName, "A") : isOwn ? "ME" : getInitials(cleanDisplayName, "FN");
+              // Handle system display names
+              const isAdmin = displayName === "__ADMIN_MODERATOR__";
+              const cleanDisplayName = (displayName === "__ARTIST_SYSTEM__" || displayName === "__ADMIN_MODERATOR__") ? null : displayName;
+              
+              // Determine sender name - admin shows as "GoLokol Moderator"
+              let senderName: string;
+              if (isAdmin) {
+                senderName = "GoLokol Moderator";
+              } else if (isArtist) {
+                senderName = artistName;
+              } else if (isOwn) {
+                senderName = "You";
+              } else {
+                senderName = cleanDisplayName || "Fan";
+              }
+              
+              const initials = isAdmin ? "GL" : isArtist ? getInitials(artistName, "A") : isOwn ? "ME" : getInitials(cleanDisplayName, "FN");
               
               return (
                 <div
@@ -1147,7 +1236,9 @@ const ChatView = ({
                   {/* Avatar */}
                   <div 
                     className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                      isArtist 
+                      isAdmin
+                        ? "bg-blue-500 text-white"
+                        : isArtist 
                         ? "bg-primary text-primary-foreground" 
                         : isOwn 
                         ? "bg-[#2A2A2A] text-muted-foreground" 
@@ -1162,7 +1253,7 @@ const ChatView = ({
                     {/* Sender Name */}
                     <div className={`flex items-center gap-2 mb-1 ${isOwn ? "flex-row-reverse" : ""}`}>
                       <span className={`text-xs font-sans ${
-                        isArtist ? "text-primary font-medium" : "text-muted-foreground"
+                        isAdmin ? "text-blue-400 font-medium" : isArtist ? "text-primary font-medium" : "text-muted-foreground"
                       }`}>
                         {senderName}
                       </span>
