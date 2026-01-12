@@ -562,23 +562,29 @@ const AfterPartyRoom = () => {
         </div>
       </header>
 
-      {/* View Content */}
-      {viewMode === "welcome" && !isArtistMode ? (
-        <WelcomeDashboard
-          artistName={artistName}
-          eventId={eventId || ""}
-          eventTitle={event.title}
-          livestreamId={livestreamId}
-          roomClosureInfo={roomClosureInfo}
-          flyerImageUrl={event.image_url}
-          attributionText={attributionText}
-          merchLink={event.merch_link}
-          musicLink={event.music_link}
-          isExpired={isExpired}
-          onGoToChat={() => setViewMode("chat")}
-          onBackToEvent={() => navigate(`/after-party/${eventId}/rsvp`)}
-        />
-      ) : (
+      {/* View Content - Keep both views mounted, toggle visibility with CSS */}
+      {/* Welcome Dashboard - always mounted for fans to preserve livestream state */}
+      {!isArtistMode && (
+        <div className={viewMode === "welcome" ? "block" : "hidden"}>
+          <WelcomeDashboard
+            artistName={artistName}
+            eventId={eventId || ""}
+            eventTitle={event.title}
+            livestreamId={livestreamId}
+            roomClosureInfo={roomClosureInfo}
+            flyerImageUrl={event.image_url}
+            attributionText={attributionText}
+            merchLink={event.merch_link}
+            musicLink={event.music_link}
+            isExpired={isExpired}
+            onGoToChat={() => setViewMode("chat")}
+            onBackToEvent={() => navigate(`/after-party/${eventId}/rsvp`)}
+          />
+        </div>
+      )}
+      
+      {/* Chat View - always mounted to preserve scroll position and input state */}
+      <div className={viewMode === "chat" || isArtistMode ? "block" : "hidden"}>
         <ChatView
           messages={messages}
           messageText={messageText}
@@ -594,7 +600,7 @@ const AfterPartyRoom = () => {
           isExpired={isExpired}
           eventId={eventId || ""}
         />
-      )}
+      </div>
 
       {/* Persistent Bottom Toggle - Hide Artist Control when expired */}
       <ViewToggle 
