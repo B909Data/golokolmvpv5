@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { key, action, id, name, type, active, file_base64, content_type, filename } = body;
+    const { key, action, id, name, type, active, city_id, file_base64, content_type, filename } = body;
     const ADMIN_KEY = Deno.env.get("ADMIN_KEY");
 
     if (!ADMIN_KEY || key !== ADMIN_KEY) {
@@ -35,9 +35,14 @@ Deno.serve(async (req) => {
         });
       }
 
+      const insertData: Record<string, unknown> = { name, type };
+      if (city_id) {
+        insertData.city_id = city_id;
+      }
+
       const { data, error } = await supabase
         .from("partners")
-        .insert({ name, type })
+        .insert(insertData)
         .select()
         .single();
 

@@ -50,10 +50,7 @@ const GENRE_OPTIONS = [
   "Other",
 ];
 
-const CITY_OPTIONS = [
-  "Atlanta",
-  "Athens",
-];
+// Cities now fetched from database
 
 const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
   const hours = Math.floor(i / 4);
@@ -94,6 +91,13 @@ interface Partner {
   type: "curator" | "venue";
   active: boolean;
   flyer_image_url?: string | null;
+  city_id?: string | null;
+}
+
+interface City {
+  id: string;
+  name: string;
+  active: boolean;
 }
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
@@ -122,35 +126,38 @@ const CreateAfterparty = () => {
     checking: boolean;
   }>({ valid: false, type: null, checking: false });
 
-  // Partners state
+  // Partners and cities state
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
   const [partnersLoading, setPartnersLoading] = useState(true);
   
   // Curator flyer auto-populated state
   const [curatorFlyerUrl, setCuratorFlyerUrl] = useState<string | null>(null);
 
-  // Scroll to top on page load and fetch partners
+  // Scroll to top on page load and fetch partners + cities
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    const fetchPartners = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await supabase
-          .from("partners")
-          .select("*")
-          .eq("active", true)
-          .order("name");
+        const [partnersRes, citiesRes] = await Promise.all([
+          supabase.from("partners").select("*").eq("active", true).order("name"),
+          supabase.from("cities").select("*").eq("active", true).order("name"),
+        ]);
         
-        if (error) throw error;
-        setPartners(data || []);
+        if (partnersRes.error) throw partnersRes.error;
+        if (citiesRes.error) throw citiesRes.error;
+        
+        setPartners(partnersRes.data || []);
+        setCities(citiesRes.data || []);
       } catch (err) {
-        console.error("Failed to fetch partners:", err);
+        console.error("Failed to fetch data:", err);
       } finally {
         setPartnersLoading(false);
       }
     };
     
-    fetchPartners();
+    fetchData();
   }, []);
 
   // Cleanup preview URL on unmount
@@ -183,14 +190,16 @@ const CreateAfterparty = () => {
   });
 
   const selectedGenres = watch("genres") || [];
+  const selectedCity = watch("city");
   const youtubeUrl = watch("youtube_url");
   const imageUrl = watch("image_url");
   const curatorId = watch("curator_id");
   const venueId = watch("venue_id");
   
-  // Derived lists
-  const curators = partners.filter((p) => p.type === "curator");
-  const venues = partners.filter((p) => p.type === "venue");
+  // Filter partners by selected city
+  const selectedCityId = cities.find(c => c.name === selectedCity)?.id;
+  const curators = partners.filter((p) => p.type === "curator" && (!selectedCityId || p.city_id === selectedCityId));
+  const venues = partners.filter((p) => p.type === "venue" && (!selectedCityId || p.city_id === selectedCityId));
 
   
   // Review step confirmation state
@@ -700,12 +709,16 @@ const CreateAfterparty = () => {
               className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <option value="">Select a city</option>
-              {CITY_OPTIONS.map((city) => (
-                <option key={city} value={city}>
-                  {city}
+              {cities.map((city) => (
+                <option key={city.id} value={city.name}>
+                  {city.name}
                 </option>
               ))}
             </select>
+            {errors.city && (
+              <p className="text-sm text-destructive font-sans">{errors.city.message}</p>
+            )}
+          </div>
             {errors.city && (
               <p className="text-sm text-destructive font-sans">{errors.city.message}</p>
             )}

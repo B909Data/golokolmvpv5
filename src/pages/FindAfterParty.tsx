@@ -38,9 +38,6 @@ const GENRE_OPTIONS = [
   "Other",
 ];
 
-// Fixed city options
-const CITY_OPTIONS = ["Atlanta", "Athens"];
-
 interface Event {
   id: string;
   title: string;
@@ -54,7 +51,6 @@ interface Event {
 }
 
 const FindAfterParty = () => {
-  const [cityFilter, setCityFilter] = useState<string>("");
   const [genreFilter, setGenreFilter] = useState<string>("");
 
   const { data: events, isLoading } = useQuery({
@@ -64,6 +60,7 @@ const FindAfterParty = () => {
         .from("events")
         .select("id, title, start_at, city, venue_name, genres, youtube_url, image_url, artist_name")
         .eq("after_party_enabled", true)
+        .eq("city", "Atlanta") // MVP: Atlanta only
         .gte("start_at", new Date().toISOString())
         .order("start_at", { ascending: true });
 
@@ -72,16 +69,15 @@ const FindAfterParty = () => {
     },
   });
 
-  // Filter events client-side
+  // Filter events client-side (only genre filter now)
   const filteredEvents = useMemo(() => {
     if (!events) return [];
     return events.filter((event) => {
-      const matchesCity = !cityFilter || event.city === cityFilter;
       const matchesGenre =
         !genreFilter || (event.genres && event.genres.includes(genreFilter));
-      return matchesCity && matchesGenre;
+      return matchesGenre;
     });
-  }, [events, cityFilter, genreFilter]);
+  }, [events, genreFilter]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -112,18 +108,10 @@ const FindAfterParty = () => {
 
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-3 mb-8">
-            <select
-              value={cityFilter}
-              onChange={(e) => setCityFilter(e.target.value)}
-              className="h-10 rounded-md border-2 border-primary bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus:bg-primary/10 [&>option]:bg-background [&>option]:text-foreground [&>option:hover]:bg-primary [&>option:checked]:bg-primary/20"
-            >
-              <option value="">All Cities</option>
-              {CITY_OPTIONS.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
+            {/* Static Atlanta label */}
+            <span className="h-10 inline-flex items-center rounded-md border-2 border-primary/50 bg-primary/10 px-3 py-2 text-base font-sans text-primary">
+              Atlanta only (for now)
+            </span>
 
             <select
               value={genreFilter}
@@ -138,17 +126,14 @@ const FindAfterParty = () => {
               ))}
             </select>
 
-            {(cityFilter || genreFilter) && (
+            {genreFilter && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  setCityFilter("");
-                  setGenreFilter("");
-                }}
+                onClick={() => setGenreFilter("")}
                 className="text-foreground hover:text-primary"
               >
-                Clear Filters
+                Clear Filter
               </Button>
             )}
           </div>
@@ -159,25 +144,13 @@ const FindAfterParty = () => {
           ) : !filteredEvents || filteredEvents.length === 0 ? (
             <div className="text-center py-16 px-4">
               <div className="max-w-md mx-auto">
-                {cityFilter ? (
-                  <>
-                    <h2 className="font-display text-2xl text-foreground mb-3">
-                      Be the first to throw a GoLokol After Party in {cityFilter}.
-                    </h2>
-                    <p className="text-muted-foreground mb-6">
-                      No After Parties scheduled yet—create one and bring your fans together.
-                    </p>
-                    <Link to="/create-afterparty">
-                      <Button size="lg">Create an After Party</Button>
-                    </Link>
-                  </>
-                ) : events && events.length > 0 ? (
+                {events && events.length > 0 && genreFilter ? (
                   <>
                     <h2 className="font-display text-2xl text-foreground mb-3">
                       No matches found
                     </h2>
                     <p className="text-muted-foreground mb-6">
-                      Try adjusting your filters or create your own After Party.
+                      Try adjusting your filter or create your own After Party.
                     </p>
                     <Link to="/create-afterparty">
                       <Button size="lg">Create an After Party</Button>
@@ -186,10 +159,10 @@ const FindAfterParty = () => {
                 ) : (
                   <>
                     <h2 className="font-display text-2xl text-foreground mb-3">
-                      No upcoming After Parties yet
+                      Be the first to throw a GoLokol After Party in Atlanta.
                     </h2>
                     <p className="text-muted-foreground mb-6">
-                      Be the first to create one and start building your fan community.
+                      No After Parties scheduled yet—create one and bring your fans together.
                     </p>
                     <Link to="/create-afterparty">
                       <Button size="lg">Create an After Party</Button>
