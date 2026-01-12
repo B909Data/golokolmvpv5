@@ -897,20 +897,48 @@ const WelcomeDashboard = ({
       }
 
       // Convert canvas to blob and download
-      canvas.toBlob((blob) => {
+      canvas.toBlob(async (blob) => {
         if (!blob) {
           toast.error("Failed to create badge image");
           setIsDownloading(false);
           return;
         }
+        
+        const safeTitle = eventTitle.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+        const fileName = `golokol-badge-${safeTitle}.png`;
+        
+        // On mobile, use Web Share API to trigger native "Save to Photos" behavior
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        if (isMobile && navigator.share && navigator.canShare) {
+          try {
+            const file = new File([blob], fileName, { type: "image/png" });
+            const shareData = { files: [file] };
+            
+            if (navigator.canShare(shareData)) {
+              await navigator.share(shareData);
+              toast.success("Badge saved to photos!");
+              setIsDownloading(false);
+              return;
+            }
+          } catch (shareError: any) {
+            // User cancelled or share failed - fall through to standard download
+            if (shareError.name === "AbortError") {
+              setIsDownloading(false);
+              return;
+            }
+            console.log("Share API failed, falling back to download:", shareError);
+          }
+        }
+        
+        // Desktop fallback: standard download
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        const safeTitle = eventTitle.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
-        link.download = `golokol-badge-${safeTitle}.png`;
+        link.download = fileName;
         link.href = url;
         link.click();
         URL.revokeObjectURL(url);
-        toast.success("Badge saved to photos!");
+        toast.success("Badge saved!");
         setIsDownloading(false);
       }, "image/png");
     } catch (error) {
