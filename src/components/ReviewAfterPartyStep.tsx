@@ -20,12 +20,16 @@ interface ReviewAfterPartyStepProps {
   };
   isConfirmed: boolean;
   onConfirmChange: (checked: boolean) => void;
+  isTermsAccepted: boolean;
+  onTermsChange: (checked: boolean) => void;
 }
 
 const ReviewAfterPartyStep = ({
   formData,
   isConfirmed,
   onConfirmChange,
+  isTermsAccepted,
+  onTermsChange,
 }: ReviewAfterPartyStepProps) => {
   // Combine date and time for preview
   const getStartAtISO = (): string => {
@@ -98,6 +102,30 @@ const ReviewAfterPartyStep = ({
           className="text-primary-foreground text-sm font-sans cursor-pointer leading-tight"
         >
           I confirm this is accurate and ready to publish.
+        </Label>
+      </div>
+
+      {/* Terms Checkbox */}
+      <div className="flex items-start gap-3 pt-2">
+        <Checkbox
+          id="accept-terms"
+          checked={isTermsAccepted}
+          onCheckedChange={(checked) => onTermsChange(checked === true)}
+          className="mt-0.5 border-primary-foreground/50 data-[state=checked]:bg-background data-[state=checked]:text-primary"
+        />
+        <Label
+          htmlFor="accept-terms"
+          className="text-primary-foreground text-sm font-sans cursor-pointer leading-tight"
+        >
+          I agree to GoLokol's{" "}
+          <a
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-white"
+          >
+            Terms of Service and Community Guidelines
+          </a>
         </Label>
       </div>
     </div>

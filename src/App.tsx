@@ -32,6 +32,8 @@ import AdminCities from "./pages/AdminCities";
 import ArtistEvent from "./pages/ArtistEvent";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +72,8 @@ const App = () => (
           <Route path="/checkin/:qr_token" element={<Checkin />} />
           <Route path="/submit-song" element={<SubmitSong />} />
           <Route path="/how-to-golokol" element={<HowToGoLokol />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="/q/:code" element={<ShortLinkRedirect />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
