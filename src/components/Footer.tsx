@@ -37,6 +37,16 @@ const Footer = () => {
                   Submit Song
                 </Link>
               </li>
+              <li>
+                <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">
+                  Terms
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+                  Privacy
+                </Link>
+              </li>
             </ul>
           </div>
 

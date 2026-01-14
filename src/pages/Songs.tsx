@@ -91,7 +91,13 @@ const Songs = () => {
                     {isLoadingTicket ? "Loading..." : "Buy a Ticket"}
                     <ArrowRight className="h-5 w-5" />
                   </Button>
-                  <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$15 limited capacity</p>
+                  <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$15 limited capacity - No subscription.</p>
+                  <p className="text-[hsl(0,0%,50%)] text-xs mt-1">
+                    By proceeding, you agree to GoLokol's{" "}
+                    <Link to="/terms" className="underline hover:text-[hsl(0,0%,30%)]">Terms</Link>
+                    {" & "}
+                    <Link to="/privacy" className="underline hover:text-[hsl(0,0%,30%)]">Privacy</Link>
+                  </p>
                 </div>
               </div>
             </div>

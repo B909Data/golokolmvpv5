@@ -192,7 +192,13 @@ const SubmitSong = () => {
                   {isSubmitting ? "Loading..." : "Submit & Pay ($5)"}
                 </Button>
                 <p className="text-xs text-[hsl(0,0%,40%)] mt-3">
-                  You'll be redirected to Stripe to complete payment. Submission fee is $5 USD.
+                  You'll be redirected to Stripe to complete payment. Submission fee is $5 USD. No subscription.
+                </p>
+                <p className="text-xs text-[hsl(0,0%,50%)] mt-1">
+                  By proceeding, you agree to GoLokol's{" "}
+                  <Link to="/terms" className="underline hover:text-[hsl(0,0%,30%)]">Terms</Link>
+                  {" & "}
+                  <Link to="/privacy" className="underline hover:text-[hsl(0,0%,30%)]">Privacy</Link>
                 </p>
               </div>
             </form>

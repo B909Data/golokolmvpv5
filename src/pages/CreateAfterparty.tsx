@@ -204,6 +204,7 @@ const CreateAfterparty = () => {
   
   // Review step confirmation state
   const [isReviewConfirmed, setIsReviewConfirmed] = useState(false);
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
   const toggleGenre = (genre: string) => {
     const current = selectedGenres;
@@ -283,6 +284,7 @@ const CreateAfterparty = () => {
       // Reset confirmation when moving to review step
       if (currentStep === 3) {
         setIsReviewConfirmed(false);
+        setIsTermsAccepted(false);
       }
       setCurrentStep((prev) => Math.min(prev + 1, 4));
     }
@@ -945,6 +947,8 @@ const CreateAfterparty = () => {
           }}
           isConfirmed={isReviewConfirmed}
           onConfirmChange={setIsReviewConfirmed}
+          isTermsAccepted={isTermsAccepted}
+          onTermsChange={setIsTermsAccepted}
         />
 
         {/* Discount Code Input */}
@@ -1011,7 +1015,7 @@ const CreateAfterparty = () => {
         <Button
           type="submit"
           className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-          disabled={isSubmitting || isUploading || !isReviewConfirmed}
+          disabled={isSubmitting || isUploading || !isReviewConfirmed || !isTermsAccepted}
         >
           {isSubmitting || isUploading ? (
             <>
