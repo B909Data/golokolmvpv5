@@ -845,7 +845,7 @@ const CreateAfterparty = () => {
         ) : (
           <div className="space-y-3">
             <Label className="text-primary-foreground text-base font-sans">
-              Upload Show Flyer <span className="text-primary-foreground/60">(recommended)</span>
+              Upload Show Flyer *
             </Label>
             
             {!selectedFile ? (
