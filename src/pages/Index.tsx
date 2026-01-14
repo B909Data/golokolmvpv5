@@ -78,12 +78,14 @@ const Index = () => {
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
+                {/* Hidden until we have traction:
                 <Link to="/find-after-party">
                   <Button size="lg">
                     Find an After Party
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
+                */}
               </div>
               <p className="text-foreground text-base font-medium">This is how you build a fanbase that feels like community.</p>
             </div>
