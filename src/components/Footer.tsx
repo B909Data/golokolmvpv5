@@ -23,8 +23,8 @@ const Footer = () => {
             <h4 className="font-display text-lg text-foreground mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/shows" className="text-muted-foreground hover:text-primary transition-colors">
-                  Upcoming Shows
+                <Link to="/songs" className="text-muted-foreground hover:text-primary transition-colors">
+                  Lokol Listening Sessions
                 </Link>
               </li>
               <li>
