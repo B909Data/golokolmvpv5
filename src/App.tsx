@@ -35,6 +35,7 @@ import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Partners from "./pages/Partners";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => (
           <Route path="/how-to-golokol" element={<HowToGoLokol />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/partners" element={<Partners />} />
           <Route path="/q/:code" element={<ShortLinkRedirect />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
