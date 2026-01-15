@@ -174,7 +174,7 @@ const AfterPartyPass = () => {
           </div>
 
           {/* QR Code Card */}
-          <div className="bg-card border-2 border-primary rounded-xl p-6 mb-6">
+          <div className="bg-card border-2 border-primary rounded-xl p-6 mb-6" data-ph-mask>
             <div className="flex flex-col items-center">
               {/* Attendee Name */}
               {attendee.display_name && (

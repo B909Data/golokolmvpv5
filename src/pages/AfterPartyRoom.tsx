@@ -1017,7 +1017,7 @@ const WelcomeDashboard = ({
         )}
 
         {/* Section C: Email Opt-in */}
-        <div className="bg-[#1A1A1A] border border-border/30 rounded-xl p-5">
+        <div className="bg-[#1A1A1A] border border-border/30 rounded-xl p-5" data-ph-mask>
           <div className="flex items-center gap-2 mb-3">
             <Mail size={16} className="text-primary" />
             <h3 className="font-sans font-medium text-foreground text-sm">
@@ -1259,7 +1259,7 @@ const ChatView = ({
       )}
 
       {/* Message Feed */}
-      <main className="flex-1 overflow-y-auto px-4 py-4">
+      <main className="flex-1 overflow-y-auto px-4 py-4" data-ph-mask>
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
