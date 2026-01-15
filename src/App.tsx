@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import PostHogPageview from "./components/PostHogPageview";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
 import Songs from "./pages/Songs";
@@ -43,6 +44,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <PostHogPageview />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/shows" element={<Shows />} />
