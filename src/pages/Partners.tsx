@@ -1,0 +1,222 @@
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+const Partners = () => {
+  return (
+    <div className="min-h-screen flex flex-col bg-[hsl(60,10%,95%)]">
+      <Navbar />
+
+      <main className="flex-1 pt-24 pb-20">
+        {/* Hero Section */}
+        <section className="w-full mb-20">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-[hsl(0,0%,10%)] mb-6 leading-tight">
+              Turn the moment after the show into something that lasts.
+            </h1>
+            <p className="text-[hsl(0,0%,20%)] text-xl md:text-2xl font-sans mb-4 max-w-3xl">
+              GoLokol After Parties give artists a private, 24-hour space to connect with fans who actually showed up.
+            </p>
+            <p className="text-[hsl(0,0%,50%)] text-sm font-sans">
+              No feeds. No algorithms. No ongoing management.
+            </p>
+          </div>
+          <div className="w-full mt-12 bg-[hsl(0,0%,85%)] h-64 md:h-80 lg:h-96 flex items-center justify-center">
+            <span className="text-[hsl(0,0%,60%)] text-sm font-sans italic">
+              Full-width image: Small venue crowd or post-show moment
+            </span>
+          </div>
+        </section>
+
+        {/* Why This Matters Section */}
+        <section className="container mx-auto px-4 max-w-4xl mb-20">
+          <div className="border-t border-[hsl(50,100%,50%)] pt-12">
+            <h2 className="font-display text-2xl md:text-3xl text-[hsl(0,0%,10%)] mb-6">
+              Why This Matters for Curators and Venues
+            </h2>
+            <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-6 max-w-2xl">
+              When a show ends, momentum usually disappears.<br />
+              After Parties keep it alive — without adding work.
+            </p>
+            <ul className="space-y-3 text-[hsl(0,0%,30%)] font-sans mb-8">
+              <li className="flex items-start gap-3">
+                <span className="text-[hsl(50,100%,40%)] mt-1">—</span>
+                <span>Artists leave with real fan connections, not just applause</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-[hsl(50,100%,40%)] mt-1">—</span>
+                <span>Fans feel recognized for showing up</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-[hsl(50,100%,40%)] mt-1">—</span>
+                <span>Your nights become more memorable and repeatable</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-[hsl(50,100%,40%)] mt-1">—</span>
+                <span>You support artists without changing how you book or promote</span>
+              </li>
+            </ul>
+            <div className="bg-[hsl(0,0%,85%)] h-48 md:h-64 flex items-center justify-center rounded-sm">
+              <span className="text-[hsl(0,0%,60%)] text-sm font-sans italic">
+                Image: Artist talking to fans after a show or at a merch table
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section className="container mx-auto px-4 max-w-4xl mb-20">
+          <div className="border-t border-[hsl(50,100%,50%)] pt-12">
+            <h2 className="font-display text-2xl md:text-3xl text-[hsl(0,0%,10%)] mb-2">
+              How GoLokol After Parties Work
+            </h2>
+            <p className="text-[hsl(0,0%,50%)] text-sm font-sans mb-8">
+              Simple by design.
+            </p>
+            <ol className="space-y-6 text-[hsl(0,0%,30%)] font-sans mb-8">
+              <li className="flex items-start gap-4">
+                <span className="font-display text-2xl text-[hsl(0,0%,10%)]">1.</span>
+                <span className="text-lg pt-1">An artist sets up an After Party. It takes under a minute.</span>
+              </li>
+              <li className="flex items-start gap-4">
+                <span className="font-display text-2xl text-[hsl(0,0%,10%)]">2.</span>
+                <span className="text-lg pt-1">Fans who attended the show join after it ends.</span>
+              </li>
+              <li className="flex items-start gap-4">
+                <span className="font-display text-2xl text-[hsl(0,0%,10%)]">3.</span>
+                <span className="text-lg pt-1">The space closes automatically after 24 hours.</span>
+              </li>
+            </ol>
+            <div className="space-y-1 text-[hsl(0,0%,50%)] text-sm font-sans">
+              <p>No moderation required.</p>
+              <p>No long-term chats.</p>
+              <p>No extra tools to manage.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* How Partners Use GoLokol Section */}
+        <section className="container mx-auto px-4 max-w-4xl mb-20">
+          <div className="border-t border-[hsl(50,100%,50%)] pt-12">
+            <h2 className="font-display text-2xl md:text-3xl text-[hsl(0,0%,10%)] mb-6">
+              How Partners Use GoLokol
+            </h2>
+            <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-6 max-w-2xl">
+              As a curator or venue, you can choose to offer After Party credits to artists you book.
+            </p>
+            <ul className="space-y-3 text-[hsl(0,0%,30%)] font-sans mb-8">
+              <li className="flex items-start gap-3">
+                <span className="text-[hsl(50,100%,40%)] mt-1">—</span>
+                <span>You decide when to offer them</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-[hsl(50,100%,40%)] mt-1">—</span>
+                <span>You control how many you give each month</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-[hsl(50,100%,40%)] mt-1">—</span>
+                <span>Artists activate them on their own</span>
+              </li>
+            </ul>
+            <p className="text-[hsl(0,0%,30%)] text-lg font-sans italic mb-8">
+              Think of it as hosting the after-show moment — not managing it.
+            </p>
+            <div className="bg-[hsl(0,0%,85%)] h-48 md:h-64 flex items-center justify-center rounded-sm">
+              <span className="text-[hsl(0,0%,60%)] text-sm font-sans italic">
+                Image: Backstage or green room moment
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* Artists Stay in Control Section */}
+        <section className="container mx-auto px-4 max-w-4xl mb-20">
+          <div className="border-t border-[hsl(50,100%,50%)] pt-12">
+            <h2 className="font-display text-2xl md:text-3xl text-[hsl(0,0%,10%)] mb-6">
+              Artists Stay in Control
+            </h2>
+            <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-4 max-w-2xl">
+              Artists can also create After Parties on their own — for any show, anywhere.
+            </p>
+            <p className="text-[hsl(0,0%,30%)] text-lg font-sans max-w-2xl">
+              Partner credits simply introduce the experience.<br />
+              Artists decide how and when to use it again.
+            </p>
+          </div>
+        </section>
+
+        {/* Built for Real Scenes Section */}
+        <section className="container mx-auto px-4 max-w-4xl mb-20">
+          <div className="border-t border-[hsl(50,100%,50%)] pt-12">
+            <h2 className="font-display text-2xl md:text-3xl text-[hsl(0,0%,10%)] mb-6">
+              Built for Real Scenes
+            </h2>
+            <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-4 max-w-2xl">
+              GoLokol is designed for independent venues, curated shows, and artists building community — not chasing algorithms.
+            </p>
+            <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-8">
+              It works best where culture already exists.
+            </p>
+            <div className="bg-[hsl(0,0%,85%)] h-48 md:h-64 flex items-center justify-center rounded-sm">
+              <span className="text-[hsl(0,0%,60%)] text-sm font-sans italic">
+                Image: Wide shot of an intimate local venue or scene
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* Closing Section */}
+        <section className="container mx-auto px-4 max-w-4xl">
+          <div className="border-t border-[hsl(50,100%,50%)] pt-12">
+            <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-8 max-w-2xl">
+              We keep partnerships simple and limited by design.
+            </p>
+            <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-6">
+              If you are a curator or venue interested in offering After Party credits to your artists:
+            </p>
+            <div className="space-y-3 text-[hsl(0,0%,30%)] font-sans mb-8">
+              <p>
+                <a 
+                  href="https://golokol.app" 
+                  className="underline hover:text-[hsl(0,0%,10%)] transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Visit golokol.app
+                </a>
+                {" "}to learn more.
+              </p>
+              <p>
+                DM us{" "}
+                <a 
+                  href="https://instagram.com/golokolmusic" 
+                  className="underline hover:text-[hsl(0,0%,10%)] transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  @golokolmusic
+                </a>
+                {" "}on Instagram.
+              </p>
+              <p>
+                Email{" "}
+                <a 
+                  href="mailto:hw@golokol.app" 
+                  className="underline hover:text-[hsl(0,0%,10%)] transition-colors"
+                >
+                  hw@golokol.app
+                </a>
+              </p>
+            </div>
+            <p className="text-[hsl(0,0%,50%)] text-sm font-sans">
+              No long-term commitments. No required promotion. No pressure.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default Partners;
