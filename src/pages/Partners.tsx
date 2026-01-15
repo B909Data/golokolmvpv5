@@ -1,5 +1,9 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import partnersHero from "@/assets/partners-hero.jpg";
+import partnersSection2 from "@/assets/partners-section2.jpg";
+import partnersSection3 from "@/assets/partners-section3.jpg";
+import partnersSection4 from "@/assets/partners-section4.jpg";
 
 const Partners = () => {
   return (
@@ -20,10 +24,12 @@ const Partners = () => {
               No feeds. No algorithms. No ongoing management.
             </p>
           </div>
-          <div className="w-full mt-12 bg-[hsl(0,0%,85%)] h-64 md:h-80 lg:h-96 flex items-center justify-center">
-            <span className="text-[hsl(0,0%,60%)] text-sm font-sans italic">
-              Full-width image: Small venue crowd or post-show moment
-            </span>
+          <div className="w-full mt-12 h-64 md:h-80 lg:h-96 overflow-hidden">
+            <img 
+              src={partnersHero} 
+              alt="Small venue crowd in a post-show moment" 
+              className="w-full h-full object-cover"
+            />
           </div>
         </section>
 
@@ -55,10 +61,12 @@ const Partners = () => {
                 <span>You support artists without changing how you book or promote</span>
               </li>
             </ul>
-            <div className="bg-[hsl(0,0%,85%)] h-48 md:h-64 flex items-center justify-center rounded-sm">
-              <span className="text-[hsl(0,0%,60%)] text-sm font-sans italic">
-                Image: Artist talking to fans after a show or at a merch table
-              </span>
+            <div className="h-48 md:h-64 overflow-hidden rounded-sm">
+              <img 
+                src={partnersSection2} 
+                alt="Artist talking to fans after a show" 
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </section>
@@ -120,10 +128,12 @@ const Partners = () => {
             <p className="text-[hsl(0,0%,30%)] text-lg font-sans italic mb-8">
               Think of it as hosting the after-show moment — not managing it.
             </p>
-            <div className="bg-[hsl(0,0%,85%)] h-48 md:h-64 flex items-center justify-center rounded-sm">
-              <span className="text-[hsl(0,0%,60%)] text-sm font-sans italic">
-                Image: Backstage or green room moment
-              </span>
+            <div className="h-48 md:h-64 overflow-hidden rounded-sm">
+              <img 
+                src={partnersSection3} 
+                alt="Backstage conversation moment" 
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </section>
@@ -156,10 +166,12 @@ const Partners = () => {
             <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-8">
               It works best where culture already exists.
             </p>
-            <div className="bg-[hsl(0,0%,85%)] h-48 md:h-64 flex items-center justify-center rounded-sm">
-              <span className="text-[hsl(0,0%,60%)] text-sm font-sans italic">
-                Image: Wide shot of an intimate local venue or scene
-              </span>
+            <div className="h-48 md:h-64 overflow-hidden rounded-sm">
+              <img 
+                src={partnersSection4} 
+                alt="Intimate local venue with live music" 
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </section>
