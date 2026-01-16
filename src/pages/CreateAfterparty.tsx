@@ -129,6 +129,10 @@ const CreateAfterparty = () => {
   
   // Step 4 curator selection (for discount code purposes)
   const [step4CuratorId, setStep4CuratorId] = useState<string>("none");
+  
+  // Confirmation email state (optional, for MailerLite)
+  const [confirmationEmail, setConfirmationEmail] = useState<string>("");
+  const [emailSentConfirmation, setEmailSentConfirmation] = useState<boolean>(false);
 
   // Partners and cities state
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -396,6 +400,8 @@ const CreateAfterparty = () => {
         venue_id: data.venue_id && data.venue_id !== "other" ? data.venue_id : undefined,
         // Manual text field for "other" venue selection
         venue_other_name: data.venue_id === "other" ? data.venue_other_name : undefined,
+        // Optional confirmation email for MailerLite
+        confirmation_email: confirmationEmail.trim() || undefined,
       };
 
       // Add discount code if valid
@@ -456,7 +462,12 @@ const CreateAfterparty = () => {
 
       // Handle free listing - redirect directly to artist control room
       if (isFree && response?.artist_access_token) {
-        toast.success("Your free listing is live!");
+        // Show email confirmation if sent
+        if (response?.email_sent) {
+          toast.success("Your free listing is live! Confirmation email sent.");
+        } else {
+          toast.success("Your free listing is live!");
+        }
         navigate(`/artist/event/${eventId}?token=${response.artist_access_token}&welcome=true`);
         return;
       }
@@ -979,6 +990,23 @@ const CreateAfterparty = () => {
               )}
             </div>
           )}
+
+          {/* Confirmation Email - optional */}
+          <div className="space-y-2 pt-4 border-t border-primary-foreground/20">
+            <Label className="text-primary-foreground text-base font-sans">
+              Email for confirmation (optional)
+            </Label>
+            <Input
+              type="email"
+              value={confirmationEmail}
+              onChange={(e) => setConfirmationEmail(e.target.value)}
+              placeholder="you@domain.com"
+              className="h-12 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
+            />
+            <p className="text-xs text-muted-foreground font-sans">
+              We'll send you a confirmation with your control room and share links.
+            </p>
+          </div>
         </div>
       </div>
     );

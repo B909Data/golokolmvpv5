@@ -24,6 +24,92 @@ interface AfterPartyFormData {
   venue_id?: string;
   curator_other_name?: string;
   venue_other_name?: string;
+  // Optional email for MailerLite confirmation
+  confirmation_email?: string;
+}
+
+// Helper to send MailerLite notification (non-blocking)
+async function sendMailerLiteNotification(
+  eventId: string,
+  email: string,
+  artistAccessToken: string,
+  artistName?: string,
+  eventTitle?: string
+): Promise<void> {
+  try {
+    const baseUrl = "https://golokol.app";
+    const artistControlUrl = `${baseUrl}/artist/event/${eventId}?token=${artistAccessToken}`;
+    const afterPartyShareUrl = `${baseUrl}/after-party/${eventId}/rsvp`;
+
+    const apiKey = Deno.env.get("MAILERLITE_API_KEY");
+    const groupId = Deno.env.get("MAILERLITE_GROUP_ID_AFTER_PARTY_CREATED");
+
+    if (!apiKey || !groupId) {
+      console.log("MailerLite not configured, skipping notification");
+      return;
+    }
+
+    // Upsert subscriber
+    const subscriberPayload: Record<string, unknown> = {
+      email,
+      fields: {
+        artist_control_url: artistControlUrl,
+        after_party_share_url: afterPartyShareUrl,
+      },
+    };
+
+    if (artistName) {
+      subscriberPayload.fields = { ...subscriberPayload.fields as object, name: artistName };
+    }
+    if (eventTitle) {
+      subscriberPayload.fields = { ...subscriberPayload.fields as object, event_title: eventTitle };
+    }
+
+    console.log("Sending MailerLite notification to:", email);
+
+    const upsertResponse = await fetch("https://connect.mailerlite.com/api/subscribers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(subscriberPayload),
+    });
+
+    const upsertData = await upsertResponse.json();
+    
+    if (!upsertResponse.ok) {
+      console.error("MailerLite upsert error:", upsertData);
+      return;
+    }
+
+    const subscriberId = upsertData.data?.id;
+    if (!subscriberId) {
+      console.error("No subscriber ID returned");
+      return;
+    }
+
+    // Add to group
+    const groupResponse = await fetch(
+      `https://connect.mailerlite.com/api/subscribers/${subscriberId}/groups/${groupId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
+      }
+    );
+
+    if (groupResponse.ok) {
+      console.log("MailerLite notification sent successfully");
+    } else {
+      const groupError = await groupResponse.json();
+      console.error("MailerLite group add error:", groupError);
+    }
+  } catch (err) {
+    console.error("MailerLite notification error (non-blocking):", err);
+  }
 }
 
 serve(async (req) => {
@@ -147,10 +233,22 @@ serve(async (req) => {
 
       console.log("Free listing activated for event:", event.id, "using code:", validatedCode);
 
+      // Send MailerLite notification (non-blocking) if confirmation email provided
+      if (formData.confirmation_email) {
+        sendMailerLiteNotification(
+          event.id,
+          formData.confirmation_email,
+          token,
+          formData.artist_name,
+          formData.title
+        ).catch(err => console.error("MailerLite error (non-blocking):", err));
+      }
+
       return new Response(JSON.stringify({ 
         free: true, 
         event_id: event.id,
-        artist_access_token: token 
+        artist_access_token: token,
+        email_sent: !!formData.confirmation_email
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -176,6 +274,9 @@ serve(async (req) => {
       metadata: {
         event_id: event.id,
         discount_code: validatedCode || "",
+        confirmation_email: formData.confirmation_email || "",
+        artist_name: formData.artist_name || "",
+        event_title: formData.title || "",
       },
       customer_email: formData.contact_email,
     };

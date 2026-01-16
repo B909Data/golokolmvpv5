@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 interface EventData {
   id: string;
@@ -45,6 +46,10 @@ const CreateAfterpartySuccess = () => {
         
         // Redirect immediately to Artist Control Room
         if (event?.id && event?.artist_access_token) {
+          // Show email confirmation toast if sent
+          if (data?.email_sent) {
+            toast.success("Confirmation email sent.");
+          }
           navigate(`/artist/event/${event.id}?token=${event.artist_access_token}&welcome=true`, { replace: true });
         } else {
           setError("Missing event data");
