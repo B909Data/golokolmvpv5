@@ -15,7 +15,7 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-muted-foreground max-w-sm">
-              Connecting local bands with their community. Discover shows, create afterparties, and support your local music scene.
+              Make every show count. We help emerging artists cultivate fanbases that show up by rewarding those fans who do.
             </p>
           </div>
 
@@ -23,18 +23,13 @@ const Footer = () => {
             <h4 className="font-display text-lg text-foreground mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
+                <Link to="/create-afterparty" className="text-muted-foreground hover:text-primary transition-colors">
+                  Create an After Party
+                </Link>
+              </li>
+              <li>
                 <Link to="/songs" className="text-muted-foreground hover:text-primary transition-colors">
                   Lokol Listening Sessions
-                </Link>
-              </li>
-              <li>
-                <Link to="/create-afterparty" className="text-muted-foreground hover:text-primary transition-colors">
-                  Create Event
-                </Link>
-              </li>
-              <li>
-                <Link to="/submit-song" className="text-muted-foreground hover:text-primary transition-colors">
-                  Submit Song
                 </Link>
               </li>
               <li>
@@ -46,6 +41,11 @@ const Footer = () => {
                 <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
                   Privacy
                 </Link>
+              </li>
+              <li>
+                <a href="mailto:backstage@golokol.app" className="text-muted-foreground hover:text-primary transition-colors">
+                  Contact
+                </a>
               </li>
             </ul>
           </div>
