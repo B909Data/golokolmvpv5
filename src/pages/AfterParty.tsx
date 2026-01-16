@@ -22,7 +22,6 @@ const AfterParty = () => {
   const navigate = useNavigate();
   const [joinError, setJoinError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
-  const [phone, setPhone] = useState("");
   const [displayName, setDisplayName] = useState("");
 
   // Check if already joined
@@ -38,13 +37,8 @@ const AfterParty = () => {
   const handleJoinAfterParty = async () => {
     if (!eventId) return;
     
-    const trimmedPhone = phone.trim();
     const trimmedName = displayName.trim();
     
-    if (!trimmedPhone) {
-      setJoinError("Phone number is required");
-      return;
-    }
     if (!trimmedName) {
       setJoinError("Display name is required");
       return;
@@ -58,7 +52,6 @@ const AfterParty = () => {
       .insert({ 
         event_id: eventId, 
         checkin_method: "qr",
-        phone: trimmedPhone,
         display_name: trimmedName
       })
       .select("id")
@@ -135,7 +128,7 @@ const AfterParty = () => {
     }
   })();
 
-  const isFormValid = phone.trim() && displayName.trim();
+  const isFormValid = displayName.trim().length > 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -159,17 +152,7 @@ const AfterParty = () => {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 disabled={isJoining}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="Enter your phone number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                disabled={isJoining}
+                autoFocus
               />
             </div>
           </div>
