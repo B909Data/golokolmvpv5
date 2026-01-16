@@ -751,6 +751,7 @@ const AfterPartyRoom = () => {
             merchLink={event.merch_link}
             musicLink={event.music_link}
             isExpired={isExpired}
+            afterPartyOpensAt={event.after_party_opens_at}
             onGoToChat={() => setViewMode("chat")}
           />
         </div>
@@ -817,8 +818,56 @@ interface WelcomeDashboardProps {
   merchLink: string | null;
   musicLink: string | null;
   isExpired?: boolean;
+  afterPartyOpensAt: string | null;
   onGoToChat: () => void;
 }
+
+// Real-time countdown hook for fan view
+const useRealTimeCountdown = (afterPartyOpensAt: string | null) => {
+  const [countdown, setCountdown] = useState<string>("24:00:00");
+  const [hasStarted, setHasStarted] = useState(false);
+  const [isExpiredLocal, setIsExpiredLocal] = useState(false);
+
+  useEffect(() => {
+    if (!afterPartyOpensAt) {
+      setCountdown("24:00:00");
+      setHasStarted(false);
+      setIsExpiredLocal(false);
+      return;
+    }
+
+    setHasStarted(true);
+
+    const calculateCountdown = () => {
+      const openTime = new Date(afterPartyOpensAt).getTime();
+      const endTime = openTime + 24 * 60 * 60 * 1000; // 24 hours after opening
+      const now = Date.now();
+      const remaining = endTime - now;
+
+      if (remaining <= 0) {
+        setCountdown("00:00:00");
+        setIsExpiredLocal(true);
+        return;
+      }
+
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+      setCountdown(
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+      );
+      setIsExpiredLocal(false);
+    };
+
+    calculateCountdown();
+    const interval = setInterval(calculateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [afterPartyOpensAt]);
+
+  return { countdown, hasStarted, isExpiredLocal };
+};
 
 const WelcomeDashboard = ({
   artistName,
@@ -831,12 +880,14 @@ const WelcomeDashboard = ({
   merchLink,
   musicLink,
   isExpired = false,
+  afterPartyOpensAt,
   onGoToChat,
 }: WelcomeDashboardProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [email, setEmail] = useState("");
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const { countdown, hasStarted, isExpiredLocal } = useRealTimeCountdown(afterPartyOpensAt);
 
   const handleEmailSubmit = async () => {
     if (!email.trim() || !eventId) return;
@@ -1179,6 +1230,21 @@ const WelcomeDashboard = ({
           <h3 className="font-display font-bold text-foreground text-lg mb-3">
             House Rules
           </h3>
+          
+          {/* Real-time Countdown - Roboto Bold for numeric displays */}
+          <div className="bg-black/50 rounded-lg p-3 mb-4 flex items-center justify-between border border-primary/20">
+            <div className="flex items-center gap-2">
+              <Clock size={18} className="text-primary" />
+              <span className="text-muted-foreground font-sans text-sm">Time Left</span>
+            </div>
+            <span 
+              className="text-primary text-xl font-bold" 
+              style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700 }}
+            >
+              {isExpiredLocal ? "After Party ended" : (hasStarted ? countdown : "24:00:00")}
+            </span>
+          </div>
+          
           <ul className="space-y-2 text-muted-foreground font-sans text-sm">
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
@@ -1195,10 +1261,6 @@ const WelcomeDashboard = ({
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
               <span>No spam or self-promotion</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">•</span>
-              <span>{roomClosureInfo || "This room stays open for 24 hours"}</span>
             </li>
           </ul>
         </div>

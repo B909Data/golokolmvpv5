@@ -51,6 +51,7 @@ interface Message {
 }
 
 // Status Card Component - Compact inline style
+// Uses Roboto Bold for numeric/stat displays to prevent Grotesk rendering issues
 const StatusCard = ({ icon: Icon, label, value, accent = false }: { 
   icon: React.ElementType; 
   label: string; 
@@ -61,7 +62,7 @@ const StatusCard = ({ icon: Icon, label, value, accent = false }: {
     <Icon className={`w-5 h-5 ${accent ? 'text-primary-foreground' : 'text-primary'}`} />
     <div>
       <p className={`text-base font-sans uppercase tracking-wide ${accent ? 'text-primary-foreground/80' : 'text-primary/70'}`}>{label}</p>
-      <p className={`text-xl font-display font-bold ${accent ? 'text-primary-foreground' : 'text-primary'}`}>{value}</p>
+      <p className={`text-xl font-sans font-bold ${accent ? 'text-primary-foreground' : 'text-primary'}`} style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700 }}>{value}</p>
     </div>
   </div>
 );
