@@ -8,6 +8,7 @@ import { format, differenceInDays, addDays, isAfter } from "date-fns";
 import { Send, MessageCircle, Home, Pin, ChevronLeft, Users, Download, Settings, ShoppingBag, Music, Mail, Clock } from "lucide-react";
 import { extractYouTubeId } from "@/lib/youtube";
 import { toast } from "sonner";
+import NoReentryOverlay from "@/components/NoReentryOverlay";
 
 import badgeFrame from "@/assets/golokol-badge-frame.svg";
 
@@ -75,6 +76,7 @@ const AfterPartyRoom = () => {
   const [messageText, setMessageText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [accessError, setAccessError] = useState<string | null>(null);
+  const [showNoReentryOverlay, setShowNoReentryOverlay] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatScrollRef = useRef<number>(0);
   const artistJoinedRef = useRef<boolean>(false); // Guard for artist join message
@@ -268,7 +270,20 @@ const AfterPartyRoom = () => {
     enabled: false, // Disabled - we'll use component state instead
   });
 
-  // Post system message when artist joins (once per session)
+  // Check if no-reentry overlay should be shown (for fans only, once per event per browser)
+  useEffect(() => {
+    if (isPrivilegedMode || !eventId) return;
+    
+    // Only show after attendee is confirmed checked in
+    if (!attendeeData?.checked_in_at) return;
+    
+    const seenKey = `afterPartyNoReentrySeen_${eventId}`;
+    if (!localStorage.getItem(seenKey)) {
+      setShowNoReentryOverlay(true);
+    }
+  }, [isPrivilegedMode, eventId, attendeeData?.checked_in_at]);
+
+  // Post system message when artist joins (once per session) + send SMS
   useEffect(() => {
     if (!isArtistMode || !eventId || !event || artistJoinedRef.current) return;
 
@@ -326,6 +341,26 @@ const AfterPartyRoom = () => {
           sessionStorage.setItem(sessionKey, "true");
           artistJoinedRef.current = true;
           refetchMessages();
+          
+          // Send SMS to all attendees with phone numbers
+          try {
+            const { data: smsResult, error: smsError } = await supabase.functions.invoke(
+              "send-artist-entered-sms",
+              {
+                body: {
+                  event_id: eventId,
+                  token: artistToken,
+                },
+              }
+            );
+            if (smsError) {
+              console.error("Failed to send artist-entered SMS:", smsError);
+            } else {
+              console.log("Artist-entered SMS result:", smsResult);
+            }
+          } catch (smsErr) {
+            console.error("Error calling send-artist-entered-sms:", smsErr);
+          }
         }
       } catch (err) {
         console.error("Error posting artist join message:", err);
@@ -333,7 +368,7 @@ const AfterPartyRoom = () => {
     };
 
     postArtistJoinMessage();
-  }, [isArtistMode, eventId, event, refetchMessages]);
+  }, [isArtistMode, eventId, event, refetchMessages, artistToken]);
 
   // Post system message when admin (GoLokol Moderator) joins (once per session)
   const adminJoinedRef = useRef<boolean>(false);
@@ -662,6 +697,13 @@ const AfterPartyRoom = () => {
 
   return (
     <div className="min-h-screen bg-[#0B0B0B] flex flex-col">
+      {/* No Re-Entry Overlay - shown once for fans on first entry */}
+      {showNoReentryOverlay && eventId && (
+        <NoReentryOverlay 
+          eventId={eventId} 
+          onEnter={() => setShowNoReentryOverlay(false)} 
+        />
+      )}
       {/* Sticky Top Bar */}
       <header className="sticky top-0 z-50 bg-[#0B0B0B]/95 backdrop-blur-sm border-b border-border/20">
         <div className="max-w-[640px] mx-auto px-4 py-3 flex items-center justify-between">

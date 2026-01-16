@@ -12,6 +12,7 @@ interface CheckinRequest {
   qr_token?: string; // for QR scan mode
   walk_in?: boolean; // for walk-in mode
   display_name?: string; // optional for walk-ins
+  phone?: string; // optional phone for walk-ins
 }
 
 serve(async (req) => {
@@ -22,9 +23,9 @@ serve(async (req) => {
 
   try {
     const body: CheckinRequest = await req.json();
-    const { event_id, token, qr_token, walk_in, display_name } = body;
+    const { event_id, token, qr_token, walk_in, display_name, phone } = body;
 
-    console.log("Check-in request:", { event_id, qr_token, walk_in, display_name });
+    console.log("Check-in request:", { event_id, qr_token, walk_in, display_name, hasPhone: !!phone });
 
     if (!event_id || !token) {
       return new Response(
@@ -84,6 +85,7 @@ serve(async (req) => {
         .insert({
           event_id,
           display_name: display_name || null,
+          phone: phone || null,
           qr_token: newQrToken,
           checkin_method: "qr",
           checked_in_at: new Date().toISOString(),
