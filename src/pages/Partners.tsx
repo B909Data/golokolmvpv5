@@ -15,7 +15,7 @@ const Partners = () => {
         <section className="w-full mb-20">
           <div className="container mx-auto px-4 max-w-4xl">
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-[hsl(0,0%,10%)] mb-6 leading-tight">
-              Extend the night for your crowd.
+              Curators? Extend the night for your crowd.
             </h1>
             <p className="text-[hsl(0,0%,20%)] text-xl md:text-2xl font-sans mb-4 max-w-3xl">
               GoLokol After Parties give your artists a private, time-limited space to connect with fans who showed up to your event.
