@@ -539,22 +539,6 @@ const ArtistEvent = () => {
                 </Button>
               </div>
               
-              {/* Artist Door Button with Tooltip */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => navigate(`/after-party/${eventId}/room?artist_token=${token}`)}
-                    variant="outline"
-                    className="w-full border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-primary font-sans text-base py-6"
-                  >
-                    <DoorOpen className="w-5 h-5 mr-2" />
-                    Artist Door
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Enter the After Party as the artist.</p>
-                </TooltipContent>
-              </Tooltip>
             </div>
           </div>
         </section>
