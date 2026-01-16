@@ -64,19 +64,45 @@ const AfterPartyPass = () => {
   const verifyUrl = `${window.location.origin}/after-party/${eventId}/verify/${qrToken}`;
   const passUrl = `${window.location.origin}/after-party/${eventId}/pass?token=${qrToken}`;
 
-  const handleSavePass = () => {
+  const handleSavePass = async () => {
     const canvas = qrRef.current?.querySelector("canvas");
     if (!canvas) return;
 
-    const link = document.createElement("a");
-    link.download = `golokol-pass-${event?.title || "afterparty"}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-
-    toast({
-      title: "Pass saved",
-      description: "Your QR pass has been downloaded.",
-    });
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        toast({ title: "Failed to create pass image", variant: "destructive" });
+        return;
+      }
+      
+      const safeTitle = event?.title?.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase() || "afterparty";
+      const fileName = `golokol-pass-${safeTitle}.png`;
+      
+      // On mobile, use Web Share API for native "Save to Photos"
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      
+      if (isMobile && navigator.share && navigator.canShare) {
+        try {
+          const file = new File([blob], fileName, { type: "image/png" });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file] });
+            toast({ title: "Pass saved to photos!" });
+            return;
+          }
+        } catch (err: any) {
+          if (err.name === "AbortError") return; // User cancelled
+          // Fall through to standard download
+        }
+      }
+      
+      // Desktop fallback
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = fileName;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast({ title: "Pass saved", description: "Your QR pass has been downloaded." });
+    }, "image/png");
   };
 
   const handleCopyLink = async () => {
