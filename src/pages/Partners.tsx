@@ -15,13 +15,13 @@ const Partners = () => {
         <section className="w-full mb-20">
           <div className="container mx-auto px-4 max-w-4xl">
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-[hsl(0,0%,10%)] mb-6 leading-tight">
-              Turn the moment after the show into something that lasts.
+              Extend the night for your crowd.
             </h1>
             <p className="text-[hsl(0,0%,20%)] text-xl md:text-2xl font-sans mb-4 max-w-3xl">
-              GoLokol After Parties give artists a private, 24-hour space to connect with fans who actually showed up.
+              GoLokol After Parties give your artists a private, time-limited space to connect with fans who showed up to your event.
             </p>
             <p className="text-[hsl(0,0%,50%)] text-sm font-sans">
-              No feeds. No algorithms. No ongoing management.
+              Easy execution. No ongoing management.
             </p>
           </div>
           <div className="w-full mt-12 h-64 md:h-80 lg:h-96 overflow-hidden">
@@ -41,7 +41,7 @@ const Partners = () => {
             </h2>
             <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-6 max-w-2xl">
               When a show ends, momentum usually disappears.<br />
-              After Parties keep it alive — without adding work.
+              GoLokol After Parties keep it alive — without adding work.
             </p>
             <ul className="space-y-3 text-[hsl(0,0%,30%)] font-sans mb-8">
               <li className="flex items-start gap-3">
@@ -124,6 +124,10 @@ const Partners = () => {
                 <span className="text-[hsl(50,100%,40%)] mt-1">—</span>
                 <span>Artists activate them on their own</span>
               </li>
+              <li className="flex items-start gap-3">
+                <span className="text-[hsl(50,100%,40%)] mt-1">—</span>
+                <span>Credited After Parties are "Brought to you by…(your curatorial brand)"</span>
+              </li>
             </ul>
             <p className="text-[hsl(0,0%,30%)] text-lg font-sans italic mb-8">
               Think of it as hosting the after-show moment — not managing it.
@@ -145,11 +149,10 @@ const Partners = () => {
               Artists Stay in Control
             </h2>
             <p className="text-[hsl(0,0%,30%)] text-lg font-sans mb-4 max-w-2xl">
-              Artists can also create After Parties on their own — for any show, anywhere.
+              Artists can create future After Parties on their own for any show, anywhere.
             </p>
             <p className="text-[hsl(0,0%,30%)] text-lg font-sans max-w-2xl">
-              Partner credits simply introduce the experience.<br />
-              Artists decide how and when to use it again.
+              Partner credits simply introduce the experience.
             </p>
           </div>
         </section>
