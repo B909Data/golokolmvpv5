@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, Pin, MessageSquare, CheckCircle2, Share2, Bookmark, PartyPopper } from "lucide-react";
+import { Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, Pin, MessageSquare, CheckCircle2, Share2, Bookmark, PartyPopper, Download, Printer } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Html5Qrcode } from "html5-qrcode";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCodeSVG, QRCodeCanvas } from "qrcode.react";
+import { jsPDF } from "jspdf";
 import {
   Dialog,
   DialogContent,
@@ -555,6 +556,81 @@ const ArtistEvent = () => {
                 </Button>
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* Merch Table QR Section - Dark Theme */}
+      <section className="px-4 pb-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-black border border-primary/30 rounded-xl p-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <Printer className="w-5 h-5 text-primary" />
+              <h3 className="font-display text-lg text-primary uppercase tracking-wide">Merch Table QR (Printable Poster)</h3>
+            </div>
+            
+            <p className="text-primary/70 text-sm font-sans">
+              Print this and place it at your merch table. Fans scan, enter their name, and join the After Party.
+            </p>
+
+            {/* Hidden QR Canvas for PDF generation */}
+            <div className="hidden">
+              <QRCodeCanvas
+                id="merch-table-qr-canvas"
+                value={`${window.location.origin}/after-party/${eventId}`}
+                size={400}
+                level="H"
+                includeMargin={false}
+              />
+            </div>
+
+            <Button
+              onClick={() => {
+                const canvas = document.getElementById("merch-table-qr-canvas") as HTMLCanvasElement;
+                if (!canvas) {
+                  toast.error("Could not generate QR code");
+                  return;
+                }
+
+                const qrDataUrl = canvas.toDataURL("image/png");
+                const doc = new jsPDF({ unit: "in", format: "letter", orientation: "portrait" });
+                
+                // Page dimensions: 8.5 x 11 inches
+                const pageWidth = 8.5;
+                const pageHeight = 11;
+                
+                // Top 1/3: Band Name's After Party Access (centered)
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(28);
+                doc.setTextColor(0, 0, 0);
+                
+                const bandName = event?.artist_name || event?.title || "Your Band";
+                const titleText = `${bandName}'s After Party Access`;
+                
+                // Center text in top third (y = 2.5 inches from top)
+                doc.text(titleText, pageWidth / 2, 2.5, { align: "center" });
+                
+                // Bottom 2/3: Large QR code (centered)
+                // QR positioned at center of bottom 2/3
+                const qrSize = 4.5; // 4.5 x 4.5 inches
+                const qrX = (pageWidth - qrSize) / 2;
+                const qrY = 4.5; // Start at 4.5 inches from top
+                
+                doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
+                
+                // Save PDF
+                const safeTitle = (event?.artist_name || event?.title || "afterparty")
+                  .replace(/[^a-zA-Z0-9]/g, "-")
+                  .toLowerCase();
+                doc.save(`merch-table-qr-${safeTitle}.pdf`);
+                
+                toast.success("Poster downloaded!");
+              }}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-sans"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download Merch Table QR Poster
+            </Button>
           </div>
         </div>
       </section>
