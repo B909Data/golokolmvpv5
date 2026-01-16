@@ -141,6 +141,9 @@ const ArtistEvent = () => {
   const [walkInPassData, setWalkInPassData] = useState<{ qrToken: string; displayName: string } | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
   
+  // Walk-ins QR modal state (new flow: show QR for fans to scan)
+  const [showWalkInsQR, setShowWalkInsQR] = useState(false);
+  
   // Share link copied state
   const [shareLinkCopied, setShareLinkCopied] = useState(false);
 
@@ -394,6 +397,12 @@ const ArtistEvent = () => {
     setLinkCopied(false);
   };
 
+  // Walk-ins QR URL - points to fan join form
+  const getWalkInsJoinUrl = () => {
+    if (!eventId) return "";
+    return `${window.location.origin}/after-party/${eventId}`;
+  };
+
   // Share link functionality
   const shareUrl = eventId ? `${PUBLIC_BASE_URL}/after-party/${eventId}/rsvp` : "";
   
@@ -627,7 +636,7 @@ const ArtistEvent = () => {
                   </Button>
                   <Button 
                     variant="outline" 
-                    onClick={() => setShowWalkInForm(true)} 
+                    onClick={() => setShowWalkInsQR(true)} 
                     className="border-primary text-primary hover:bg-primary hover:text-primary-foreground text-base py-5"
                     disabled={isExpired}
                   >
@@ -846,6 +855,41 @@ const ArtistEvent = () => {
                   Done
                 </Button>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Walk-Ins QR Modal - Shows QR for fans to scan */}
+        <Dialog open={showWalkInsQR} onOpenChange={setShowWalkInsQR}>
+          <DialogContent className="sm:max-w-md bg-black border-primary">
+            <DialogHeader>
+              <DialogTitle className="font-display text-2xl text-center text-primary uppercase">
+                Walk-Ins
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center space-y-6 py-6">
+              {/* Large QR Code */}
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <QRCodeSVG
+                  value={getWalkInsJoinUrl()}
+                  size={280}
+                  level="H"
+                />
+              </div>
+              
+              <p className="text-primary/80 text-base font-sans text-center">
+                Fans scan to join the After Party
+              </p>
+              
+              {/* Close Button */}
+              <Button 
+                onClick={() => setShowWalkInsQR(false)} 
+                variant="outline"
+                className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground text-base py-5"
+              >
+                <X className="w-5 h-5 mr-2" />
+                Close
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
