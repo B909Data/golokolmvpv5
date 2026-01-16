@@ -133,6 +133,7 @@ const ArtistEvent = () => {
   const [scannerError, setScannerError] = useState<string | null>(null);
   const [showWalkInForm, setShowWalkInForm] = useState(false);
   const [walkInName, setWalkInName] = useState("");
+  const [walkInPhone, setWalkInPhone] = useState("");
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   
@@ -343,6 +344,7 @@ const ArtistEvent = () => {
           token,
           walk_in: true,
           display_name: walkInName.trim() || undefined,
+          phone: walkInPhone.trim() || undefined,
         },
       });
 
@@ -354,6 +356,7 @@ const ArtistEvent = () => {
       fetchEvent();
       setShowWalkInForm(false);
       setWalkInName("");
+      setWalkInPhone("");
 
       setWalkInPassData({
         qrToken: data.attendee.qr_token,
@@ -579,6 +582,26 @@ const ArtistEvent = () => {
                       className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans text-base py-5"
                     />
                   </div>
+                  <div>
+                    <label className="block text-base text-primary mb-2 font-sans font-bold">
+                      Phone number (optional) — get a text when you enter
+                    </label>
+                    <Input
+                      value={walkInPhone}
+                      onChange={(e) => setWalkInPhone(e.target.value)}
+                      placeholder="(555) 123-4567"
+                      type="tel"
+                      className="bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans text-base py-5"
+                    />
+                    <p className="text-primary/80 font-sans font-semibold text-sm mt-2">
+                      We ONLY use this to alert when the artist enters the After Party.
+                      <br />
+                      Number is not shared with artist or third parties.
+                    </p>
+                    <p className="text-primary/60 font-sans text-xs mt-1">
+                      Msg & data rates may apply.
+                    </p>
+                  </div>
                   <div className="flex gap-3">
                     <Button
                       onClick={handleWalkInSubmit}
@@ -587,7 +610,7 @@ const ArtistEvent = () => {
                     >
                       {isCheckingIn ? "Adding..." : "Add Walk-In"}
                     </Button>
-                    <Button variant="outline" onClick={() => setShowWalkInForm(false)} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground text-base py-5">
+                    <Button variant="outline" onClick={() => { setShowWalkInForm(false); setWalkInPhone(""); }} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground text-base py-5">
                       Cancel
                     </Button>
                   </div>

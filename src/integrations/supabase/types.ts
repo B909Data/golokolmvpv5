@@ -242,6 +242,7 @@ export type Database = {
           after_party_enabled: boolean
           after_party_opens_at: string | null
           artist_access_token: string | null
+          artist_entered_sms_at: string | null
           artist_name: string | null
           city: string | null
           contact_email: string | null
@@ -272,6 +273,7 @@ export type Database = {
           after_party_enabled?: boolean
           after_party_opens_at?: string | null
           artist_access_token?: string | null
+          artist_entered_sms_at?: string | null
           artist_name?: string | null
           city?: string | null
           contact_email?: string | null
@@ -302,6 +304,7 @@ export type Database = {
           after_party_enabled?: boolean
           after_party_opens_at?: string | null
           artist_access_token?: string | null
+          artist_entered_sms_at?: string | null
           artist_name?: string | null
           city?: string | null
           contact_email?: string | null

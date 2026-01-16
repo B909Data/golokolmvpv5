@@ -17,12 +17,20 @@ type EventData = {
   after_party_opens_at: string;
 } | null;
 
+// Light US phone validation
+const isValidUSPhone = (phone: string): boolean => {
+  if (!phone.trim()) return true;
+  const digitsOnly = phone.replace(/\D/g, "");
+  return digitsOnly.length === 10 || (digitsOnly.length === 11 && digitsOnly.startsWith("1"));
+};
+
 const AfterParty = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const [joinError, setJoinError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
   const [displayName, setDisplayName] = useState("");
+  const [phone, setPhone] = useState("");
 
   // Check if already joined
   const existingAttendeeId = eventId ? localStorage.getItem(`afterparty-attendee-${eventId}`) : null;
@@ -43,6 +51,12 @@ const AfterParty = () => {
       setJoinError("Display name is required");
       return;
     }
+
+    // Validate phone if provided
+    if (phone.trim() && !isValidUSPhone(phone)) {
+      setJoinError("Please enter a valid US phone number (10 digits).");
+      return;
+    }
     
     setIsJoining(true);
     setJoinError(null);
@@ -52,7 +66,8 @@ const AfterParty = () => {
       .insert({ 
         event_id: eventId, 
         checkin_method: "qr",
-        display_name: trimmedName
+        display_name: trimmedName,
+        phone: phone.trim() || null,
       })
       .select("id")
       .single();
@@ -154,6 +169,28 @@ const AfterParty = () => {
                 disabled={isJoining}
                 autoFocus
               />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="font-bold">
+                Phone number (optional) — get a text when the artist enters
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="(555) 123-4567"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={isJoining}
+              />
+              <p className="text-foreground font-semibold text-sm">
+                We ONLY use this to alert you when the artist enters the After Party.
+                <br />
+                Your number is not shared with the artist or any third parties.
+              </p>
+              <p className="text-muted-foreground text-xs">
+                Msg & data rates may apply.
+              </p>
             </div>
           </div>
 
