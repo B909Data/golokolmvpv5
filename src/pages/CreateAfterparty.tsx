@@ -65,11 +65,11 @@ const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
 const formSchema = z.object({
   artist_name: z.string().min(1, "Artist/Band name is required"),
   contact_email: z.string().email("Valid email required"),
-  // Curator/Event Series selection
+  // Curator/Event Series selection - now optional text in Step 2
   curator_id: z.string().optional(),
   curator_other_name: z.string().optional(),
-  // Event title kept for display purposes
-  title: z.string().min(1, "Event title is required"),
+  // Event title - now optional text input
+  title: z.string().optional(),
   start_date: z.date({ required_error: "Start date is required" }),
   start_time: z.string().min(1, "Start time is required"),
   city: z.string().min(1, "City is required"),
@@ -120,11 +120,15 @@ const CreateAfterparty = () => {
   
   // Discount code state
   const [discountCode, setDiscountCode] = useState("");
+  const [discountCodeError, setDiscountCodeError] = useState<string | null>(null);
   const [discountValidation, setDiscountValidation] = useState<{
     valid: boolean;
     type: string | null;
     checking: boolean;
   }>({ valid: false, type: null, checking: false });
+  
+  // Step 4 curator selection (for discount code purposes)
+  const [step4CuratorId, setStep4CuratorId] = useState<string>("none");
 
   // Partners and cities state
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -222,6 +226,9 @@ const CreateAfterparty = () => {
 
   // Validate discount code (including expiration check for partner codes)
   const validateDiscountCode = async (code: string) => {
+    // Clear previous error
+    setDiscountCodeError(null);
+    
     if (!code.trim()) {
       setDiscountValidation({ valid: false, type: null, checking: false });
       return;
@@ -238,20 +245,20 @@ const CreateAfterparty = () => {
 
       if (error || !data) {
         setDiscountValidation({ valid: false, type: null, checking: false });
-        toast.error("Invalid code");
+        setDiscountCodeError("Invalid code");
         return;
       }
 
       if (data.used_at) {
         setDiscountValidation({ valid: false, type: null, checking: false });
-        toast.error("This code has already been used");
+        setDiscountCodeError("This code has already been used");
         return;
       }
 
       // Check expiration for partner codes
       if (data.expires_at && new Date(data.expires_at) < new Date()) {
         setDiscountValidation({ valid: false, type: null, checking: false });
-        toast.error("This code has expired");
+        setDiscountCodeError("This code has expired");
         return;
       }
 
@@ -259,13 +266,13 @@ const CreateAfterparty = () => {
       toast.success(data.discount_type === "free" ? "Free listing code applied!" : "50% discount applied!");
     } catch {
       setDiscountValidation({ valid: false, type: null, checking: false });
-      toast.error("Failed to validate code");
+      setDiscountCodeError("Failed to validate code");
     }
   };
 
-  // Step validation - Step 3 only requires genres now
+  // Step validation - Step 2 title is now optional
   const step1Fields = ["artist_name", "contact_email"] as const;
-  const step2Fields = ["title", "start_date", "start_time", "city", "venue_name"] as const;
+  const step2Fields = ["start_date", "start_time", "city", "venue_name"] as const;
   const step3Fields = ["genres"] as const;
 
   const validateStep = async (step: number): Promise<boolean> => {
@@ -371,11 +378,11 @@ const CreateAfterparty = () => {
         ? undefined // Will be set after upload
         : data.image_url || curatorFlyerUrl || undefined;
 
-      // Build payload - include partner IDs when not "other"
+      // Build payload - include partner IDs when applicable
       const payload: Record<string, unknown> = {
         artist_name: data.artist_name,
         contact_email: data.contact_email,
-        title: data.title,
+        title: data.title || undefined, // Title is now optional
         start_at: startDate.toISOString(),
         city: data.city,
         venue_name: data.venue_name,
@@ -383,11 +390,11 @@ const CreateAfterparty = () => {
         genres: data.genres,
         youtube_url: data.youtube_url || undefined,
         image_url: resolvedImageUrl,
-        // Partner references - only include if a real partner is selected (not "other")
-        curator_id: data.curator_id && data.curator_id !== "other" ? data.curator_id : undefined,
+        // Curator ID from Step 4 dropdown (only if not "none")
+        curator_id: step4CuratorId !== "none" ? step4CuratorId : undefined,
+        // Venue references - only include if a real partner is selected (not "other")
         venue_id: data.venue_id && data.venue_id !== "other" ? data.venue_id : undefined,
-        // Manual text fields for "other" selections
-        curator_other_name: data.curator_id === "other" ? data.curator_other_name : undefined,
+        // Manual text field for "other" venue selection
         venue_other_name: data.venue_id === "other" ? data.venue_other_name : undefined,
       };
 
@@ -551,42 +558,8 @@ const CreateAfterparty = () => {
   const renderStep2 = () => {
     const selectedDate = watch("start_date");
     const selectedTime = watch("start_time");
-    const curatorOtherName = watch("curator_other_name");
     const venueOtherName = watch("venue_other_name");
-
-    // Handle curator dropdown change
-    const handleCuratorChange = (value: string) => {
-      setValue("curator_id", value, { shouldValidate: true });
-      if (value === "other") {
-        // Clear curator flyer when "Other" selected
-        setCuratorFlyerUrl(null);
-        // Keep any existing manual text
-      } else if (value) {
-        // Clear manual text and set title from curator name
-        setValue("curator_other_name", "");
-        const curator = curators.find((c) => c.id === value);
-        setValue("title", curator?.name || "", { shouldValidate: true });
-        
-        // Auto-populate curator flyer if available
-        if (curator?.flyer_image_url) {
-          setCuratorFlyerUrl(curator.flyer_image_url);
-          // Clear any manual file selection since curator flyer takes precedence
-          handleRemoveFile();
-          setValue("image_url", "");
-        } else {
-          setCuratorFlyerUrl(null);
-        }
-      } else {
-        setCuratorFlyerUrl(null);
-      }
-    };
-
-    // Handle curator other name change
-    const handleCuratorOtherChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setValue("curator_other_name", value);
-      setValue("title", value, { shouldValidate: true });
-    };
+    const eventTitle = watch("title");
 
     // Handle venue dropdown change
     const handleVenueChange = (value: string) => {
@@ -616,34 +589,15 @@ const CreateAfterparty = () => {
         </div>
 
         <div className="space-y-5">
-          {/* Name of Event (Curator/Series) */}
+          {/* Name of Event - optional text input */}
           <div className="space-y-2">
-            <Label className="text-primary-foreground text-base font-sans">Name of Event *</Label>
-            <select
-              value={curatorId || ""}
-              onChange={(e) => handleCuratorChange(e.target.value)}
-              className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              disabled={partnersLoading}
-            >
-              <option value="">Select event series</option>
-              {curators.map((curator) => (
-                <option key={curator.id} value={curator.id}>
-                  {curator.name}
-                </option>
-              ))}
-              <option value="other">Other</option>
-            </select>
-            {curatorId === "other" && (
-              <Input
-                value={curatorOtherName || ""}
-                onChange={handleCuratorOtherChange}
-                placeholder="Enter event name"
-                className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground mt-2"
-              />
-            )}
-            {errors.title && (
-              <p className="text-sm text-destructive font-sans">{errors.title.message}</p>
-            )}
+            <Label className="text-primary-foreground text-base font-sans">Name of Event?</Label>
+            <Input
+              value={eventTitle || ""}
+              onChange={(e) => setValue("title", e.target.value)}
+              placeholder="Optional (ex: Summer Sessions, Release Show)"
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -929,6 +883,10 @@ const CreateAfterparty = () => {
 
   const renderStep4 = () => {
     const formValues = watch();
+    
+    // Get all active curators (not filtered by city in Step 4)
+    const allCurators = partners.filter((p) => p.type === "curator");
+    
     return (
       <div className="space-y-6">
         <ReviewAfterPartyStep
@@ -951,37 +909,75 @@ const CreateAfterparty = () => {
           onTermsChange={setIsTermsAccepted}
         />
 
-        {/* Discount Code Input */}
-        <div className="space-y-2 pt-4 border-t border-primary-foreground/20">
-          <Label className="text-primary-foreground text-base font-sans">
-            Have a discount code?
-          </Label>
-          <div className="flex gap-2">
-            <Input
-              value={discountCode}
-              onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
-              placeholder="Enter code"
-              className="h-12 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground uppercase"
-              maxLength={12}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => validateDiscountCode(discountCode)}
-              disabled={discountValidation.checking || !discountCode.trim()}
-              className="h-12 px-4 font-sans bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
+        {/* Curator Selection for Discount Code */}
+        <div className="space-y-4 pt-4 border-t border-primary-foreground/20">
+          <div className="space-y-2">
+            <Label className="text-primary-foreground text-base font-sans">
+              Select a curator
+            </Label>
+            <select
+              value={step4CuratorId}
+              onChange={(e) => {
+                setStep4CuratorId(e.target.value);
+                // Clear discount code and errors when curator changes
+                if (e.target.value === "none") {
+                  setDiscountCode("");
+                  setDiscountCodeError(null);
+                  setDiscountValidation({ valid: false, type: null, checking: false });
+                }
+              }}
+              className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              disabled={partnersLoading}
             >
-              {discountValidation.checking ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Apply"
-              )}
-            </Button>
+              {allCurators.map((curator) => (
+                <option key={curator.id} value={curator.id}>
+                  {curator.name}
+                </option>
+              ))}
+              <option value="none">I don't have a curator code</option>
+            </select>
           </div>
-          {discountValidation.valid && (
-            <p className="text-sm text-green-400 font-sans">
-              ✓ {discountValidation.type === "free" ? "Free listing!" : "50% off applied!"}
-            </p>
+
+          {/* Discount Code Input - only show if a curator is selected */}
+          {step4CuratorId !== "none" && (
+            <div className="space-y-2">
+              <Label className="text-primary-foreground text-base font-sans">
+                Discount code
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  value={discountCode}
+                  onChange={(e) => {
+                    setDiscountCode(e.target.value.toUpperCase());
+                    setDiscountCodeError(null); // Clear error on input change
+                  }}
+                  placeholder="Enter code"
+                  className="h-12 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground uppercase"
+                  maxLength={12}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => validateDiscountCode(discountCode)}
+                  disabled={discountValidation.checking || !discountCode.trim()}
+                  className="h-12 px-4 font-sans bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
+                >
+                  {discountValidation.checking ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Apply"
+                  )}
+                </Button>
+              </div>
+              {discountCodeError && (
+                <p className="text-sm text-red-500 font-sans">{discountCodeError}</p>
+              )}
+              {discountValidation.valid && (
+                <p className="text-sm text-green-400 font-sans">
+                  ✓ {discountValidation.type === "free" ? "Free listing!" : "50% off applied!"}
+                </p>
+              )}
+            </div>
           )}
         </div>
       </div>
