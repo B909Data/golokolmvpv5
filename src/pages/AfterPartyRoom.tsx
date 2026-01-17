@@ -136,27 +136,39 @@ const AfterPartyRoom = () => {
   useEffect(() => {
     if (!eventId || isPrivilegedMode) return;
 
+    console.log("[AfterPartyRoom] Access check:", { 
+      urlToken, 
+      storedAttendeeId, 
+      isCheckingIn, 
+      attendeeData: attendeeData ? { id: attendeeData.id, checked_in_at: attendeeData.checked_in_at } : null,
+      attendeeError: attendeeError?.message 
+    });
+
     if (!urlToken && !storedAttendeeId) {
-      navigate(`/after-party/${eventId}/rsvp`, { replace: true });
+      console.log("[AfterPartyRoom] No token or stored ID, redirecting to join");
+      navigate(`/after-party/${eventId}`, { replace: true });
       return;
     }
 
     if (!isCheckingIn && attendeeError) {
+      console.log("[AfterPartyRoom] Attendee error:", attendeeError);
       setAccessError("Unable to verify access. Please try again.");
       return;
     }
 
     if (!isCheckingIn && !attendeeData) {
-      navigate(`/after-party/${eventId}/rsvp`, { replace: true });
+      console.log("[AfterPartyRoom] No attendee data found, redirecting to join");
+      navigate(`/after-party/${eventId}`, { replace: true });
       return;
     }
 
     if (!isCheckingIn && attendeeData && !attendeeData.checked_in_at) {
+      console.log("[AfterPartyRoom] Attendee not checked in, redirecting to pass");
       const token = attendeeData.qr_token || qrToken;
       if (token) {
         navigate(`/after-party/${eventId}/pass?token=${token}`, { replace: true });
       } else {
-        navigate(`/after-party/${eventId}/rsvp`, { replace: true });
+        navigate(`/after-party/${eventId}`, { replace: true });
       }
     }
   }, [urlToken, storedAttendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn, isPrivilegedMode]);
@@ -275,10 +287,17 @@ const AfterPartyRoom = () => {
     if (isPrivilegedMode || !eventId) return;
     
     // Only show after attendee is confirmed checked in
-    if (!attendeeData?.checked_in_at) return;
+    if (!attendeeData?.checked_in_at) {
+      console.log("[AfterPartyRoom] No Re-entry overlay skipped - not checked in yet");
+      return;
+    }
     
     const seenKey = `afterPartyNoReentrySeen_${eventId}`;
-    if (!localStorage.getItem(seenKey)) {
+    const alreadySeen = localStorage.getItem(seenKey);
+    console.log("[AfterPartyRoom] No Re-entry overlay check:", { seenKey, alreadySeen, checked_in_at: attendeeData.checked_in_at });
+    
+    if (!alreadySeen) {
+      console.log("[AfterPartyRoom] Showing No Re-entry overlay");
       setShowNoReentryOverlay(true);
     }
   }, [isPrivilegedMode, eventId, attendeeData?.checked_in_at]);

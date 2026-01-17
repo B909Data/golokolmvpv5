@@ -12,6 +12,7 @@ const WalkInIntro = () => {
   const token = searchParams.get("token");
 
   const handleEnter = () => {
+    console.log("[WalkInIntro] Entering room with token:", { eventId, token });
     navigate(`/after-party/${eventId}/room?token=${token}`);
   };
 
