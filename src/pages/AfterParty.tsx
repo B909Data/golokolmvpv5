@@ -61,6 +61,11 @@ const AfterParty = () => {
     setIsJoining(true);
     setJoinError(null);
 
+    // Generate QR token for consistency with other flows
+    const qrToken = crypto.randomUUID();
+
+    console.log("[AfterParty Join] Starting join:", { eventId, displayName: trimmedName, hasPhone: !!phone.trim() });
+
     const { data, error } = await supabase
       .from("attendees")
       .insert({ 
@@ -68,17 +73,28 @@ const AfterParty = () => {
         checkin_method: "qr",
         display_name: trimmedName,
         phone: phone.trim() || null,
+        qr_token: qrToken,
+        checked_in_at: new Date().toISOString(), // Mark as checked in immediately (they're at the venue)
       })
-      .select("id")
+      .select("id, qr_token")
       .single();
 
     setIsJoining(false);
 
     if (error) {
+      console.error("[AfterParty Join] Insert failed:", error);
       setJoinError(error.message);
     } else if (data) {
+      console.log("[AfterParty Join] Success - attendee created:", { id: data.id, qr_token: data.qr_token });
+      
+      // Store attendee info in localStorage (consistent with other flows)
       localStorage.setItem(`afterparty-attendee-${eventId}`, data.id);
-      navigate(`/after-party/${eventId}/room`);
+      localStorage.setItem(`attendee_${eventId}`, data.id);
+      localStorage.setItem(`attendee_qr_${eventId}`, data.qr_token);
+      
+      // Navigate to room with token - NoReentryOverlay will show on first visit
+      console.log("[AfterParty Join] Navigating to room with token");
+      navigate(`/after-party/${eventId}/room?token=${data.qr_token}`);
     }
   };
 
@@ -204,7 +220,7 @@ const AfterParty = () => {
             disabled={isJoining || !isFormValid}
             className="px-8 py-6 text-lg w-full"
           >
-            {isJoining ? "Joining..." : "Join After Party"}
+            {isJoining ? "Joining..." : "Join Party"}
           </Button>
         </div>
       </main>
