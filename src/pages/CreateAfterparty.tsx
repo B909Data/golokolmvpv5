@@ -52,13 +52,11 @@ const GENRE_OPTIONS = [
 
 // Cities now fetched from database
 
-const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
-  const hours = Math.floor(i / 4);
-  const minutes = (i % 4) * 15;
-  const ampm = hours >= 12 ? "PM" : "AM";
-  const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-  const label = `${displayHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
-  const value = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
+  const ampm = i >= 12 ? "PM" : "AM";
+  const displayHours = i === 0 ? 12 : i > 12 ? i - 12 : i;
+  const label = `${displayHours}:00 ${ampm}`;
+  const value = `${i.toString().padStart(2, "0")}:00`;
   return { label, value };
 });
 
