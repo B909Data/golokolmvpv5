@@ -585,6 +585,14 @@ const AfterPartyRoom = () => {
     const closesAt = addDays(openedAt, 1);
     return isAfter(new Date(), closesAt);
   };
+  
+  // Calculate expiration early (before event loads, using direct query if needed)
+  const checkExpirationFromEvent = (eventData: EventData | null): boolean => {
+    if (!eventData?.after_party_opens_at) return false;
+    const openedAt = new Date(eventData.after_party_opens_at);
+    const closesAt = addDays(openedAt, 1);
+    return isAfter(new Date(), closesAt);
+  };
 
   // Validate YouTube livestream URL - accepts all valid YouTube URL formats
   const getValidLivestreamId = () => {
@@ -620,6 +628,27 @@ const AfterPartyRoom = () => {
 
   // Fan access checks (not for artist or admin mode)
   if (!isPrivilegedMode) {
+    // First check if party is expired - block fans immediately
+    const partyExpired = checkExpirationFromEvent(event);
+    if (partyExpired && !isLoading && event) {
+      // Show expired overlay for fans trying to enter expired party
+      return (
+        <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
+          <div className="max-w-md w-full text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center mx-auto">
+              <Clock size={28} className="text-muted-foreground" />
+            </div>
+            <h1 className="font-display font-bold text-foreground text-3xl leading-tight">
+              The Party is over!<br />See you at the next.
+            </h1>
+            <p className="text-muted-foreground font-sans">
+              This After Party has ended. Thanks for being here!
+            </p>
+          </div>
+        </div>
+      );
+    }
+    
     if (!urlToken && !storedAttendeeId) {
       return (
         <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center px-4">
@@ -1576,6 +1605,7 @@ const ChatView = ({
     </div>
   );
 };
+
 
 // View Toggle Component
 interface ViewToggleProps {
