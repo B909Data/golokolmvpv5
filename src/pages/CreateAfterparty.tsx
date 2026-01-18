@@ -213,6 +213,9 @@ const CreateAfterparty = () => {
   // Review step confirmation state
   const [isReviewConfirmed, setIsReviewConfirmed] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  
+  // Confirmation email validation (computed)
+  const isEmailValid = confirmationEmail.trim() !== "" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(confirmationEmail);
 
   const toggleGenre = (genre: string) => {
     const current = selectedGenres;
@@ -274,16 +277,19 @@ const CreateAfterparty = () => {
     }
   };
 
-  // Step validation - Step 2 title is now optional
-  const step1Fields = ["artist_name", "contact_email"] as const;
-  const step2Fields = ["start_date", "start_time", "city", "venue_name"] as const;
-  const step3Fields = ["genres"] as const;
+  // Step validation - Now 3 steps total
+  // Step 1: Artist name + Event details (merged)
+  // Step 2: Genre & Media
+  // Step 3: Review + Required confirmation email
+  const step1Fields = ["artist_name", "start_date", "start_time", "city", "venue_name"] as const;
+  const step2Fields = ["genres"] as const;
+  // Step 3 validates confirmationEmail separately (required)
 
   const validateStep = async (step: number): Promise<boolean> => {
     let fieldsToValidate: readonly (keyof FormData)[] = [];
     if (step === 1) fieldsToValidate = step1Fields;
     if (step === 2) fieldsToValidate = step2Fields;
-    if (step === 3) fieldsToValidate = step3Fields;
+    // Step 3 has no form fields to validate via zod (email handled separately)
 
     const result = await trigger(fieldsToValidate as (keyof FormData)[]);
     return result;
@@ -293,11 +299,11 @@ const CreateAfterparty = () => {
     const isValid = await validateStep(currentStep);
     if (isValid) {
       // Reset confirmation when moving to review step
-      if (currentStep === 3) {
+      if (currentStep === 2) {
         setIsReviewConfirmed(false);
         setIsTermsAccepted(false);
       }
-      setCurrentStep((prev) => Math.min(prev + 1, 4));
+      setCurrentStep((prev) => Math.min(prev + 1, 3));
     }
   };
 
@@ -503,7 +509,7 @@ const CreateAfterparty = () => {
 
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center gap-2 mb-8">
-      {[1, 2, 3, 4].map((step) => (
+      {[1, 2, 3].map((step) => (
         <div key={step} className="flex items-center">
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-sans font-semibold transition-colors ${
@@ -516,7 +522,7 @@ const CreateAfterparty = () => {
           >
             {step}
           </div>
-          {step < 4 && (
+          {step < 3 && (
             <div
               className={`w-8 h-1 mx-1 rounded ${
                 step < currentStep ? "bg-primary" : "bg-muted/30"
@@ -528,45 +534,8 @@ const CreateAfterparty = () => {
     </div>
   );
 
-  const renderStep1 = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="font-display text-2xl text-primary-foreground">Artist Info</h2>
-        <p className="text-primary-foreground/70 text-base font-sans mt-1">Tell us about yourself</p>
-      </div>
-
-        <div className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="artist_name" className="text-primary-foreground text-base font-sans">Artist / Band Name *</Label>
-            <Input
-              id="artist_name"
-              {...register("artist_name")}
-              placeholder="Your artist or band name"
-              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
-            />
-            {errors.artist_name && (
-              <p className="text-sm text-destructive font-sans">{errors.artist_name.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contact_email" className="text-primary-foreground text-base font-sans">Contact Email *</Label>
-            <Input
-              id="contact_email"
-              type="email"
-              {...register("contact_email")}
-              placeholder="you@example.com"
-              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
-            />
-            {errors.contact_email && (
-              <p className="text-sm text-destructive font-sans">{errors.contact_email.message}</p>
-            )}
-          </div>
-        </div>
-    </div>
-  );
-
-  const renderStep2 = () => {
+  // Step 1: Event Details + Artist Info (merged from original Steps 1 & 2)
+  const renderStep1 = () => {
     const selectedDate = watch("start_date");
     const selectedTime = watch("start_time");
     const venueOtherName = watch("venue_other_name");
@@ -596,10 +565,24 @@ const CreateAfterparty = () => {
       <div className="space-y-6">
         <div className="text-center mb-6">
           <h2 className="font-display text-2xl text-primary-foreground">Event Details</h2>
-          <p className="text-primary-foreground/70 text-base font-sans mt-1">Where and when is it happening?</p>
+          <p className="text-primary-foreground/70 text-base font-sans mt-1">Tell us about your show</p>
         </div>
 
         <div className="space-y-5">
+          {/* Artist / Band Name - moved from original Step 1 */}
+          <div className="space-y-2">
+            <Label htmlFor="artist_name" className="text-primary-foreground text-base font-sans">Artist / Band Name *</Label>
+            <Input
+              id="artist_name"
+              {...register("artist_name")}
+              placeholder="Your artist or band name"
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
+            />
+            {errors.artist_name && (
+              <p className="text-sm text-destructive font-sans">{errors.artist_name.message}</p>
+            )}
+          </div>
+
           {/* Name of Event - optional text input */}
           <div className="space-y-2">
             <Label className="text-primary-foreground text-base font-sans">Name of Event?</Label>
@@ -735,7 +718,8 @@ const CreateAfterparty = () => {
     );
   };
 
-  const renderStep3 = () => (
+  // Step 2: Genre & Media (formerly Step 3)
+  const renderStep2 = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h2 className="font-display text-2xl text-primary-foreground">Genre & Media</h2>
@@ -892,10 +876,11 @@ const CreateAfterparty = () => {
     </div>
   );
 
-  const renderStep4 = () => {
+  // Step 3: Review + Required Confirmation Email (formerly Step 4)
+  const renderStep3 = () => {
     const formValues = watch();
     
-    // Get all active curators (not filtered by city in Step 4)
+    // Get all active curators (not filtered by city in Step 3)
     const allCurators = partners.filter((p) => p.type === "curator");
     
     return (
@@ -991,10 +976,10 @@ const CreateAfterparty = () => {
             </div>
           )}
 
-          {/* Confirmation Email - optional */}
+          {/* Confirmation Email - REQUIRED */}
           <div className="space-y-2 pt-4 border-t border-primary-foreground/20">
             <Label className="text-primary-foreground text-base font-sans">
-              Email for confirmation (optional)
+              Email for confirmation *
             </Label>
             <Input
               type="email"
@@ -1003,7 +988,10 @@ const CreateAfterparty = () => {
               placeholder="you@domain.com"
               className="h-12 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
             />
-            <p className="text-xs text-muted-foreground font-sans">
+            {confirmationEmail.trim() !== "" && !isEmailValid && (
+              <p className="text-sm text-destructive font-sans">Please enter a valid email address</p>
+            )}
+            <p className="text-sm text-black font-bold font-sans">
               We'll send you a confirmation with your control room and share links.
             </p>
           </div>
@@ -1026,7 +1014,7 @@ const CreateAfterparty = () => {
         </Button>
       )}
       
-      {currentStep < 4 ? (
+      {currentStep < 3 ? (
         <Button
           type="button"
           onClick={handleNext}
@@ -1039,7 +1027,7 @@ const CreateAfterparty = () => {
         <Button
           type="submit"
           className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-          disabled={isSubmitting || isUploading || !isReviewConfirmed || !isTermsAccepted}
+          disabled={isSubmitting || isUploading || !isReviewConfirmed || !isTermsAccepted || !isEmailValid}
         >
           {isSubmitting || isUploading ? (
             <>
@@ -1115,7 +1103,7 @@ const CreateAfterparty = () => {
             </div>
 
             <p className="text-center text-base font-sans text-muted-foreground mb-6">
-              Step {currentStep} of 4
+              Step {currentStep} of 3
             </p>
 
             {renderStepIndicator()}
@@ -1125,7 +1113,6 @@ const CreateAfterparty = () => {
                 {currentStep === 1 && renderStep1()}
                 {currentStep === 2 && renderStep2()}
                 {currentStep === 3 && renderStep3()}
-                {currentStep === 4 && renderStep4()}
                 {renderNavButtons()}
               </form>
             </div>
