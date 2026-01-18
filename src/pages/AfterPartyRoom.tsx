@@ -587,11 +587,21 @@ const AfterPartyRoom = () => {
   };
   
   // Calculate expiration early (before event loads, using direct query if needed)
+  // Party is expired if: status is 'ended' OR 24 hours have passed since after_party_opens_at
   const checkExpirationFromEvent = (eventData: EventData | null): boolean => {
-    if (!eventData?.after_party_opens_at) return false;
-    const openedAt = new Date(eventData.after_party_opens_at);
-    const closesAt = addDays(openedAt, 1);
-    return isAfter(new Date(), closesAt);
+    if (!eventData) return false;
+    
+    // Check if event status is explicitly 'ended'
+    if (eventData.status === 'ended') return true;
+    
+    // Check if 24 hours have passed since party opened
+    if (eventData.after_party_opens_at) {
+      const openedAt = new Date(eventData.after_party_opens_at);
+      const closesAt = addDays(openedAt, 1);
+      return isAfter(new Date(), closesAt);
+    }
+    
+    return false;
   };
 
   // Validate YouTube livestream URL - accepts all valid YouTube URL formats
