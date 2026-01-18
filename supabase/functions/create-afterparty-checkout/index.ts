@@ -10,7 +10,7 @@ const corsHeaders = {
 interface AfterPartyFormData {
   artist_name: string;
   contact_email: string;
-  title: string;
+  title?: string; // Now optional
   start_at: string;
   city: string;
   venue_name: string;
@@ -122,10 +122,18 @@ serve(async (req) => {
     const formData: AfterPartyFormData = await req.json();
     console.log("Received form data:", formData);
 
-    // Validate required fields
+    // Validate required fields (title is now optional)
     if (!formData.artist_name || !formData.contact_email || 
-        !formData.title || !formData.start_at || !formData.city || !formData.venue_name || 
+        !formData.start_at || !formData.city || !formData.venue_name || 
         !formData.genres || formData.genres.length === 0) {
+      console.log("Validation failed, missing fields:", {
+        artist_name: !!formData.artist_name,
+        contact_email: !!formData.contact_email,
+        start_at: !!formData.start_at,
+        city: !!formData.city,
+        venue_name: !!formData.venue_name,
+        genres: formData.genres?.length || 0,
+      });
       throw new Error("Missing required fields");
     }
 
@@ -140,10 +148,12 @@ serve(async (req) => {
     );
 
     // Insert event with after_party_enabled = false (pending payment)
+    // Use artist_name as fallback title if title not provided
+    const eventTitle = formData.title || formData.artist_name;
     const { data: event, error: insertError } = await supabaseAdmin
       .from("events")
       .insert({
-        title: formData.title,
+        title: eventTitle,
         artist_name: formData.artist_name,
         contact_email: formData.contact_email,
         start_at: formData.start_at,

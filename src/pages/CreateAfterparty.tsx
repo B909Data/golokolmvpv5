@@ -62,7 +62,8 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
 
 const formSchema = z.object({
   artist_name: z.string().min(1, "Artist/Band name is required"),
-  contact_email: z.string().email("Valid email required"),
+  // contact_email is now handled separately via confirmationEmail state (not form-validated)
+  contact_email: z.string().optional(),
   // Curator/Event Series selection - now optional text in Step 2
   curator_id: z.string().optional(),
   curator_other_name: z.string().optional(),
@@ -296,8 +297,14 @@ const CreateAfterparty = () => {
   const handleNext = async () => {
     const isValid = await validateStep(currentStep);
     if (isValid) {
-      // Reset confirmation when moving to review step
+      // Step 2 additional validation: flyer is required (unless curator flyer exists)
       if (currentStep === 2) {
+        const hasFlyer = selectedFile || curatorFlyerUrl || watch("image_url");
+        if (!hasFlyer) {
+          toast.error("Please upload a show flyer");
+          return;
+        }
+        // Reset confirmation when moving to review step
         setIsReviewConfirmed(false);
         setIsTermsAccepted(false);
       }
@@ -366,6 +373,8 @@ const CreateAfterparty = () => {
   };
 
   const onSubmit = async (data: FormData) => {
+    console.log("[CreateAfterparty] onSubmit called", { data, isSubmitting, isReviewConfirmed, isTermsAccepted, isEmailValid, confirmationEmail });
+    
     if (isSubmitting) return;
     
     setIsSubmitting(true);
@@ -389,7 +398,7 @@ const CreateAfterparty = () => {
       // Build payload - include partner IDs when applicable
       const payload: Record<string, unknown> = {
         artist_name: data.artist_name,
-        contact_email: data.contact_email,
+        contact_email: confirmationEmail.trim(), // Use confirmationEmail as contact_email
         title: data.title || undefined, // Title is now optional
         start_at: startDate.toISOString(),
         city: data.city,
@@ -404,8 +413,8 @@ const CreateAfterparty = () => {
         venue_id: data.venue_id && data.venue_id !== "other" ? data.venue_id : undefined,
         // Manual text field for "other" venue selection
         venue_other_name: data.venue_id === "other" ? data.venue_other_name : undefined,
-        // Optional confirmation email for MailerLite
-        confirmation_email: confirmationEmail.trim() || undefined,
+        // Required confirmation email for MailerLite
+        confirmation_email: confirmationEmail.trim(),
       };
 
       // Add discount code if valid
@@ -414,15 +423,20 @@ const CreateAfterparty = () => {
       }
 
       // Create event via create-afterparty-checkout
+      console.log("[CreateAfterparty] Calling create-afterparty-checkout with payload:", payload);
+      
       const { data: response, error } = await supabase.functions.invoke(
         "create-afterparty-checkout",
         { body: payload }
       );
 
       clearTimeout(timeoutId);
+      
+      console.log("[CreateAfterparty] Edge function response:", { response, error });
 
       if (error) {
         const errMsg = error.message || "Failed to create checkout session";
+        console.error("[CreateAfterparty] Edge function error:", error);
         setCheckoutError(errMsg);
         toast.error(errMsg);
         return;
@@ -1022,24 +1036,44 @@ const CreateAfterparty = () => {
           <ChevronRight className="ml-1 h-4 w-4" />
         </Button>
       ) : (
-        <Button
-          type="submit"
-          className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-          disabled={isSubmitting || isUploading || !isReviewConfirmed || !isTermsAccepted || !isEmailValid}
-        >
-          {isSubmitting || isUploading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {isUploading ? "Uploading..." : "Processing..."}
-            </>
-          ) : discountValidation.valid && discountValidation.type === "free" ? (
-            "Create Free Listing"
-          ) : discountValidation.valid && discountValidation.type === "50_percent" ? (
-            "Pay — $5.99"
-          ) : (
-            "Pay — $11.99"
+        <>
+          <Button
+            type="submit"
+            className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSubmitting || isUploading || !isReviewConfirmed || !isTermsAccepted || !isEmailValid}
+            onClick={() => {
+              // Additional debugging when button is clicked but form might not submit
+              console.log("[CreateAfterparty] Submit button clicked", { isSubmitting, isUploading, isReviewConfirmed, isTermsAccepted, isEmailValid, confirmationEmail });
+            }}
+          >
+            {isSubmitting || isUploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {isUploading ? "Uploading..." : "Processing..."}
+              </>
+            ) : discountValidation.valid && discountValidation.type === "free" ? (
+              "Create Free Listing"
+            ) : discountValidation.valid && discountValidation.type === "50_percent" ? (
+              "Pay — $5.99"
+            ) : (
+              "Pay — $11.99"
+            )}
+          </Button>
+          {/* Inline error hints when button is disabled */}
+          {currentStep === 3 && !isSubmitting && !isUploading && (
+            <div className="w-full mt-2">
+              {!isEmailValid && (
+                <p className="text-sm text-red-400 font-sans">Enter a valid email address</p>
+              )}
+              {!isReviewConfirmed && isEmailValid && (
+                <p className="text-sm text-red-400 font-sans">Confirm your listing is accurate</p>
+              )}
+              {!isTermsAccepted && isEmailValid && isReviewConfirmed && (
+                <p className="text-sm text-red-400 font-sans">Accept the Terms of Service</p>
+              )}
+            </div>
           )}
-        </Button>
+        </>
       )}
     </div>
   );
@@ -1107,7 +1141,10 @@ const CreateAfterparty = () => {
             {renderStepIndicator()}
 
             <div className="bg-primary rounded-2xl p-6 md:p-8">
-              <form onSubmit={handleSubmit(onSubmit)}>
+              <form onSubmit={handleSubmit(onSubmit, (formErrors) => {
+                console.error("[CreateAfterparty] Form validation failed:", formErrors);
+                toast.error("Please fix the form errors before submitting");
+              })}>
                 {currentStep === 1 && renderStep1()}
                 {currentStep === 2 && renderStep2()}
                 {currentStep === 3 && renderStep3()}
