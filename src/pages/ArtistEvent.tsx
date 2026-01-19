@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, MessageSquare, CheckCircle2, Share2, Bookmark, PartyPopper, Download, Printer, Clock, DoorOpen } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -506,8 +506,20 @@ const ArtistEvent = () => {
             <div className="flex items-center gap-3 mt-6 text-muted-foreground">
               <Bookmark className="w-5 h-5 shrink-0" />
               <p className="text-lg font-sans">
-                Bookmark this page. This is your home base to promote and manage your After Party.
+                Bookmark this page. This is your home base to promote and manage your After Party.{" "}
+                <Link to="/how-to-golokol" className="text-primary hover:underline">FAQ</Link>
               </p>
+            </div>
+
+            {/* Tutorial Video */}
+            <div className="mt-6 aspect-video w-full rounded-lg overflow-hidden">
+              <iframe
+                src="https://www.youtube.com/embed/4b9rf2KQt0E"
+                title="How to use the Artist Control Room"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
             </div>
           </div>
         </section>
