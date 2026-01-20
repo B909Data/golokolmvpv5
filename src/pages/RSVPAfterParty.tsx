@@ -11,20 +11,12 @@ import Footer from "@/components/Footer";
 import AfterPartyCard from "@/components/AfterPartyCard";
 import { CheckCircle } from "lucide-react";
 
-// Light US phone validation - accepts common formats
-const isValidUSPhone = (phone: string): boolean => {
-  if (!phone.trim()) return true; // Optional field
-  const digitsOnly = phone.replace(/\D/g, "");
-  return digitsOnly.length === 10 || (digitsOnly.length === 11 && digitsOnly.startsWith("1"));
-};
-
 const RSVPAfterParty = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   
   const [displayName, setDisplayName] = useState("");
-  const [phone, setPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
@@ -57,16 +49,6 @@ const RSVPAfterParty = () => {
     
     if (!eventId) return;
 
-    // Validate phone if provided
-    if (phone.trim() && !isValidUSPhone(phone)) {
-      toast({
-        title: "Invalid phone number",
-        description: "Please enter a valid US phone number (10 digits).",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -78,7 +60,6 @@ const RSVPAfterParty = () => {
         .insert({
           event_id: eventId,
           display_name: displayName.trim() || null,
-          phone: phone.trim() || null,
           checkin_method: "qr",
           qr_token: qrToken,
         })
@@ -209,28 +190,6 @@ const RSVPAfterParty = () => {
                     onChange={(e) => setDisplayName(e.target.value)}
                     className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
                   />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-foreground font-sans font-bold">
-                    Phone number (optional) — get a text when the artist enters
-                  </Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="(555) 123-4567"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
-                  />
-                  <p className="text-foreground font-sans font-semibold text-sm">
-                    We ONLY use this to alert you when the artist enters the After Party.
-                    <br />
-                    Your number is not shared with the artist or any third parties.
-                  </p>
-                  <p className="text-muted-foreground font-sans text-xs">
-                    Msg & data rates may apply.
-                  </p>
                 </div>
 
                 <Button
