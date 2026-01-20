@@ -852,13 +852,9 @@ const buildAttribution = (
   curatorName: string | null,
   venueName: string | null
 ): string | null => {
-  // If both curator and venue exist, show combined format
-  if (curatorName && venueName) {
-    return `This ${artistName} After Party is brought to you by ${curatorName} at ${venueName}.`;
-  }
-  // If only venue exists
-  if (venueName) {
-    return `This ${artistName} After Party is brought to you by ${venueName}.`;
+  // If curator exists, show attribution
+  if (curatorName) {
+    return `This ${artistName} After Party is brought to you by ${curatorName}.`;
   }
   // No attribution
   return null;
@@ -1102,9 +1098,9 @@ const WelcomeDashboard = ({
   return (
     <main className="flex-1 overflow-y-auto pb-24">
       <div className="max-w-[640px] mx-auto px-4 py-6 space-y-4">
-        {/* Partner Attribution - Subtle secondary text */}
+        {/* Partner Attribution - Prominent text */}
         {attributionText && (
-          <p className="text-muted-foreground text-sm font-sans text-center leading-relaxed">
+          <p className="text-foreground text-lg font-sans font-semibold text-center leading-relaxed">
             {attributionText}
           </p>
         )}
