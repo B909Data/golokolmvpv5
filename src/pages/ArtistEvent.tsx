@@ -824,6 +824,26 @@ const ArtistEvent = () => {
           </div>
         </section>
 
+        {/* CONTAINER 5: Educational Video - Dark Theme */}
+        <section className="px-4 pb-24">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-black border border-primary/30 rounded-xl p-6">
+              <h3 className="font-display text-xl text-primary uppercase tracking-wide mb-6">
+                How to Promote Your After Party
+              </h3>
+              <div className="w-full aspect-video rounded-lg overflow-hidden">
+                <iframe
+                  src="https://www.youtube.com/embed/6Q7AZCHm8OE?rel=0"
+                  title="How to Promote Your After Party"
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Walk-In Pass Modal */}
         <Dialog open={!!walkInPassData} onOpenChange={(open) => !open && closeWalkInPassModal()}>
           <DialogContent className="sm:max-w-md bg-black border-primary">
