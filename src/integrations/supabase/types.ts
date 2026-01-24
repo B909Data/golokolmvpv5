@@ -255,7 +255,9 @@ export type Database = {
         Row: {
           admin_state: string
           after_party_enabled: boolean
+          after_party_expires_at: string | null
           after_party_opens_at: string | null
+          after_party_started_at: string | null
           artist_access_token: string | null
           artist_entered_sms_at: string | null
           artist_name: string | null
@@ -291,7 +293,9 @@ export type Database = {
         Insert: {
           admin_state?: string
           after_party_enabled?: boolean
+          after_party_expires_at?: string | null
           after_party_opens_at?: string | null
+          after_party_started_at?: string | null
           artist_access_token?: string | null
           artist_entered_sms_at?: string | null
           artist_name?: string | null
@@ -327,7 +331,9 @@ export type Database = {
         Update: {
           admin_state?: string
           after_party_enabled?: boolean
+          after_party_expires_at?: string | null
           after_party_opens_at?: string | null
+          after_party_started_at?: string | null
           artist_access_token?: string | null
           artist_entered_sms_at?: string | null
           artist_name?: string | null
