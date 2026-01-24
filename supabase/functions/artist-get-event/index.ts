@@ -71,6 +71,13 @@ serve(async (req) => {
         venue_name: event.venue_name,
         merch_link: event.merch_link,
         music_link: event.music_link,
+        after_party_opens_at: event.after_party_opens_at,
+        // Paid access fields
+        stripe_account_id: event.stripe_account_id,
+        pricing_mode: event.pricing_mode,
+        fixed_price: event.fixed_price,
+        min_price: event.min_price,
+        pricing_locked_at: event.pricing_locked_at,
       },
       messages: messages || [],
     }), {
