@@ -26,6 +26,7 @@ type EventData = {
   start_at: string;
   city: string | null;
   after_party_opens_at: string | null;
+  after_party_expires_at: string | null;
   pinned_message: string | null;
   livestream_url: string | null;
   image_url: string | null;
@@ -884,7 +885,7 @@ const AfterPartyRoom = () => {
             merchLink={event.merch_link}
             musicLink={event.music_link}
             isExpired={isExpired}
-            afterPartyOpensAt={event.after_party_opens_at}
+            afterPartyExpiresAt={event.after_party_expires_at}
             onGoToChat={() => setViewMode("chat")}
           />
         </div>
@@ -947,55 +948,34 @@ interface WelcomeDashboardProps {
   merchLink: string | null;
   musicLink: string | null;
   isExpired?: boolean;
-  afterPartyOpensAt: string | null;
+  afterPartyExpiresAt: string | null;
   onGoToChat: () => void;
 }
 
-// Real-time countdown hook for fan view
-const useRealTimeCountdown = (afterPartyOpensAt: string | null) => {
-  const [countdown, setCountdown] = useState<string>("24:00:00");
-  const [hasStarted, setHasStarted] = useState(false);
-  const [isExpiredLocal, setIsExpiredLocal] = useState(false);
-
-  useEffect(() => {
-    if (!afterPartyOpensAt) {
-      setCountdown("24:00:00");
-      setHasStarted(false);
-      setIsExpiredLocal(false);
-      return;
-    }
-
-    setHasStarted(true);
-
-    const calculateCountdown = () => {
-      const openTime = new Date(afterPartyOpensAt).getTime();
-      const endTime = openTime + 24 * 60 * 60 * 1000; // 24 hours after opening
-      const now = Date.now();
-      const remaining = endTime - now;
-
-      if (remaining <= 0) {
-        setCountdown("00:00:00");
-        setIsExpiredLocal(true);
-        return;
-      }
-
-      const hours = Math.floor(remaining / (1000 * 60 * 60));
-      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-
-      setCountdown(
-        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-      );
-      setIsExpiredLocal(false);
-    };
-
-    calculateCountdown();
-    const interval = setInterval(calculateCountdown, 1000);
-
-    return () => clearInterval(interval);
-  }, [afterPartyOpensAt]);
-
-  return { countdown, hasStarted, isExpiredLocal };
+// Format party end time in user's local timezone
+const formatPartyEndTime = (expiresAt: string | null): { label: string; value: string } => {
+  if (!expiresAt) {
+    return { label: "Party Starts When", value: "The first fan joins." };
+  }
+  
+  const expiresDate = new Date(expiresAt);
+  const now = new Date();
+  
+  if (expiresDate <= now) {
+    return { label: "Party Ended", value: "This party has ended." };
+  }
+  
+  // Format in user's local timezone
+  const formattedTime = new Intl.DateTimeFormat(undefined, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(expiresDate);
+  
+  return { label: "Party Ends At", value: formattedTime };
 };
 
 const WelcomeDashboard = ({
@@ -1009,14 +989,14 @@ const WelcomeDashboard = ({
   merchLink,
   musicLink,
   isExpired = false,
-  afterPartyOpensAt,
+  afterPartyExpiresAt,
   onGoToChat,
 }: WelcomeDashboardProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [email, setEmail] = useState("");
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const [emailSubmitted, setEmailSubmitted] = useState(false);
-  const { countdown, hasStarted, isExpiredLocal } = useRealTimeCountdown(afterPartyOpensAt);
+  const partyEndInfo = formatPartyEndTime(afterPartyExpiresAt);
 
   const handleEmailSubmit = async () => {
     if (!email.trim() || !eventId) return;
@@ -1360,17 +1340,17 @@ const WelcomeDashboard = ({
             House Rules
           </h3>
           
-          {/* Real-time Countdown - Roboto Bold for numeric displays */}
+          {/* Party End Time - Simple timestamp display */}
           <div className="bg-black/50 rounded-lg p-3 mb-4 flex items-center justify-between border border-primary/20">
             <div className="flex items-center gap-2">
               <Clock size={18} className="text-primary" />
-              <span className="text-muted-foreground font-sans text-sm">Time Left</span>
+              <span className="text-muted-foreground font-sans text-sm">{partyEndInfo.label}</span>
             </div>
             <span 
-              className="text-primary text-xl font-bold" 
+              className="text-primary text-base font-bold text-right" 
               style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700 }}
             >
-              {isExpiredLocal ? "After Party ended" : (hasStarted ? countdown : "24:00:00")}
+              {partyEndInfo.value}
             </span>
           </div>
           

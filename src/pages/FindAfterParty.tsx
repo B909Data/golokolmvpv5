@@ -47,6 +47,7 @@ interface Event {
   youtube_url: string | null;
   image_url: string | null;
   artist_name: string | null;
+  after_party_expires_at: string | null;
 }
 
 const FindAfterParty = () => {
@@ -55,16 +56,26 @@ const FindAfterParty = () => {
   const { data: events, isLoading } = useQuery({
     queryKey: ["after-parties-enabled"],
     queryFn: async () => {
+      // Fetch After Parties that are enabled. We filter expiration client-side
+      // because we need: (after_party_expires_at IS NULL) OR (after_party_expires_at > now())
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, start_at, city, venue_name, genres, youtube_url, image_url, artist_name")
+        .select("id, title, start_at, city, venue_name, genres, youtube_url, image_url, artist_name, after_party_expires_at")
         .eq("after_party_enabled", true)
         .eq("city", "Atlanta") // MVP: Atlanta only
-        .gte("start_at", new Date().toISOString())
         .order("start_at", { ascending: true });
 
       if (error) throw error;
-      return data as Event[];
+      
+      // Filter client-side: show events that haven't expired
+      // An event is active if: after_party_expires_at is NULL OR after_party_expires_at > now
+      const now = new Date();
+      const activeEvents = (data || []).filter((event) => {
+        if (!event.after_party_expires_at) return true; // Not started yet = show it
+        return new Date(event.after_party_expires_at) > now;
+      });
+      
+      return activeEvents as Event[];
     },
   });
 

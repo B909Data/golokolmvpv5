@@ -41,6 +41,7 @@ interface EventData {
   merch_link: string | null;
   music_link: string | null;
   after_party_opens_at: string | null;
+  after_party_expires_at: string | null;
   // Paid access fields
   stripe_account_id: string | null;
   pricing_mode: string | null;
@@ -74,47 +75,30 @@ const StatusCard = ({ icon: Icon, label, value, accent = false }: {
   </div>
 );
 
-// Time Left Hook - calculates remaining time from after_party_opens_at
-const useTimeLeft = (afterPartyOpensAt: string | null) => {
-  const [timeLeft, setTimeLeft] = useState<string>("24:00:00");
-  const [isExpired, setIsExpired] = useState(false);
-
-  useEffect(() => {
-    if (!afterPartyOpensAt) {
-      setTimeLeft("24:00:00");
-      setIsExpired(false);
-      return;
-    }
-
-    const calculateTimeLeft = () => {
-      const openTime = new Date(afterPartyOpensAt).getTime();
-      const endTime = openTime + 24 * 60 * 60 * 1000; // 24 hours after opening
-      const now = Date.now();
-      const remaining = endTime - now;
-
-      if (remaining <= 0) {
-        setTimeLeft("00:00:00");
-        setIsExpired(true);
-        return;
-      }
-
-      const hours = Math.floor(remaining / (1000 * 60 * 60));
-      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-
-      setTimeLeft(
-        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-      );
-      setIsExpired(false);
-    };
-
-    calculateTimeLeft();
-    const interval = setInterval(calculateTimeLeft, 1000);
-
-    return () => clearInterval(interval);
-  }, [afterPartyOpensAt]);
-
-  return { timeLeft, isExpired };
+// Format party end time in user's local timezone
+const formatPartyEndTime = (expiresAt: string | null): { label: string; value: string } => {
+  if (!expiresAt) {
+    return { label: "Party Starts When", value: "The first fan joins." };
+  }
+  
+  const expiresDate = new Date(expiresAt);
+  const now = new Date();
+  
+  if (expiresDate <= now) {
+    return { label: "Party Ended", value: "This party has ended." };
+  }
+  
+  // Format in user's local timezone
+  const formattedTime = new Intl.DateTimeFormat(undefined, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(expiresDate);
+  
+  return { label: "Party Ends At", value: formattedTime };
 };
 
 const ArtistEvent = () => {
@@ -157,8 +141,11 @@ const ArtistEvent = () => {
   // Share link copied state
   const [shareLinkCopied, setShareLinkCopied] = useState(false);
 
-  // Time left hook
-  const { timeLeft, isExpired } = useTimeLeft(event?.after_party_opens_at || null);
+  // Party end time display (replaces buggy countdown timer)
+  const partyEndInfo = formatPartyEndTime(event?.after_party_expires_at || null);
+  const isExpired = event?.after_party_expires_at 
+    ? new Date(event.after_party_expires_at) <= new Date() 
+    : false;
 
   const fetchEvent = async () => {
     if (!eventId || !token) return;
@@ -736,7 +723,7 @@ const ArtistEvent = () => {
               <div className="grid grid-cols-3 gap-3 pt-4 border-t border-primary/20">
                 <StatusCard icon={CheckCircle2} label="Checked In" value={checkedInCount} accent />
                 <StatusCard icon={Users} label="In Room" value={checkedInCount} />
-                <StatusCard icon={Clock} label="Time Left" value={timeLeft} />
+                <StatusCard icon={Clock} label={partyEndInfo.label} value={partyEndInfo.value} />
               </div>
             </div>
           </div>
