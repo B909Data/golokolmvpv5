@@ -118,8 +118,13 @@ export type Database = {
           display_name: string | null
           event_id: string
           id: string
+          paid_amount: number | null
+          paid_at: string | null
+          payment_status: string | null
           phone: string | null
           qr_token: string | null
+          sms_opt_in: boolean | null
+          stripe_payment_intent_id: string | null
         }
         Insert: {
           checked_in_at?: string | null
@@ -128,8 +133,13 @@ export type Database = {
           display_name?: string | null
           event_id: string
           id?: string
+          paid_amount?: number | null
+          paid_at?: string | null
+          payment_status?: string | null
           phone?: string | null
           qr_token?: string | null
+          sms_opt_in?: boolean | null
+          stripe_payment_intent_id?: string | null
         }
         Update: {
           checked_in_at?: string | null
@@ -138,8 +148,13 @@ export type Database = {
           display_name?: string | null
           event_id?: string
           id?: string
+          paid_amount?: number | null
+          paid_at?: string | null
+          payment_status?: string | null
           phone?: string | null
           qr_token?: string | null
+          sms_opt_in?: boolean | null
+          stripe_payment_intent_id?: string | null
         }
         Relationships: [
           {
@@ -251,13 +266,17 @@ export type Database = {
           curator_id: string | null
           curator_other_name: string | null
           ends_at: string | null
+          fixed_price: number | null
           genres: string[] | null
           id: string
           image_url: string | null
           livestream_url: string | null
           merch_link: string | null
+          min_price: number | null
           music_link: string | null
           pinned_message: string | null
+          pricing_locked_at: string | null
+          pricing_mode: string | null
           start_at: string
           status: Database["public"]["Enums"]["event_status"]
           ticket_url: string | null
@@ -282,13 +301,17 @@ export type Database = {
           curator_id?: string | null
           curator_other_name?: string | null
           ends_at?: string | null
+          fixed_price?: number | null
           genres?: string[] | null
           id?: string
           image_url?: string | null
           livestream_url?: string | null
           merch_link?: string | null
+          min_price?: number | null
           music_link?: string | null
           pinned_message?: string | null
+          pricing_locked_at?: string | null
+          pricing_mode?: string | null
           start_at: string
           status?: Database["public"]["Enums"]["event_status"]
           ticket_url?: string | null
@@ -313,13 +336,17 @@ export type Database = {
           curator_id?: string | null
           curator_other_name?: string | null
           ends_at?: string | null
+          fixed_price?: number | null
           genres?: string[] | null
           id?: string
           image_url?: string | null
           livestream_url?: string | null
           merch_link?: string | null
+          min_price?: number | null
           music_link?: string | null
           pinned_message?: string | null
+          pricing_locked_at?: string | null
+          pricing_mode?: string | null
           start_at?: string
           status?: Database["public"]["Enums"]["event_status"]
           ticket_url?: string | null
