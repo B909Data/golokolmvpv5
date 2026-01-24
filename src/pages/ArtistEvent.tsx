@@ -23,6 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import PaidAccessSection from "@/components/PaidAccessSection";
 
 const PUBLIC_BASE_URL = "https://golokol.app";
 
@@ -40,6 +41,12 @@ interface EventData {
   merch_link: string | null;
   music_link: string | null;
   after_party_opens_at: string | null;
+  // Paid access fields
+  stripe_account_id: string | null;
+  pricing_mode: string | null;
+  fixed_price: number | null;
+  min_price: number | null;
+  pricing_locked_at: string | null;
 }
 
 interface Message {
@@ -116,6 +123,8 @@ const ArtistEvent = () => {
   const navigate = useNavigate();
   const token = searchParams.get("token");
   const isWelcome = searchParams.get("welcome") === "true";
+  const stripeConnected = searchParams.get("stripe_connected") === "true";
+  const stripeRefresh = searchParams.get("stripe_refresh") === "true";
 
   const [event, setEvent] = useState<EventData | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -201,6 +210,29 @@ const ArtistEvent = () => {
       });
     }
   }, [isWelcome, event]);
+
+  // Handle Stripe Connect callback
+  useEffect(() => {
+    if (stripeConnected && event) {
+      toast.success("Stripe connected!", {
+        description: "You can now set up paid access for your After Party.",
+        duration: 5000,
+      });
+      // Clean up URL params
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("stripe_connected");
+      window.history.replaceState({}, "", newUrl.toString());
+    }
+    if (stripeRefresh && event) {
+      toast.info("Stripe onboarding incomplete", {
+        description: "Click 'Connect with Stripe' to continue setup.",
+        duration: 5000,
+      });
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("stripe_refresh");
+      window.history.replaceState({}, "", newUrl.toString());
+    }
+  }, [stripeConnected, stripeRefresh, event]);
 
   // Cleanup scanner on unmount
   useEffect(() => {
@@ -567,6 +599,20 @@ const ArtistEvent = () => {
             </div>
           </div>
         </section>
+
+        {/* PAID ACCESS SECTION */}
+        {event && eventId && token && (
+          <PaidAccessSection
+            eventId={eventId}
+            token={token}
+            stripeAccountId={event.stripe_account_id}
+            pricingMode={event.pricing_mode}
+            fixedPrice={event.fixed_price}
+            minPrice={event.min_price}
+            pricingLockedAt={event.pricing_locked_at}
+            onUpdate={fetchEvent}
+          />
+        )}
 
         {/* CONTAINER 2: After Party Check-In - Dark Theme */}
         <section className="px-4 pb-8">

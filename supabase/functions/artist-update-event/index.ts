@@ -12,7 +12,21 @@ serve(async (req) => {
   }
 
   try {
-    const { event_id, token, pinned_message, youtube_url, image_url, livestream_url, merch_link, music_link } = await req.json();
+    const { 
+      event_id, 
+      token, 
+      pinned_message, 
+      youtube_url, 
+      image_url, 
+      livestream_url, 
+      merch_link, 
+      music_link,
+      // Paid access fields
+      stripe_account_id,
+      pricing_mode,
+      fixed_price,
+      min_price,
+    } = await req.json();
 
     if (!event_id || !token) {
       throw new Error("Missing event_id or token");
@@ -42,13 +56,18 @@ serve(async (req) => {
     }
 
     // Build update object with only provided fields
-    const updateData: Record<string, string | null> = {};
+    const updateData: Record<string, string | number | null> = {};
     if (pinned_message !== undefined) updateData.pinned_message = pinned_message;
     if (youtube_url !== undefined) updateData.youtube_url = youtube_url;
     if (image_url !== undefined) updateData.image_url = image_url;
     if (livestream_url !== undefined) updateData.livestream_url = livestream_url;
     if (merch_link !== undefined) updateData.merch_link = merch_link;
     if (music_link !== undefined) updateData.music_link = music_link;
+    // Paid access fields
+    if (stripe_account_id !== undefined) updateData.stripe_account_id = stripe_account_id;
+    if (pricing_mode !== undefined) updateData.pricing_mode = pricing_mode;
+    if (fixed_price !== undefined) updateData.fixed_price = fixed_price;
+    if (min_price !== undefined) updateData.min_price = min_price;
 
     const { error: updateError } = await supabase
       .from("events")
