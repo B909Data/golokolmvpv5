@@ -91,12 +91,13 @@ serve(async (req) => {
       }
     }
 
-    // Get all attendees with phone numbers for this event
+    // Get all attendees with phone numbers who have opted in for this event
     const { data: attendees, error: attendeesError } = await supabaseAdmin
       .from("attendees")
-      .select("id, phone")
+      .select("id, phone, sms_opt_in")
       .eq("event_id", event_id)
-      .not("phone", "is", null);
+      .not("phone", "is", null)
+      .eq("sms_opt_in", true);
 
     if (attendeesError) {
       console.error("[ARTIST-ENTERED-SMS] Failed to fetch attendees:", attendeesError);
@@ -107,7 +108,7 @@ serve(async (req) => {
     }
 
     const validAttendees = attendees?.filter(a => a.phone && a.phone.trim()) || [];
-    console.log("[ARTIST-ENTERED-SMS] Found attendees with phones:", validAttendees.length);
+    console.log("[ARTIST-ENTERED-SMS] Found opt-in attendees with phones:", validAttendees.length);
 
     if (validAttendees.length === 0) {
       // Update timestamp anyway to prevent spam

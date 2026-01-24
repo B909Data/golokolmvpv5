@@ -254,7 +254,9 @@ const AfterPartyRoom = () => {
     enabled: !!eventId && (isArtistMode || (!!attendeeId && !!attendeeData?.checked_in_at)),
   });
 
-  const { data: messages = [], refetch: refetchMessages } = useQuery({
+  const [messages, setMessages] = useState<Message[]>([]);
+  
+  const { refetch: refetchMessages } = useQuery({
     queryKey: ["after-party-messages", eventId],
     queryFn: async (): Promise<Message[]> => {
       const { data, error } = await supabase
@@ -264,10 +266,83 @@ const AfterPartyRoom = () => {
         .order("created_at", { ascending: true });
 
       if (error) throw error;
+      setMessages(data || []);
       return data || [];
     },
     enabled: !!eventId && (isArtistMode || (!!attendeeId && !!attendeeData?.checked_in_at)),
   });
+
+  // Realtime subscription for chat messages
+  useEffect(() => {
+    if (!eventId) return;
+    if (!isArtistMode && (!attendeeId || !attendeeData?.checked_in_at)) return;
+
+    console.log("[AfterPartyRoom] Setting up realtime subscription for messages, eventId:", eventId);
+
+    const channel = supabase
+      .channel(`after_party_messages_${eventId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'after_party_messages',
+          filter: `event_id=eq.${eventId}`,
+        },
+        async (payload) => {
+          console.log("[AfterPartyRoom] Realtime INSERT received:", payload.new);
+          
+          // Fetch the full message with attendee info
+          const newMsg = payload.new as { id: string; role: string; message: string | null; created_at: string | null; attendee_id: string; event_id: string };
+          
+          // Fetch attendee display_name for this message
+          const { data: attendeeInfo } = await supabase
+            .from("attendees")
+            .select("display_name")
+            .eq("id", newMsg.attendee_id)
+            .maybeSingle();
+          
+          const fullMessage: Message = {
+            id: newMsg.id,
+            role: newMsg.role,
+            message: newMsg.message,
+            created_at: newMsg.created_at,
+            attendee_id: newMsg.attendee_id,
+            attendees: attendeeInfo ? { display_name: attendeeInfo.display_name } : null,
+          };
+          
+          setMessages((prev) => {
+            // Avoid duplicates
+            if (prev.some(m => m.id === fullMessage.id)) {
+              return prev;
+            }
+            return [...prev, fullMessage];
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'after_party_messages',
+          filter: `event_id=eq.${eventId}`,
+        },
+        (payload) => {
+          console.log("[AfterPartyRoom] Realtime DELETE received:", payload.old);
+          const deletedId = (payload.old as { id: string }).id;
+          setMessages((prev) => prev.filter(m => m.id !== deletedId));
+        }
+      )
+      .subscribe((status) => {
+        console.log("[AfterPartyRoom] Realtime subscription status:", status);
+      });
+
+    return () => {
+      console.log("[AfterPartyRoom] Cleaning up realtime subscription");
+      supabase.removeChannel(channel);
+    };
+  }, [eventId, attendeeId, attendeeData?.checked_in_at, isArtistMode]);
 
   // Check if fan has already opted in (for end-state display)
   const { data: hasOptedIn = false } = useQuery({
