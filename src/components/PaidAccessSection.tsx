@@ -187,105 +187,112 @@ const PaidAccessSection = ({
               </div>
             )}
 
-            {/* Fan Pay Gate Section - Inside Stripe Connect container */}
-            {isConnected && (
-              <div className="border-t border-primary/30 pt-4 mt-4 space-y-4">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-primary" />
-                  <Label className="text-base text-primary font-sans font-medium">
-                    Fan Pay Gate
-                  </Label>
-                </div>
-
-                {/* Locked State */}
-                {isLocked ? (
-                  <div className="bg-primary/20 border border-primary/40 rounded-lg p-4 space-y-3">
-                    <div className="flex items-center gap-2 text-primary">
-                      <Lock className="w-5 h-5" />
-                      <span className="font-sans text-base font-medium">Pricing Locked</span>
-                    </div>
-                    <p className="text-primary/80 text-sm font-sans">
-                      Pricing locked after first fan purchase. Contact support to make changes.
-                    </p>
-                    {pricingMode && (
-                      <div className="bg-black/30 rounded-lg p-3">
-                        <p className="text-foreground text-sm font-sans">
-                          {pricingMode === "fixed" && fixedPrice ? (
-                            <>Current price: <strong>{formatPrice(fixedPrice)}</strong></>
-                          ) : pricingMode === "pwyw" && minPrice ? (
-                            <>Pay what you want (minimum <strong>{formatPrice(minPrice)}</strong>)</>
-                          ) : (
-                            "No pricing set"
-                          )}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    {/* Pricing Mode Toggle */}
-                    <RadioGroup
-                      value={mode}
-                      onValueChange={(val) => setMode(val as "fixed" | "pwyw")}
-                      className="space-y-3"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <RadioGroupItem value="fixed" id="fixed" className="border-primary text-primary" />
-                        <Label htmlFor="fixed" className="text-foreground font-sans text-base cursor-pointer">
-                          Set price — one fixed price
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <RadioGroupItem value="pwyw" id="pwyw" className="border-primary text-primary" />
-                        <Label htmlFor="pwyw" className="text-foreground font-sans text-base cursor-pointer">
-                          Pay what you want — set a minimum
-                        </Label>
-                      </div>
-                    </RadioGroup>
-
-                    {/* Price Input - Shows when mode is selected */}
-                    {mode && (
-                      <div className="space-y-3 pt-2">
-                        <Label className="text-sm text-primary/80 font-sans">
-                          {mode === "fixed" ? "Price (USD)" : "Minimum Price (USD)"}
-                        </Label>
-                        <div className="flex items-center gap-3">
-                          <div className="relative flex-1">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary font-sans text-lg">$</span>
-                            <Input
-                              type="number"
-                              min="1"
-                              step="0.01"
-                              value={priceValue}
-                              onChange={(e) => setPriceValue(e.target.value)}
-                              placeholder="5.00"
-                              className="pl-8 bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans text-base py-5"
-                            />
-                          </div>
-                          <Button
-                            onClick={handleSavePricing}
-                            disabled={isSaving || !priceValue}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 text-base py-5"
-                          >
-                            {isSaving ? (
-                              <>
-                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                Saving...
-                              </>
-                            ) : (
-                              "Save"
-                            )}
-                          </Button>
-                        </div>
-                        <p className="text-primary/60 text-xs font-sans">
-                          Minimum $1.00. {mode === "pwyw" ? "Fans can pay more if they choose." : ""}
-                        </p>
-                      </div>
-                    )}
-                  </>
-                )}
+            {/* Fan Pay Gate Section - Always visible inside Stripe Connect container */}
+            <div className="border-t border-primary/30 pt-4 mt-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-primary" />
+                <Label className="text-base text-primary font-sans font-medium">
+                  Fan Pay Gate
+                </Label>
               </div>
-            )}
+
+              {/* Info note when Stripe not connected */}
+              {!isConnected && (
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                  <p className="text-yellow-500 text-sm font-sans">
+                    Connect Stripe to accept payments. You can still set pricing now.
+                  </p>
+                </div>
+              )}
+
+              {/* Locked State - shows when pricing_locked_at is set */}
+              {isLocked ? (
+                <div className="bg-primary/20 border border-primary/40 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Lock className="w-5 h-5" />
+                    <span className="font-sans text-base font-medium">Pricing Locked</span>
+                  </div>
+                  <p className="text-primary/80 text-sm font-sans">
+                    Pricing locked after first fan purchase. Contact support to make changes.
+                  </p>
+                  {pricingMode && (
+                    <div className="bg-black/30 rounded-lg p-3">
+                      <p className="text-foreground text-sm font-sans">
+                        {pricingMode === "fixed" && fixedPrice ? (
+                          <>Current price: <strong>{formatPrice(fixedPrice)}</strong></>
+                        ) : pricingMode === "pwyw" && minPrice ? (
+                          <>Pay what you want (minimum <strong>{formatPrice(minPrice)}</strong>)</>
+                        ) : (
+                          "No pricing set"
+                        )}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {/* Pricing Mode Toggle */}
+                  <RadioGroup
+                    value={mode}
+                    onValueChange={(val) => setMode(val as "fixed" | "pwyw")}
+                    className="space-y-3"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <RadioGroupItem value="fixed" id="fixed" className="border-primary text-primary" />
+                      <Label htmlFor="fixed" className="text-foreground font-sans text-base cursor-pointer">
+                        Set price — one fixed price
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <RadioGroupItem value="pwyw" id="pwyw" className="border-primary text-primary" />
+                      <Label htmlFor="pwyw" className="text-foreground font-sans text-base cursor-pointer">
+                        Pay what you want — set a minimum
+                      </Label>
+                    </div>
+                  </RadioGroup>
+
+                  {/* Price Input - Shows when mode is selected */}
+                  {mode && (
+                    <div className="space-y-3 pt-2">
+                      <Label className="text-sm text-primary/80 font-sans">
+                        {mode === "fixed" ? "Price (USD)" : "Minimum Price (USD)"}
+                      </Label>
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex-1">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary font-sans text-lg">$</span>
+                          <Input
+                            type="number"
+                            min="1"
+                            step="0.01"
+                            value={priceValue}
+                            onChange={(e) => setPriceValue(e.target.value)}
+                            placeholder="5.00"
+                            className="pl-8 bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans text-base py-5"
+                          />
+                        </div>
+                        <Button
+                          onClick={handleSavePricing}
+                          disabled={isSaving || !priceValue}
+                          className="bg-primary text-primary-foreground hover:bg-primary/90 text-base py-5"
+                        >
+                          {isSaving ? (
+                            <>
+                              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            "Save"
+                          )}
+                        </Button>
+                      </div>
+                      <p className="text-primary/60 text-xs font-sans">
+                        Minimum $1.00. {mode === "pwyw" ? "Fans can pay more if they choose." : ""}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Entry Points Info - Shows when pricing is configured */}
