@@ -83,10 +83,38 @@ serve(async (req) => {
       throw new Error("Failed to save Stripe account");
     }
 
-    // Get origin for redirect URLs
-    const origin = req.headers.get("origin") || "https://golokol.app";
+    // Get origin for redirect URLs with safe fallback
+    const rawOrigin = req.headers.get("origin");
+    const rawReferer = req.headers.get("referer");
+
+    let origin: string;
+    if (rawOrigin) {
+      origin = rawOrigin;
+    } else if (rawReferer) {
+      try {
+        origin = new URL(rawReferer).origin;
+      } catch {
+        origin = "https://golokol.app";
+      }
+    } else {
+      origin = "https://golokol.app";
+    }
+
     const returnUrl = `${origin}/artist/event/${event_id}?token=${token}&stripe_connected=true`;
     const refreshUrl = `${origin}/artist/event/${event_id}?token=${token}&stripe_refresh=true`;
+
+    // DEBUG: Log exact values at runtime
+    console.log("DEBUG - Request origin header:", rawOrigin);
+    console.log("DEBUG - Request referer header:", rawReferer);
+    console.log("DEBUG - Resolved origin:", origin);
+    console.log("DEBUG - return_url:", returnUrl);
+    console.log("DEBUG - refresh_url:", refreshUrl);
+    console.log("DEBUG - Is HTTPS:", origin.startsWith("https://"));
+
+    // DEBUG: Log Stripe key mode without exposing the key
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+    const keyMode = stripeKey.startsWith("sk_live_") ? "LIVE" : stripeKey.startsWith("sk_test_") ? "TEST" : "UNKNOWN";
+    console.log("DEBUG - Stripe key mode:", keyMode);
 
     // Create account link for onboarding
     const accountLink = await stripe.accountLinks.create({
