@@ -279,6 +279,7 @@ export type Database = {
           pricing_mode: string | null
           start_at: string
           status: Database["public"]["Enums"]["event_status"]
+          stripe_account_id: string | null
           ticket_url: string | null
           title: string
           type: Database["public"]["Enums"]["event_type"]
@@ -314,6 +315,7 @@ export type Database = {
           pricing_mode?: string | null
           start_at: string
           status?: Database["public"]["Enums"]["event_status"]
+          stripe_account_id?: string | null
           ticket_url?: string | null
           title: string
           type: Database["public"]["Enums"]["event_type"]
@@ -349,6 +351,7 @@ export type Database = {
           pricing_mode?: string | null
           start_at?: string
           status?: Database["public"]["Enums"]["event_status"]
+          stripe_account_id?: string | null
           ticket_url?: string | null
           title?: string
           type?: Database["public"]["Enums"]["event_type"]
