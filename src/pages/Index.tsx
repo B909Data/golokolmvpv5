@@ -29,7 +29,7 @@ const Index = () => {
 
             <Link to="/for-artists" className="inline-block mb-4">
               <Button variant="secondary" size="lg">
-                Create an After Party
+                Throw an After Party
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
