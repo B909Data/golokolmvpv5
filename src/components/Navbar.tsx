@@ -23,7 +23,6 @@ const Navbar = () => {
     { label: "For Artists", path: "/for-artists", colorClass: "text-foreground" },
     { label: "Create an After Party", path: "/create-afterparty", hideOnTablet: true, colorClass: "text-foreground" },
     { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Listening Sessions", colorClass: "text-primary" },
-    { label: "How to GoLokol", path: "/how-to-golokol", hideOnTablet: true, colorClass: "text-foreground" },
   ];
 
   const tabletHiddenItems = navItems.filter((item) => item.hideOnTablet);
@@ -103,9 +102,9 @@ const Navbar = () => {
 
           {/* Desktop/Tablet CTA Button */}
           <div className="hidden md:flex items-center flex-shrink-0 ml-2">
-            <Link to="/find-after-party">
+            <Link to="/how-to-golokol">
               <Button variant="secondary" size="sm" className="text-xs md:text-sm whitespace-nowrap">
-                Tonight's After Parties
+                How to GoLokol
               </Button>
             </Link>
           </div>
@@ -136,9 +135,9 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="pt-2 mt-2 border-t border-border/50">
-                <Link to="/find-after-party" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/how-to-golokol" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="secondary" size="sm" className="w-full">
-                    Tonight's After Parties
+                    How to GoLokol
                   </Button>
                 </Link>
               </div>
