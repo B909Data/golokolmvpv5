@@ -533,7 +533,7 @@ const ArtistEvent = () => {
             {/* Tutorial Video */}
             <div className="mt-6 aspect-video w-full rounded-lg overflow-hidden">
               <iframe
-                src="https://www.youtube.com/embed/4b9rf2KQt0E"
+                src="https://www.youtube.com/embed/YxRz4qjIUmI"
                 title="How to use the Artist Control Room"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

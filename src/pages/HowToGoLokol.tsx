@@ -213,7 +213,7 @@ const HowToGoLokol = () => {
                   <Paragraph className="text-[#555555]">
                     This video walks through how to use your Artist Control Room to promote, manage, and host your After Party — all in one place.
                   </Paragraph>
-                  <YouTubeEmbed videoId="4b9rf2KQt0E" />
+                  <YouTubeEmbed videoId="YxRz4qjIUmI" />
                 </div>
 
                 {/* Subsection: How to Promote */}
