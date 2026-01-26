@@ -27,15 +27,15 @@ const Index = () => {
               The show is over.
             </h1>
 
-            <Link to="/find-after-party" className="inline-block mb-4">
+            <Link to="/for-artists" className="inline-block mb-4">
               <Button variant="secondary" size="lg">
-                Tonight's After Party
+                Create an After Party
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
 
             <p className="font-display font-bold text-lg md:text-xl lg:text-2xl text-primary leading-[1.1]">
-              What comes after.
+              For Artists
             </p>
           </div>
         </div>
