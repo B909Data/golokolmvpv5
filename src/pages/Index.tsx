@@ -34,20 +34,23 @@ const Index = () => {
               </Button>
             </Link>
 
-            <p className="font-display font-bold text-lg md:text-xl lg:text-2xl text-primary leading-[1.1]">
-              Artist curated. Fan appreciated.
-            </p>
           </div>
         </div>
       </section>
 
-      {/* SECTION 2 — EMPTY STAGE (atmosphere only) */}
+      {/* SECTION 2 — EMPTY STAGE with subcaption */}
       <section className="relative w-full">
         <img
           src={section2Image}
           alt=""
           className="w-full h-auto block"
         />
+        {/* Subcaption overlay positioned in lower center third */}
+        <div className="absolute inset-0 flex items-end justify-center pb-[15%]">
+          <p className="font-display font-bold text-lg md:text-xl lg:text-2xl text-white leading-[1.1]">
+            Artist curated. Fan appreciated.
+          </p>
+        </div>
       </section>
 
       <Footer />
