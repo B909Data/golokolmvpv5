@@ -50,7 +50,7 @@ const ArtistRecognition = () => {
               Your party. Your time. Your imagination.
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-              When the set is over, A GoLokol After Party opens a smaller, paid space to chat or livestream with fans who were at the show. Its open for only 24 hours.
+              A GoLokol After Party is a space fans at the show pay to chat/ livestream with artists. 24 hours, to use how you want. Then Poof! The party ends.
             </p>
           </div>
         </div>
