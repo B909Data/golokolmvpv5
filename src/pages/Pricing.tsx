@@ -22,17 +22,20 @@ const Pricing = () => {
               Pay as needed
             </h2>
             <p className="text-3xl md:text-4xl font-display font-bold mb-6">
-              $11.99 <span className="text-lg font-normal text-muted-foreground">/ per After Party</span>
+              11.99 <span className="text-lg font-normal text-muted-foreground">per After Party</span>
             </p>
 
             <p className="type-body text-card-foreground mb-4">Includes:</p>
-            <ul className="type-body text-card-foreground space-y-2 mb-8 list-disc list-inside">
+            <ul className="type-body text-card-foreground space-y-2 mb-4 list-disc list-inside">
               <li>Chat</li>
               <li>Livestream</li>
               <li>Show badges</li>
               <li>Special merch links</li>
               <li>Moderate chat</li>
             </ul>
+            <p className="type-body text-card-foreground mb-8">
+              10% of sales goes to GoLokol.
+            </p>
 
             <Link to="/create-afterparty">
               <Button variant="card" size="lg">
@@ -50,17 +53,9 @@ const Pricing = () => {
               Professional Credits
             </h2>
 
-            <div className="type-body text-card-foreground space-y-4 mb-6">
-              <p>
-                Purchase After Parties in bulk at a discounted rate and an optional three-way revenue split (10 / 10 / 80).
-              </p>
-              <p>
-                The artist receives the majority share. This split is non-negotiable.
-              </p>
-              <p>
-                Perfect for touring artists, venues, booking agents, and live show curators.
-              </p>
-            </div>
+            <p className="type-body text-card-foreground mb-6">
+              Purchase After Parties in bulk at a discounted rate. Perfect for touring artists, venues, booking agents, and live show curators.
+            </p>
 
             <Link 
               to="/partners" 
