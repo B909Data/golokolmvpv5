@@ -55,9 +55,6 @@ const ArtistRecognition = () => {
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8">
               Chat/ Livestream. Only 24 hours, to use how you want. Then Poof! The party ends.
             </p>
-            <h3 className="font-display font-bold text-2xl md:text-3xl lg:text-4xl text-foreground leading-[0.95]">
-              What's it worth?
-            </h3>
           </div>
         </div>
       </section>
