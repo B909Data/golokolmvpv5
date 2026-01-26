@@ -23,19 +23,20 @@ const Index = () => {
 
         <div className="container relative z-10 mx-auto px-4">
           <div className="max-w-2xl ml-auto mr-8 md:mr-16 lg:mr-24 text-right">
-            <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl text-foreground mb-4 leading-[0.95]">
+            <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl text-foreground mb-6 leading-[0.95]">
               The show is over.
             </h1>
-            <p className="font-display font-bold text-2xl md:text-3xl lg:text-4xl text-primary mb-8 leading-[1.1]">
-              This is what comes after.
-            </p>
 
-            <Link to="/find-after-party">
+            <Link to="/find-after-party" className="inline-block mb-4">
               <Button variant="secondary" size="lg">
                 Tonight's After Party
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
+
+            <p className="font-display font-bold text-lg md:text-xl lg:text-2xl text-primary leading-[1.1]">
+              What comes after.
+            </p>
           </div>
         </div>
       </section>
