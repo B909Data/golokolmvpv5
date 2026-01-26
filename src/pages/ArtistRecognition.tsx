@@ -49,9 +49,15 @@ const ArtistRecognition = () => {
             <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-[0.95]">
               Your party. Your time. Your imagination.
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-              A GoLokol After Party is a space fans at the show pay to chat/ livestream with artists. 24 hours, to use how you want. Then Poof! The party ends.
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-6">
+              A GoLokol After Party is a post-show online space curated by the artist that fans pay to access.
             </p>
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8">
+              Chat/ Livestream. Only 24 hours, to use how you want. Then Poof! The party ends.
+            </p>
+            <h3 className="font-display font-bold text-2xl md:text-3xl lg:text-4xl text-foreground leading-[0.95]">
+              What's it worth?
+            </h3>
           </div>
         </div>
       </section>
