@@ -25,7 +25,7 @@ const ArtistRecognition = () => {
               Make every show count.
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed">
-              The shows cover expenses. The After Party funds the rest.
+              The shows cover expenses. The After Parties fund the rest.
             </p>
             <Link to="/create-afterparty">
               <Button size="lg">
@@ -66,7 +66,7 @@ const ArtistRecognition = () => {
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="max-w-3xl">
             <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-[0.95]">
-              This is where value shows up again.
+              This is where value has a name.
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
               The After Party lets you see who stays, who pays, and who comes back. Not vanity metrics. Real signals careers are based on.
