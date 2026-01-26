@@ -22,6 +22,7 @@ const Navbar = () => {
   const navItems = [
     { label: "After Parties", path: "/find-after-party", colorClass: "text-foreground" },
     { label: "Create an After Party", path: "/create-afterparty", hideOnTablet: true, colorClass: "text-foreground" },
+    { label: "For Artists", path: "/for-artists", hideOnTablet: true, colorClass: "text-foreground" },
     { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Listening Sessions", colorClass: "text-primary" },
   ];
 
