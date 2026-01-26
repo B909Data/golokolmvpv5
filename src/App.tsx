@@ -37,6 +37,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Partners from "./pages/Partners";
 import ArtistRecognition from "./pages/ArtistRecognition";
+import Pricing from "./pages/Pricing";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/partners" element={<Partners />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/for-artists" element={<ArtistRecognition />} />
           <Route path="/q/:code" element={<ShortLinkRedirect />} />
           <Route path="*" element={<NotFound />} />
