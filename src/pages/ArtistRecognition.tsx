@@ -47,10 +47,10 @@ const ArtistRecognition = () => {
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="max-w-3xl">
             <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-[0.95]">
-              The show ends. Not Opportunity.
+              Your party. Your time. Your imagination.
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-              When the set is over, the After Party opens a smaller, paid space to chat or livestream. It's where attention narrows, conversations happen, and community shows up. It disappears in 24 hours.
+              When the set is over, A GoLokol After Party opens a smaller, paid space to chat or livestream with fans who were at the show. Its open for only 24 hours.
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ const ArtistRecognition = () => {
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="max-w-3xl">
             <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-[0.95]">
-              This is where value keeps it real.
+              This is where value shows up again.
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
               The After Party lets you see who stays, who pays, and who comes back. Not vanity metrics. Real signals careers are based on.
