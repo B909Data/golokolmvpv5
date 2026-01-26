@@ -50,3 +50,9 @@ verify_jwt = false
 
 [functions.admin-get-artist-control-link]
 verify_jwt = false
+
+[functions.create-fan-checkout]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
