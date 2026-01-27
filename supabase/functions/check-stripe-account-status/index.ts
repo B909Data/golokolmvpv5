@@ -63,36 +63,28 @@ serve(async (req) => {
 
     const account = await stripe.accounts.retrieve(event.stripe_account_id);
 
-    // Determine status based on Stripe account state (order matters)
-    let status: "not_connected" | "setup_in_progress" | "action_required" | "ready";
+    // Simplified 3-state logic based on payouts_enabled
+    // State 2 (action_required): connected but payouts not enabled
+    // State 3 (connected): connected and payouts enabled
+    let status: "not_connected" | "action_required" | "connected";
     
-    // Check for disabled account first (action required)
-    if (account.requirements?.disabled_reason) {
-      status = "action_required";
-    } else if (
-      // Check if transfers capability is not active OR there are pending requirements
-      account.capabilities?.transfers !== "active" ||
-      (account.requirements?.currently_due && account.requirements.currently_due.length > 0)
-    ) {
-      status = "setup_in_progress";
+    if (account.payouts_enabled) {
+      status = "connected";
     } else {
-      // Transfers active and no pending requirements
-      status = "ready";
+      status = "action_required";
     }
 
     console.log("Stripe account status check:", {
       account_id: event.stripe_account_id,
       status,
-      transfers_capability: account.capabilities?.transfers,
-      disabled_reason: account.requirements?.disabled_reason,
-      currently_due: account.requirements?.currently_due?.length || 0,
+      payouts_enabled: account.payouts_enabled,
+      charges_enabled: account.charges_enabled,
     });
 
     return new Response(JSON.stringify({ 
       status,
-      transfers_capability: account.capabilities?.transfers,
-      disabled_reason: account.requirements?.disabled_reason || null,
-      currently_due: account.requirements?.currently_due || [],
+      payouts_enabled: account.payouts_enabled,
+      charges_enabled: account.charges_enabled,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

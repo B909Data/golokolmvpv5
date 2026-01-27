@@ -16,7 +16,7 @@ interface PaidAccessSectionProps {
   onUpdate: () => void;
 }
 
-export type StripeStatus = "not_connected" | "setup_in_progress" | "action_required" | "ready" | "loading";
+export type StripeStatus = "not_connected" | "action_required" | "connected" | "loading";
 
 const PaidAccessSection = ({
   eventId,
@@ -45,11 +45,11 @@ const PaidAccessSection = ({
         });
 
         if (error) throw error;
-        setStripeStatus(data.status || "setup_in_progress");
+        setStripeStatus(data.status || "action_required");
       } catch (err) {
         console.error("Failed to check Stripe status:", err);
-        // Fallback: if we have an account ID, assume setup in progress
-        setStripeStatus("setup_in_progress");
+        // Fallback: if we have an account ID, assume action required
+        setStripeStatus("action_required");
       }
     };
 
@@ -88,7 +88,7 @@ const PaidAccessSection = ({
   };
 
   const isLocked = !!pricingLockedAt;
-  const canConfigurePricing = stripeStatus === "ready" || stripeStatus === "setup_in_progress" || stripeStatus === "action_required";
+  const canConfigurePricing = stripeStatus === "connected" || stripeStatus === "action_required";
 
   return (
     <section className="px-4 pb-8">
