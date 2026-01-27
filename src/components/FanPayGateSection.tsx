@@ -92,7 +92,7 @@ const FanPayGateSection = ({
     return `$${(cents / 100).toFixed(2)}`;
   };
 
-  const isStripeVerified = stripeStatus === "verified";
+  const isStripeVerified = stripeStatus === "ready";
 
   return (
     <div className="border-t border-primary/30 pt-6 space-y-4">

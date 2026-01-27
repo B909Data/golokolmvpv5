@@ -63,36 +63,36 @@ serve(async (req) => {
 
     const account = await stripe.accounts.retrieve(event.stripe_account_id);
 
-    // Determine status based on Stripe account state
-    let status: "not_connected" | "incomplete" | "action_required" | "verified";
+    // Determine status based on Stripe account state (order matters)
+    let status: "not_connected" | "setup_in_progress" | "action_required" | "ready";
     
-    if (account.charges_enabled && account.payouts_enabled) {
-      status = "verified";
-    } else if (account.requirements?.currently_due && account.requirements.currently_due.length > 0) {
+    // Check for disabled account first (action required)
+    if (account.requirements?.disabled_reason) {
       status = "action_required";
-    } else if (account.details_submitted) {
-      // Details submitted but not yet verified by Stripe
-      status = "incomplete";
+    } else if (
+      // Check if transfers capability is not active OR there are pending requirements
+      account.capabilities?.transfers !== "active" ||
+      (account.requirements?.currently_due && account.requirements.currently_due.length > 0)
+    ) {
+      status = "setup_in_progress";
     } else {
-      // Account created but onboarding not started/completed
-      status = "incomplete";
+      // Transfers active and no pending requirements
+      status = "ready";
     }
 
     console.log("Stripe account status check:", {
       account_id: event.stripe_account_id,
       status,
-      charges_enabled: account.charges_enabled,
-      payouts_enabled: account.payouts_enabled,
-      details_submitted: account.details_submitted,
+      transfers_capability: account.capabilities?.transfers,
+      disabled_reason: account.requirements?.disabled_reason,
       currently_due: account.requirements?.currently_due?.length || 0,
     });
 
     return new Response(JSON.stringify({ 
       status,
-      charges_enabled: account.charges_enabled,
-      payouts_enabled: account.payouts_enabled,
-      details_submitted: account.details_submitted,
-      requirements: account.requirements?.currently_due || [],
+      transfers_capability: account.capabilities?.transfers,
+      disabled_reason: account.requirements?.disabled_reason || null,
+      currently_due: account.requirements?.currently_due || [],
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
