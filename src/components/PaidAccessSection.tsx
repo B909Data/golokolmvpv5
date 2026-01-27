@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { CreditCard, Check, ExternalLink, DollarSign, Loader2, Lock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { DollarSign, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import StripeConnectSection from "@/components/StripeConnectSection";
+import FanPayGateSection from "@/components/FanPayGateSection";
 
 interface PaidAccessSectionProps {
   eventId: string;
@@ -18,6 +16,8 @@ interface PaidAccessSectionProps {
   onUpdate: () => void;
 }
 
+export type StripeStatus = "not_connected" | "incomplete" | "action_required" | "verified" | "loading";
+
 const PaidAccessSection = ({
   eventId,
   token,
@@ -28,31 +28,33 @@ const PaidAccessSection = ({
   pricingLockedAt,
   onUpdate,
 }: PaidAccessSectionProps) => {
+  const [stripeStatus, setStripeStatus] = useState<StripeStatus>("loading");
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [mode, setMode] = useState<"fixed" | "pwyw" | "">(pricingMode as "fixed" | "pwyw" | "" || "");
-  const [priceValue, setPriceValue] = useState<string>(
-    pricingMode === "fixed" && fixedPrice 
-      ? (fixedPrice / 100).toFixed(2) 
-      : pricingMode === "pwyw" && minPrice 
-        ? (minPrice / 100).toFixed(2) 
-        : ""
-  );
 
-  const isLocked = !!pricingLockedAt;
-  const isConnected = !!stripeAccountId;
-
-  // Update local state when props change
+  // Check Stripe account status when component mounts or stripeAccountId changes
   useEffect(() => {
-    setMode(pricingMode as "fixed" | "pwyw" | "" || "");
-    setPriceValue(
-      pricingMode === "fixed" && fixedPrice 
-        ? (fixedPrice / 100).toFixed(2) 
-        : pricingMode === "pwyw" && minPrice 
-          ? (minPrice / 100).toFixed(2) 
-          : ""
-    );
-  }, [pricingMode, fixedPrice, minPrice]);
+    const checkStatus = async () => {
+      if (!stripeAccountId) {
+        setStripeStatus("not_connected");
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.functions.invoke("check-stripe-account-status", {
+          body: { event_id: eventId, token },
+        });
+
+        if (error) throw error;
+        setStripeStatus(data.status || "incomplete");
+      } catch (err) {
+        console.error("Failed to check Stripe status:", err);
+        // Fallback: if we have an account ID, assume incomplete
+        setStripeStatus("incomplete");
+      }
+    };
+
+    checkStatus();
+  }, [eventId, token, stripeAccountId]);
 
   const handleConnectStripe = async () => {
     setIsConnecting(true);
@@ -70,7 +72,6 @@ const PaidAccessSection = ({
       }
 
       if (data.url) {
-        // Open Stripe Connect onboarding in new tab
         const newWindow = window.open(data.url, "_blank");
         if (!newWindow) {
           toast.error("Popup blocked. Please allow popups for this site.");
@@ -86,47 +87,8 @@ const PaidAccessSection = ({
     }
   };
 
-  const handleSavePricing = async () => {
-    if (!mode) {
-      toast.error("Please select a pricing mode");
-      return;
-    }
-
-    const numericValue = parseFloat(priceValue);
-    if (isNaN(numericValue) || numericValue < 1) {
-      toast.error("Minimum price is $1.00");
-      return;
-    }
-
-    const priceInCents = Math.round(numericValue * 100);
-
-    setIsSaving(true);
-    try {
-      const { error } = await supabase.functions.invoke("artist-update-event", {
-        body: {
-          event_id: eventId,
-          token,
-          pricing_mode: mode,
-          fixed_price: mode === "fixed" ? priceInCents : null,
-          min_price: mode === "pwyw" ? priceInCents : null,
-        },
-      });
-
-      if (error) throw error;
-      toast.success("Fan pricing saved successfully");
-      onUpdate();
-    } catch (err: any) {
-      console.error("Save pricing error:", err);
-      toast.error(err.message || "Failed to save pricing");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  // Format price for display
-  const formatPrice = (cents: number) => {
-    return `$${(cents / 100).toFixed(2)}`;
-  };
+  const isLocked = !!pricingLockedAt;
+  const canConfigurePricing = stripeStatus === "verified" || stripeStatus === "incomplete" || stripeStatus === "action_required";
 
   return (
     <section className="px-4 pb-8">
@@ -140,190 +102,28 @@ const PaidAccessSection = ({
           </div>
 
           <p className="text-muted-foreground text-base font-sans">
-            Monetize your After Party. Fans pay you directly via Stripe — GoLokol never holds your funds.
+            Monetize your After Party. Fans pay you directly via Stripe.
           </p>
 
           {/* Stripe Connect Section */}
-          <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <CreditCard className="w-5 h-5 text-primary" />
-                <span className="font-sans text-base text-foreground font-medium">Stripe Account</span>
-              </div>
-              {isConnected ? (
-                <div className="flex items-center gap-2 text-green-500">
-                  <Check className="w-5 h-5" />
-                  <span className="font-sans text-base font-medium">Connected</span>
-                </div>
-              ) : null}
-            </div>
+          <StripeConnectSection
+            stripeStatus={stripeStatus}
+            isConnecting={isConnecting}
+            onConnect={handleConnectStripe}
+          />
 
-            {isConnected ? (
-              <p className="text-primary/70 text-sm font-sans">
-                Your Stripe account is connected. Fan payments go directly to you.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-primary/70 text-sm font-sans">
-                  Connect your Stripe account to receive payments. If you don't have one, you can create it during onboarding.
-                </p>
-                <Button
-                  onClick={handleConnectStripe}
-                  disabled={isConnecting}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-base"
-                >
-                  {isConnecting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Connecting...
-                    </>
-                  ) : (
-                    <>
-                      <ExternalLink className="w-5 h-5 mr-2" />
-                      Connect with Stripe
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
-
-            {/* Fan Pay Gate Section - Always visible inside Stripe Connect container */}
-            <div className="border-t border-primary/30 pt-4 mt-4 space-y-4">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-primary" />
-                <Label className="text-base text-primary font-sans font-medium">
-                  Fan Pay Gate
-                </Label>
-              </div>
-
-              {/* Info note when Stripe not connected */}
-              {!isConnected && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
-                  <p className="text-yellow-500 text-sm font-sans">
-                    Connect Stripe to accept payments. You can still set pricing now.
-                  </p>
-                </div>
-              )}
-
-              {/* Locked State - shows when pricing_locked_at is set */}
-              {isLocked ? (
-                <div className="bg-primary/20 border border-primary/40 rounded-lg p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-primary">
-                    <Lock className="w-5 h-5" />
-                    <span className="font-sans text-base font-medium">Pricing Locked</span>
-                  </div>
-                  <p className="text-primary/80 text-sm font-sans">
-                    Pricing locked after first fan purchase. Contact support to make changes.
-                  </p>
-                  {pricingMode && (
-                    <div className="bg-black/30 rounded-lg p-3">
-                      <p className="text-foreground text-sm font-sans">
-                        {pricingMode === "fixed" && fixedPrice ? (
-                          <>Current price: <strong>{formatPrice(fixedPrice)}</strong></>
-                        ) : pricingMode === "pwyw" && minPrice ? (
-                          <>Pay what you want (minimum <strong>{formatPrice(minPrice)}</strong>)</>
-                        ) : (
-                          "No pricing set"
-                        )}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <>
-                  {/* Pricing Mode Toggle */}
-                  <RadioGroup
-                    value={mode}
-                    onValueChange={(val) => setMode(val as "fixed" | "pwyw")}
-                    className="space-y-3"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <RadioGroupItem value="fixed" id="fixed" className="border-primary text-primary" />
-                      <Label htmlFor="fixed" className="text-foreground font-sans text-base cursor-pointer">
-                        Set price — one fixed price
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <RadioGroupItem value="pwyw" id="pwyw" className="border-primary text-primary" />
-                      <Label htmlFor="pwyw" className="text-foreground font-sans text-base cursor-pointer">
-                        Pay what you want — set a minimum
-                      </Label>
-                    </div>
-                  </RadioGroup>
-
-                  {/* Price Input - Shows when mode is selected */}
-                  {mode && (
-                    <div className="space-y-3 pt-2">
-                      <Label className="text-sm text-primary/80 font-sans">
-                        {mode === "fixed" ? "Price (USD)" : "Minimum Price (USD)"}
-                      </Label>
-                      <div className="flex items-center gap-3">
-                        <div className="relative flex-1">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary font-sans text-lg">$</span>
-                          <Input
-                            type="number"
-                            min="1"
-                            step="0.01"
-                            value={priceValue}
-                            onChange={(e) => setPriceValue(e.target.value)}
-                            placeholder="5.00"
-                            className="pl-8 bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans text-base py-5"
-                          />
-                        </div>
-                        <Button
-                          onClick={handleSavePricing}
-                          disabled={isSaving || !priceValue}
-                          className="bg-primary text-primary-foreground hover:bg-primary/90 text-base py-5"
-                        >
-                          {isSaving ? (
-                            <>
-                              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                              Saving...
-                            </>
-                          ) : (
-                            "Save"
-                          )}
-                        </Button>
-                      </div>
-                      <p className="text-primary/60 text-xs font-sans">
-                        Minimum $1.00. {mode === "pwyw" ? "Fans can pay more if they choose." : ""}
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Entry Points Info - Shows when pricing is configured */}
-          {isConnected && mode && priceValue && (
-            <div className="border-t border-primary/20 pt-4 space-y-3">
-              <Label className="text-base text-primary font-sans font-medium">
-                Paid Entry Points
-              </Label>
-              <div className="grid gap-3 text-sm font-sans text-muted-foreground">
-                <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span>
-                    <strong className="text-foreground">Pre-Show Pass:</strong>{" "}
-                    {pricingMode === "fixed" && fixedPrice 
-                      ? `After Party Pass — ${formatPrice(fixedPrice)}`
-                      : pricingMode === "pwyw" && minPrice
-                        ? `Pay what you want (minimum ${formatPrice(minPrice)})`
-                        : "Fans pay online → get QR pass → you scan at show → they join."
-                    }
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span><strong className="text-foreground">Merch Table:</strong> Fans scan QR at your merch table → pay → join party.</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span><strong className="text-foreground">Walk-Ins:</strong> Still free via the Walk-Ins QR in Check-In section.</span>
-                </div>
-              </div>
-            </div>
+          {/* Fan Pay Gate Section - Only show when Stripe is connected (any state) */}
+          {stripeAccountId && canConfigurePricing && (
+            <FanPayGateSection
+              eventId={eventId}
+              token={token}
+              stripeStatus={stripeStatus}
+              pricingMode={pricingMode}
+              fixedPrice={fixedPrice}
+              minPrice={minPrice}
+              isLocked={isLocked}
+              onUpdate={onUpdate}
+            />
           )}
         </div>
       </div>
