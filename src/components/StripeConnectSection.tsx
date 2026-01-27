@@ -85,8 +85,8 @@ const StripeConnectSection = ({
     );
   }
 
-  // STATE 2: Stripe connected but setup incomplete
-  if (stripeStatus === "incomplete") {
+  // STATE 2: Stripe connected but setup in progress
+  if (stripeStatus === "setup_in_progress") {
     return (
       <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-3">
@@ -136,8 +136,8 @@ const StripeConnectSection = ({
     );
   }
 
-  // STATE 3: Stripe fully connected and verified
-  if (stripeStatus === "verified") {
+  // STATE 3: Stripe fully connected and ready
+  if (stripeStatus === "ready") {
     return (
       <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
