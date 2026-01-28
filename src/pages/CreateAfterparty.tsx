@@ -1122,9 +1122,12 @@ const CreateAfterparty = () => {
               <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <img src={golokolLogo} alt="GoLokol" className="h-12 w-12" />
               </div>
-              <h1 className="font-display text-3xl md:text-4xl text-foreground mb-1">
+              <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
                 CREATE AN <span className="text-primary">AFTER PARTY</span>
               </h1>
+              <Link to="/pricing" className="text-primary hover:underline text-sm font-sans">
+                View pricing options →
+              </Link>
             </div>
 
             <p className="text-center text-base font-sans text-muted-foreground mb-6">
