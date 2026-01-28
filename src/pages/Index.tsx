@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,6 +7,12 @@ import heroImage from "@/assets/homepage-hero.png";
 import section2Image from "@/assets/homepage-section2.png";
 
 const Index = () => {
+  const heroBullets = [
+    "Earn directly from fans after your show",
+    "Create a private, 24-hour After Party",
+    "See who values your work in real time",
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -23,22 +29,36 @@ const Index = () => {
 
         <div className="container relative z-10 mx-auto px-4">
           <div className="max-w-2xl ml-auto mr-8 md:mr-16 lg:mr-24 text-right">
-            <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl text-foreground mb-6 leading-[0.95]">
-              The show is over.
+            <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl text-foreground mb-4 leading-[0.95]">
+              Make every show count
             </h1>
 
-            <Link to="/for-artists" className="inline-block mb-4">
+            <p className="text-lg md:text-xl text-foreground/90 mb-6 leading-relaxed">
+              Turn the energy after your set into real support from the fans who showed up.
+            </p>
+
+            <ul className="space-y-3 mb-8">
+              {heroBullets.map((bullet, index) => (
+                <li key={index} className="flex items-center justify-end gap-3 text-foreground/90">
+                  <span className="text-base md:text-lg">{bullet}</span>
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                    <Check className="w-4 h-4 text-primary-foreground" />
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <Link to="/for-artists" className="inline-block">
               <Button variant="secondary" size="lg">
                 Throw an After Party
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
-
           </div>
         </div>
       </section>
 
-      {/* SECTION 2 — EMPTY STAGE with subcaption */}
+      {/* SECTION 2 — ATMOSPHERIC */}
       <section className="relative w-full">
         <img
           src={section2Image}
