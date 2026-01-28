@@ -32,23 +32,37 @@ const Index = () => {
 
       {/* HERO SECTION */}
       <section className="pt-16">
-        {/* Hero Image */}
-        <div className="w-full">
+        {/* Hero Image with Text Overlay */}
+        <div className="relative w-full">
           <img
             src={heroImage}
             alt="Artists on stage"
             className="w-full h-auto block"
           />
+          {/* Light overlay for readability */}
+          <div className="absolute inset-0 bg-background/40" />
+          {/* Text overlay on image */}
+          <div className="absolute inset-0 flex flex-col justify-center items-start px-6 md:px-12 lg:px-20">
+            <div className="max-w-3xl">
+              <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl leading-[0.95] mb-6">
+                <span className="text-foreground">Make every show </span>
+                <span className="text-primary">count.</span>
+              </h1>
+              <Link to="/create-afterparty">
+                <Button variant="default" size="lg">
+                  Create an After Party
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Black Section Below Hero */}
         <div className="bg-background px-6 md:px-12 lg:px-20 py-10 md:py-14">
           <div className="max-w-4xl">
-            <h1 className="font-display font-black text-3xl md:text-5xl lg:text-6xl text-foreground mb-3 leading-[0.95]">
-              Make every show count
-            </h1>
             <p className="text-base md:text-lg lg:text-xl text-foreground/80 mb-8 leading-relaxed">
-              Build momentum and revenue after each show.
+              Build momentum and revenue with a GoLokol After Party.
             </p>
 
             <ul className="space-y-4 mb-8">
