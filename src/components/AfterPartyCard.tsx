@@ -18,6 +18,10 @@ interface AfterPartyCardProps {
   showRsvpButton?: boolean;
   onRsvpClick?: () => void;
   isPreview?: boolean;
+  // New props for Stripe gate
+  ctaText?: string;
+  isBlocked?: boolean;
+  blockedMessage?: string;
 }
 
 const AfterPartyCard = ({
@@ -33,6 +37,9 @@ const AfterPartyCard = ({
   showRsvpButton = true,
   onRsvpClick,
   isPreview = false,
+  ctaText = "Get Your Pass",
+  isBlocked = false,
+  blockedMessage,
 }: AfterPartyCardProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -167,24 +174,38 @@ const AfterPartyCard = ({
 
         {/* Primary CTA - Black bg with yellow text */}
         {showRsvpButton && (
-          isPreview ? (
+          isBlocked ? (
+            <div className="mt-auto space-y-2">
+              <Button 
+                disabled
+                className="w-full bg-muted text-muted-foreground cursor-not-allowed font-sans"
+              >
+                {ctaText}
+              </Button>
+              {blockedMessage && (
+                <p className="text-sm text-primary-foreground/70 text-center font-sans">
+                  {blockedMessage}
+                </p>
+              )}
+            </div>
+          ) : isPreview ? (
             <Button 
               disabled
               className="w-full mt-auto bg-primary-foreground text-primary cursor-not-allowed opacity-70 font-sans"
             >
-              Get Your Pass
+              {ctaText}
             </Button>
           ) : onRsvpClick ? (
             <Button 
               onClick={onRsvpClick}
               className="w-full mt-auto bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-sans"
             >
-              Get Your Pass
+              {ctaText}
             </Button>
           ) : (
             <Link to={`/after-party/${id}/rsvp`} className="mt-auto">
               <Button className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-sans">
-                Get Your Pass
+                {ctaText}
               </Button>
             </Link>
           )
