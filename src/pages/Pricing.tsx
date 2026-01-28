@@ -16,7 +16,7 @@ const Pricing = () => {
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
               Pricing
             </h1>
-            <p className="type-body text-muted-foreground text-lg max-w-xl mx-auto">
+            <p className="type-body text-card-foreground-secondary text-lg max-w-xl mx-auto">
               Choose the After Party setup that fits where you are right now.
             </p>
           </div>
@@ -26,7 +26,7 @@ const Pricing = () => {
             {/* EMERGE TIER */}
             <Card className="bg-card border-border flex flex-col">
               <CardHeader className="pb-4">
-                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                <div className="text-xs text-card-foreground-secondary uppercase tracking-wide mb-2">
                   Best for emerging artists
                 </div>
                 <CardTitle className="font-display text-2xl text-card-foreground">
@@ -34,7 +34,7 @@ const Pricing = () => {
                 </CardTitle>
                 <div className="pt-2">
                   <span className="text-3xl font-display font-bold text-card-foreground">$25.99</span>
-                  <span className="text-muted-foreground ml-2">per After Party</span>
+                  <span className="text-card-foreground-secondary ml-2">per After Party</span>
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
@@ -56,10 +56,10 @@ const Pricing = () => {
 
                 {/* Limits & Revenue */}
                 <div className="border-t border-border pt-4 mb-6 space-y-2">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-card-foreground-secondary">
                     <strong className="text-card-foreground">Limit:</strong> $500 gross revenue cap per After Party
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-card-foreground-secondary">
                     <strong className="text-card-foreground">Revenue:</strong> Artist keeps majority. GoLokol platform fee applies.
                   </p>
                 </div>
@@ -71,7 +71,7 @@ const Pricing = () => {
                       Create an After Party
                     </Button>
                   </Link>
-                  <p className="text-xs text-muted-foreground text-center mt-3">
+                  <p className="text-xs text-card-foreground-secondary text-center mt-3">
                     Emerge is designed to help you prove value. Upgrade when you outgrow it.
                   </p>
                 </div>
@@ -81,7 +81,7 @@ const Pricing = () => {
             {/* TOURING TIER */}
             <Card className="bg-card border-border flex flex-col">
               <CardHeader className="pb-4">
-                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                <div className="text-xs text-card-foreground-secondary uppercase tracking-wide mb-2">
                   No revenue cap
                 </div>
                 <CardTitle className="font-display text-2xl text-card-foreground">
@@ -89,7 +89,7 @@ const Pricing = () => {
                 </CardTitle>
                 <div className="pt-2">
                   <span className="text-3xl font-display font-bold text-card-foreground">$49.99</span>
-                  <span className="text-muted-foreground ml-2">per After Party</span>
+                  <span className="text-card-foreground-secondary ml-2">per After Party</span>
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
@@ -111,10 +111,10 @@ const Pricing = () => {
 
                 {/* Limits & Revenue */}
                 <div className="border-t border-border pt-4 mb-6 space-y-2">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-card-foreground-secondary">
                     <strong className="text-card-foreground">Limit:</strong> No revenue cap
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-card-foreground-secondary">
                     <strong className="text-card-foreground">Revenue:</strong> Artist keeps majority. GoLokol platform fee applies.
                   </p>
                 </div>
@@ -126,7 +126,7 @@ const Pricing = () => {
                       Create an After Party
                     </Button>
                   </Link>
-                  <p className="text-xs text-muted-foreground text-center mt-3">
+                  <p className="text-xs text-card-foreground-secondary text-center mt-3">
                     Unlimited revenue. No ceiling.
                   </p>
                 </div>
@@ -136,7 +136,7 @@ const Pricing = () => {
             {/* PROFESSIONAL / BULK TIER */}
             <Card className="bg-card border-border flex flex-col">
               <CardHeader className="pb-4">
-                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                <div className="text-xs text-card-foreground-secondary uppercase tracking-wide mb-2">
                   For teams & labels
                 </div>
                 <CardTitle className="font-display text-2xl text-card-foreground">
@@ -144,7 +144,7 @@ const Pricing = () => {
                 </CardTitle>
                 <div className="pt-2">
                   <span className="text-3xl font-display font-bold text-card-foreground">Custom</span>
-                  <span className="text-muted-foreground ml-2">pricing</span>
+                  <span className="text-card-foreground-secondary ml-2">pricing</span>
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
@@ -164,7 +164,7 @@ const Pricing = () => {
 
                 {/* Spacer to align with other cards */}
                 <div className="border-t border-border pt-4 mb-6">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-card-foreground-secondary">
                     Custom pricing based on volume and needs.
                   </p>
                 </div>
@@ -179,7 +179,7 @@ const Pricing = () => {
                       Contact Us
                     </Button>
                   </a>
-                  <p className="text-xs text-muted-foreground text-center mt-3">
+                  <p className="text-xs text-card-foreground-secondary text-center mt-3">
                     Email backstage@golokol.app
                   </p>
                 </div>
@@ -189,7 +189,7 @@ const Pricing = () => {
 
           {/* FOOTER NOTE */}
           <div className="text-center pt-8 border-t border-border">
-            <p className="text-muted-foreground text-sm">
+            <p className="text-card-foreground-secondary text-sm">
               Artist curated. Fan appreciated.
             </p>
           </div>

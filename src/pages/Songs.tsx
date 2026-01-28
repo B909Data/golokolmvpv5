@@ -4,7 +4,7 @@ import { ArrowRight, Check, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import llsCover from "@/assets/lls-cover.jpg";
+import { extractYouTubeId } from "@/lib/youtube";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -102,12 +102,14 @@ const Songs = () => {
               </div>
             </div>
 
-            {/* Right column - LLS Cover image */}
+            {/* Right column - YouTube Video */}
             <div className="aspect-video w-full rounded-lg overflow-hidden">
-              <img
-                src={llsCover}
-                alt="Lokol Listening Sessions Coming February 2026"
-                className="w-full h-full object-cover"
+              <iframe
+                src={`https://www.youtube.com/embed/${extractYouTubeId("https://youtu.be/2exJWgcJRlA")}`}
+                title="Lokol Listening Sessions"
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
               />
             </div>
           </div>
