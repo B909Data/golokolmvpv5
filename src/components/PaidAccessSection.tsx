@@ -9,9 +9,7 @@ interface PaidAccessSectionProps {
   eventId: string;
   token: string;
   stripeAccountId: string | null;
-  pricingMode: string | null;
   fixedPrice: number | null;
-  minPrice: number | null;
   pricingLockedAt: string | null;
   onUpdate: () => void;
 }
@@ -22,9 +20,7 @@ const PaidAccessSection = ({
   eventId,
   token,
   stripeAccountId,
-  pricingMode,
   fixedPrice,
-  minPrice,
   pricingLockedAt,
   onUpdate,
 }: PaidAccessSectionProps) => {
@@ -88,7 +84,7 @@ const PaidAccessSection = ({
   };
 
   const isLocked = !!pricingLockedAt;
-  const canConfigurePricing = stripeStatus === "connected" || stripeStatus === "action_required";
+  const showPayGate = stripeStatus !== "loading";
 
   return (
     <section className="px-4 pb-8">
@@ -112,15 +108,13 @@ const PaidAccessSection = ({
             onConnect={handleConnectStripe}
           />
 
-          {/* Fan Pay Gate Section - Only show when Stripe is connected (any state) */}
-          {stripeAccountId && canConfigurePricing && (
+          {/* Fan Pay Gate Section - Always show when not loading */}
+          {showPayGate && (
             <FanPayGateSection
               eventId={eventId}
               token={token}
               stripeStatus={stripeStatus}
-              pricingMode={pricingMode}
               fixedPrice={fixedPrice}
-              minPrice={minPrice}
               isLocked={isLocked}
               onUpdate={onUpdate}
             />

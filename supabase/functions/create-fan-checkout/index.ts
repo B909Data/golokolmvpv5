@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
   const stripe = new Stripe(stripeSecret, { apiVersion: "2024-06-20" });
 
   try {
-    const { eventId, attendeeId, origin, qrToken, pwywAmountCents } = await req.json();
+    const { eventId, attendeeId, origin, qrToken } = await req.json();
 
     if (!eventId || !attendeeId || !origin || !qrToken) {
       return new Response(
@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     // 1) Fetch event pricing + connected account id
     const { data: event, error: eventErr } = await supabase
       .from("events")
-      .select("id, pricing_mode, fixed_price, min_price, stripe_account_id, artist_name, title")
+      .select("id, fixed_price, stripe_account_id, artist_name, title")
       .eq("id", eventId)
       .single();
 
@@ -48,56 +48,33 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 2) Explicit paid event validation (Tweak #2)
-    const isPaidEvent =
-      (event.pricing_mode === "fixed" || event.pricing_mode === "pwyw") &&
-      !!event.stripe_account_id &&
-      (event.pricing_mode === "fixed" ? !!event.fixed_price : !!event.min_price);
-
-    if (!isPaidEvent) {
+    // 2) Validate paid event configuration
+    if (!event.stripe_account_id) {
       return new Response(
-        JSON.stringify({ error: "Paid access not properly configured" }),
+        JSON.stringify({ error: "Stripe not connected for this event" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // 3) Decide price (already stored in cents)
-    let priceCents: number;
-    if (event.pricing_mode === "fixed") {
-      priceCents = event.fixed_price!;
-    } else if (event.pricing_mode === "pwyw") {
-      // Pay-what-you-want: use provided amount but enforce minimum
-      const provided = Number(pwywAmountCents);
-      if (!Number.isFinite(provided) || provided <= 0) {
-        return new Response(
-          JSON.stringify({ error: "Invalid amount" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (event.min_price && provided < event.min_price) {
-        return new Response(
-          JSON.stringify({ error: `Amount must be at least $${(event.min_price / 100).toFixed(2)}` }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      priceCents = provided;
-    } else {
+    if (!event.fixed_price || event.fixed_price < 100) {
       return new Response(
-        JSON.stringify({ error: "Invalid pricing mode" }),
+        JSON.stringify({ error: "Price not configured for this event" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // 4) Mark attendee pending (idempotent)
+    const priceCents = event.fixed_price;
+
+    // 3) Mark attendee pending (idempotent)
     await supabase
       .from("attendees")
       .update({ payment_status: "pending" })
       .eq("id", attendeeId);
 
-    // 5) Platform fee (10%)
+    // 4) Platform fee (10%)
     const feeCents = Math.max(0, Math.round(priceCents * 0.10));
 
-    // 6) Create Checkout Session (platform-led destination charge)
+    // 5) Create Checkout Session (platform-led destination charge)
     const productName = event.artist_name
       ? `${event.artist_name} After Party`
       : event.title || "GoLokol After Party Entry";
@@ -115,7 +92,7 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
-      // Dual metadata placement (Tweak #1 - reliability)
+      // Dual metadata placement for reliability
       metadata: { event_id: eventId, attendee_id: attendeeId },
       payment_intent_data: {
         metadata: { event_id: eventId, attendee_id: attendeeId },

@@ -665,9 +665,7 @@ const ArtistEvent = () => {
             eventId={eventId}
             token={token}
             stripeAccountId={event.stripe_account_id}
-            pricingMode={event.pricing_mode}
             fixedPrice={event.fixed_price}
-            minPrice={event.min_price}
             pricingLockedAt={event.pricing_locked_at}
             onUpdate={fetchEvent}
           />
