@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Roboto', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['Breul Grotesk', 'Roboto', 'system-ui', 'sans-serif'],
+        display: ['Montserrat', 'Roboto', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
