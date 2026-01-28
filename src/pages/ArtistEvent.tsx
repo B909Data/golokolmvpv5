@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom";
-import { Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, MessageSquare, CheckCircle2, Share2, Bookmark, PartyPopper, Download, Printer, Clock, DoorOpen } from "lucide-react";
+import { Save, Trash2, RefreshCw, QrCode, UserPlus, Users, X, Copy, Check, MessageSquare, CheckCircle2, Share2, Bookmark, PartyPopper, Download, Printer, Clock, DoorOpen, ExternalLink, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -140,6 +140,9 @@ const ArtistEvent = () => {
   
   // Share link copied state
   const [shareLinkCopied, setShareLinkCopied] = useState(false);
+  
+  // Stripe connect state for banner
+  const [isConnectingStripe, setIsConnectingStripe] = useState(false);
 
   // Party end time display (replaces buggy countdown timer)
   const partyEndInfo = formatPartyEndTime(event?.after_party_expires_at || null);
@@ -433,6 +436,39 @@ const ArtistEvent = () => {
     setTimeout(() => setShareLinkCopied(false), 2000);
   };
 
+  // Handle Stripe Connect from banner
+  const handleBannerConnectStripe = async () => {
+    if (!eventId || !token) return;
+    setIsConnectingStripe(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-stripe-connect-link", {
+        body: { event_id: eventId, token },
+      });
+
+      if (error) throw error;
+
+      if (data.already_connected) {
+        toast.info("Stripe account already connected");
+        fetchEvent();
+        return;
+      }
+
+      if (data.url) {
+        const newWindow = window.open(data.url, "_blank");
+        if (!newWindow) {
+          toast.error("Popup blocked. Please allow popups for this site.");
+        } else {
+          toast.success("Complete Stripe onboarding in the new tab");
+        }
+      }
+    } catch (err: any) {
+      console.error("Stripe connect error:", err);
+      toast.error(err.message || "Failed to connect Stripe");
+    } finally {
+      setIsConnectingStripe(false);
+    }
+  };
+
   // Download Merch Table QR Poster
   const handleDownloadPoster = () => {
     const canvas = document.getElementById("merch-table-qr-canvas") as HTMLCanvasElement;
@@ -542,6 +578,42 @@ const ArtistEvent = () => {
             </div>
           </div>
         </section>
+
+        {/* STRIPE NOT CONNECTED BANNER - Show when stripe_account_id is null */}
+        {event && !event.stripe_account_id && (
+          <section className="px-4 pb-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-destructive/10 border-2 border-destructive rounded-xl p-6 space-y-4">
+                <h2 className="font-display text-xl text-destructive uppercase tracking-wide">
+                  Connect Stripe to Activate Your After Party
+                </h2>
+                <p className="text-foreground text-base font-sans">
+                  Fans can't enter your After Party until payments are enabled.
+                </p>
+                <p className="text-muted-foreground text-base font-sans">
+                  Connect your Stripe account to start earning directly from your fans.
+                </p>
+                <Button
+                  onClick={handleBannerConnectStripe}
+                  disabled={isConnectingStripe}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-base"
+                >
+                  {isConnectingStripe ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <ExternalLink className="w-5 h-5 mr-2" />
+                      Connect Stripe
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* CONTAINER 1: Promote Your After Party - Yellow Container */}
         <section className="px-4 pb-8 pt-2">
