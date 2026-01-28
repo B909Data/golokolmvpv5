@@ -37,7 +37,12 @@ const RSVPAfterParty = () => {
     enabled: !!eventId,
   });
 
-  // Explicit paid event detection (Tweak #2)
+  // Check if Stripe is connected (artist has started monetization)
+  const isStripeConnected = useMemo(() => {
+    return !!event?.stripe_account_id;
+  }, [event]);
+
+  // Explicit paid event detection - fully configured for payment
   const isPaidEvent = useMemo(() => {
     if (!event) return false;
     return (
@@ -46,6 +51,11 @@ const RSVPAfterParty = () => {
       (event.pricing_mode === "fixed" ? !!event.fixed_price : !!event.min_price)
     );
   }, [event]);
+
+  // Stripe connected but pricing not fully configured = blocked state
+  const isPricingIncomplete = useMemo(() => {
+    return isStripeConnected && !isPaidEvent;
+  }, [isStripeConnected, isPaidEvent]);
 
   // Format price for display
   const displayPrice = useMemo(() => {
@@ -60,6 +70,16 @@ const RSVPAfterParty = () => {
   }, [event, isPaidEvent]);
 
   const handleRsvpClick = () => {
+    // Block if Stripe connected but pricing not complete
+    if (isPricingIncomplete) {
+      toast({
+        title: "Not available yet",
+        description: "This artist hasn't finished setting up paid access.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setShowForm(true);
     // Set default PWYW amount if applicable
     if (event?.pricing_mode === "pwyw" && event.min_price) {
@@ -160,9 +180,16 @@ const RSVPAfterParty = () => {
           localStorage.setItem(`checkout_url_${eventId}`, data.url);
           window.location.href = data.url;
         }
-      } else {
-        // Free event - navigate directly to pass page
+      } else if (!isStripeConnected) {
+        // Truly free event (no Stripe connected) - navigate directly to pass page
         navigate(`/after-party/${eventId}/pass?token=${qrToken}`);
+      } else {
+        // Should never reach here - Stripe connected but not paid means incomplete
+        toast({
+          title: "Configuration error",
+          description: "This event's payment setup is incomplete.",
+          variant: "destructive",
+        });
       }
     } catch (error: unknown) {
       console.error("RSVP error:", error);
@@ -263,11 +290,22 @@ const RSVPAfterParty = () => {
               imageUrl={event.image_url}
               showRsvpButton={!showForm}
               onRsvpClick={handleRsvpClick}
+              ctaText={isPricingIncomplete 
+                ? "Not Available Yet" 
+                : isPaidEvent 
+                  ? "Pay for Pass" 
+                  : "Get Your Pass"
+              }
+              isBlocked={isPricingIncomplete}
+              blockedMessage={isPricingIncomplete 
+                ? "This artist hasn't enabled paid After Party access yet." 
+                : undefined
+              }
             />
           </div>
 
-          {/* RSVP Form - Shows after clicking RSVP on card */}
-          {showForm && (
+          {/* RSVP Form - Shows after clicking RSVP on card, never if blocked */}
+          {showForm && !isPricingIncomplete && (
             <div id="rsvp-form" className="rounded-xl border-2 border-primary bg-background p-6">
               <h2 className="font-display text-xl text-primary mb-4 uppercase">
                 {isPaidEvent ? "Complete your purchase" : "Put your name on the list"}
