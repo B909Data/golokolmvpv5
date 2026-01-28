@@ -21,8 +21,8 @@ const Navbar = () => {
 
   const navItems = [
     { label: "Create an After Party", path: "/create-afterparty", hideOnTablet: true, colorClass: "text-foreground" },
-    { label: "Pricing", path: "/pricing", hideOnTablet: true, colorClass: "text-foreground" },
     { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Listening Sessions", colorClass: "text-primary" },
+    { label: "Pricing", path: "/pricing", hideOnTablet: true, colorClass: "text-foreground" },
   ];
 
   const tabletHiddenItems = navItems.filter((item) => item.hideOnTablet);
