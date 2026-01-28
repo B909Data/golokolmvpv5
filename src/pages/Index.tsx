@@ -42,13 +42,13 @@ const Index = () => {
           {/* Light overlay for readability */}
           <div className="absolute inset-0 bg-background/40" />
           {/* Text overlay on image */}
-          <div className="absolute inset-0 flex flex-col justify-center items-start px-6 md:px-12 lg:px-20">
+          <div className="absolute inset-0 flex flex-col justify-center items-start px-6 md:px-12 lg:px-20 pt-5">
             <div className="max-w-3xl">
               <h1 className="font-display font-black text-4xl md:text-6xl lg:text-7xl leading-[0.95] mb-4">
-                <span className="text-foreground">Make every show </span>
-                <span className="text-primary">count.</span>
+                <span className="text-foreground font-bold">Make every show </span>
+                <span className="text-primary font-bold">count.</span>
               </h1>
-              <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-relaxed">
+              <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-relaxed font-semibold">
                 Build momentum and revenue with a GoLokol After Party.
               </p>
             </div>
@@ -92,11 +92,11 @@ const Index = () => {
           {/* Light overlay for readability */}
           <div className="absolute inset-0 bg-background/40" />
           {/* Text overlay on image */}
-          <div className="absolute inset-0 flex flex-col justify-center items-start px-6 md:px-12 lg:px-20">
+          <div className="absolute inset-0 flex flex-col justify-center items-start px-6 md:px-12 lg:px-20 pt-5">
             <div className="max-w-3xl">
-              <h2 className="font-display font-bold text-3xl md:text-5xl lg:text-6xl leading-[0.95]">
-                <span className="text-foreground">Your party. Your time. </span>
-                <span className="text-primary">Your imagination.</span>
+              <h2 className="font-display font-black text-3xl md:text-5xl lg:text-6xl leading-[0.95]">
+                <span className="text-foreground font-bold">Your party. Your time. </span>
+                <span className="text-primary font-bold">Your imagination.</span>
               </h2>
             </div>
           </div>
