@@ -16,7 +16,7 @@ const Pricing = () => {
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
               Pricing
             </h1>
-            <p className="type-body text-card-foreground-secondary text-lg max-w-xl mx-auto">
+            <p className="type-body text-foreground text-lg max-w-xl mx-auto">
               Choose the After Party setup that fits where you are right now.
             </p>
           </div>
@@ -189,7 +189,7 @@ const Pricing = () => {
 
           {/* FOOTER NOTE */}
           <div className="text-center pt-8 border-t border-border">
-            <p className="text-card-foreground-secondary text-sm">
+            <p className="text-foreground text-sm">
               Artist curated. Fan appreciated.
             </p>
           </div>
