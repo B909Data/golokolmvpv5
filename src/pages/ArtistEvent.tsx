@@ -23,7 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import PaidAccessSection from "@/components/PaidAccessSection";
+import PaymentsAndPricingSection from "@/components/PaymentsAndPricingSection";
 
 const PUBLIC_BASE_URL = "https://golokol.app";
 
@@ -140,9 +140,6 @@ const ArtistEvent = () => {
   
   // Share link copied state
   const [shareLinkCopied, setShareLinkCopied] = useState(false);
-  
-  // Stripe connect state for banner
-  const [isConnectingStripe, setIsConnectingStripe] = useState(false);
 
   // Party end time display (replaces buggy countdown timer)
   const partyEndInfo = formatPartyEndTime(event?.after_party_expires_at || null);
@@ -436,40 +433,7 @@ const ArtistEvent = () => {
     setTimeout(() => setShareLinkCopied(false), 2000);
   };
 
-  // Handle Stripe Connect from banner
-  const handleBannerConnectStripe = async () => {
-    if (!eventId || !token) return;
-    setIsConnectingStripe(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-stripe-connect-link", {
-        body: { event_id: eventId, token },
-      });
-
-      if (error) throw error;
-
-      if (data.already_connected) {
-        toast.info("Stripe account already connected");
-        fetchEvent();
-        return;
-      }
-
-      if (data.url) {
-        const newWindow = window.open(data.url, "_blank");
-        if (!newWindow) {
-          toast.error("Popup blocked. Please allow popups for this site.");
-        } else {
-          toast.success("Complete Stripe onboarding in the new tab");
-        }
-      }
-    } catch (err: any) {
-      console.error("Stripe connect error:", err);
-      toast.error(err.message || "Failed to connect Stripe");
-    } finally {
-      setIsConnectingStripe(false);
-    }
-  };
-
-  // Download Merch Table QR Poster
+  // Share link functionality
   const handleDownloadPoster = () => {
     const canvas = document.getElementById("merch-table-qr-canvas") as HTMLCanvasElement;
     if (!canvas) {
@@ -579,89 +543,9 @@ const ArtistEvent = () => {
           </div>
         </section>
 
-        {/* STRIPE NOT CONNECTED BANNER - Show when stripe_account_id is null */}
-        {event && !event.stripe_account_id && (
-          <section className="px-4 pb-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-destructive/10 border-2 border-destructive rounded-xl p-6 space-y-4">
-                <h2 className="font-display text-xl text-destructive uppercase tracking-wide">
-                  Connect Stripe to Activate Your After Party
-                </h2>
-                <p className="text-foreground text-base font-sans">
-                  Fans can't enter your After Party until payments are enabled.
-                </p>
-                <p className="text-muted-foreground text-base font-sans">
-                  Connect your Stripe account to start earning directly from your fans.
-                </p>
-                <Button
-                  onClick={handleBannerConnectStripe}
-                  disabled={isConnectingStripe}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-base"
-                >
-                  {isConnectingStripe ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Connecting...
-                    </>
-                  ) : (
-                    <>
-                      <ExternalLink className="w-5 h-5 mr-2" />
-                      Connect Stripe
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* CONTAINER 1: Promote Your After Party - Yellow Container */}
-        <section className="px-4 pb-8 pt-2">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-primary rounded-xl p-6 space-y-4">
-              <div className="flex items-center gap-3">
-                <Share2 className="w-6 h-6 text-primary-foreground" />
-                <h2 className="font-display text-xl text-primary-foreground uppercase tracking-wide">
-                  Promote Your After Party
-                </h2>
-              </div>
-              
-              <p className="text-primary-foreground text-base font-sans">
-                Share this link with your fans so they can get their pass.
-              </p>
-              
-              {/* Link Display - Black on Yellow */}
-              <div className="bg-black rounded-lg p-4 flex items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="text-primary font-mono text-base truncate">
-                    {shareUrl}
-                  </p>
-                </div>
-                <Button
-                  onClick={handleCopyShareLink}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0 text-base"
-                >
-                  {shareLinkCopied ? (
-                    <>
-                      <Check className="w-5 h-5 mr-2" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-5 h-5 mr-2" />
-                      Copy
-                    </>
-                  )}
-                </Button>
-              </div>
-              
-            </div>
-          </div>
-        </section>
-
-        {/* PAID ACCESS SECTION */}
+        {/* PAYMENTS & PRICING SECTION - Single consolidated Stripe + pricing UI */}
         {event && eventId && token && (
-          <PaidAccessSection
+          <PaymentsAndPricingSection
             eventId={eventId}
             token={token}
             stripeAccountId={event.stripe_account_id}
