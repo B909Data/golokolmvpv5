@@ -555,6 +555,35 @@ const ArtistEvent = () => {
           />
         )}
 
+        {/* PROMOTE YOUR AFTER PARTY - Always visible, not gated by Stripe */}
+        <section className="px-4 pb-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-black border border-primary/30 rounded-xl p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <Share2 className="w-6 h-6 text-primary" />
+                <h3 className="font-display text-xl text-primary uppercase tracking-wide">Promote Your After Party</h3>
+              </div>
+              
+              <p className="text-muted-foreground font-sans text-base">
+                Share this link with your fans so they can RSVP before the show.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1 bg-primary/10 border border-primary/30 rounded-lg px-4 py-3">
+                  <p className="text-primary font-mono text-sm break-all">{shareUrl}</p>
+                </div>
+                <Button 
+                  onClick={handleCopyShareLink} 
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-base py-5 shrink-0"
+                >
+                  {shareLinkCopied ? <Check className="w-5 h-5 mr-2" /> : <Copy className="w-5 h-5 mr-2" />}
+                  {shareLinkCopied ? "Copied!" : "Copy Link"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CONTAINER 2: After Party Check-In - Dark Theme */}
         <section className="px-4 pb-8">
           <div className="max-w-4xl mx-auto">
