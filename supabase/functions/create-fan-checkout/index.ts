@@ -135,7 +135,8 @@ Deno.serve(async (req) => {
     }
 
     // 5) PAID PATH - Create Stripe Checkout Session
-    const feeCents = Math.max(0, Math.round(priceCents * 0.10));
+    // Platform fee: 25% of fan pass price (artist receives 75%)
+    const feeCents = Math.max(0, Math.round(priceCents * 0.25));
 
     const productName = event.artist_name
       ? `${event.artist_name} After Party`
@@ -172,11 +173,11 @@ Deno.serve(async (req) => {
     // Apply 50% coupon if promo kind matches
     if (promoKind === "percent_50" && coupon50Id) {
       sessionConfig.discounts = [{ coupon: coupon50Id }];
-      // Recalculate fee based on discounted amount
+      // Recalculate fee based on discounted amount (25% platform fee)
       const discountedPrice = Math.round(priceCents * 0.5);
       sessionConfig.payment_intent_data!.application_fee_amount = Math.max(
         0,
-        Math.round(discountedPrice * 0.10)
+        Math.round(discountedPrice * 0.25)
       );
     }
 
