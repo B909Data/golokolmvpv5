@@ -23,8 +23,14 @@ Deno.serve(async (req) => {
 
   const stripe = new Stripe(stripeSecret, { apiVersion: "2024-06-20" });
 
+  // Determine if we're in test mode based on stripe key
+  const isTestMode = stripeSecret.startsWith("sk_test_");
+  const coupon50Id = isTestMode
+    ? Deno.env.get("STRIPE_COUPON_50_TEST")
+    : Deno.env.get("STRIPE_COUPON_50_LIVE");
+
   try {
-    const { eventId, attendeeId, origin, qrToken } = await req.json();
+    const { eventId, attendeeId, origin, qrToken, promoCode } = await req.json();
 
     if (!eventId || !attendeeId || !origin || !qrToken) {
       return new Response(
@@ -65,21 +71,78 @@ Deno.serve(async (req) => {
 
     const priceCents = event.fixed_price;
 
-    // 3) Mark attendee pending (idempotent)
-    await supabase
-      .from("attendees")
-      .update({ payment_status: "pending" })
-      .eq("id", attendeeId);
+    // 3) Handle promo code if provided (backend-only validation)
+    let promoKind: string | null = null;
+    
+    if (promoCode && promoCode.trim().length > 0) {
+      // Call atomic validation function (service_role only)
+      const { data: promoResult, error: promoErr } = await supabase.rpc(
+        "validate_and_redeem_promo_code",
+        { p_code: promoCode.trim() }
+      );
 
-    // 4) Platform fee (10%)
+      if (promoErr) {
+        console.error("Promo validation error:", promoErr);
+        return new Response(
+          JSON.stringify({ error: "Failed to validate promo code" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // RPC returns array with single row
+      const result = promoResult?.[0];
+      
+      if (!result?.valid) {
+        return new Response(
+          JSON.stringify({ error: result?.error_message || "Invalid promo code" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      promoKind = result.promo_kind;
+    }
+
+    // 4) FREE CODE PATH - Skip Stripe entirely
+    if (promoKind === "free") {
+      // Update attendee to paid status immediately (free entry)
+      const { error: updateErr } = await supabase
+        .from("attendees")
+        .update({
+          payment_status: "paid",
+          paid_amount: 0,
+          paid_at: new Date().toISOString(),
+        })
+        .eq("id", attendeeId);
+
+      if (updateErr) {
+        console.error("Attendee update error:", updateErr);
+        return new Response(
+          JSON.stringify({ error: "Failed to grant free access" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      console.log("Free promo redeemed for attendee:", attendeeId);
+
+      // Return success with redirect to pass page (no Stripe)
+      return new Response(
+        JSON.stringify({
+          free: true,
+          redirectUrl: `${origin}/after-party/${eventId}/pass?token=${qrToken}`,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // 5) PAID PATH - Create Stripe Checkout Session
     const feeCents = Math.max(0, Math.round(priceCents * 0.10));
 
-    // 5) Create Checkout Session (platform-led destination charge)
     const productName = event.artist_name
       ? `${event.artist_name} After Party`
       : event.title || "GoLokol After Party Entry";
 
-    const session = await stripe.checkout.sessions.create({
+    // Build checkout session config
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       payment_method_types: ["card"],
       line_items: [
@@ -92,8 +155,11 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
-      // Dual metadata placement for reliability
-      metadata: { event_id: eventId, attendee_id: attendeeId },
+      metadata: { 
+        event_id: eventId, 
+        attendee_id: attendeeId,
+        promo_code: promoCode || null,
+      },
       payment_intent_data: {
         metadata: { event_id: eventId, attendee_id: attendeeId },
         application_fee_amount: feeCents,
@@ -101,9 +167,22 @@ Deno.serve(async (req) => {
       },
       success_url: `${origin}/after-party/${eventId}/room?token=${qrToken}&paid=1`,
       cancel_url: `${origin}/after-party/${eventId}?paid=0`,
-    });
+    };
 
-    console.log("Checkout session created:", session.id, "for attendee:", attendeeId);
+    // Apply 50% coupon if promo kind matches
+    if (promoKind === "percent_50" && coupon50Id) {
+      sessionConfig.discounts = [{ coupon: coupon50Id }];
+      // Recalculate fee based on discounted amount
+      const discountedPrice = Math.round(priceCents * 0.5);
+      sessionConfig.payment_intent_data!.application_fee_amount = Math.max(
+        0,
+        Math.round(discountedPrice * 0.10)
+      );
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
+
+    console.log("Checkout session created:", session.id, "for attendee:", attendeeId, "promo:", promoKind || "none");
 
     return new Response(
       JSON.stringify({ url: session.url, id: session.id }),
