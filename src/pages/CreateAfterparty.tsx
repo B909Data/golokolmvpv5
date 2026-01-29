@@ -1064,9 +1064,9 @@ const CreateAfterparty = () => {
             ) : discountValidation.valid && discountValidation.type === "free" ? (
               "Create Free Listing"
             ) : discountValidation.valid && discountValidation.type === "50_percent" ? (
-              "Pay — $5.99"
+              selectedPlan === "touring" ? "Pay — $24.99" : "Pay — $12.99"
             ) : (
-              "Pay — $11.99"
+              selectedPlan === "touring" ? "Pay — $49.99" : "Pay — $25.99"
             )}
           </Button>
           {/* Inline error hints when button is disabled */}
@@ -1136,6 +1136,9 @@ const CreateAfterparty = () => {
               <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
                 CREATE AN <span className="text-primary">AFTER PARTY</span>
               </h1>
+              <p className="text-muted-foreground text-sm font-sans mb-1">
+                {selectedPlan === "touring" ? "Touring Plan — $49.99" : "Emerge Plan — $25.99"}
+              </p>
               <Link to="/create-after-party" className="text-primary hover:underline text-sm font-sans">
                 Change plan →
               </Link>
