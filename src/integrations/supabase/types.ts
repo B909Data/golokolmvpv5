@@ -433,6 +433,42 @@ export type Database = {
           },
         ]
       }
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          kind: string
+          max_redemptions: number | null
+          redemption_count: number
+          starts_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          kind: string
+          max_redemptions?: number | null
+          redemption_count?: number
+          starts_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: string
+          max_redemptions?: number | null
+          redemption_count?: number
+          starts_at?: string | null
+        }
+        Relationships: []
+      }
       recaps: {
         Row: {
           content: string | null
@@ -533,7 +569,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      validate_and_redeem_promo_code: {
+        Args: { p_code: string }
+        Returns: {
+          error_message: string
+          promo_kind: string
+          valid: boolean
+        }[]
+      }
     }
     Enums: {
       badge_type: "first_show" | "repeat_show"

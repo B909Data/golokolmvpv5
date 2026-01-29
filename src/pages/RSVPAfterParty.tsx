@@ -20,6 +20,7 @@ const RSVPAfterParty = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [pwywAmount, setPwywAmount] = useState("");
+  const [promoCode, setPromoCode] = useState("");
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", eventId],
@@ -142,7 +143,7 @@ const RSVPAfterParty = () => {
       localStorage.setItem(`attendee_${eventId}`, attendee.id);
       localStorage.setItem(`attendee_qr_${eventId}`, qrToken);
 
-      // If paid event, redirect to Stripe checkout
+      // If paid event, redirect to Stripe checkout (or handle free promo)
       if (isPaidEvent) {
         const pwywAmountCents = event.pricing_mode === "pwyw" 
           ? Math.round(parseFloat(pwywAmount) * 100) 
@@ -155,28 +156,33 @@ const RSVPAfterParty = () => {
             origin: window.location.origin,
             qrToken,
             pwywAmountCents,
+            promoCode: promoCode.trim() || undefined,
           },
         });
 
-        if (error || !data?.url) {
+        if (error || (!data?.url && !data?.free)) {
           console.error("Checkout error:", error, data);
           toast({
-            title: "Payment setup failed",
+            title: data?.error ? "Promo code error" : "Payment setup failed",
             description: data?.error || "Could not create checkout session. Please try again.",
             variant: "destructive",
           });
           return;
         }
 
-        // Try to open in new tab, fallback to redirect
+        // FREE promo code path - immediate redirect to pass
+        if (data.free && data.redirectUrl) {
+          navigate(data.redirectUrl.replace(window.location.origin, ""));
+          return;
+        }
+
+        // Stripe checkout path
         const newWindow = window.open(data.url, "_blank");
         if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
-          // Popup blocked - show fallback link
           toast({
             title: "Popup blocked",
             description: "Click the link below to complete payment.",
           });
-          // Store URL for manual navigation
           localStorage.setItem(`checkout_url_${eventId}`, data.url);
           window.location.href = data.url;
         }
@@ -355,13 +361,29 @@ const RSVPAfterParty = () => {
                   </div>
                 )}
 
+                {/* Promo code input for paid events */}
+                {isPaidEvent && (
+                  <div className="space-y-2">
+                    <Label htmlFor="promoCode" className="text-foreground font-sans">Promo Code (optional)</Label>
+                    <Input
+                      id="promoCode"
+                      type="text"
+                      placeholder="Enter promo code"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                      className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans uppercase"
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                )}
+
                 <Button
                   type="submit"
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-sans"
                   disabled={isSubmitting}
                 >
                   {isSubmitting 
-                    ? (isPaidEvent ? "Redirecting to payment..." : "Getting your pass...")
+                    ? (isPaidEvent ? "Opening checkout..." : "Getting your pass...")
                     : (isPaidEvent 
                         ? (event?.pricing_mode === "fixed" && displayPrice 
                             ? `Pay ${displayPrice} to Join` 
