@@ -70,7 +70,7 @@ const Index = () => {
               ))}
             </ul>
 
-            <Link to="/create-afterparty">
+            <Link to="/create-after-party">
               <Button variant="default" size="lg">
                 Create an After Party
                 <ArrowRight className="h-5 w-5" />

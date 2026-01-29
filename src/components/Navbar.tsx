@@ -20,7 +20,7 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { label: "Create an After Party", path: "/create-afterparty", hideOnTablet: true, colorClass: "text-foreground" },
+    { label: "Create an After Party", path: "/create-after-party", hideOnTablet: true, colorClass: "text-foreground" },
     { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Listening Sessions", colorClass: "text-primary" },
     { label: "Pricing", path: "/pricing", hideOnTablet: true, colorClass: "text-foreground" },
   ];

@@ -26,6 +26,8 @@ interface AfterPartyFormData {
   venue_other_name?: string;
   // Optional email for MailerLite confirmation
   confirmation_email?: string;
+  // Plan selection (emerge or touring) - required
+  plan: "emerge" | "touring";
 }
 
 // Helper to send MailerLite notification (non-blocking)
@@ -122,10 +124,11 @@ serve(async (req) => {
     const formData: AfterPartyFormData = await req.json();
     console.log("Received form data:", formData);
 
-    // Validate required fields (title is now optional)
+    // Validate required fields (title is now optional, plan is required)
     if (!formData.artist_name || !formData.contact_email || 
         !formData.start_at || !formData.city || !formData.venue_name || 
-        !formData.genres || formData.genres.length === 0) {
+        !formData.genres || formData.genres.length === 0 ||
+        !formData.plan || !["emerge", "touring"].includes(formData.plan)) {
       console.log("Validation failed, missing fields:", {
         artist_name: !!formData.artist_name,
         contact_email: !!formData.contact_email,
@@ -133,13 +136,22 @@ serve(async (req) => {
         city: !!formData.city,
         venue_name: !!formData.venue_name,
         genres: formData.genres?.length || 0,
+        plan: formData.plan,
       });
-      throw new Error("Missing required fields");
+      throw new Error("Missing required fields or invalid plan");
     }
 
     if (formData.genres.length > 2) {
       throw new Error("Maximum 2 genres allowed");
     }
+
+    // Determine pricing based on plan
+    // Emerge: $25.99 (2599 cents), $500 revenue cap
+    // Touring: $49.99 (4999 cents), no revenue cap
+    const EMERGE_PRICE_ID = "price_1SugIlPKcGpNZUZR0jivc1Dw";
+    const TOURING_PRICE_ID = "price_1SugJKPKcGpNZUZR1BoxCP6b";
+    const priceId = formData.plan === "emerge" ? EMERGE_PRICE_ID : TOURING_PRICE_ID;
+    const revenueCap = formData.plan === "emerge" ? 500 : null;
 
     // Create Supabase client with service role for secure insert
     const supabaseAdmin = createClient(
@@ -171,6 +183,9 @@ serve(async (req) => {
         venue_id: formData.venue_id || null,
         curator_other_name: formData.curator_other_name || null,
         venue_other_name: formData.venue_other_name || null,
+        // Plan and revenue cap based on selection
+        plan: formData.plan,
+        revenue_cap: revenueCap,
       })
       .select()
       .single();
@@ -270,23 +285,24 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Create Checkout session
+    // Create Checkout session with plan-specific pricing
     const sessionConfig: any = {
       line_items: [
         {
-          price: "price_1SnmXSPKcGpNZUZRDmeIMJlh", // Live mode: After Party Listing $11.99
+          price: priceId, // Use plan-specific price ID
           quantity: 1,
         },
       ],
       mode: "payment",
       success_url: `${req.headers.get("origin")}/create-afterparty/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/create-afterparty?canceled=true`,
+      cancel_url: `${req.headers.get("origin")}/create-afterparty?plan=${formData.plan}&canceled=true`,
       metadata: {
         event_id: event.id,
         discount_code: validatedCode || "",
         confirmation_email: formData.confirmation_email || "",
         artist_name: formData.artist_name || "",
         event_title: formData.title || "",
+        plan: formData.plan,
       },
       customer_email: formData.contact_email,
     };
