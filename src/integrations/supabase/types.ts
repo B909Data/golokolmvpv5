@@ -280,8 +280,10 @@ export type Database = {
           min_price: number | null
           music_link: string | null
           pinned_message: string | null
+          plan: string | null
           pricing_locked_at: string | null
           pricing_mode: string | null
+          revenue_cap: number | null
           start_at: string
           status: Database["public"]["Enums"]["event_status"]
           stripe_account_id: string | null
@@ -318,8 +320,10 @@ export type Database = {
           min_price?: number | null
           music_link?: string | null
           pinned_message?: string | null
+          plan?: string | null
           pricing_locked_at?: string | null
           pricing_mode?: string | null
+          revenue_cap?: number | null
           start_at: string
           status?: Database["public"]["Enums"]["event_status"]
           stripe_account_id?: string | null
@@ -356,8 +360,10 @@ export type Database = {
           min_price?: number | null
           music_link?: string | null
           pinned_message?: string | null
+          plan?: string | null
           pricing_locked_at?: string | null
           pricing_mode?: string | null
+          revenue_cap?: number | null
           start_at?: string
           status?: Database["public"]["Enums"]["event_status"]
           stripe_account_id?: string | null

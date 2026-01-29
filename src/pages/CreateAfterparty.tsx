@@ -107,6 +107,9 @@ const CreateAfterparty = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const canceled = searchParams.get("canceled") === "true";
+  
+  // Plan selection from bumper page - redirect if missing
+  const selectedPlan = searchParams.get("plan") as "emerge" | "touring" | null;
 
   // File upload state
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -140,9 +143,15 @@ const CreateAfterparty = () => {
   // Curator flyer auto-populated state
   const [curatorFlyerUrl, setCuratorFlyerUrl] = useState<string | null>(null);
 
-  // Scroll to top on page load and fetch partners + cities
+  // Scroll to top on page load, fetch partners + cities, and validate plan
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Redirect to plan selection if no valid plan is specified
+    if (!selectedPlan || !["emerge", "touring"].includes(selectedPlan)) {
+      navigate("/create-after-party", { replace: true });
+      return;
+    }
     
     const fetchData = async () => {
       try {
@@ -164,7 +173,7 @@ const CreateAfterparty = () => {
     };
     
     fetchData();
-  }, []);
+  }, [selectedPlan, navigate]);
 
   // Cleanup preview URL on unmount
   useEffect(() => {
@@ -394,7 +403,7 @@ const CreateAfterparty = () => {
         ? undefined // Will be set after upload
         : data.image_url || curatorFlyerUrl || undefined;
 
-      // Build payload - include partner IDs when applicable
+      // Build payload - include partner IDs and plan when applicable
       const payload: Record<string, unknown> = {
         artist_name: data.artist_name,
         contact_email: confirmationEmail.trim(), // Use confirmationEmail as contact_email
@@ -414,6 +423,8 @@ const CreateAfterparty = () => {
         venue_other_name: data.venue_id === "other" ? data.venue_other_name : undefined,
         // Required confirmation email for MailerLite
         confirmation_email: confirmationEmail.trim(),
+        // Plan selection from bumper page (emerge or touring)
+        plan: selectedPlan,
       };
 
       // Add discount code if valid
@@ -1125,8 +1136,8 @@ const CreateAfterparty = () => {
               <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
                 CREATE AN <span className="text-primary">AFTER PARTY</span>
               </h1>
-              <Link to="/pricing" className="text-primary hover:underline text-sm font-sans">
-                View pricing options →
+              <Link to="/create-after-party" className="text-primary hover:underline text-sm font-sans">
+                Change plan →
               </Link>
             </div>
 

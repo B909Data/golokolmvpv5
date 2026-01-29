@@ -66,7 +66,7 @@ const Pricing = () => {
 
                 {/* CTA */}
                 <div className="mt-auto">
-                  <Link to="/create-afterparty" className="block">
+                  <Link to="/create-afterparty?plan=emerge" className="block">
                     <Button variant="card" size="lg" className="w-full">
                       Create an After Party
                     </Button>
@@ -121,7 +121,7 @@ const Pricing = () => {
 
                 {/* CTA */}
                 <div className="mt-auto">
-                  <Link to="/create-afterparty" className="block">
+                  <Link to="/create-afterparty?plan=touring" className="block">
                     <Button variant="card" size="lg" className="w-full">
                       Create an After Party
                     </Button>

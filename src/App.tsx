@@ -38,6 +38,7 @@ import Privacy from "./pages/Privacy";
 import Partners from "./pages/Partners";
 import ArtistRecognition from "./pages/ArtistRecognition";
 import Pricing from "./pages/Pricing";
+import SelectAfterPartyPlan from "./pages/SelectAfterPartyPlan";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
           <Route path="/after-party/:eventId/intro" element={<WalkInIntro />} />
           <Route path="/after-party/:eventId/room" element={<AfterPartyRoom />} />
           
+          <Route path="/create-after-party" element={<SelectAfterPartyPlan />} />
           <Route path="/create-afterparty" element={<CreateAfterparty />} />
           <Route path="/create-afterparty/success" element={<CreateAfterpartySuccess />} />
           <Route path="/checkin/:qr_token" element={<Checkin />} />
