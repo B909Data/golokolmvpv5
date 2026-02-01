@@ -1,18 +1,19 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
-import { Bookmark, ExternalLink } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Section components
+// Components
 import StatusBar from "@/components/artist/StatusBar";
-import PaymentsAndPricingSection from "@/components/PaymentsAndPricingSection";
-import PromoteSection from "@/components/artist/PromoteSection";
-import DoorSection from "@/components/artist/DoorSection";
-import RoomControlsSection from "@/components/artist/RoomControlsSection";
-import MoneyMadeSection from "@/components/artist/MoneyMadeSection";
+import ControlRoomTabs, { TabId } from "@/components/artist/ControlRoomTabs";
+import HomeTab from "@/components/artist/tabs/HomeTab";
+import GetPaidTab from "@/components/artist/tabs/GetPaidTab";
+import PromoteTab from "@/components/artist/tabs/PromoteTab";
+import CheckInTab from "@/components/artist/tabs/CheckInTab";
+import AfterPartyTab from "@/components/artist/tabs/AfterPartyTab";
 
 interface EventData {
   id: string;
@@ -60,6 +61,7 @@ const ArtistEvent = () => {
   const [authorized, setAuthorized] = useState(true);
   const [checkedInCount, setCheckedInCount] = useState(0);
   const [stripeStatus, setStripeStatus] = useState<StripeStatus>("loading");
+  const [activeTab, setActiveTab] = useState<TabId>("home");
 
   // Fetch event with hybrid auth (token OR logged-in user)
   const fetchEvent = useCallback(async () => {
@@ -225,44 +227,38 @@ const ArtistEvent = () => {
         stripeStatus={stripeStatus}
       />
 
-      {/* Header */}
-      <section className="pt-6 pb-4 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Bookmark tip */}
-          <div className="flex items-start gap-3 mb-4 p-3 bg-primary/10 border border-primary/30 rounded-lg">
-            <Bookmark className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <p className="text-sm font-sans text-foreground">
-              <strong>Bookmark this page.</strong> This is your control room for promoting and managing your After Party.{" "}
-              <Link to="/how-to-golokol" className="text-primary hover:underline">FAQ</Link>
-            </p>
-          </div>
+      {/* Tab Navigation */}
+      <ControlRoomTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-          {/* Quick intro video - collapsed by default on mobile */}
-          <details className="group">
-            <summary className="flex items-center gap-2 cursor-pointer text-primary hover:text-primary/80 text-sm font-sans mb-2">
-              <ExternalLink className="w-4 h-4" />
-              <span>Watch: How to use the Control Room (2 min)</span>
-            </summary>
-            <div className="aspect-video w-full rounded-lg overflow-hidden mt-2">
-              <iframe
-                src="https://www.youtube.com/embed/pKD4IptzlTg"
-                title="How to use the Artist Control Room"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            </div>
-          </details>
-        </div>
-      </section>
-
-      {/* SECTION 1: STATUS - Handled by StatusBar above */}
-
-      {/* SECTION 2: PAYMENTS & PRICING */}
-      {event && eventId && token && (
-        <section className="px-4 pb-4">
+      {/* Bookmark tip - only on Home tab */}
+      {activeTab === "home" && (
+        <section className="px-4 pt-4">
           <div className="max-w-4xl mx-auto">
-            <PaymentsAndPricingSection
+            <div className="flex items-start gap-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+              <Bookmark className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+              <p className="text-sm font-sans text-foreground">
+                <strong>Bookmark this page.</strong> This is your control room.{" "}
+                <Link to="/how-to-golokol" className="text-primary hover:underline">FAQ</Link>
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Tab Content */}
+      <section className="px-4 py-6">
+        <div className="max-w-4xl mx-auto">
+          {activeTab === "home" && eventId && (
+            <HomeTab
+              eventId={eventId}
+              stripeStatus={stripeStatus}
+              fixedPrice={event?.fixed_price || null}
+              onSwitchTab={setActiveTab}
+            />
+          )}
+
+          {activeTab === "get-paid" && eventId && token && event && (
+            <GetPaidTab
               eventId={eventId}
               token={token}
               stripeAccountId={event.stripe_account_id}
@@ -270,42 +266,27 @@ const ArtistEvent = () => {
               pricingLockedAt={event.pricing_locked_at}
               onUpdate={handleEventUpdate}
             />
-          </div>
-        </section>
-      )}
+          )}
 
-      {/* SECTION 3: PROMOTE */}
-      {eventId && event && (
-        <section className="px-4 pb-4">
-          <div className="max-w-4xl mx-auto">
-            <PromoteSection
+          {activeTab === "promote" && eventId && event && (
+            <PromoteTab
               eventId={eventId}
               artistName={artistName}
               fixedPrice={event.fixed_price}
             />
-          </div>
-        </section>
-      )}
+          )}
 
-      {/* SECTION 4: DOOR (CHECK-IN) */}
-      {eventId && token && (
-        <section className="px-4 pb-4">
-          <div className="max-w-4xl mx-auto">
-            <DoorSection
+          {activeTab === "check-in" && eventId && token && (
+            <CheckInTab
               eventId={eventId}
               token={token}
               isExpired={isExpired}
               onCheckin={handleCheckin}
             />
-          </div>
-        </section>
-      )}
+          )}
 
-      {/* SECTION 5: ROOM CONTROLS */}
-      {eventId && token && event && (
-        <section className="px-4 pb-4">
-          <div className="max-w-4xl mx-auto">
-            <RoomControlsSection
+          {activeTab === "after-party" && eventId && token && event && (
+            <AfterPartyTab
               eventId={eventId}
               token={token}
               pinnedMessage={event.pinned_message || ""}
@@ -315,37 +296,7 @@ const ArtistEvent = () => {
               messages={messages}
               onUpdate={handleEventUpdate}
             />
-          </div>
-        </section>
-      )}
-
-      {/* SECTION 6: MONEY MADE */}
-      {eventId && (
-        <section className="px-4 pb-8">
-          <div className="max-w-4xl mx-auto">
-            <MoneyMadeSection eventId={eventId} />
-          </div>
-        </section>
-      )}
-
-      {/* Educational video section - optional deep dive */}
-      <section className="px-4 pb-16">
-        <div className="max-w-4xl mx-auto">
-          <details className="group">
-            <summary className="flex items-center gap-2 cursor-pointer text-primary hover:text-primary/80 text-sm font-sans">
-              <ExternalLink className="w-4 h-4" />
-              <span>Watch: How to promote your After Party (tips)</span>
-            </summary>
-            <div className="aspect-video w-full rounded-lg overflow-hidden mt-3 border border-primary/30">
-              <iframe
-                src="https://www.youtube.com/embed/6Q7AZCHm8OE?rel=0"
-                title="How to Promote Your After Party"
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-          </details>
+          )}
         </div>
       </section>
 
