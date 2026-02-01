@@ -264,6 +264,7 @@ export type Database = {
           artist_access_token: string | null
           artist_entered_sms_at: string | null
           artist_name: string | null
+          artist_user_id: string | null
           city: string | null
           contact_email: string | null
           contact_phone: string | null
@@ -304,6 +305,7 @@ export type Database = {
           artist_access_token?: string | null
           artist_entered_sms_at?: string | null
           artist_name?: string | null
+          artist_user_id?: string | null
           city?: string | null
           contact_email?: string | null
           contact_phone?: string | null
@@ -344,6 +346,7 @@ export type Database = {
           artist_access_token?: string | null
           artist_entered_sms_at?: string | null
           artist_name?: string | null
+          artist_user_id?: string | null
           city?: string | null
           contact_email?: string | null
           contact_phone?: string | null

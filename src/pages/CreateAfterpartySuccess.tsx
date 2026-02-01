@@ -34,9 +34,18 @@ const CreateAfterpartySuccess = () => {
       }
 
       try {
+        // Check if artist is logged in to assign ownership
+        const { data: { session } } = await supabase.auth.getSession();
+        const artistUserId = session?.user?.id || null;
+
         const { data, error: fnError } = await supabase.functions.invoke(
           "verify-afterparty-payment",
-          { body: { session_id: sessionId } }
+          { 
+            body: { 
+              session_id: sessionId,
+              artist_user_id: artistUserId, // Phase 1: assign ownership if logged in
+            } 
+          }
         );
 
         if (fnError) throw fnError;
@@ -50,7 +59,14 @@ const CreateAfterpartySuccess = () => {
           if (data?.email_sent) {
             toast.success("Confirmation email sent.");
           }
-          navigate(`/artist/event/${event.id}?token=${event.artist_access_token}&welcome=true`, { replace: true });
+          
+          // If logged in, redirect to dashboard instead (they can access via ownership)
+          if (artistUserId) {
+            navigate(`/artist/event/${event.id}?welcome=true`, { replace: true });
+          } else {
+            // Not logged in - use token-based access
+            navigate(`/artist/event/${event.id}?token=${event.artist_access_token}&welcome=true`, { replace: true });
+          }
         } else {
           setError("Missing event data");
           setIsVerifying(false);

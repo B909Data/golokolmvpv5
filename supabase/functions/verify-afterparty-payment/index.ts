@@ -98,7 +98,7 @@ serve(async (req) => {
   }
 
   try {
-    const { session_id } = await req.json();
+    const { session_id, artist_user_id } = await req.json();
     console.log("Verifying payment for session:", session_id);
 
     if (!session_id) {
@@ -137,7 +137,7 @@ serve(async (req) => {
     // Fetch the event to check current state
     const { data: existingEvent, error: fetchError } = await supabaseAdmin
       .from("events")
-      .select("id, title, artist_name, start_at, city, venue_name, after_party_enabled, artist_access_token")
+      .select("id, title, artist_name, start_at, city, venue_name, after_party_enabled, artist_access_token, artist_user_id")
       .eq("id", eventId)
       .single();
 
@@ -176,6 +176,11 @@ serve(async (req) => {
     const updateData: Record<string, unknown> = { after_party_enabled: true };
     if (!existingEvent.artist_access_token) {
       updateData.artist_access_token = artistAccessToken;
+    }
+    // Assign artist_user_id if provided and not already set (Phase 1 ownership)
+    if (artist_user_id && !existingEvent.artist_user_id) {
+      updateData.artist_user_id = artist_user_id;
+      console.log("Assigning artist_user_id:", artist_user_id);
     }
 
     const { data: event, error: updateError } = await supabaseAdmin

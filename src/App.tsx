@@ -9,10 +9,7 @@ import Shows from "./pages/Shows";
 import Songs from "./pages/Songs";
 import SongsSuccess from "./pages/SongsSuccess";
 import SongDetail from "./pages/SongDetail";
-import AfterpartyDetail from "./pages/AfterpartyDetail";
-import AfterParty from "./pages/AfterParty";
 import AfterPartyRoom from "./pages/AfterPartyRoom";
-
 import RSVPAfterParty from "./pages/RSVPAfterParty";
 import AfterPartyPass from "./pages/AfterPartyPass";
 import QRDisplayPage from "./pages/QRDisplayPage";
@@ -20,10 +17,8 @@ import VerifyQRPage from "./pages/VerifyQRPage";
 import WalkInIntro from "./pages/WalkInIntro";
 import CreateAfterparty from "./pages/CreateAfterparty";
 import CreateAfterpartySuccess from "./pages/CreateAfterpartySuccess";
-import Checkin from "./pages/Checkin";
 import SubmitSong from "./pages/SubmitSong";
 import HowToGoLokol from "./pages/HowToGoLokol";
-import FindAfterParty from "./pages/FindAfterParty";
 import Admin from "./pages/Admin";
 import AdminLLS from "./pages/AdminLLS";
 import AdminAfterParties from "./pages/AdminAfterParties";
@@ -31,6 +26,8 @@ import AdminDiscountCodes from "./pages/AdminDiscountCodes";
 import AdminPartners from "./pages/AdminPartners";
 import AdminCities from "./pages/AdminCities";
 import ArtistEvent from "./pages/ArtistEvent";
+import ArtistLogin from "./pages/ArtistLogin";
+import ArtistDashboard from "./pages/ArtistDashboard";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
@@ -52,7 +49,6 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/shows" element={<Shows />} />
-          <Route path="/find-after-party" element={<FindAfterParty />} />
           <Route path="/songs" element={<Songs />} />
           <Route path="/songs/success" element={<SongsSuccess />} />
           <Route path="/admin" element={<Admin />} />
@@ -61,22 +57,34 @@ const App = () => (
           <Route path="/admin/discount-codes" element={<AdminDiscountCodes />} />
           <Route path="/admin/partners" element={<AdminPartners />} />
           <Route path="/admin/cities" element={<AdminCities />} />
+          
+          {/* Artist Auth Routes */}
+          <Route path="/artist/login" element={<ArtistLogin />} />
+          <Route path="/artist/dashboard" element={<ArtistDashboard />} />
           <Route path="/artist/event/:eventId" element={<ArtistEvent />} />
+          
+          {/* Song Detail */}
           <Route path="/song/:slug" element={<SongDetail />} />
-          <Route path="/afterparty/:slug" element={<AfterpartyDetail />} />
-          <Route path="/after-party/:eventId" element={<AfterParty />} />
+          
+          {/* After Party Fan Routes - Canonical: /after-party/:eventId/rsvp */}
           <Route path="/after-party/:eventId/rsvp" element={<RSVPAfterParty />} />
-          <Route path="/after-party/:eventId/rsvp/confirmed" element={<Navigate to="../pass" replace />} />
+          <Route path="/after-party/:eventId" element={<Navigate to="rsvp" replace />} />
           <Route path="/after-party/:eventId/pass" element={<AfterPartyPass />} />
           <Route path="/after-party/:eventId/qr/:qrToken" element={<QRDisplayPage />} />
           <Route path="/after-party/:eventId/verify/:qrToken" element={<VerifyQRPage />} />
           <Route path="/after-party/:eventId/intro" element={<WalkInIntro />} />
           <Route path="/after-party/:eventId/room" element={<AfterPartyRoom />} />
           
+          {/* Redirect legacy/duplicate routes */}
+          <Route path="/find-after-party" element={<Navigate to="/shows" replace />} />
+          <Route path="/afterparty/:slug" element={<Navigate to="/shows" replace />} />
+          
+          {/* After Party Creation */}
           <Route path="/create-after-party" element={<SelectAfterPartyPlan />} />
           <Route path="/create-afterparty" element={<CreateAfterparty />} />
           <Route path="/create-afterparty/success" element={<CreateAfterpartySuccess />} />
-          <Route path="/checkin/:qr_token" element={<Checkin />} />
+          
+          {/* Other Routes */}
           <Route path="/submit-song" element={<SubmitSong />} />
           <Route path="/how-to-golokol" element={<HowToGoLokol />} />
           <Route path="/terms" element={<Terms />} />
@@ -85,7 +93,8 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/for-artists" element={<ArtistRecognition />} />
           <Route path="/q/:code" element={<ShortLinkRedirect />} />
-          <Route path="*" element={<NotFound />} />
+          
+          {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
