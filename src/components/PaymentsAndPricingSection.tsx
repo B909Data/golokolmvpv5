@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import CollapsibleSection from "@/components/artist/CollapsibleSection";
 
 interface PaymentsAndPricingSectionProps {
   eventId: string;
@@ -33,7 +34,6 @@ const PaymentsAndPricingSection = ({
     fixedPrice ? (fixedPrice / 100).toFixed(2) : ""
   );
 
-  // Check Stripe account status when component mounts or stripeAccountId changes
   useEffect(() => {
     const checkStatus = async () => {
       if (!stripeAccountId) {
@@ -57,7 +57,6 @@ const PaymentsAndPricingSection = ({
     checkStatus();
   }, [eventId, token, stripeAccountId]);
 
-  // Update local state when props change
   useEffect(() => {
     setPriceValue(fixedPrice ? (fixedPrice / 100).toFixed(2) : "");
   }, [fixedPrice]);
@@ -115,7 +114,7 @@ const PaymentsAndPricingSection = ({
       });
 
       if (error) throw error;
-      toast.success("Price saved successfully");
+      toast.success("Price saved");
       onUpdate();
     } catch (err: any) {
       console.error("Save pricing error:", err);
@@ -125,225 +124,198 @@ const PaymentsAndPricingSection = ({
     }
   };
 
-  const formatPrice = (cents: number) => {
-    return `$${(cents / 100).toFixed(2)}`;
-  };
-
+  const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const isLocked = !!pricingLockedAt;
 
+  // Status badge for header
+  const getStatusBadge = () => {
+    if (stripeStatus === "loading") return null;
+    if (stripeStatus === "connected") {
+      return (
+        <Badge variant="checked" className="ml-2">
+          <Check className="w-3 h-3 mr-1" />
+          Active
+        </Badge>
+      );
+    }
+    if (stripeStatus === "action_required") {
+      return (
+        <Badge className="ml-2 bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+          <AlertCircle className="w-3 h-3 mr-1" />
+          Action Needed
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="destructive" className="ml-2">
+        <AlertCircle className="w-3 h-3 mr-1" />
+        Setup Required
+      </Badge>
+    );
+  };
+
   return (
-    <section className="px-4 pb-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-black border border-primary/30 rounded-xl p-6 space-y-6">
-          {/* Section Header */}
-          <div className="flex items-center gap-3">
-            <DollarSign className="w-6 h-6 text-primary" />
-            <h3 className="font-display text-xl text-primary uppercase tracking-wide">
-              Payments & Pricing
-            </h3>
+    <CollapsibleSection
+      title="Payments & Pricing"
+      icon={DollarSign}
+      defaultOpen={true}
+      variant="dark"
+      badge={getStatusBadge()}
+    >
+      <div className="space-y-4">
+        <p className="text-muted-foreground text-sm font-sans">
+          Fans pay you directly via Stripe.
+        </p>
+
+        {/* Loading State */}
+        {stripeStatus === "loading" && (
+          <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <Loader2 className="w-5 h-5 text-primary animate-spin" />
+              <span className="font-sans text-sm text-foreground">Checking Stripe status...</span>
+            </div>
           </div>
+        )}
 
-          <p className="text-muted-foreground text-base font-sans">
-            Monetize your After Party. Fans pay you directly via Stripe.
-          </p>
-
-          {/* Loading State */}
-          {stripeStatus === "loading" && (
-            <div className="bg-primary/10 border border-primary/30 rounded-lg p-6">
-              <div className="flex items-center gap-3">
-                <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                <span className="font-sans text-base text-foreground">Checking Stripe status...</span>
-              </div>
+        {/* Not Connected */}
+        {stripeStatus === "not_connected" && (
+          <div className="bg-destructive/10 border border-destructive/50 rounded-lg p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-destructive" />
+              <span className="font-sans font-medium text-destructive">Payouts Not Connected</span>
             </div>
-          )}
-
-          {/* STATE 1: Not Connected */}
-          {stripeStatus === "not_connected" && (
-            <div className="bg-destructive/10 border border-destructive/50 rounded-lg p-6 space-y-4">
-              <div className="flex items-center gap-3">
-                <CreditCard className="w-6 h-6 text-destructive" />
-                <h4 className="font-display text-lg text-destructive uppercase tracking-wide">
-                  Stripe Not Connected
-                </h4>
-              </div>
-
-              <div className="space-y-2 text-foreground text-base font-sans leading-relaxed">
-                <p>Fans can't enter your After Party until Stripe is connected.</p>
-                <p className="text-muted-foreground">Connect Stripe to start earning directly from fans.</p>
-              </div>
-
-              <Button
-                onClick={handleConnectStripe}
-                disabled={isConnecting}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 text-base"
-              >
-                {isConnecting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Connecting...
-                  </>
-                ) : (
-                  <>
-                    <ExternalLink className="w-5 h-5 mr-2" />
-                    Connect Stripe
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-
-          {/* STATE 2: Action Required */}
-          {stripeStatus === "action_required" && (
-            <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-lg p-6 space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-3">
-                  <AlertCircle className="w-6 h-6 text-yellow-400" />
-                  <h4 className="font-display text-lg text-yellow-400 uppercase tracking-wide">
-                    Stripe Needs More Info
-                  </h4>
-                </div>
-                <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-                  <AlertCircle className="w-3 h-3 mr-1" />
-                  Action Needed
-                </Badge>
-              </div>
-
-              <div className="space-y-2 text-foreground text-base font-sans leading-relaxed">
-                <p>Stripe requires additional information to enable payouts.</p>
-                <p className="text-muted-foreground">Once completed, payments unlock automatically.</p>
-              </div>
-
-              <Button
-                onClick={handleConnectStripe}
-                disabled={isConnecting}
-                className="bg-yellow-500 text-black hover:bg-yellow-400 text-base"
-              >
-                {isConnecting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Loading...
-                  </>
-                ) : (
-                  <>
-                    <ExternalLink className="w-5 h-5 mr-2" />
-                    Complete Stripe Setup
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-
-          {/* STATE 3: Connected */}
-          {stripeStatus === "connected" && (
-            <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-6">
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-3">
-                  <CreditCard className="w-6 h-6 text-green-400" />
-                  <h4 className="font-display text-lg text-green-400 uppercase tracking-wide">
-                    Payments Enabled
-                  </h4>
-                </div>
-                <Badge variant="default" className="bg-green-500/20 text-green-400 border-green-500/30">
-                  <Check className="w-3 h-3 mr-1" />
-                  Stripe Connected
-                </Badge>
-              </div>
-
-              <p className="text-foreground text-base font-sans mt-3">
-                Fans can now pay to join your After Party.
-              </p>
-            </div>
-          )}
-
-          {/* PRICING SECTION - Always show when not loading */}
-          {stripeStatus !== "loading" && (
-            <div className="border-t border-primary/30 pt-6 space-y-4">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-primary" />
-                <Label className="text-base text-primary font-sans font-medium">
-                  After Party Price
-                </Label>
-              </div>
-
-              {/* Info note when Stripe not connected */}
-              {stripeStatus === "not_connected" && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
-                  <p className="text-yellow-400 text-sm font-sans">
-                    Connect Stripe above to accept payments. You can still set pricing now.
-                  </p>
-                </div>
-              )}
-
-              {/* Locked State */}
-              {isLocked ? (
-                <div className="bg-primary/20 border border-primary/40 rounded-lg p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-primary">
-                    <Lock className="w-5 h-5" />
-                    <span className="font-sans text-base font-medium">Price Locked</span>
-                  </div>
-                  <p className="text-primary/80 text-sm font-sans">
-                    Price locked after first fan purchase.
-                  </p>
-                  {fixedPrice && (
-                    <div className="bg-black/30 rounded-lg p-3">
-                      <p className="text-foreground text-sm font-sans">
-                        After Party Pass — <strong>{formatPrice(fixedPrice)}</strong>
-                      </p>
-                    </div>
-                  )}
-                </div>
+            <p className="text-foreground text-sm font-sans">
+              Fans can't pay until you connect Stripe.
+            </p>
+            <Button
+              onClick={handleConnectStripe}
+              disabled={isConnecting}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {isConnecting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Connecting...
+                </>
               ) : (
-                <div className="space-y-3">
-                  <Label className="text-sm text-primary/80 font-sans">
-                    Set After Party Price (USD)
-                  </Label>
-                  <div className="flex items-center gap-3">
-                    <div className="relative flex-1">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary font-sans text-lg">$</span>
-                      <Input
-                        type="number"
-                        min="1"
-                        step="0.01"
-                        value={priceValue}
-                        onChange={(e) => setPriceValue(e.target.value)}
-                        placeholder="5.00"
-                        className="pl-8 bg-black/50 border-2 border-primary/30 focus:border-primary text-foreground font-sans text-base py-5"
-                      />
-                    </div>
-                    <Button
-                      onClick={handleSavePricing}
-                      disabled={isSaving || !priceValue}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 text-base py-5"
-                    >
-                      {isSaving ? (
-                        <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        "Save"
-                      )}
-                    </Button>
-                  </div>
-                  <p className="text-primary/60 text-xs font-sans">
-                    Minimum $1.00. Price locks after the first fan purchase.
-                  </p>
-                </div>
+                <>
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Connect Payouts
+                </>
               )}
+            </Button>
+          </div>
+        )}
 
-              {/* Current price display for Promote section reference */}
-              {fixedPrice && !isLocked && (
-                <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 mt-4">
-                  <p className="text-primary text-sm font-sans">
-                    Current price shown to fans: <strong>{formatPrice(fixedPrice)}</strong>
-                  </p>
-                </div>
-              )}
+        {/* Action Required */}
+        {stripeStatus === "action_required" && (
+          <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-lg p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-yellow-400" />
+              <span className="font-sans font-medium text-yellow-400">Stripe Needs More Info</span>
             </div>
-          )}
-        </div>
+            <p className="text-foreground text-sm font-sans">
+              Complete setup to enable payouts.
+            </p>
+            <Button
+              onClick={handleConnectStripe}
+              disabled={isConnecting}
+              className="bg-yellow-500 text-black hover:bg-yellow-400"
+            >
+              {isConnecting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Complete Setup
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+
+        {/* Connected */}
+        {stripeStatus === "connected" && (
+          <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-green-400" />
+              <span className="font-sans font-medium text-green-400">Payouts Active</span>
+            </div>
+            <p className="text-foreground text-sm font-sans mt-1">
+              Fans can now pay to join your After Party.
+            </p>
+          </div>
+        )}
+
+        {/* Pricing Section */}
+        {stripeStatus !== "loading" && (
+          <div className="border-t border-primary/30 pt-4 space-y-3">
+            <Label className="text-sm text-primary font-sans font-medium">After Party Price</Label>
+
+            {stripeStatus === "not_connected" && (
+              <p className="text-yellow-400 text-xs font-sans">
+                Connect payouts first. You can still set pricing now.
+              </p>
+            )}
+
+            {isLocked ? (
+              <div className="bg-primary/20 border border-primary/40 rounded-lg p-3 space-y-2">
+                <div className="flex items-center gap-2 text-primary">
+                  <Lock className="w-4 h-4" />
+                  <span className="font-sans text-sm font-medium">Price Locked</span>
+                </div>
+                <p className="text-primary/80 text-xs font-sans">
+                  Locked after first purchase.
+                </p>
+                {fixedPrice && (
+                  <p className="text-foreground text-sm font-sans">
+                    After Party Pass: <strong>{formatPrice(fixedPrice)}</strong>
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary font-sans">$</span>
+                    <Input
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      value={priceValue}
+                      onChange={(e) => setPriceValue(e.target.value)}
+                      placeholder="5.00"
+                      className="pl-7 bg-black/50 border-primary/30 focus:border-primary"
+                    />
+                  </div>
+                  <Button
+                    onClick={handleSavePricing}
+                    disabled={isSaving || !priceValue}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {isSaving ? "Saving..." : "Save"}
+                  </Button>
+                </div>
+                <p className="text-primary/60 text-xs font-sans">
+                  Minimum $1.00. Price locks after first purchase.
+                </p>
+              </div>
+            )}
+
+            {fixedPrice && !isLocked && (
+              <div className="bg-primary/10 border border-primary/30 rounded-lg p-2">
+                <p className="text-primary text-xs font-sans">
+                  Current price: <strong>{formatPrice(fixedPrice)}</strong>
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </section>
+    </CollapsibleSection>
   );
 };
 
