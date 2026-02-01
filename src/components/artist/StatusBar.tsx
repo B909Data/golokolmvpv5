@@ -44,7 +44,7 @@ const StatusBar = ({ artistName, expiresAt, checkedInCount, stripeStatus }: Stat
   }[stripeStatus];
 
   return (
-    <div className="sticky top-[calc(4rem+env(safe-area-inset-top))] z-40 bg-background/95 backdrop-blur-sm border-b border-primary/20">
+    <div className="bg-background/95 backdrop-blur-sm border-b border-primary/20">
       <div className="max-w-4xl mx-auto px-4 py-3">
         {/* Mobile: Stack vertically */}
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">

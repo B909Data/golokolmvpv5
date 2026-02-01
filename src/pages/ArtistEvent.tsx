@@ -219,16 +219,24 @@ const ArtistEvent = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Status Bar - Sticky */}
-      <StatusBar
-        artistName={artistName}
-        expiresAt={event?.after_party_expires_at || null}
-        checkedInCount={checkedInCount}
-        stripeStatus={stripeStatus}
-      />
+      {/*
+        Navbar is fixed, so reserve its height in normal flow.
+        This prevents the Control Room header (StatusBar + Tabs) and tab content
+        from rendering underneath the browser/nav frame (esp. iOS Safari).
+      */}
+      <div aria-hidden className="h-[calc(4rem+env(safe-area-inset-top))]" />
 
-      {/* Tab Navigation */}
-      <ControlRoomTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      {/* Control Room header stack (sticky as one unit) */}
+      <div className="sticky top-[calc(4rem+env(safe-area-inset-top))] z-40">
+        <StatusBar
+          artistName={artistName}
+          expiresAt={event?.after_party_expires_at || null}
+          checkedInCount={checkedInCount}
+          stripeStatus={stripeStatus}
+        />
+
+        <ControlRoomTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
 
       {/* Bookmark tip - only on Home tab */}
       {activeTab === "home" && (
