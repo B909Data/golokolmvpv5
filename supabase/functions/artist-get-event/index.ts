@@ -16,19 +16,19 @@ serve(async (req) => {
     const eventId = url.searchParams.get("event_id");
     const token = url.searchParams.get("token");
 
-    if (!eventId || !token) {
-      throw new Error("Missing event_id or token");
+    if (!eventId) {
+      throw new Error("Missing event_id");
     }
 
-    const supabase = createClient(
+    const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Fetch event and verify token
-    const { data: event, error: fetchError } = await supabase
+    // Fetch event first
+    const { data: event, error: fetchError } = await supabaseAdmin
       .from("events")
-      .select("*")
+      .select("*, after_party_expires_at")
       .eq("id", eventId)
       .single();
 
@@ -36,7 +36,35 @@ serve(async (req) => {
       throw new Error("Event not found");
     }
 
-    if (event.artist_access_token !== token) {
+    // Hybrid auth: check token OR authenticated user
+    let isAuthorized = false;
+    let userId: string | null = null;
+
+    // Check for authenticated user via Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const accessToken = authHeader.replace("Bearer ", "");
+      const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
+      
+      if (!userError && user) {
+        userId = user.id;
+        // Check if this user owns the event
+        if (event.artist_user_id === user.id) {
+          isAuthorized = true;
+          console.log("Artist authorized via auth (user_id match):", user.id);
+        }
+      }
+    }
+
+    // If not authorized via auth, check token (for unclaimed events)
+    if (!isAuthorized && token) {
+      if (event.artist_access_token === token) {
+        isAuthorized = true;
+        console.log("Artist authorized via token for event:", eventId);
+      }
+    }
+
+    if (!isAuthorized) {
       return new Response(JSON.stringify({ error: "Not authorized" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 403,
@@ -44,7 +72,7 @@ serve(async (req) => {
     }
 
     // Fetch messages for moderation
-    const { data: messages, error: messagesError } = await supabase
+    const { data: messages, error: messagesError } = await supabaseAdmin
       .from("after_party_messages")
       .select("id, message, role, created_at, attendee_id")
       .eq("event_id", eventId)
@@ -72,12 +100,15 @@ serve(async (req) => {
         merch_link: event.merch_link,
         music_link: event.music_link,
         after_party_opens_at: event.after_party_opens_at,
+        after_party_expires_at: event.after_party_expires_at,
         // Paid access fields
         stripe_account_id: event.stripe_account_id,
         pricing_mode: event.pricing_mode,
         fixed_price: event.fixed_price,
         min_price: event.min_price,
         pricing_locked_at: event.pricing_locked_at,
+        // Ownership info
+        artist_user_id: event.artist_user_id,
       },
       messages: messages || [],
     }), {

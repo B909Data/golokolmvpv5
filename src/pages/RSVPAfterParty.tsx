@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AfterPartyCard from "@/components/AfterPartyCard";
+import CheckoutFallbackBanner from "@/components/CheckoutFallbackBanner";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { CheckCircle } from "lucide-react";
 
 const RSVPAfterParty = () => {
@@ -21,6 +23,9 @@ const RSVPAfterParty = () => {
   const [showForm, setShowForm] = useState(false);
   const [pwywAmount, setPwywAmount] = useState("");
   const [promoCode, setPromoCode] = useState("");
+  
+  // Use the shared checkout hook for popup fallback
+  const { checkoutUrl, showFallback, openCheckout, dismissFallback } = useStripeCheckout();
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", eventId],
@@ -28,7 +33,7 @@ const RSVPAfterParty = () => {
       if (!eventId) throw new Error("No event ID");
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, start_at, city, venue_name, ticket_url, artist_name, genres, youtube_url, image_url, pricing_mode, fixed_price, min_price, stripe_account_id")
+        .select("id, title, start_at, city, venue_name, ticket_url, artist_name, genres, youtube_url, image_url, pricing_mode, fixed_price, min_price, stripe_account_id, status")
         .eq("id", eventId)
         .maybeSingle();
 
@@ -176,16 +181,8 @@ const RSVPAfterParty = () => {
           return;
         }
 
-        // Stripe checkout path
-        const newWindow = window.open(data.url, "_blank");
-        if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
-          toast({
-            title: "Popup blocked",
-            description: "Click the link below to complete payment.",
-          });
-          localStorage.setItem(`checkout_url_${eventId}`, data.url);
-          window.location.href = data.url;
-        }
+        // Stripe checkout path - use the new hook
+        openCheckout(data.url);
       } else if (!isStripeConnected) {
         // Truly free event (no Stripe connected) - navigate directly to pass page
         navigate(`/after-party/${eventId}/pass?token=${qrToken}`);
@@ -396,6 +393,14 @@ const RSVPAfterParty = () => {
           )}
         </div>
       </main>
+      
+      {/* Checkout Fallback Banner */}
+      <CheckoutFallbackBanner
+        checkoutUrl={checkoutUrl}
+        isVisible={showFallback}
+        onClose={dismissFallback}
+      />
+      
       <Footer />
     </div>
   );

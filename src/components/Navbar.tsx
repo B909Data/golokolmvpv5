@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ChevronDown, Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,14 +10,41 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import { supabase } from "@/integrations/supabase/client";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+
+  useEffect(() => {
+    // Check initial auth state
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleArtistClick = () => {
+    if (user) {
+      navigate("/artist/dashboard");
+    } else {
+      navigate("/artist/login");
+    }
+    setMobileMenuOpen(false);
+  };
 
   const navItems = [
     { label: "Create an After Party", path: "/create-after-party", hideOnTablet: true, colorClass: "text-foreground" },
@@ -100,8 +127,15 @@ const Navbar = () => {
             </DropdownMenu>
           </div>
 
-          {/* Desktop/Tablet CTA Button */}
-          <div className="hidden md:flex items-center flex-shrink-0 ml-2">
+          {/* Desktop/Tablet CTA Buttons */}
+          <div className="hidden md:flex items-center gap-2 flex-shrink-0 ml-2">
+            <button
+              onClick={handleArtistClick}
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-sm"
+            >
+              <User className="h-4 w-4" />
+              {user ? "Dashboard" : "Artist Sign In"}
+            </button>
             <Link to="/how-to-golokol">
               <Button variant="secondary" size="sm" className="text-xs md:text-sm whitespace-nowrap">
                 How to GoLokol
@@ -134,6 +168,15 @@ const Navbar = () => {
                   </Button>
                 </Link>
               ))}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-foreground"
+                onClick={handleArtistClick}
+              >
+                <User className="h-4 w-4 mr-2" />
+                {user ? "My Dashboard" : "Artist Sign In"}
+              </Button>
               <div className="pt-2 mt-2 border-t border-border/50">
                 <Link to="/how-to-golokol" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="secondary" size="sm" className="w-full">

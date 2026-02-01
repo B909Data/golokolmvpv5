@@ -115,6 +115,7 @@ const ArtistEvent = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [authorized, setAuthorized] = useState(true);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
 
   const [pinnedMessage, setPinnedMessage] = useState("");
   const [livestreamUrl, setLivestreamUrl] = useState("");
@@ -147,13 +148,31 @@ const ArtistEvent = () => {
     ? new Date(event.after_party_expires_at) <= new Date() 
     : false;
 
+  // Fetch event with hybrid auth (token OR logged-in user)
   const fetchEvent = async () => {
-    if (!eventId || !token) return;
+    if (!eventId) return;
     setLoading(true);
+    
     try {
+      // Get current session for auth header
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Build query params - token is optional now
+      const params = new URLSearchParams({ event_id: eventId });
+      if (token) {
+        params.set("token", token);
+      }
+      
+      // Call edge function with auth header if logged in
       const { data, error } = await supabase.functions.invoke(
-        `artist-get-event?event_id=${eventId}&token=${token}`
+        `artist-get-event?${params.toString()}`,
+        {
+          headers: session?.access_token 
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : undefined,
+        }
       );
+      
       if (error) throw error;
       if (data?.error === "Not authorized") {
         setAuthorized(false);
@@ -170,6 +189,7 @@ const ArtistEvent = () => {
       setAuthorized(false);
     } finally {
       setLoading(false);
+      setIsAuthChecked(true);
     }
   };
 
