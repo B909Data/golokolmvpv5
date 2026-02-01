@@ -69,6 +69,15 @@ Deno.serve(async (req) => {
       );
     }
 
+    // 2b) Fetch attendee display_name for metadata
+    const { data: attendee } = await supabase
+      .from("attendees")
+      .select("display_name")
+      .eq("id", attendeeId)
+      .single();
+
+    const fanName = attendee?.display_name || "";
+
     const priceCents = event.fixed_price;
 
     // 3) Handle promo code if provided (backend-only validation)
@@ -157,12 +166,23 @@ Deno.serve(async (req) => {
         },
       ],
       metadata: { 
+        purchase_type: "fan_pass",
         event_id: eventId, 
         attendee_id: attendeeId,
+        pass_token: qrToken,
+        fan_name: fanName,
+        artist_name: event.artist_name || "",
         promo_code: promoCode || null,
       },
       payment_intent_data: {
-        metadata: { event_id: eventId, attendee_id: attendeeId },
+        metadata: { 
+          purchase_type: "fan_pass",
+          event_id: eventId, 
+          attendee_id: attendeeId,
+          pass_token: qrToken,
+          fan_name: fanName,
+          artist_name: event.artist_name || "",
+        },
         application_fee_amount: feeCents,
         transfer_data: { destination: event.stripe_account_id },
       },

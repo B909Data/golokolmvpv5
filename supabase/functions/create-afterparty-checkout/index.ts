@@ -297,6 +297,7 @@ serve(async (req) => {
       success_url: `${req.headers.get("origin")}/create-afterparty/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/create-afterparty?plan=${formData.plan}&canceled=true`,
       metadata: {
+        purchase_type: "artist_setup",
         event_id: event.id,
         discount_code: validatedCode || "",
         confirmation_email: formData.confirmation_email || "",
