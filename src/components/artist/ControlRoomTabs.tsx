@@ -24,7 +24,7 @@ interface ControlRoomTabsProps {
 
 const ControlRoomTabs = ({ activeTab, onTabChange }: ControlRoomTabsProps) => {
   return (
-    <div className="sticky top-[calc(108px+env(safe-area-inset-top))] md:top-[calc(76px+env(safe-area-inset-top))] z-30 bg-background border-b border-primary/20">
+    <div className="sticky top-[calc(140px+env(safe-area-inset-top))] md:top-[calc(116px+env(safe-area-inset-top))] z-30 bg-background border-b border-primary/20">
       <div className="max-w-4xl mx-auto px-2">
         <div className="flex overflow-x-auto scrollbar-hide gap-1.5 py-2 -mx-2 px-2">
           {tabs.map((tab) => {
