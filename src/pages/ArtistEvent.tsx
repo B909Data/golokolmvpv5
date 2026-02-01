@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useLayoutEffect, useRef } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { Bookmark } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -62,6 +62,12 @@ const ArtistEvent = () => {
   const [checkedInCount, setCheckedInCount] = useState(0);
   const [stripeStatus, setStripeStatus] = useState<StripeStatus>("loading");
   const [activeTab, setActiveTab] = useState<TabId>("home");
+
+  // Helps avoid tab body being partially hidden under the sticky header stack
+  // after a tab switch (some browsers adjust scroll/focus subtly on tap).
+  const headerStackRef = useRef<HTMLDivElement | null>(null);
+  const tabBodyTopRef = useRef<HTMLDivElement | null>(null);
+  const [tabBodyScrollMarginTop, setTabBodyScrollMarginTop] = useState(0);
 
   // Fetch event with hybrid auth (token OR logged-in user)
   const fetchEvent = useCallback(async () => {
@@ -136,6 +142,28 @@ const ArtistEvent = () => {
       checkStripeStatus();
     }
   }, [event, checkStripeStatus]);
+
+  useLayoutEffect(() => {
+    const compute = () => {
+      const nav = document.querySelector("nav");
+      const navH = nav?.getBoundingClientRect().height ?? 0;
+      const headerH = headerStackRef.current?.getBoundingClientRect().height ?? 0;
+      // A little extra breathing room so the first card isn't tight to the tabs.
+      setTabBodyScrollMarginTop(Math.ceil(navH + headerH + 12));
+    };
+
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
+
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    // Ensure the tab content starts fully below the sticky header stack.
+    requestAnimationFrame(() => {
+      tabBodyTopRef.current?.scrollIntoView({ block: "start" });
+    });
+  };
 
   // Welcome toast
   useEffect(() => {
@@ -227,7 +255,10 @@ const ArtistEvent = () => {
       <div aria-hidden className="h-[calc(4rem+env(safe-area-inset-top))]" />
 
       {/* Control Room header stack (sticky as one unit) */}
-      <div className="sticky top-[calc(4rem+env(safe-area-inset-top))] z-40">
+      <div
+        ref={headerStackRef}
+        className="sticky top-[calc(4rem+env(safe-area-inset-top))] z-40"
+      >
         <StatusBar
           artistName={artistName}
           expiresAt={event?.after_party_expires_at || null}
@@ -235,8 +266,15 @@ const ArtistEvent = () => {
           stripeStatus={stripeStatus}
         />
 
-        <ControlRoomTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <ControlRoomTabs activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
+
+      {/* Scroll anchor for tab content; scroll-margins keep it below sticky header */}
+      <div
+        ref={tabBodyTopRef}
+        aria-hidden
+        style={{ scrollMarginTop: `${tabBodyScrollMarginTop}px` }}
+      />
 
       {/* Bookmark tip - only on Home tab */}
       {activeTab === "home" && (
@@ -261,7 +299,7 @@ const ArtistEvent = () => {
               eventId={eventId}
               stripeStatus={stripeStatus}
               fixedPrice={event?.fixed_price || null}
-              onSwitchTab={setActiveTab}
+              onSwitchTab={handleTabChange}
             />
           )}
 
