@@ -212,7 +212,7 @@ const ArtistEvent = () => {
     ? new Date(event.after_party_expires_at) <= new Date()
     : false;
 
-  if (!token || !authorized) {
+  if (!authorized) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -301,7 +301,7 @@ const ArtistEvent = () => {
             />
           )}
 
-          {activeTab === "get-paid" && eventId && token && event && (
+          {activeTab === "get-paid" && eventId && event && (
             <GetPaidTab
               eventId={eventId}
               token={token}
@@ -320,7 +320,7 @@ const ArtistEvent = () => {
             />
           )}
 
-          {activeTab === "check-in" && eventId && token && (
+          {activeTab === "check-in" && eventId && (
             <CheckInTab
               eventId={eventId}
               token={token}
@@ -329,7 +329,7 @@ const ArtistEvent = () => {
             />
           )}
 
-          {activeTab === "after-party" && eventId && token && event && (
+          {activeTab === "after-party" && eventId && event && (
             <AfterPartyTab
               eventId={eventId}
               token={token}

@@ -28,19 +28,19 @@ serve(async (req) => {
       min_price,
     } = await req.json();
 
-    if (!event_id || !token) {
-      throw new Error("Missing event_id or token");
+    if (!event_id) {
+      throw new Error("Missing event_id");
     }
 
-    const supabase = createClient(
+    const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Verify token matches event
-    const { data: event, error: fetchError } = await supabase
+    // Fetch event first
+    const { data: event, error: fetchError } = await supabaseAdmin
       .from("events")
-      .select("id, artist_access_token")
+      .select("id, artist_access_token, artist_user_id")
       .eq("id", event_id)
       .single();
 
@@ -48,7 +48,33 @@ serve(async (req) => {
       throw new Error("Event not found");
     }
 
-    if (event.artist_access_token !== token) {
+    // Hybrid auth: check token OR authenticated user
+    let isAuthorized = false;
+
+    // Check for authenticated user via Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const accessToken = authHeader.replace("Bearer ", "");
+      const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
+      
+      if (!userError && user) {
+        // Check if this user owns the event
+        if (event.artist_user_id === user.id) {
+          isAuthorized = true;
+          console.log("Artist authorized via auth (user_id match):", user.id);
+        }
+      }
+    }
+
+    // If not authorized via auth, check token (for unclaimed events)
+    if (!isAuthorized && token) {
+      if (event.artist_access_token === token) {
+        isAuthorized = true;
+        console.log("Artist authorized via token for event:", event_id);
+      }
+    }
+
+    if (!isAuthorized) {
       return new Response(JSON.stringify({ error: "Not authorized" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 403,
@@ -69,7 +95,7 @@ serve(async (req) => {
     if (fixed_price !== undefined) updateData.fixed_price = fixed_price;
     if (min_price !== undefined) updateData.min_price = min_price;
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from("events")
       .update(updateData)
       .eq("id", event_id);

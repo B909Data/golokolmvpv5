@@ -15,19 +15,19 @@ serve(async (req) => {
   try {
     const { event_id, token } = await req.json();
 
-    if (!event_id || !token) {
-      throw new Error("Missing event_id or token");
+    if (!event_id) {
+      throw new Error("Missing event_id");
     }
 
-    const supabase = createClient(
+    const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Verify artist token
-    const { data: event, error: fetchError } = await supabase
+    // Fetch event
+    const { data: event, error: fetchError } = await supabaseAdmin
       .from("events")
-      .select("id, artist_access_token, stripe_account_id, artist_name, title")
+      .select("id, artist_access_token, artist_user_id, stripe_account_id, artist_name, title")
       .eq("id", event_id)
       .single();
 
@@ -35,7 +35,33 @@ serve(async (req) => {
       throw new Error("Event not found");
     }
 
-    if (event.artist_access_token !== token) {
+    // Hybrid auth: check token OR authenticated user
+    let isAuthorized = false;
+
+    // Check for authenticated user via Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const accessToken = authHeader.replace("Bearer ", "");
+      const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
+      
+      if (!userError && user) {
+        // Check if this user owns the event
+        if (event.artist_user_id === user.id) {
+          isAuthorized = true;
+          console.log("Artist authorized via auth (user_id match):", user.id);
+        }
+      }
+    }
+
+    // If not authorized via auth, check token (for unclaimed events)
+    if (!isAuthorized && token) {
+      if (event.artist_access_token === token) {
+        isAuthorized = true;
+        console.log("Artist authorized via token for event:", event_id);
+      }
+    }
+
+    if (!isAuthorized) {
       return new Response(JSON.stringify({ error: "Not authorized" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 403,
@@ -73,7 +99,7 @@ serve(async (req) => {
     console.log("Created Stripe Connect account:", account.id);
 
     // Store the account ID immediately (onboarding will complete it)
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from("events")
       .update({ stripe_account_id: account.id })
       .eq("id", event_id);
@@ -100,8 +126,13 @@ serve(async (req) => {
       origin = "https://golokol.app";
     }
 
-    const returnUrl = `${origin}/artist/event/${event_id}?token=${token}&stripe_connected=true`;
-    const refreshUrl = `${origin}/artist/event/${event_id}?token=${token}&stripe_refresh=true`;
+    // Build return URL - use token if available, otherwise just event ID
+    const returnUrl = token 
+      ? `${origin}/artist/event/${event_id}?token=${token}&stripe_connected=true`
+      : `${origin}/artist/event/${event_id}?stripe_connected=true`;
+    const refreshUrl = token
+      ? `${origin}/artist/event/${event_id}?token=${token}&stripe_refresh=true`
+      : `${origin}/artist/event/${event_id}?stripe_refresh=true`;
 
     // DEBUG: Log exact values at runtime
     console.log("DEBUG - Request origin header:", rawOrigin);

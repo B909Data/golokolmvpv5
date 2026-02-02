@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 interface GetPaidTabProps {
   eventId: string;
-  token: string;
+  token: string | null;
   stripeAccountId: string | null;
   fixedPrice: number | null;
   pricingLockedAt: string | null;
@@ -41,7 +41,7 @@ const GetPaidTab = ({
 
       try {
         const { data, error } = await supabase.functions.invoke("check-stripe-account-status", {
-          body: { event_id: eventId, token },
+          body: { event_id: eventId, token: token || undefined },
         });
 
         if (error) throw error;
@@ -63,7 +63,7 @@ const GetPaidTab = ({
     setIsConnecting(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-stripe-connect-link", {
-        body: { event_id: eventId, token },
+        body: { event_id: eventId, token: token || undefined },
       });
 
       if (error) throw error;
@@ -104,7 +104,7 @@ const GetPaidTab = ({
       const { error } = await supabase.functions.invoke("artist-update-event", {
         body: {
           event_id: eventId,
-          token,
+          token: token || undefined,
           pricing_mode: "fixed",
           fixed_price: priceInCents,
           min_price: null,

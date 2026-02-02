@@ -16,7 +16,7 @@ interface Message {
 
 interface AfterPartyTabProps {
   eventId: string;
-  token: string;
+  token: string | null;
   pinnedMessage: string;
   livestreamUrl: string;
   merchLink: string;
@@ -49,7 +49,7 @@ const AfterPartyTab = ({
       const { error } = await supabase.functions.invoke("artist-update-event", {
         body: {
           event_id: eventId,
-          token,
+          token: token || undefined,
           pinned_message: pinnedMessage,
           livestream_url: livestreamUrl,
           merch_link: merchLink,
@@ -70,7 +70,7 @@ const AfterPartyTab = ({
   const handleDeleteMessage = async (messageId: string) => {
     try {
       const { error } = await supabase.functions.invoke("artist-delete-message", {
-        body: { event_id: eventId, token, message_id: messageId },
+        body: { event_id: eventId, token: token || undefined, message_id: messageId },
       });
       if (error) throw error;
       setLocalMessages((prev) => prev.filter((m) => m.id !== messageId));
@@ -82,7 +82,10 @@ const AfterPartyTab = ({
   };
 
   const handleEnterParty = () => {
-    navigate(`/after-party/${eventId}/room?artist_token=${token}`);
+    const url = token 
+      ? `/after-party/${eventId}/room?artist_token=${token}`
+      : `/after-party/${eventId}/room`;
+    navigate(url);
   };
 
   return (
