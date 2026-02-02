@@ -99,7 +99,7 @@ const HomeTab = ({ eventId, stripeStatus, fixedPrice, onSwitchTab }: HomeTabProp
   return (
     <div className="space-y-6">
       {/* Money Snapshot */}
-      <div className="bg-card border border-border rounded-xl p-5">
+      <div className="bg-primary/10 rounded-xl p-5">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
             <div className="flex items-center justify-center gap-1.5 text-muted-foreground mb-1">

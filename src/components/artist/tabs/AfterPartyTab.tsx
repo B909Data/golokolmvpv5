@@ -97,7 +97,7 @@ const AfterPartyTab = ({
       </Button>
 
       {/* Room Settings */}
-      <div className="bg-card border border-border rounded-xl p-5 space-y-4">
+      <div className="bg-primary/10 rounded-xl p-5 space-y-4">
         <h3 className="font-display text-lg text-primary uppercase tracking-tight">Room Settings</h3>
 
         {/* Pinned message */}
@@ -165,16 +165,16 @@ const AfterPartyTab = ({
       </div>
 
       {/* Moderation */}
-      <div className="bg-card border border-border rounded-xl p-5 space-y-4">
+      <div className="bg-primary/10 rounded-xl p-5 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-display text-lg text-primary uppercase tracking-tight">Moderation</h3>
-          <span className="bg-muted text-muted-foreground px-2 py-0.5 rounded-full text-xs font-sans">
+          <span className="bg-primary/20 text-foreground px-2 py-0.5 rounded-full text-xs font-sans">
             {localMessages.length} messages
           </span>
         </div>
 
         {localMessages.length === 0 ? (
-          <div className="bg-muted/50 rounded-lg p-6 text-center">
+          <div className="bg-primary/5 rounded-lg p-6 text-center">
             <MessageSquare className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
             <p className="text-muted-foreground text-sm font-sans">No messages yet</p>
           </div>
@@ -183,7 +183,7 @@ const AfterPartyTab = ({
             {localMessages.slice(0, 10).map((msg) => (
               <div
                 key={msg.id}
-                className="flex items-start justify-between gap-3 p-3 bg-muted/50 rounded-lg group"
+                className="flex items-start justify-between gap-3 p-3 bg-primary/5 rounded-lg group"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-foreground text-sm break-words font-sans">{msg.message || "(empty)"}</p>
