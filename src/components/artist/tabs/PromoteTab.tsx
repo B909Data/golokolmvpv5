@@ -120,7 +120,7 @@ const PromoteTab = ({ eventId, artistName, fixedPrice }: PromoteTabProps) => {
       )}
 
       {/* QR Code + Poster */}
-      <div className="bg-card border border-border rounded-xl p-5 space-y-4">
+      <div className="bg-primary/10 rounded-xl p-5 space-y-4">
         <div className="flex items-center gap-4">
           <div className="bg-white p-3 rounded-lg shrink-0">
             <QRCodeSVG value={shareUrl} size={80} level="H" />

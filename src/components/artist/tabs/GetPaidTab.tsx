@@ -134,7 +134,7 @@ const GetPaidTab = ({
 
       {/* Loading State */}
       {stripeStatus === "loading" && (
-        <div className="bg-card border border-border rounded-xl p-6">
+        <div className="bg-primary/10 rounded-xl p-6">
           <div className="flex items-center gap-3">
             <Loader2 className="w-5 h-5 text-primary animate-spin" />
             <span className="font-sans text-sm text-foreground">Checking payout status...</span>
@@ -223,17 +223,17 @@ const GetPaidTab = ({
 
       {/* Pricing Section */}
       {stripeStatus !== "loading" && (
-        <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+        <div className="bg-primary/10 rounded-xl p-6 space-y-4">
           <Label className="text-sm text-primary font-sans font-medium">After Party Price</Label>
 
           {stripeStatus === "not_connected" && (
-            <p className="text-yellow-400 text-sm font-sans">
+            <p className="text-primary text-sm font-sans">
               Connect payouts first. You can still set pricing now.
             </p>
           )}
 
           {isLocked ? (
-            <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 space-y-2">
+            <div className="bg-primary/20 rounded-lg p-4 space-y-2">
               <div className="flex items-center gap-2 text-primary">
                 <Lock className="w-4 h-4" />
                 <span className="font-sans text-sm font-medium">Price locked</span>
@@ -277,7 +277,7 @@ const GetPaidTab = ({
           )}
 
           {fixedPrice && !isLocked && (
-            <div className="bg-primary/10 border border-primary/30 rounded-lg p-3">
+            <div className="bg-primary/20 rounded-lg p-3">
               <p className="text-primary text-sm font-sans">
                 Current price: <strong>{formatPrice(fixedPrice)}</strong>
               </p>

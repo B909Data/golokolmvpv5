@@ -280,13 +280,11 @@ const ArtistEvent = () => {
       {activeTab === "home" && (
         <section className="px-4 pt-4">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-start gap-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
-              <Bookmark className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              <p className="text-sm font-sans text-foreground">
-                <strong>Bookmark this page.</strong> This is your control room.{" "}
-                <Link to="/how-to-golokol" className="text-primary hover:underline">FAQ</Link>
-              </p>
-            </div>
+            <p className="text-sm font-sans text-muted-foreground">
+              <Bookmark className="w-4 h-4 inline-block mr-1.5 text-primary align-[-2px]" />
+              <strong className="text-foreground">Bookmark this page.</strong> This is your control room.{" "}
+              <Link to="/how-to-golokol" className="text-primary hover:underline">FAQ</Link>
+            </p>
           </div>
         </section>
       )}
