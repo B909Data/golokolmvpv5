@@ -34,7 +34,7 @@ const ArtistLogin = () => {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          emailRedirectTo: `${window.location.origin}/artist/dashboard`,
+          emailRedirectTo: `${window.location.origin}/artist/after-parties`,
         },
       });
 

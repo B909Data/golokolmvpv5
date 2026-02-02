@@ -8,7 +8,7 @@ const corsHeaders = {
 
 interface CheckinRequest {
   event_id: string;
-  token: string; // artist access token
+  token?: string; // artist access token (optional if authenticated)
   qr_token?: string; // for QR scan mode
   walk_in?: boolean; // for walk-in mode
   display_name?: string; // optional for walk-ins
@@ -27,9 +27,9 @@ serve(async (req) => {
 
     console.log("Check-in request:", { event_id, qr_token, walk_in, display_name, hasPhone: !!phone });
 
-    if (!event_id || !token) {
+    if (!event_id) {
       return new Response(
-        JSON.stringify({ error: "Missing event_id or token" }),
+        JSON.stringify({ error: "Missing event_id" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
       );
     }
@@ -40,10 +40,10 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Validate artist access token
+    // Fetch event
     const { data: event, error: eventError } = await supabaseAdmin
       .from("events")
-      .select("id, title, artist_access_token, after_party_opens_at")
+      .select("id, title, artist_access_token, artist_user_id, after_party_opens_at")
       .eq("id", event_id)
       .single();
 
@@ -55,8 +55,34 @@ serve(async (req) => {
       );
     }
 
-    if (event.artist_access_token !== token) {
-      console.error("Invalid artist token");
+    // Hybrid auth: check token OR authenticated user
+    let isAuthorized = false;
+
+    // Check for authenticated user via Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const accessToken = authHeader.replace("Bearer ", "");
+      const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
+      
+      if (!userError && user) {
+        // Check if this user owns the event
+        if (event.artist_user_id === user.id) {
+          isAuthorized = true;
+          console.log("Artist authorized via auth (user_id match):", user.id);
+        }
+      }
+    }
+
+    // If not authorized via auth, check token (for unclaimed events)
+    if (!isAuthorized && token) {
+      if (event.artist_access_token === token) {
+        isAuthorized = true;
+        console.log("Artist authorized via token for event:", event_id);
+      }
+    }
+
+    if (!isAuthorized) {
+      console.error("Not authorized");
       return new Response(
         JSON.stringify({ error: "Not authorized" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }

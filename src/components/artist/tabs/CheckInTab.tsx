@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface CheckInTabProps {
   eventId: string;
-  token: string;
+  token: string | null;
   isExpired: boolean;
   onCheckin: () => void;
 }
@@ -97,7 +97,7 @@ const CheckInTab = ({ eventId, token, isExpired, onCheckin }: CheckInTabProps) =
     setIsCheckingIn(true);
     try {
       const { data, error } = await supabase.functions.invoke("artist-checkin-attendee", {
-        body: { event_id: eventId, token, qr_token: qrToken },
+        body: { event_id: eventId, token: token || undefined, qr_token: qrToken },
       });
 
       if (error) throw error;
@@ -122,7 +122,7 @@ const CheckInTab = ({ eventId, token, isExpired, onCheckin }: CheckInTabProps) =
       const { data, error } = await supabase.functions.invoke("artist-checkin-attendee", {
         body: {
           event_id: eventId,
-          token,
+          token: token || undefined,
           walk_in: true,
           display_name: walkInName.trim() || undefined,
           phone: walkInPhone.trim() || undefined,
