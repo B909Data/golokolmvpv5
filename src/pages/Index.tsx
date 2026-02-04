@@ -9,15 +9,15 @@ import section3Image from "@/assets/homepage-section3-2026.png";
 
 const Index = () => {
   const heroBullets = [
-    "A private pop-up online chat and livestream.",
-    "Artist curated. Fan appreciated.",
-    "Support each show with additional revenue and no overhead.",
+    "Sell After Party passes before and at the show.",
+    "Fans must be at the show to activate them.",
+    "Easy to manage. Fun to curate. Low overhead. High return merch.",
   ];
 
   const section2Bullets = [
-    "Artists create and promote an After Party for an upcoming show",
-    "Plan an experience your fans will value and your capacity can hold",
-    "Fans pay for a pass that's only unlocked at the show",
+    "Whether fans pay $1, $100 or $1,000. After Party metrics are backed by value. Find the true fans in the crowd.",
+    "Show fees pay for hotel and gas. GoLokol After Parties pay for the dream.",
+    "Each Party is an extension of one show, venue, curator, team. Learn more about GoLokol Partners.",
   ];
 
   const section3Bullets = [
@@ -49,7 +49,7 @@ const Index = () => {
                 <span className="text-primary font-bold">count.</span>
               </h1>
               <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-relaxed font-semibold">
-                Build momentum and revenue with a GoLokol After Party.
+                Build momentum and revenue after each show.
               </p>
             </div>
           </div>
@@ -58,6 +58,12 @@ const Index = () => {
         {/* Black Section Below Hero */}
         <div className="bg-background px-6 md:px-12 lg:px-20 py-10 md:py-14">
           <div className="max-w-4xl">
+            <h3 className="text-lg md:text-xl font-bold text-foreground mb-2">
+              What is a GoLokol After Party?
+            </h3>
+            <p className="text-base md:text-lg text-foreground/80 mb-8 leading-relaxed max-w-3xl">
+              A post-show online space curated by the artist that fans pay to access. Only 24 hours, to use how you want. Then Poof! The party ends.
+            </p>
 
             <ul className="space-y-4 mb-8">
               {heroBullets.map((bullet, index) => (
@@ -106,7 +112,8 @@ const Index = () => {
         <div className="bg-background px-6 md:px-12 lg:px-20 py-10 md:py-14">
           <div className="max-w-4xl">
             <p className="text-base md:text-lg text-foreground/80 mb-8 leading-relaxed max-w-3xl">
-              A GoLokol After Party is a post-show online space curated by the artist that fans pay to access. Only 24 hours, to use how you want. Then Poof! The party ends.
+              <span className="font-bold">Who are After Parties for?</span>{" "}
+              Emerging and touring artists who know their fans, want more show revenue and a better way to create community on their terms.
             </p>
 
             <ul className="space-y-4 mb-8">
