@@ -720,6 +720,7 @@ const AfterPartyRoom = () => {
             pinnedMessage={event.pinned_message}
             curatorName={curatorName}
             venueName={venueName}
+            flyerUrl={event.image_url}
             onGoToChat={() => setViewMode("chat")}
           />
         </div>
