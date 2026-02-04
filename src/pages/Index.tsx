@@ -111,8 +111,10 @@ const Index = () => {
         {/* Black Section Below */}
         <div className="bg-background px-6 md:px-12 lg:px-20 py-10 md:py-14">
           <div className="max-w-4xl">
+            <h3 className="text-lg md:text-xl font-bold text-foreground mb-2">
+              Who are After Parties for?
+            </h3>
             <p className="text-base md:text-lg text-foreground/80 mb-8 leading-relaxed max-w-3xl">
-              <span className="font-bold">Who are After Parties for?</span>{" "}
               Emerging and touring artists who know their fans, want more show revenue and a better way to create community on their terms.
             </p>
 
