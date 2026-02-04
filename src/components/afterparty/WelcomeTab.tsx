@@ -173,10 +173,16 @@ const WelcomeTab = ({
             ref={badgeContainerRef}
             className="relative w-64 h-64 md:w-72 md:h-72"
           >
-            {/* Flyer circle */}
+            {/* Badge frame as background */}
+            <img 
+              src={badgeFrameSvg} 
+              alt="GoLokol Badge"
+              className="absolute inset-0 w-full h-full z-0"
+            />
+            {/* Flyer circle on top */}
             {flyerUrl && (
               <div 
-                className="absolute rounded-full overflow-hidden border-4 border-black"
+                className="absolute rounded-full overflow-hidden z-10"
                 style={{
                   top: "42%",
                   left: "50%",
@@ -192,12 +198,6 @@ const WelcomeTab = ({
                 />
               </div>
             )}
-            {/* Badge frame on top */}
-            <img 
-              src={badgeFrameSvg} 
-              alt="GoLokol Badge"
-              className="absolute inset-0 w-full h-full"
-            />
           </div>
           
           {/* Save Badge Button */}
