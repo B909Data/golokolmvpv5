@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "@/hooks/use-toast";
 
 const ARTISTS = [
   "Sque3eze",
@@ -38,6 +39,18 @@ const LLSGuestPass = () => {
     e.preventDefault();
     setError(null);
 
+    // Client-side validation
+    const missingFields: string[] = [];
+    if (!guestName.trim()) missingFields.push("Name");
+    if (!guestEmail.trim()) missingFields.push("Email");
+    if (!artistName) missingFields.push("Artist");
+    if (!code.trim()) missingFields.push("Invite Code");
+
+    if (missingFields.length > 0) {
+      setError(`Please fill in: ${missingFields.join(", ")}`);
+      return;
+    }
+
     const payload = {
       eventId,
       guestName: guestName.trim(),
@@ -47,7 +60,10 @@ const LLSGuestPass = () => {
     };
 
     console.log("Form submitted:", payload);
-    // Placeholder for future database integration
+    
+    toast({
+      title: "Submitting… (wiring in progress)",
+    });
   };
 
   return (
