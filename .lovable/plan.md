@@ -1,90 +1,57 @@
 
-
-# Plan: Add Checkout Session Metadata for Zapier Filtering
+# LLS Guest Pass Page
 
 ## Overview
-Add distinct metadata fields to Stripe Checkout Sessions to differentiate between **fan pass purchases** and **artist setup purchases**. This enables Zapier to filter webhook events and only trigger confirmation emails for fan pass checkouts.
+Create a new public page at `/lls/:eventId/pass` for Local Listening Sessions guest pass claims. This is a static form page without database connectivity.
 
----
+## Route Setup
+Add the new route to `src/App.tsx`:
+```
+/lls/:eventId/pass -> LLSGuestPass component
+```
 
-## Changes Required
+## Page Structure
 
-### 1. Update `create-fan-checkout/index.ts` (Fan Pass Checkout)
+### File Location
+`src/pages/LLSGuestPass.tsx`
 
-Add the following metadata fields to the checkout session:
+### Layout
+- Dark background with Navbar and Footer (matching existing page patterns)
+- Centered content container (max-w-md)
+- Heading: "Get Your LLS Pass"
+- Form with 4 fields + submit button
 
-| Field | Value | Source |
-|-------|-------|--------|
-| `purchase_type` | `"fan_pass"` | Static |
-| `event_id` | Event UUID | Already exists |
-| `attendee_id` | Attendee UUID | Already exists |
-| `pass_token` | QR token for pass link | From request body (`qrToken`) |
-| `fan_name` | Display name (optional) | Fetch from attendee record |
-| `artist_name` | Artist name | Already fetched from event |
+### Form Fields
+1. **Name** (text input, required)
+2. **Email** (email input, required)
+3. **Role** (radio group: Fan, Friend, Industry, Other)
+4. **Invite Code** (text input, required)
 
-**Implementation notes:**
-- The `qrToken` is already passed from the frontend but not stored in metadata - will add it
-- Need to fetch `display_name` from the attendee record (already have `attendeeId`)
-- Add metadata to both `session.metadata` and `payment_intent_data.metadata` per project conventions
-
-### 2. Update `create-afterparty-checkout/index.ts` (Artist Setup Checkout)
-
-Add explicit `purchase_type` field to clarify this is not a fan pass:
-
-| Field | Value |
-|-------|-------|
-| `purchase_type` | `"artist_setup"` |
-
-The existing metadata (event_id, artist_name, plan, etc.) remains unchanged.
-
----
+### Submit Button
+- Label: "Get Pass"
+- Disabled state while submitting (placeholder for future)
 
 ## Technical Details
 
-### Fan Checkout Metadata Structure (after changes)
-```javascript
-metadata: {
-  purchase_type: "fan_pass",
-  event_id: eventId,
-  attendee_id: attendeeId,
-  pass_token: qrToken,
-  fan_name: attendee.display_name || "",
-  artist_name: event.artist_name || "",
-  promo_code: promoCode || null,
-}
-```
+### Dependencies Used
+- React Router (`useParams` for eventId)
+- Existing UI components: `Button`, `Input`, `Label`, `RadioGroup`, `RadioGroupItem`
+- Layout components: `Navbar`, `Footer`
+- React state for form values
 
-### Artist Setup Metadata Structure (after changes)
-```javascript
-metadata: {
-  purchase_type: "artist_setup",
-  event_id: event.id,
-  discount_code: validatedCode || "",
-  confirmation_email: formData.confirmation_email || "",
-  artist_name: formData.artist_name || "",
-  event_title: formData.title || "",
-  plan: formData.plan,
-}
-```
+### Styling
+- Uses existing design system (dark background, yellow primary)
+- Form styling consistent with RSVPAfterParty page pattern
+- Input styling: `bg-background border-2 border-muted-foreground/30 focus:border-primary`
 
----
+## Implementation Steps
 
-## Zapier Filter Configuration (for reference)
-After implementation, the Zapier webhook filter step should check:
-- `session.metadata.purchase_type == "fan_pass"` → Send confirmation email
-- Otherwise → Skip
+1. Create `src/pages/LLSGuestPass.tsx` with:
+   - URL parameter extraction for eventId
+   - Form state management (useState for each field)
+   - Radio group for role selection
+   - Form submission handler (placeholder, logs to console)
 
----
-
-## Files to Modify
-
-| File | Change |
-|------|--------|
-| `supabase/functions/create-fan-checkout/index.ts` | Add `purchase_type`, `pass_token`, `fan_name`, `artist_name` to session metadata |
-| `supabase/functions/create-afterparty-checkout/index.ts` | Add `purchase_type: "artist_setup"` to session metadata |
-
----
-
-## No Database Changes Required
-All metadata is passed through Stripe - no schema updates needed.
-
+2. Update `src/App.tsx` to add the route:
+   - Import `LLSGuestPass` component
+   - Add route: `<Route path="/lls/:eventId/pass" element={<LLSGuestPass />} />`
