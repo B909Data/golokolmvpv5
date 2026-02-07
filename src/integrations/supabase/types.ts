@@ -395,6 +395,113 @@ export type Database = {
           },
         ]
       }
+      lls_guest_claims: {
+        Row: {
+          artist_name: string
+          checked_in_at: string | null
+          checked_in_by: string | null
+          checkin_status: string
+          claimed_at: string
+          event_id: string
+          guest_email: string
+          guest_name: string
+          guest_role: string
+          id: string
+          invite_code_id: string
+          qr_image_url: string | null
+          qr_token: string
+        }
+        Insert: {
+          artist_name: string
+          checked_in_at?: string | null
+          checked_in_by?: string | null
+          checkin_status?: string
+          claimed_at?: string
+          event_id: string
+          guest_email: string
+          guest_name: string
+          guest_role: string
+          id?: string
+          invite_code_id: string
+          qr_image_url?: string | null
+          qr_token: string
+        }
+        Update: {
+          artist_name?: string
+          checked_in_at?: string | null
+          checked_in_by?: string | null
+          checkin_status?: string
+          claimed_at?: string
+          event_id?: string
+          guest_email?: string
+          guest_name?: string
+          guest_role?: string
+          id?: string
+          invite_code_id?: string
+          qr_image_url?: string | null
+          qr_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lls_guest_claims_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lls_guest_claims_invite_code_id_fkey"
+            columns: ["invite_code_id"]
+            isOneToOne: false
+            referencedRelation: "lls_invite_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lls_invite_codes: {
+        Row: {
+          artist_name: string
+          claims_count: number
+          code: string
+          created_at: string
+          curator_name: string | null
+          event_id: string
+          id: string
+          is_active: boolean
+          max_claims: number
+        }
+        Insert: {
+          artist_name: string
+          claims_count?: number
+          code: string
+          created_at?: string
+          curator_name?: string | null
+          event_id: string
+          id?: string
+          is_active?: boolean
+          max_claims?: number
+        }
+        Update: {
+          artist_name?: string
+          claims_count?: number
+          code?: string
+          created_at?: string
+          curator_name?: string | null
+          event_id?: string
+          id?: string
+          is_active?: boolean
+          max_claims?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lls_invite_codes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
           active: boolean
