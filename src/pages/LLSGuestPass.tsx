@@ -55,9 +55,20 @@ const LLSGuestPass = () => {
       <Navbar />
       <main className="flex-1 pt-24 pb-12 px-4">
         <div className="max-w-md mx-auto">
-          <h1 className="font-display text-3xl text-foreground text-center mb-8">
-            Get Your LLS Pass
+          <h1 className="font-display text-2xl text-foreground text-center mb-6">
+            Get Your Lokol Listening Session Guest Pass
           </h1>
+
+          {/* YouTube Video */}
+          <div className="aspect-video mb-8 rounded-lg overflow-hidden">
+            <iframe
+              src="https://www.youtube.com/embed/2exJWgcJRlA"
+              title="Lokol Listening Sessions"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            />
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name Field */}
