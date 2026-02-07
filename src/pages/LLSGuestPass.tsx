@@ -5,19 +5,48 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const ARTISTS = [
+  "Sque3eze",
+  "Kantii",
+  "Alyx Ransom",
+  "Kavier Sundays",
+  "E-Coolin",
+  "Charlie Global",
+  "Big Prise",
+  "Mvsua",
+  "Trayonpass",
+];
 
 const LLSGuestPass = () => {
   const { eventId } = useParams<{ eventId: string }>();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("fan");
-  const [inviteCode, setInviteCode] = useState("");
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [artistName, setArtistName] = useState("");
+  const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { eventId, name, email, role, inviteCode });
+    setError(null);
+
+    const payload = {
+      eventId,
+      guestName: guestName.trim(),
+      guestEmail: guestEmail.trim().toLowerCase(),
+      artistName,
+      code: code.trim().toUpperCase(),
+    };
+
+    console.log("Form submitted:", payload);
     // Placeholder for future database integration
   };
 
@@ -39,8 +68,8 @@ const LLSGuestPass = () => {
               <Input
                 id="name"
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
                 required
                 className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
                 placeholder="Your name"
@@ -55,37 +84,29 @@ const LLSGuestPass = () => {
               <Input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
                 required
                 className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
                 placeholder="your@email.com"
               />
             </div>
 
-            {/* Role Field */}
-            <div className="space-y-3">
-              <Label className="text-foreground">Role</Label>
-              <RadioGroup
-                value={role}
-                onValueChange={setRole}
-                className="flex flex-wrap gap-4"
-              >
-                {["Fan", "Friend", "Industry", "Other"].map((option) => (
-                  <div key={option} className="flex items-center space-x-2">
-                    <RadioGroupItem
-                      value={option.toLowerCase()}
-                      id={`role-${option.toLowerCase()}`}
-                    />
-                    <Label
-                      htmlFor={`role-${option.toLowerCase()}`}
-                      className="text-foreground cursor-pointer"
-                    >
-                      {option}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
+            {/* Artist Dropdown */}
+            <div className="space-y-2">
+              <Label className="text-foreground">Artist</Label>
+              <Select value={artistName} onValueChange={setArtistName} required>
+                <SelectTrigger className="bg-background border-2 border-muted-foreground/30 focus:border-primary">
+                  <SelectValue placeholder="Select the artist you're coming for" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ARTISTS.map((artist) => (
+                    <SelectItem key={artist} value={artist}>
+                      {artist}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Invite Code Field */}
@@ -96,8 +117,8 @@ const LLSGuestPass = () => {
               <Input
                 id="inviteCode"
                 type="text"
-                value={inviteCode}
-                onChange={(e) => setInviteCode(e.target.value)}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
                 required
                 className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
                 placeholder="Enter your invite code"
@@ -107,11 +128,16 @@ const LLSGuestPass = () => {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !artistName}
               className="w-full"
             >
               {isSubmitting ? "Processing..." : "Get Pass"}
             </Button>
+
+            {/* Error Message Area */}
+            {error && (
+              <p className="text-destructive text-sm text-center">{error}</p>
+            )}
           </form>
         </div>
       </main>
