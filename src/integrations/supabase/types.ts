@@ -461,36 +461,33 @@ export type Database = {
       lls_invite_codes: {
         Row: {
           artist_name: string
-          claims_count: number
           code: string
           created_at: string
           curator_name: string | null
           event_id: string
+          expires_at: string | null
           id: string
           is_active: boolean
-          max_claims: number
         }
         Insert: {
           artist_name: string
-          claims_count?: number
           code: string
           created_at?: string
           curator_name?: string | null
           event_id: string
+          expires_at?: string | null
           id?: string
           is_active?: boolean
-          max_claims?: number
         }
         Update: {
           artist_name?: string
-          claims_count?: number
           code?: string
           created_at?: string
           curator_name?: string | null
           event_id?: string
+          expires_at?: string | null
           id?: string
           is_active?: boolean
-          max_claims?: number
         }
         Relationships: [
           {
