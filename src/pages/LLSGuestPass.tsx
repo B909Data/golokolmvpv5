@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { Download } from "lucide-react";
 
 const ARTISTS = [
   "Sque3eze",
@@ -28,13 +29,16 @@ const ARTISTS = [
 
 const LLSGuestPass = () => {
   const { eventId } = useParams<{ eventId: string }>();
-  const navigate = useNavigate();
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [artistName, setArtistName] = useState("");
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Success state
+  const [qrImageUrl, setQrImageUrl] = useState<string | null>(null);
+  const [successArtistName, setSuccessArtistName] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,8 +83,9 @@ const LLSGuestPass = () => {
         return;
       }
 
-      if (data?.claimId) {
-        navigate(`/lls/${eventId}/pass/success?claimId=${data.claimId}`);
+      if (data?.qrImageUrl) {
+        setQrImageUrl(data.qrImageUrl);
+        setSuccessArtistName(data.artistName || artistName);
       }
     } catch (err) {
       console.error("Error claiming pass:", err);
@@ -90,106 +95,150 @@ const LLSGuestPass = () => {
     }
   };
 
+  const handleDownloadQR = async () => {
+    if (!qrImageUrl) return;
+    
+    try {
+      const response = await fetch(qrImageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `lls-pass-${successArtistName?.replace(/\s+/g, "-").toLowerCase() || "guest"}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download failed:", err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1 pt-24 pb-12 px-4">
         <div className="max-w-md mx-auto">
-          <h1 className="font-display text-2xl text-foreground text-center mb-6">
-            Get Your Lokol Listening Session Guest Pass
-          </h1>
-
-          {/* YouTube Video */}
-          <div className="aspect-video mb-8 rounded-lg overflow-hidden">
-            <iframe
-              src="https://www.youtube.com/embed/2exJWgcJRlA"
-              title="Lokol Listening Sessions"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Name Field */}
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground">
-                Name
-              </Label>
-              <Input
-                id="name"
-                type="text"
-                value={guestName}
-                onChange={(e) => setGuestName(e.target.value)}
-                required
-                className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
-                placeholder="Your name"
-              />
+          {/* Success State */}
+          {qrImageUrl ? (
+            <div className="text-center space-y-6">
+              <h1 className="font-display text-2xl text-foreground">
+                Your pass is ready
+              </h1>
+              
+              <div className="bg-white p-4 rounded-lg inline-block">
+                <img 
+                  src={qrImageUrl} 
+                  alt="Your LLS Guest Pass QR Code" 
+                  className="w-64 h-64 mx-auto"
+                />
+              </div>
+              
+              <p className="text-muted-foreground">
+                Show this QR code at the door for {successArtistName}
+              </p>
+              
+              <Button onClick={handleDownloadQR} className="w-full">
+                <Download className="w-4 h-4 mr-2" />
+                Download QR
+              </Button>
             </div>
+          ) : (
+            <>
+              <h1 className="font-display text-2xl text-foreground text-center mb-6">
+                Get Your Lokol Listening Session Guest Pass
+              </h1>
 
-            {/* Email Field */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
-                required
-                className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
-                placeholder="your@email.com"
-              />
-            </div>
+              {/* YouTube Video */}
+              <div className="aspect-video mb-8 rounded-lg overflow-hidden">
+                <iframe
+                  src="https://www.youtube.com/embed/2exJWgcJRlA"
+                  title="Lokol Listening Sessions"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
 
-            {/* Artist Dropdown */}
-            <div className="space-y-2">
-              <Label className="text-foreground">Artist</Label>
-              <Select value={artistName} onValueChange={setArtistName} required>
-                <SelectTrigger className="bg-background border-2 border-muted-foreground/30 focus:border-primary">
-                  <SelectValue placeholder="Select the artist you're coming for" />
-                </SelectTrigger>
-                <SelectContent>
-                  {ARTISTS.map((artist) => (
-                    <SelectItem key={artist} value={artist}>
-                      {artist}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Name Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-foreground">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
+                    placeholder="Your name"
+                  />
+                </div>
 
-            {/* Invite Code Field */}
-            <div className="space-y-2">
-              <Label htmlFor="inviteCode" className="text-foreground">
-                Invite Code
-              </Label>
-              <Input
-                id="inviteCode"
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-                className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
-                placeholder="Enter your invite code"
-              />
-            </div>
+                {/* Email Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-foreground">
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
+                    placeholder="your@email.com"
+                  />
+                </div>
 
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full"
-            >
-              {isSubmitting ? "Generating…" : "Get Pass"}
-            </Button>
+                {/* Artist Dropdown */}
+                <div className="space-y-2">
+                  <Label className="text-foreground">Artist</Label>
+                  <Select value={artistName} onValueChange={setArtistName}>
+                    <SelectTrigger className="bg-background border-2 border-muted-foreground/30 focus:border-primary">
+                      <SelectValue placeholder="Select the artist you're coming for" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ARTISTS.map((artist) => (
+                        <SelectItem key={artist} value={artist}>
+                          {artist}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* Error Message Area */}
-            {error && (
-              <p className="text-destructive text-sm text-center">{error}</p>
-            )}
-          </form>
+                {/* Invite Code Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="inviteCode" className="text-foreground">
+                    Invite Code
+                  </Label>
+                  <Input
+                    id="inviteCode"
+                    type="text"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
+                    placeholder="Enter your invite code"
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full"
+                >
+                  {isSubmitting ? "Generating…" : "Get Pass"}
+                </Button>
+
+                {/* Error Message Area */}
+                {error && (
+                  <p className="text-destructive text-sm text-center">{error}</p>
+                )}
+              </form>
+            </>
+          )}
         </div>
       </main>
       <Footer />
