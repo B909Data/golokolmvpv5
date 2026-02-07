@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ARTISTS = [
   "Sque3eze",
@@ -28,6 +28,7 @@ const ARTISTS = [
 
 const LLSGuestPass = () => {
   const { eventId } = useParams<{ eventId: string }>();
+  const navigate = useNavigate();
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [artistName, setArtistName] = useState("");
@@ -35,35 +36,58 @@ const LLSGuestPass = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     // Client-side validation
+    const trimmedName = guestName.trim();
+    const trimmedEmail = guestEmail.trim();
+    const trimmedCode = code.trim();
+
     const missingFields: string[] = [];
-    if (!guestName.trim()) missingFields.push("Name");
-    if (!guestEmail.trim()) missingFields.push("Email");
+    if (!trimmedName) missingFields.push("Name");
+    if (!trimmedEmail) missingFields.push("Email");
     if (!artistName) missingFields.push("Artist");
-    if (!code.trim()) missingFields.push("Invite Code");
+    if (!trimmedCode) missingFields.push("Invite Code");
 
     if (missingFields.length > 0) {
       setError(`Please fill in: ${missingFields.join(", ")}`);
       return;
     }
 
-    const payload = {
-      eventId,
-      guestName: guestName.trim(),
-      guestEmail: guestEmail.trim().toLowerCase(),
-      artistName,
-      code: code.trim().toUpperCase(),
-    };
+    setIsSubmitting(true);
 
-    console.log("Form submitted:", payload);
-    
-    toast({
-      title: "Submitting… (wiring in progress)",
-    });
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("lls-claim-pass", {
+        body: {
+          eventId,
+          guestName: trimmedName,
+          guestEmail: trimmedEmail.toLowerCase(),
+          artistName,
+          code: trimmedCode.toUpperCase(),
+        },
+      });
+
+      if (fnError) {
+        setError(fnError.message || "Something went wrong. Please try again.");
+        return;
+      }
+
+      if (data?.error) {
+        setError(data.error);
+        return;
+      }
+
+      if (data?.claimId) {
+        navigate(`/lls/${eventId}/pass/success?claimId=${data.claimId}`);
+      }
+    } catch (err) {
+      console.error("Error claiming pass:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -155,10 +179,10 @@ const LLSGuestPass = () => {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={isSubmitting || !artistName}
+              disabled={isSubmitting}
               className="w-full"
             >
-              {isSubmitting ? "Processing..." : "Get Pass"}
+              {isSubmitting ? "Generating…" : "Get Pass"}
             </Button>
 
             {/* Error Message Area */}
