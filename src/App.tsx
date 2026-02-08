@@ -38,6 +38,7 @@ import Pricing from "./pages/Pricing";
 import SelectAfterPartyPlan from "./pages/SelectAfterPartyPlan";
 import LLSGuestPass from "./pages/LLSGuestPass";
 import LLSCheckin from "./pages/LLSCheckin";
+import LLSRelease from "./pages/LLSRelease";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
           {/* LLS Guest Pass & Check-in */}
           <Route path="/lls/:eventId/pass" element={<LLSGuestPass />} />
           <Route path="/lls/:eventId/checkin" element={<LLSCheckin />} />
+          <Route path="/lls-release" element={<LLSRelease />} />
           <Route path="/admin/after-parties" element={<AdminAfterParties />} />
           <Route path="/admin/discount-codes" element={<AdminDiscountCodes />} />
           <Route path="/admin/partners" element={<AdminPartners />} />

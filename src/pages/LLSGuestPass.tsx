@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -33,6 +34,7 @@ const LLSGuestPass = () => {
   const [guestEmail, setGuestEmail] = useState("");
   const [artistName, setArtistName] = useState("");
   const [code, setCode] = useState("");
+  const [consentChecked, setConsentChecked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -60,6 +62,11 @@ const LLSGuestPass = () => {
 
     if (missingFields.length > 0) {
       setError(`Please fill in: ${missingFields.join(", ")}`);
+      return;
+    }
+
+    if (!consentChecked) {
+      setError("You must agree to the photo/video release to get a pass.");
       return;
     }
 
@@ -251,6 +258,22 @@ const LLSGuestPass = () => {
                     className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
                     placeholder="Enter your invite code"
                   />
+                </div>
+
+                {/* Consent Checkbox */}
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="consent"
+                    checked={consentChecked}
+                    onCheckedChange={(checked) => setConsentChecked(checked === true)}
+                    className="mt-1"
+                  />
+                  <Label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+                    I consent to be filmed/photographed at Lokol Listening Sessions on Feb 15, 2026 at The Handlebar, and I grant GoLokol permission to use my image/likeness in event-related media.{" "}
+                    <Link to="/lls-release" className="text-primary hover:underline">
+                      (Read more)
+                    </Link>
+                  </Label>
                 </div>
 
                 {/* Submit Button */}
