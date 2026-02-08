@@ -74,11 +74,16 @@ const LLSGuestPass = () => {
       });
 
       if (fnError) {
-        setError(fnError.message || "Something went wrong. Please try again.");
+        // Display full error details from non-2xx responses
+        const errorText = typeof fnError === "object" 
+          ? JSON.stringify(fnError, null, 2) 
+          : String(fnError);
+        setError(errorText);
         return;
       }
 
       if (data?.error) {
+        // Display error returned in response body
         setError(data.error);
         return;
       }
@@ -87,9 +92,11 @@ const LLSGuestPass = () => {
         setQrImageUrl(data.qrImageUrl);
         setSuccessArtistName(data.artistName || artistName);
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      // Catch network errors or unexpected exceptions
+      const message = err instanceof Error ? err.message : String(err);
       console.error("Error claiming pass:", err);
-      setError("Something went wrong. Please try again.");
+      setError(message);
     } finally {
       setIsSubmitting(false);
     }
