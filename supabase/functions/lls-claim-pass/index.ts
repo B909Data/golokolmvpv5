@@ -1,8 +1,9 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-// Simple QR generator (pure JS) -> PNG data URL
-import QRCode from "https://esm.sh/qrcode@1.5.4";
+// Deno-native QR code generator - no canvas/DOM required
+// This library returns a data:image/gif;base64,... string
+import { qrcode } from "https://deno.land/x/qrcode@v2.0.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -70,7 +71,7 @@ serve(async (req) => {
     // (Matches your unique index: (event_id, lower(guest_email)))
     const { data: existing, error: existingErr } = await supabase
       .from("lls_guest_claims")
-      .select("id, artist_name, qr_image_url")
+      .select("id, artist_name, qr_image_url, qr_token")
       .eq("event_id", eventId)
       .eq("guest_email", guestEmail)
       .maybeSingle();
@@ -80,9 +81,61 @@ serve(async (req) => {
     let claimId: string;
     let qrImageUrl: string | null = null;
 
+    // Helper function to generate and upload QR code
+    async function generateAndUploadQR(qrToken: string, id: string): Promise<string | null> {
+      try {
+        const checkinUrl = `${APP_BASE_URL}/lls/${eventId}/checkin?token=${qrToken}`;
+        console.log("Generating QR for URL:", checkinUrl);
+        
+        // qrcode() returns a Promise that resolves to data:image/gif;base64,...
+        const dataUrl = await qrcode(checkinUrl);
+        console.log("QR dataUrl type:", typeof dataUrl, "length:", dataUrl?.length);
+        
+        if (typeof dataUrl !== "string" || !dataUrl.includes(",")) {
+          console.error("Invalid dataUrl format:", dataUrl);
+          return null;
+        }
+        
+        const base64 = dataUrl.split(",")[1];
+        const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+        
+        const path = `${eventId}/${id}.gif`;
+        console.log("Uploading to path:", path);
+        
+        const { error: uploadErr } = await supabase.storage
+          .from("lls_qr")
+          .upload(path, bytes, { contentType: "image/gif", upsert: true });
+
+        if (uploadErr) {
+          console.error("QR upload failed:", uploadErr.message);
+          return null;
+        }
+
+        const { data: pub } = supabase.storage.from("lls_qr").getPublicUrl(path);
+        const publicUrl = pub.publicUrl;
+        
+        // Update the claim with the QR URL
+        await supabase
+          .from("lls_guest_claims")
+          .update({ qr_image_url: publicUrl })
+          .eq("id", id);
+          
+        console.log("QR generated successfully:", publicUrl);
+        return publicUrl;
+      } catch (qrErr) {
+        console.error("QR generation error:", qrErr);
+        return null;
+      }
+    }
+
     if (existing) {
       claimId = existing.id;
       qrImageUrl = existing.qr_image_url ?? null;
+      
+      // If QR was never generated, generate it now
+      if (!qrImageUrl && existing.qr_token) {
+        qrImageUrl = await generateAndUploadQR(existing.qr_token, claimId);
+      }
     } else {
       // 3) Insert new claim
       const qrToken = crypto.randomUUID().replaceAll("-", "") + crypto.randomUUID().replaceAll("-", "");
@@ -94,7 +147,7 @@ serve(async (req) => {
           invite_code_id: invite.id,
           guest_name: guestName,
           guest_email: guestEmail,
-          guest_role: "Fan", // no longer used in UI, but column is required in your schema
+          guest_role: "Fan",
           artist_name: artistName,
           qr_token: qrToken,
         })
@@ -107,45 +160,22 @@ serve(async (req) => {
 
       claimId = inserted.id;
 
-      // 4) Generate QR code (URL with token)
-      const checkinUrl = `${APP_BASE_URL}/lls/${eventId}/checkin?token=${inserted.qr_token}`;
-
-      // PNG data URL -> bytes
-      const dataUrl = await QRCode.toDataURL(checkinUrl, { margin: 1, width: 512 });
-      const base64 = dataUrl.split(",")[1];
-      const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-
-      // 5) Upload to Storage
-      const path = `${eventId}/${claimId}.png`;
-      const { error: uploadErr } = await supabase.storage
-        .from("lls_qr")
-        .upload(path, bytes, { contentType: "image/png", upsert: true });
-
-      if (uploadErr) {
-        return res(400, { error: "QR upload failed", details: uploadErr.message });
-      }
-
-      // 6) Get public URL and save it
-      const { data: pub } = supabase.storage.from("lls_qr").getPublicUrl(path);
-      qrImageUrl = pub.publicUrl;
-
-      const { error: updErr } = await supabase
-        .from("lls_guest_claims")
-        .update({ qr_image_url: qrImageUrl })
-        .eq("id", claimId);
-
-      if (updErr) {
-        return res(400, { error: "Failed to save QR URL", details: updErr.message });
+      // 4) Generate and upload QR code
+      qrImageUrl = await generateAndUploadQR(inserted.qr_token, claimId);
+      
+      if (!qrImageUrl) {
+        return res(500, { error: "QR generation failed", details: "Could not generate QR code" });
       }
     }
 
-    // 7) Return success
+    // 5) Return success
     return res(200, {
       claimId,
       artistName,
       qrImageUrl,
     });
   } catch (e) {
+    console.error("Unhandled error:", e);
     return res(500, { error: "Unhandled error", details: String(e?.message ?? e) });
   }
 });
