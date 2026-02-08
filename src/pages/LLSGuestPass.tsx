@@ -37,8 +37,11 @@ const LLSGuestPass = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Success state
-  const [qrImageUrl, setQrImageUrl] = useState<string | null>(null);
-  const [successArtistName, setSuccessArtistName] = useState<string | null>(null);
+  const [successData, setSuccessData] = useState<{
+    claimId: string;
+    artistName: string;
+    qrImageUrl: string;
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,8 +100,11 @@ const LLSGuestPass = () => {
 
         const fallbackData = await res.json();
         if (fallbackData?.qrImageUrl) {
-          setQrImageUrl(fallbackData.qrImageUrl);
-          setSuccessArtistName(fallbackData.artistName || artistName);
+          setSuccessData({
+            claimId: fallbackData.claimId,
+            artistName: fallbackData.artistName || artistName,
+            qrImageUrl: fallbackData.qrImageUrl,
+          });
         }
         return;
       }
@@ -109,8 +115,11 @@ const LLSGuestPass = () => {
       }
 
       if (data?.qrImageUrl) {
-        setQrImageUrl(data.qrImageUrl);
-        setSuccessArtistName(data.artistName || artistName);
+        setSuccessData({
+          claimId: data.claimId,
+          artistName: data.artistName || artistName,
+          qrImageUrl: data.qrImageUrl,
+        });
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
@@ -121,23 +130,8 @@ const LLSGuestPass = () => {
     }
   };
 
-  const handleDownloadQR = async () => {
-    if (!qrImageUrl) return;
-    
-    try {
-      const response = await fetch(qrImageUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `lls-pass-${successArtistName?.replace(/\s+/g, "-").toLowerCase() || "guest"}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Download failed:", err);
-    }
+  const handleReset = () => {
+    setSuccessData(null);
   };
 
   return (
@@ -146,28 +140,38 @@ const LLSGuestPass = () => {
       <main className="flex-1 pt-24 pb-12 px-4">
         <div className="max-w-md mx-auto">
           {/* Success State */}
-          {qrImageUrl ? (
+          {successData ? (
             <div className="text-center space-y-6">
               <h1 className="font-display text-2xl text-foreground">
                 Your pass is ready
               </h1>
               
+              <p className="text-muted-foreground">
+                You're attending for {successData.artistName}
+              </p>
+              
               <div className="bg-white p-4 rounded-lg inline-block">
                 <img 
-                  src={qrImageUrl} 
+                  src={successData.qrImageUrl} 
                   alt="Your LLS Guest Pass QR Code" 
                   className="w-64 h-64 mx-auto"
                 />
               </div>
               
-              <p className="text-muted-foreground">
-                Show this QR code at the door for {successArtistName}
-              </p>
-              
-              <Button onClick={handleDownloadQR} className="w-full">
-                <Download className="w-4 h-4 mr-2" />
-                Download QR
-              </Button>
+              <div className="space-y-3">
+                <a 
+                  href={successData.qrImageUrl} 
+                  download={`lls-pass-${successData.artistName.replace(/\s+/g, "-").toLowerCase()}.png`}
+                  className="inline-flex items-center justify-center w-full rounded-md bg-primary text-primary-foreground h-10 px-4 py-2 font-medium"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download QR
+                </a>
+                
+                <Button variant="outline" onClick={handleReset} className="w-full">
+                  Back
+                </Button>
+              </div>
             </div>
           ) : (
             <>
