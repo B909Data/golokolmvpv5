@@ -62,28 +62,48 @@ const LLSGuestPass = () => {
 
     setIsSubmitting(true);
 
+    const payload = {
+      eventId,
+      guestName: trimmedName,
+      guestEmail: trimmedEmail.toLowerCase(),
+      artistName,
+      code: trimmedCode.toUpperCase(),
+    };
+
     try {
+      // Try supabase.functions.invoke first
       const { data, error: fnError } = await supabase.functions.invoke("lls-claim-pass", {
-        body: {
-          eventId,
-          guestName: trimmedName,
-          guestEmail: trimmedEmail.toLowerCase(),
-          artistName,
-          code: trimmedCode.toUpperCase(),
-        },
+        body: payload,
       });
 
       if (fnError) {
-        // Display full error details from non-2xx responses
-        const errorText = typeof fnError === "object" 
-          ? JSON.stringify(fnError, null, 2) 
-          : String(fnError);
-        setError(errorText);
+        // Fallback to fetch to read actual response body
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/lls-claim-pass`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          setError(txt);
+          return;
+        }
+
+        const fallbackData = await res.json();
+        if (fallbackData?.qrImageUrl) {
+          setQrImageUrl(fallbackData.qrImageUrl);
+          setSuccessArtistName(fallbackData.artistName || artistName);
+        }
         return;
       }
 
       if (data?.error) {
-        // Display error returned in response body
         setError(data.error);
         return;
       }
@@ -93,7 +113,6 @@ const LLSGuestPass = () => {
         setSuccessArtistName(data.artistName || artistName);
       }
     } catch (err: unknown) {
-      // Catch network errors or unexpected exceptions
       const message = err instanceof Error ? err.message : String(err);
       console.error("Error claiming pass:", err);
       setError(message);
