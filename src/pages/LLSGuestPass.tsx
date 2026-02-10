@@ -150,11 +150,16 @@ const LLSGuestPass = () => {
           {successData ? (
             <div className="text-center space-y-6">
               <h1 className="font-display text-2xl text-foreground">
-                Your pass is ready
+                Your Pass Is Ready
               </h1>
               
               <p className="text-muted-foreground">
-                You're attending for {successData.artistName}
+                You're attending Lokol Listening Sessions to support{" "}
+                <span className="text-foreground font-semibold">{successData.artistName}</span>
+              </p>
+
+              <p className="text-sm text-muted-foreground">
+                Save or screenshot this QR code. You'll need it at the door.
               </p>
               
               <div className="bg-white p-4 rounded-lg inline-block">
@@ -164,6 +169,10 @@ const LLSGuestPass = () => {
                   className="w-64 h-64 mx-auto"
                 />
               </div>
+
+              <p className="text-sm text-muted-foreground">
+                We've emailed you a copy of your pass. Check your inbox.
+              </p>
               
               <div className="space-y-3">
                 <a 
