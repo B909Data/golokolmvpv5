@@ -128,9 +128,12 @@ serve(async (req) => {
       }
     }
 
+    let passQrToken: string = "";
+
     if (existing) {
       claimId = existing.id;
       qrImageUrl = existing.qr_image_url ?? null;
+      passQrToken = existing.qr_token ?? "";
       
       // If QR was never generated, generate it now
       if (!qrImageUrl && existing.qr_token) {
@@ -159,6 +162,7 @@ serve(async (req) => {
       }
 
       claimId = inserted.id;
+      passQrToken = qrToken;
 
       // 4) Generate and upload QR code
       qrImageUrl = await generateAndUploadQR(inserted.qr_token, claimId);
@@ -168,7 +172,43 @@ serve(async (req) => {
       }
     }
 
-    // 5) Return success
+    // 5) Send to MailerLite (non-blocking — never fail the pass flow)
+    try {
+      const mlApiKey = Deno.env.get("MAILERLITE_API_KEY");
+      const mlGroupId = Deno.env.get("MAILERLITE_GROUP_ID_LLS");
+      if (mlApiKey && mlGroupId) {
+        const mlRes = await fetch("https://connect.mailerlite.com/api/subscribers", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${mlApiKey}`,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          body: JSON.stringify({
+            email: guestEmail,
+            fields: {
+              name: guestName,
+              lls_artistname: artistName,
+              lls_token: passQrToken,
+            },
+            groups: [mlGroupId],
+            status: "active",
+          }),
+        });
+        if (!mlRes.ok) {
+          const mlErr = await mlRes.text();
+          console.error("MailerLite error (non-fatal):", mlRes.status, mlErr);
+        } else {
+          console.log("MailerLite subscriber added for", guestEmail);
+        }
+      } else {
+        console.warn("MailerLite secrets not set, skipping subscriber sync");
+      }
+    } catch (mlErr) {
+      console.error("MailerLite call failed (non-fatal):", mlErr);
+    }
+
+    // 6) Return success
     return res(200, {
       claimId,
       artistName,
