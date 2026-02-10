@@ -138,7 +138,7 @@ const Navbar = () => {
             </button>
             <Link to="/how-to-golokol">
               <Button variant="secondary" size="sm" className="text-xs md:text-sm whitespace-nowrap">
-                How to GoLokol
+                GoLokol FAQ
               </Button>
             </Link>
           </div>
@@ -180,7 +180,7 @@ const Navbar = () => {
               <div className="pt-2 mt-2 border-t border-border/50">
                 <Link to="/how-to-golokol" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="secondary" size="sm" className="w-full">
-                    How to GoLokol
+                    GoLokol FAQ
                   </Button>
                 </Link>
               </div>
