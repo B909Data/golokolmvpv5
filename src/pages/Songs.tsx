@@ -104,14 +104,17 @@ const Songs = () => {
 
             {/* Right column - YouTube Video */}
             <div className="aspect-video w-full rounded-lg overflow-hidden">
-              <iframe
-                src={`https://www.youtube.com/embed/${extractYouTubeId("https://youtu.be/2exJWgcJRlA")}`}
-                title="Lokol Listening Sessions"
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
+            <iframe
+              src={`https://www.youtube.com/embed/${extractYouTubeId("https://youtu.be/2exJWgcJRlA")}`}
+              title="Lokol Listening Sessions"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+          <p className="text-[hsl(0,0%,10%)] text-lg mt-4">
+            <a href="https://golokol.app/lls/ed9dc0d5-b974-43fa-b5c3-91e8763ccde7/pass" className="underline font-semibold hover:text-[hsl(0,0%,30%)]">Get Free Access</a> to Feb 15 Lokol Listening Sessions with Artist code
+          </p>
           </div>
         </div>
       </section>
