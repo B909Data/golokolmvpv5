@@ -215,6 +215,7 @@ const LLSGuestPass = () => {
                   <Input
                     id="name"
                     type="text"
+                    required
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
@@ -230,6 +231,7 @@ const LLSGuestPass = () => {
                   <Input
                     id="email"
                     type="email"
+                    required
                     value={guestEmail}
                     onChange={(e) => setGuestEmail(e.target.value)}
                     className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
@@ -240,7 +242,7 @@ const LLSGuestPass = () => {
                 {/* Artist Dropdown */}
                 <div className="space-y-2">
                   <Label className="text-foreground">Artist</Label>
-                  <Select value={artistName} onValueChange={setArtistName}>
+                  <Select value={artistName} onValueChange={setArtistName} required>
                     <SelectTrigger className="bg-background border-2 border-muted-foreground/30 focus:border-primary">
                       <SelectValue placeholder="Select the artist you're coming for" />
                     </SelectTrigger>
@@ -262,6 +264,7 @@ const LLSGuestPass = () => {
                   <Input
                     id="inviteCode"
                     type="text"
+                    required
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
