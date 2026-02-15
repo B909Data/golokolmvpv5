@@ -45,27 +45,19 @@ serve(async (req) => {
     const guestName = requireStr(body.guestName, "guestName");
     const guestEmail = requireStr(body.guestEmail, "guestEmail").toLowerCase();
     const artistName = requireStr(body.artistName, "artistName");
-    const code = requireStr(body.code, "code").toUpperCase();
 
-    // 1) Validate invite code row matches event + artist + code and is active/not expired
+    // 1) Look up the invite code row by artist name + event (no user-entered code needed)
     const { data: invite, error: inviteErr } = await supabase
       .from("lls_invite_codes")
-      .select("id, artist_name, code, is_active, expires_at")
+      .select("id")
       .eq("event_id", eventId)
       .eq("artist_name", artistName)
-      .eq("code", code)
       .eq("is_active", true)
+      .limit(1)
       .maybeSingle();
 
     if (inviteErr) return res(400, { error: "Invite lookup failed", details: inviteErr.message });
-    if (!invite) return res(400, { error: "Invalid code for selected artist (or inactive)." });
-
-    if (invite.expires_at) {
-      const exp = new Date(invite.expires_at).getTime();
-      if (Number.isFinite(exp) && exp <= Date.now()) {
-        return res(400, { error: "This invite code has expired." });
-      }
-    }
+    if (!invite) return res(400, { error: "No active invite code found for this artist." });
 
     // 2) If the same email already claimed for this event, return the existing claim
     // (Matches your unique index: (event_id, lower(guest_email)))

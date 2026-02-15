@@ -33,7 +33,6 @@ const LLSGuestPass = () => {
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [artistName, setArtistName] = useState("");
-  const [code, setCode] = useState("");
   const [consentChecked, setConsentChecked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,13 +51,11 @@ const LLSGuestPass = () => {
     // Client-side validation
     const trimmedName = guestName.trim();
     const trimmedEmail = guestEmail.trim();
-    const trimmedCode = code.trim();
 
     const missingFields: string[] = [];
     if (!trimmedName) missingFields.push("Name");
     if (!trimmedEmail) missingFields.push("Email");
     if (!artistName) missingFields.push("Artist");
-    if (!trimmedCode) missingFields.push("Invite Code");
 
     if (missingFields.length > 0) {
       setError(`Please fill in: ${missingFields.join(", ")}`);
@@ -77,7 +74,6 @@ const LLSGuestPass = () => {
       guestName: trimmedName,
       guestEmail: trimmedEmail.toLowerCase(),
       artistName,
-      code: trimmedCode.toUpperCase(),
     };
 
     try {
@@ -254,22 +250,6 @@ const LLSGuestPass = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-
-                {/* Invite Code Field */}
-                <div className="space-y-2">
-                  <Label htmlFor="inviteCode" className="text-foreground">
-                    Invite Code
-                  </Label>
-                  <Input
-                    id="inviteCode"
-                    type="text"
-                    required
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    className="bg-background border-2 border-muted-foreground/30 focus:border-primary"
-                    placeholder="Enter your invite code"
-                  />
                 </div>
 
                 {/* Consent Checkbox */}
