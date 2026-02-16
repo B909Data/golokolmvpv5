@@ -86,7 +86,7 @@ const AfterPartyRoom = () => {
       if (urlToken) {
         const { data, error } = await supabase
           .from("attendees")
-          .select("id, checked_in_at, qr_token, display_name")
+          .select("id, checked_in_at, qr_token, display_name, payment_status")
           .eq("event_id", eventId)
           .eq("qr_token", urlToken)
           .maybeSingle();
@@ -97,7 +97,7 @@ const AfterPartyRoom = () => {
       if (storedAttendeeId) {
         const { data, error } = await supabase
           .from("attendees")
-          .select("id, checked_in_at, qr_token, display_name")
+          .select("id, checked_in_at, qr_token, display_name, payment_status")
           .eq("id", storedAttendeeId)
           .maybeSingle();
         if (error) throw error;
@@ -125,7 +125,8 @@ const AfterPartyRoom = () => {
     if (!eventId || isPrivilegedMode) return;
 
     if (!urlToken && !storedAttendeeId) {
-      navigate(`/after-party/${eventId}`, { replace: true });
+      console.log("[AfterPartyRoom] No token/attendeeId, redirecting to RSVP");
+      navigate(`/after-party/${eventId}/rsvp`, { replace: true });
       return;
     }
 
@@ -135,16 +136,28 @@ const AfterPartyRoom = () => {
     }
 
     if (!isCheckingIn && !attendeeData) {
-      navigate(`/after-party/${eventId}`, { replace: true });
+      console.log("[AfterPartyRoom] No attendee data, redirecting to RSVP");
+      navigate(`/after-party/${eventId}/rsvp`, { replace: true });
       return;
     }
 
-    if (!isCheckingIn && attendeeData && !attendeeData.checked_in_at) {
-      const token = attendeeData.qr_token || qrToken;
-      if (token) {
-        navigate(`/after-party/${eventId}/pass?token=${token}`, { replace: true });
-      } else {
-        navigate(`/after-party/${eventId}`, { replace: true });
+    if (!isCheckingIn && attendeeData) {
+      // Payment gate: fan must have paid or be free to access room
+      const ps = attendeeData.payment_status;
+      if (ps && ps !== "paid" && ps !== "free") {
+        console.log("[AfterPartyRoom] Payment not confirmed (status:", ps, "), redirecting to RSVP");
+        navigate(`/after-party/${eventId}/rsvp`, { replace: true });
+        return;
+      }
+
+      // Check-in gate: must be checked in
+      if (!attendeeData.checked_in_at) {
+        const token = attendeeData.qr_token || qrToken;
+        if (token) {
+          navigate(`/after-party/${eventId}/pass?token=${token}`, { replace: true });
+        } else {
+          navigate(`/after-party/${eventId}/rsvp`, { replace: true });
+        }
       }
     }
   }, [urlToken, storedAttendeeId, attendeeData, attendeeError, eventId, qrToken, navigate, isCheckingIn, isPrivilegedMode]);

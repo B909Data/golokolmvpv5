@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +21,6 @@ const RSVPAfterParty = () => {
   const [displayName, setDisplayName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [pwywAmount, setPwywAmount] = useState("");
   const [promoCode, setPromoCode] = useState("");
   
   // Use the shared checkout hook for popup fallback
@@ -48,32 +47,34 @@ const RSVPAfterParty = () => {
     return !!event?.stripe_account_id;
   }, [event]);
 
-  // Explicit paid event detection - fully configured for payment
+  // Paid event = stripe connected AND fixed_price > 0 (pricing_mode is deprecated)
   const isPaidEvent = useMemo(() => {
     if (!event) return false;
-    return (
-      (event.pricing_mode === "fixed" || event.pricing_mode === "pwyw") &&
-      !!event.stripe_account_id &&
-      (event.pricing_mode === "fixed" ? !!event.fixed_price : !!event.min_price)
-    );
+    return !!event.stripe_account_id && !!event.fixed_price && event.fixed_price >= 100;
   }, [event]);
 
-  // Stripe connected but pricing not fully configured = blocked state
+  // Stripe connected but price not set = blocked state
   const isPricingIncomplete = useMemo(() => {
     return isStripeConnected && !isPaidEvent;
   }, [isStripeConnected, isPaidEvent]);
 
   // Format price for display
   const displayPrice = useMemo(() => {
-    if (!event || !isPaidEvent) return null;
-    if (event.pricing_mode === "fixed" && event.fixed_price) {
-      return `$${(event.fixed_price / 100).toFixed(2)}`;
-    }
-    if (event.pricing_mode === "pwyw" && event.min_price) {
-      return `$${(event.min_price / 100).toFixed(2)}+`;
-    }
-    return null;
+    if (!event || !isPaidEvent || !event.fixed_price) return null;
+    return `$${(event.fixed_price / 100).toFixed(2)}`;
   }, [event, isPaidEvent]);
+
+  // Logging: fan page load diagnostics
+  useEffect(() => {
+    if (!event) return;
+    console.log("[FanRSVP] Page load:", {
+      eventId: event.id,
+      fixedPrice: event.fixed_price,
+      stripeConnected: !!event.stripe_account_id,
+      isPaidEvent,
+      isPricingIncomplete,
+    });
+  }, [event, isPaidEvent, isPricingIncomplete]);
 
   const handleRsvpClick = () => {
     // Block if Stripe connected but pricing not complete
@@ -87,10 +88,6 @@ const RSVPAfterParty = () => {
     }
 
     setShowForm(true);
-    // Set default PWYW amount if applicable
-    if (event?.pricing_mode === "pwyw" && event.min_price) {
-      setPwywAmount((event.min_price / 100).toFixed(2));
-    }
     // Scroll to form after state update
     setTimeout(() => {
       document.getElementById("rsvp-form")?.scrollIntoView({ behavior: "smooth" });
@@ -101,27 +98,6 @@ const RSVPAfterParty = () => {
     e.preventDefault();
     
     if (!eventId || !event) return;
-
-    // Validate PWYW amount if applicable
-    if (isPaidEvent && event.pricing_mode === "pwyw") {
-      const amountCents = Math.round(parseFloat(pwywAmount) * 100);
-      if (isNaN(amountCents) || amountCents <= 0) {
-        toast({
-          title: "Invalid amount",
-          description: "Please enter a valid payment amount.",
-          variant: "destructive",
-        });
-        return;
-      }
-      if (event.min_price && amountCents < event.min_price) {
-        toast({
-          title: "Amount too low",
-          description: `Minimum amount is $${(event.min_price / 100).toFixed(2)}`,
-          variant: "destructive",
-        });
-        return;
-      }
-    }
 
     setIsSubmitting(true);
 
@@ -150,9 +126,7 @@ const RSVPAfterParty = () => {
 
       // If paid event, redirect to Stripe checkout (or handle free promo)
       if (isPaidEvent) {
-        const pwywAmountCents = event.pricing_mode === "pwyw" 
-          ? Math.round(parseFloat(pwywAmount) * 100) 
-          : undefined;
+        console.log("[FanRSVP] Paid event — creating checkout session", { eventId, attendeeId: attendee.id, promoCode: promoCode.trim() || "none" });
 
         const { data, error } = await supabase.functions.invoke("create-fan-checkout", {
           body: {
@@ -160,13 +134,12 @@ const RSVPAfterParty = () => {
             attendeeId: attendee.id,
             origin: window.location.origin,
             qrToken,
-            pwywAmountCents,
             promoCode: promoCode.trim() || undefined,
           },
         });
 
         if (error || (!data?.url && !data?.free)) {
-          console.error("Checkout error:", error, data);
+          console.error("[FanRSVP] Checkout error:", error, data);
           toast({
             title: data?.error ? "Promo code error" : "Payment setup failed",
             description: data?.error || "Could not create checkout session. Please try again.",
@@ -177,17 +150,21 @@ const RSVPAfterParty = () => {
 
         // FREE promo code path - immediate redirect to pass
         if (data.free && data.redirectUrl) {
+          console.log("[FanRSVP] Free promo redeemed, redirecting to pass");
           navigate(data.redirectUrl.replace(window.location.origin, ""));
           return;
         }
 
         // Stripe checkout path - use the new hook
+        console.log("[FanRSVP] Opening Stripe checkout");
         openCheckout(data.url);
       } else if (!isStripeConnected) {
         // Truly free event (no Stripe connected) - navigate directly to pass page
+        console.log("[FanRSVP] Free event (no Stripe), navigating to pass");
         navigate(`/after-party/${eventId}/pass?token=${qrToken}`);
       } else {
         // Should never reach here - Stripe connected but not paid means incomplete
+        console.log("[FanRSVP] Configuration error: Stripe connected but no price");
         toast({
           title: "Configuration error",
           description: "This event's payment setup is incomplete.",
@@ -318,7 +295,7 @@ const RSVPAfterParty = () => {
               {isPaidEvent && displayPrice && (
                 <div className="mb-4 p-3 bg-muted rounded-lg">
                   <p className="text-foreground font-sans text-lg font-semibold">
-                    {event?.pricing_mode === "fixed" ? `Price: ${displayPrice}` : `Minimum: ${displayPrice}`}
+                    Price: {displayPrice}
                   </p>
                 </div>
               )}
@@ -335,28 +312,6 @@ const RSVPAfterParty = () => {
                     className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
                   />
                 </div>
-
-                {/* PWYW amount input */}
-                {isPaidEvent && event?.pricing_mode === "pwyw" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="pwywAmount" className="text-foreground font-sans">
-                      Your Amount (min ${event.min_price ? (event.min_price / 100).toFixed(2) : "1.00"})
-                    </Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                      <Input
-                        id="pwywAmount"
-                        type="number"
-                        step="0.01"
-                        min={event.min_price ? (event.min_price / 100).toFixed(2) : "1.00"}
-                        placeholder={(event.min_price ? event.min_price / 100 : 1).toFixed(2)}
-                        value={pwywAmount}
-                        onChange={(e) => setPwywAmount(e.target.value)}
-                        className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans pl-8"
-                      />
-                    </div>
-                  </div>
-                )}
 
                 {/* Promo code input for paid events */}
                 {isPaidEvent && (
@@ -382,9 +337,7 @@ const RSVPAfterParty = () => {
                   {isSubmitting 
                     ? (isPaidEvent ? "Opening checkout..." : "Getting your pass...")
                     : (isPaidEvent 
-                        ? (event?.pricing_mode === "fixed" && displayPrice 
-                            ? `Pay ${displayPrice} to Join` 
-                            : "Pay to Join")
+                        ? (displayPrice ? `Pay ${displayPrice} to Join` : "Pay to Join")
                         : "Get My Pass")
                   }
                 </Button>
