@@ -47,16 +47,27 @@ const RSVPAfterParty = () => {
     return !!event?.stripe_account_id;
   }, [event]);
 
-  // Paid event = stripe connected AND fixed_price > 0 (pricing_mode is deprecated)
-  const isPaidEvent = useMemo(() => {
-    if (!event) return false;
-    return !!event.stripe_account_id && !!event.fixed_price && event.fixed_price >= 100;
+  // Does the event have a price set?
+  const hasPriceSet = useMemo(() => {
+    return !!event?.fixed_price && event.fixed_price >= 100;
   }, [event]);
 
-  // Stripe connected but price not set = blocked state
+  // Paid event = stripe connected AND fixed_price >= 100
+  const isPaidEvent = useMemo(() => {
+    if (!event) return false;
+    return isStripeConnected && hasPriceSet;
+  }, [event, isStripeConnected, hasPriceSet]);
+
+  // Blocked: price is set but Stripe not connected, OR Stripe connected but no price
+  // In both cases, fan should NOT get a free pass
   const isPricingIncomplete = useMemo(() => {
-    return isStripeConnected && !isPaidEvent;
-  }, [isStripeConnected, isPaidEvent]);
+    if (!event) return false;
+    // Price set but no Stripe = artist hasn't connected payouts yet
+    if (hasPriceSet && !isStripeConnected) return true;
+    // Stripe connected but no price = artist hasn't set pricing yet
+    if (isStripeConnected && !hasPriceSet) return true;
+    return false;
+  }, [event, hasPriceSet, isStripeConnected]);
 
   // Format price for display
   const displayPrice = useMemo(() => {
@@ -70,11 +81,13 @@ const RSVPAfterParty = () => {
     console.log("[FanRSVP] Page load:", {
       eventId: event.id,
       fixedPrice: event.fixed_price,
-      stripeConnected: !!event.stripe_account_id,
+      stripeAccountId: event.stripe_account_id,
+      hasPriceSet,
+      isStripeConnected,
       isPaidEvent,
       isPricingIncomplete,
     });
-  }, [event, isPaidEvent, isPricingIncomplete]);
+  }, [event, hasPriceSet, isStripeConnected, isPaidEvent, isPricingIncomplete]);
 
   const handleRsvpClick = () => {
     // Block if Stripe connected but pricing not complete
@@ -158,16 +171,16 @@ const RSVPAfterParty = () => {
         // Stripe checkout path - use the new hook
         console.log("[FanRSVP] Opening Stripe checkout");
         openCheckout(data.url);
-      } else if (!isStripeConnected) {
-        // Truly free event (no Stripe connected) - navigate directly to pass page
-        console.log("[FanRSVP] Free event (no Stripe), navigating to pass");
+      } else if (!hasPriceSet && !isStripeConnected) {
+        // Truly free event (no price AND no Stripe) - navigate directly to pass page
+        console.log("[FanRSVP] Free event (no price, no Stripe), navigating to pass");
         navigate(`/after-party/${eventId}/pass?token=${qrToken}`);
       } else {
-        // Should never reach here - Stripe connected but not paid means incomplete
-        console.log("[FanRSVP] Configuration error: Stripe connected but no price");
+        // Price set but Stripe not connected, or vice versa — should have been blocked earlier
+        console.log("[FanRSVP] Configuration incomplete:", { hasPriceSet, isStripeConnected });
         toast({
-          title: "Configuration error",
-          description: "This event's payment setup is incomplete.",
+          title: "Not available yet",
+          description: "This After Party is not ready for paid passes yet.",
           variant: "destructive",
         });
       }
@@ -278,7 +291,9 @@ const RSVPAfterParty = () => {
               }
               isBlocked={isPricingIncomplete}
               blockedMessage={isPricingIncomplete 
-                ? "This artist hasn't enabled paid After Party access yet." 
+                ? hasPriceSet 
+                  ? "This After Party is not ready for paid passes yet. The artist needs to connect payouts."
+                  : "This artist hasn't finished setting up paid access."
                 : undefined
               }
             />

@@ -61,6 +61,7 @@ const GetPaidTab = ({
 
   const handleConnectStripe = async () => {
     setIsConnecting(true);
+    console.log("[GetPaidTab] Connecting Stripe for event:", eventId);
     try {
       const { data, error } = await supabase.functions.invoke("create-stripe-connect-link", {
         body: { event_id: eventId, token: token || undefined },
@@ -69,12 +70,14 @@ const GetPaidTab = ({
       if (error) throw error;
 
       if (data.already_connected) {
+        console.log("[GetPaidTab] Stripe already connected:", { eventId, accountId: data.account_id });
         toast.info("Stripe account already connected");
         onUpdate();
         return;
       }
 
       if (data.url) {
+        console.log("[GetPaidTab] Stripe onboarding link created:", { eventId, accountId: data.account_id });
         const newWindow = window.open(data.url, "_blank");
         if (!newWindow) {
           toast.error("Popup blocked. Please allow popups for this site.");
@@ -83,7 +86,7 @@ const GetPaidTab = ({
         }
       }
     } catch (err: any) {
-      console.error("Stripe connect error:", err);
+      console.error("[GetPaidTab] Stripe connect error:", { eventId, error: err });
       toast.error(err.message || "Failed to connect Stripe");
     } finally {
       setIsConnecting(false);
@@ -98,10 +101,11 @@ const GetPaidTab = ({
     }
 
     const priceInCents = Math.round(numericValue * 100);
+    console.log("[GetPaidTab] Saving price:", { eventId, priceDollars: numericValue, priceCents: priceInCents });
 
     setIsSaving(true);
     try {
-      const { error } = await supabase.functions.invoke("artist-update-event", {
+      const { data, error } = await supabase.functions.invoke("artist-update-event", {
         body: {
           event_id: eventId,
           token: token || undefined,
@@ -112,10 +116,11 @@ const GetPaidTab = ({
       });
 
       if (error) throw error;
+      console.log("[GetPaidTab] Price saved successfully:", { eventId, priceCents: priceInCents, response: data });
       toast.success("Price saved");
       onUpdate();
     } catch (err: any) {
-      console.error("Save pricing error:", err);
+      console.error("[GetPaidTab] Save pricing error:", { eventId, priceCents: priceInCents, error: err });
       toast.error(err.message || "Failed to save price");
     } finally {
       setIsSaving(false);
