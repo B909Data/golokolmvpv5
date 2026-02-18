@@ -26,6 +26,14 @@ serve(async (req) => {
       pricing_mode,
       fixed_price,
       min_price,
+      // Edit Pass fields
+      artist_name,
+      title,
+      city,
+      venue_name,
+      start_at,
+      ticket_url,
+      genres,
     } = await req.json();
 
     if (!event_id) {
@@ -82,7 +90,7 @@ serve(async (req) => {
     }
 
     // Build update object with only provided fields
-    const updateData: Record<string, string | number | null> = {};
+    const updateData: Record<string, unknown> = {};
     if (pinned_message !== undefined) updateData.pinned_message = pinned_message;
     if (youtube_url !== undefined) updateData.youtube_url = youtube_url;
     if (image_url !== undefined) updateData.image_url = image_url;
@@ -94,6 +102,14 @@ serve(async (req) => {
     if (pricing_mode !== undefined) updateData.pricing_mode = pricing_mode;
     if (fixed_price !== undefined) updateData.fixed_price = fixed_price;
     if (min_price !== undefined) updateData.min_price = min_price;
+    // Edit Pass fields
+    if (artist_name !== undefined) updateData.artist_name = artist_name;
+    if (title !== undefined) updateData.title = title;
+    if (city !== undefined) updateData.city = city;
+    if (venue_name !== undefined) updateData.venue_name = venue_name;
+    if (start_at !== undefined) updateData.start_at = start_at;
+    if (ticket_url !== undefined) updateData.ticket_url = ticket_url;
+    if (genres !== undefined) updateData.genres = genres;
 
     const { error: updateError } = await supabaseAdmin
       .from("events")

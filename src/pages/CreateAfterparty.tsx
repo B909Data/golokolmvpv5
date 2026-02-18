@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2, ChevronLeft, ChevronRight, CalendarIcon, Upload, X, ChevronDown } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -50,6 +51,22 @@ const GENRE_OPTIONS = [
 ];
 
 // Cities now fetched from database
+
+const US_CITIES = [
+  "Albuquerque", "Anchorage", "Atlanta", "Austin", "Baltimore",
+  "Birmingham", "Boise", "Boston", "Buffalo", "Charlotte",
+  "Chicago", "Cincinnati", "Cleveland", "Colorado Springs", "Columbus",
+  "Dallas", "Denver", "Des Moines", "Detroit", "El Paso",
+  "Fort Worth", "Fresno", "Honolulu", "Houston", "Indianapolis",
+  "Jacksonville", "Kansas City", "Las Vegas", "Long Beach", "Los Angeles",
+  "Louisville", "Memphis", "Mesa", "Miami", "Milwaukee",
+  "Minneapolis", "Nashville", "New Orleans", "New York", "Newark",
+  "Oakland", "Oklahoma City", "Omaha", "Orlando", "Philadelphia",
+  "Phoenix", "Pittsburgh", "Portland", "Raleigh", "Richmond",
+  "Sacramento", "Salt Lake City", "San Antonio", "San Diego", "San Francisco",
+  "San Jose", "Seattle", "St. Louis", "Tampa", "Tucson",
+  "Tulsa", "Virginia Beach", "Washington D.C.",
+];
 
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   const ampm = i >= 12 ? "PM" : "AM";
@@ -130,6 +147,9 @@ const CreateAfterparty = () => {
   
   // Step 4 curator selection (for discount code purposes)
   const [step4CuratorId, setStep4CuratorId] = useState<string>("none");
+  
+  // Discount code radio selection
+  const [hasDiscountCode, setHasDiscountCode] = useState<string>("no");
   
   // Confirmation email state (optional, for MailerLite)
   const [confirmationEmail, setConfirmationEmail] = useState<string>("");
@@ -560,28 +580,7 @@ const CreateAfterparty = () => {
   const renderStep1 = () => {
     const selectedDate = watch("start_date");
     const selectedTime = watch("start_time");
-    const venueOtherName = watch("venue_other_name");
     const eventTitle = watch("title");
-
-    // Handle venue dropdown change
-    const handleVenueChange = (value: string) => {
-      setValue("venue_id", value, { shouldValidate: true });
-      if (value === "other") {
-        // Keep any existing manual text
-      } else {
-        // Clear manual text and set venue_name from venue name
-        setValue("venue_other_name", "");
-        const venue = venues.find((v) => v.id === value);
-        setValue("venue_name", venue?.name || "", { shouldValidate: true });
-      }
-    };
-
-    // Handle venue other name change
-    const handleVenueOtherChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setValue("venue_other_name", value);
-      setValue("venue_name", value, { shouldValidate: true });
-    };
 
     return (
       <div className="space-y-6">
@@ -681,9 +680,9 @@ const CreateAfterparty = () => {
               className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <option value="">Select a city</option>
-              {cities.map((city) => (
-                <option key={city.id} value={city.name}>
-                  {city.name}
+              {US_CITIES.map((cityName) => (
+                <option key={cityName} value={cityName}>
+                  {cityName}
                 </option>
               ))}
             </select>
@@ -692,38 +691,21 @@ const CreateAfterparty = () => {
             )}
           </div>
 
-          {/* Venue */}
+          {/* Venue Name */}
           <div className="space-y-2">
-            <Label className="text-primary-foreground text-base font-sans">Venue *</Label>
-            <select
-              value={venueId || ""}
-              onChange={(e) => handleVenueChange(e.target.value)}
-              className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              disabled={partnersLoading}
-            >
-              <option value="">Select venue</option>
-              {venues.map((venue) => (
-                <option key={venue.id} value={venue.id}>
-                  {venue.name}
-                </option>
-              ))}
-              <option value="other">Other</option>
-            </select>
-            {venueId === "other" && (
-              <Input
-                value={venueOtherName || ""}
-                onChange={handleVenueOtherChange}
-                placeholder="Enter venue name"
-                className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground mt-2"
-              />
-            )}
+            <Label className="text-primary-foreground text-base font-sans">Venue Name *</Label>
+            <Input
+              {...register("venue_name")}
+              placeholder="Enter venue name"
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
+            />
             {errors.venue_name && (
               <p className="text-sm text-destructive font-sans">{errors.venue_name.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="ticket_url" className="text-primary-foreground text-base font-sans">Ticket URL (optional)</Label>
+            <Label htmlFor="ticket_url" className="text-primary-foreground text-base font-sans">Buy Ticket URL (Optional)</Label>
             <Input
               id="ticket_url"
               type="url"
@@ -826,7 +808,7 @@ const CreateAfterparty = () => {
               >
                 <Upload className="w-8 h-8 mx-auto mb-2 text-primary-foreground/60" />
                 <p className="text-primary-foreground font-sans text-sm">Click to upload or drag & drop</p>
-                <p className="text-primary-foreground/60 text-xs font-sans mt-1">JPG/PNG · max 3MB</p>
+                <p className="text-primary-foreground/60 text-xs font-sans mt-1">JPG/PNG · max 3MB, 4:3 ratio</p>
               </div>
             ) : (
               <div className="relative rounded-xl overflow-hidden bg-primary-foreground/10 p-3">
@@ -927,37 +909,37 @@ const CreateAfterparty = () => {
           onTermsChange={setIsTermsAccepted}
         />
 
-        {/* Curator Selection for Discount Code */}
+        {/* Discount Code Section */}
         <div className="space-y-4 pt-4 border-t border-primary-foreground/20">
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label className="text-primary-foreground text-base font-sans">
-              Select a curator
+              Do you have a discount code?
             </Label>
-            <select
-              value={step4CuratorId}
-              onChange={(e) => {
-                setStep4CuratorId(e.target.value);
-                // Clear discount code and errors when curator changes
-                if (e.target.value === "none") {
+            <RadioGroup
+              value={hasDiscountCode}
+              onValueChange={(val: string) => {
+                setHasDiscountCode(val);
+                if (val === "no") {
                   setDiscountCode("");
                   setDiscountCodeError(null);
                   setDiscountValidation({ valid: false, type: null, checking: false });
                 }
               }}
-              className="flex h-14 w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              disabled={partnersLoading}
+              className="flex gap-6"
             >
-              {allCurators.map((curator) => (
-                <option key={curator.id} value={curator.id}>
-                  {curator.name}
-                </option>
-              ))}
-              <option value="none">I don't have a curator code</option>
-            </select>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="yes" id="has-code-yes" className="border-primary-foreground/50 text-primary-foreground" />
+                <Label htmlFor="has-code-yes" className="text-primary-foreground text-sm font-sans cursor-pointer">I have a code</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="no" id="has-code-no" className="border-primary-foreground/50 text-primary-foreground" />
+                <Label htmlFor="has-code-no" className="text-primary-foreground text-sm font-sans cursor-pointer">I do not have a code</Label>
+              </div>
+            </RadioGroup>
           </div>
 
-          {/* Discount Code Input - only show if a curator is selected */}
-          {step4CuratorId !== "none" && (
+          {/* Discount Code Input - only show if "I have a code" is selected */}
+          {hasDiscountCode === "yes" && (
             <div className="space-y-2">
               <Label className="text-primary-foreground text-base font-sans">
                 Discount code
@@ -967,7 +949,7 @@ const CreateAfterparty = () => {
                   value={discountCode}
                   onChange={(e) => {
                     setDiscountCode(e.target.value.toUpperCase());
-                    setDiscountCodeError(null); // Clear error on input change
+                    setDiscountCodeError(null);
                   }}
                   placeholder="Enter code"
                   className="h-12 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground uppercase"

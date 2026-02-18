@@ -14,6 +14,7 @@ import GetPaidTab from "@/components/artist/tabs/GetPaidTab";
 import PromoteTab from "@/components/artist/tabs/PromoteTab";
 import CheckInTab from "@/components/artist/tabs/CheckInTab";
 import AfterPartyTab from "@/components/artist/tabs/AfterPartyTab";
+import EditPassTab from "@/components/artist/tabs/EditPassTab";
 
 interface EventData {
   id: string;
@@ -35,6 +36,8 @@ interface EventData {
   fixed_price: number | null;
   min_price: number | null;
   pricing_locked_at: string | null;
+  ticket_url: string | null;
+  genres: string[] | null;
 }
 
 interface Message {
@@ -338,6 +341,23 @@ const ArtistEvent = () => {
               merchLink={event.merch_link || ""}
               musicLink={event.music_link || ""}
               messages={messages}
+              onUpdate={handleEventUpdate}
+            />
+          )}
+
+          {activeTab === "edit-pass" && eventId && event && (
+            <EditPassTab
+              eventId={eventId}
+              token={token}
+              artistName={event.artist_name || ""}
+              city={event.city}
+              venueName={event.venue_name}
+              startAt={event.start_at}
+              ticketUrl={event.ticket_url || null}
+              imageUrl={event.image_url}
+              youtubeUrl={event.youtube_url}
+              genres={event.genres || null}
+              title={event.title}
               onUpdate={handleEventUpdate}
             />
           )}
