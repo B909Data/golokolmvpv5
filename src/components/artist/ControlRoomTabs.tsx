@@ -1,7 +1,7 @@
-import { Home, DollarSign, Share2, QrCode, PartyPopper } from "lucide-react";
+import { Home, DollarSign, Share2, QrCode, PartyPopper, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type TabId = "home" | "get-paid" | "promote" | "check-in" | "after-party";
+export type TabId = "home" | "get-paid" | "promote" | "check-in" | "after-party" | "edit-pass";
 
 interface Tab {
   id: TabId;
@@ -15,6 +15,7 @@ const tabs: Tab[] = [
   { id: "promote", label: "Promote", icon: Share2 },
   { id: "check-in", label: "Check-In", icon: QrCode },
   { id: "after-party", label: "After Party", icon: PartyPopper },
+  { id: "edit-pass", label: "Edit Pass", icon: Pencil },
 ];
 
 interface ControlRoomTabsProps {
