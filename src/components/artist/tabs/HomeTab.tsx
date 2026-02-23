@@ -174,7 +174,7 @@ const HomeTab = ({ eventId, stripeStatus, fixedPrice, onSwitchTab }: HomeTabProp
         {helpExpanded && (
           <div className="space-y-3 pt-2">
             <a
-              href="https://www.youtube.com/embed/pKD4IptzlTg"
+              href="https://www.youtube.com/embed/PlNn4tpYHQA"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
@@ -184,11 +184,11 @@ const HomeTab = ({ eventId, stripeStatus, fixedPrice, onSwitchTab }: HomeTabProp
               </div>
               <div className="min-w-0">
                 <p className="font-sans text-sm font-medium text-foreground">How to use the Control Room</p>
-                <p className="font-sans text-xs text-muted-foreground">2 min video</p>
+                <p className="font-sans text-xs text-muted-foreground">5 min video</p>
               </div>
             </a>
             <a
-              href="https://www.youtube.com/embed/6Q7AZCHm8OE"
+              href="https://www.youtube.com/embed/PlNn4tpYHQA"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
