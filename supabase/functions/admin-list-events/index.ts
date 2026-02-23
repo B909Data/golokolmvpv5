@@ -33,6 +33,7 @@ serve(async (req) => {
       .from("events")
       .select("*")
       .eq("type", "after_party")
+      .eq("admin_state", "active")
       .order("start_at", { ascending: false });
 
     if (eventsError) {
