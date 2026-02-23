@@ -54,6 +54,13 @@ export type Database = {
             referencedRelation: "events"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "after_party_messages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "paid_events"
+            referencedColumns: ["id"]
+          },
         ]
       }
       afterparty_discount_codes: {
@@ -99,6 +106,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "afterparty_discount_codes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "paid_events"
             referencedColumns: ["id"]
           },
           {
@@ -165,6 +179,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "paid_events"
             referencedColumns: ["id"]
           },
         ]
@@ -252,6 +273,13 @@ export type Database = {
             referencedRelation: "events"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "email_optins_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "paid_events"
+            referencedColumns: ["id"]
+          },
         ]
       }
       events: {
@@ -280,6 +308,7 @@ export type Database = {
           merch_link: string | null
           min_price: number | null
           music_link: string | null
+          payment_status: string | null
           pinned_message: string | null
           plan: string | null
           pricing_locked_at: string | null
@@ -321,6 +350,7 @@ export type Database = {
           merch_link?: string | null
           min_price?: number | null
           music_link?: string | null
+          payment_status?: string | null
           pinned_message?: string | null
           plan?: string | null
           pricing_locked_at?: string | null
@@ -362,6 +392,7 @@ export type Database = {
           merch_link?: string | null
           min_price?: number | null
           music_link?: string | null
+          payment_status?: string | null
           pinned_message?: string | null
           plan?: string | null
           pricing_locked_at?: string | null
@@ -450,6 +481,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "lls_guest_claims_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "paid_events"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "lls_guest_claims_invite_code_id_fkey"
             columns: ["invite_code_id"]
             isOneToOne: false
@@ -495,6 +533,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lls_invite_codes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "paid_events"
             referencedColumns: ["id"]
           },
         ]
@@ -609,6 +654,13 @@ export type Database = {
             referencedRelation: "events"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "recaps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "paid_events"
+            referencedColumns: ["id"]
+          },
         ]
       }
       short_links: {
@@ -673,7 +725,150 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      paid_events: {
+        Row: {
+          admin_state: string | null
+          after_party_enabled: boolean | null
+          after_party_expires_at: string | null
+          after_party_opens_at: string | null
+          after_party_started_at: string | null
+          artist_access_token: string | null
+          artist_entered_sms_at: string | null
+          artist_name: string | null
+          artist_user_id: string | null
+          city: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          curator_id: string | null
+          curator_other_name: string | null
+          ends_at: string | null
+          fixed_price: number | null
+          genres: string[] | null
+          id: string | null
+          image_url: string | null
+          livestream_url: string | null
+          merch_link: string | null
+          min_price: number | null
+          music_link: string | null
+          payment_status: string | null
+          pinned_message: string | null
+          plan: string | null
+          pricing_locked_at: string | null
+          pricing_mode: string | null
+          revenue_cap: number | null
+          start_at: string | null
+          status: Database["public"]["Enums"]["event_status"] | null
+          stripe_account_id: string | null
+          ticket_url: string | null
+          title: string | null
+          type: Database["public"]["Enums"]["event_type"] | null
+          venue_id: string | null
+          venue_name: string | null
+          venue_other_name: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          admin_state?: string | null
+          after_party_enabled?: boolean | null
+          after_party_expires_at?: string | null
+          after_party_opens_at?: string | null
+          after_party_started_at?: string | null
+          artist_access_token?: string | null
+          artist_entered_sms_at?: string | null
+          artist_name?: string | null
+          artist_user_id?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          curator_id?: string | null
+          curator_other_name?: string | null
+          ends_at?: string | null
+          fixed_price?: number | null
+          genres?: string[] | null
+          id?: string | null
+          image_url?: string | null
+          livestream_url?: string | null
+          merch_link?: string | null
+          min_price?: number | null
+          music_link?: string | null
+          payment_status?: string | null
+          pinned_message?: string | null
+          plan?: string | null
+          pricing_locked_at?: string | null
+          pricing_mode?: string | null
+          revenue_cap?: number | null
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["event_status"] | null
+          stripe_account_id?: string | null
+          ticket_url?: string | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["event_type"] | null
+          venue_id?: string | null
+          venue_name?: string | null
+          venue_other_name?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          admin_state?: string | null
+          after_party_enabled?: boolean | null
+          after_party_expires_at?: string | null
+          after_party_opens_at?: string | null
+          after_party_started_at?: string | null
+          artist_access_token?: string | null
+          artist_entered_sms_at?: string | null
+          artist_name?: string | null
+          artist_user_id?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          curator_id?: string | null
+          curator_other_name?: string | null
+          ends_at?: string | null
+          fixed_price?: number | null
+          genres?: string[] | null
+          id?: string | null
+          image_url?: string | null
+          livestream_url?: string | null
+          merch_link?: string | null
+          min_price?: number | null
+          music_link?: string | null
+          payment_status?: string | null
+          pinned_message?: string | null
+          plan?: string | null
+          pricing_locked_at?: string | null
+          pricing_mode?: string | null
+          revenue_cap?: number | null
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["event_status"] | null
+          stripe_account_id?: string | null
+          ticket_url?: string | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["event_type"] | null
+          venue_id?: string | null
+          venue_name?: string | null
+          venue_other_name?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_curator_id_fkey"
+            columns: ["curator_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       validate_and_redeem_promo_code: {
