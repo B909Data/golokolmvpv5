@@ -1,31 +1,11 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { extractYouTubeId } from "@/lib/youtube";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 const Songs = () => {
-  const [isLoadingTicket, setIsLoadingTicket] = useState(false);
-
-  const handleBuyTicket = async () => {
-    setIsLoadingTicket(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-lls-ticket-checkout");
-      if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (err) {
-      console.error("Error creating ticket checkout:", err);
-      toast.error("Failed to start checkout. Please try again.");
-    } finally {
-      setIsLoadingTicket(false);
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[hsl(60,10%,95%)]">
@@ -70,7 +50,7 @@ const Songs = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4 pt-2">
+              <div className="pt-2">
                 <div className="flex flex-col">
                   <Link to="/submit-song">
                     <Button variant="secondary" size="lg">
@@ -79,25 +59,6 @@ const Songs = () => {
                     </Button>
                   </Link>
                   <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$5 each submission</p>
-                </div>
-                <div className="flex flex-col">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-[hsl(0,0%,10%)] text-[hsl(0,0%,10%)] hover:bg-[hsl(0,0%,10%)] hover:text-white"
-                    onClick={handleBuyTicket}
-                    disabled={isLoadingTicket}
-                  >
-                    {isLoadingTicket ? "Loading..." : "Buy a Ticket"}
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                  <p className="text-[hsl(0,0%,40%)] text-sm mt-2">$15 limited capacity - No subscription.</p>
-                  <p className="text-[hsl(0,0%,50%)] text-xs mt-1">
-                    By proceeding, you agree to GoLokol's{" "}
-                    <Link to="/terms" className="underline hover:text-[hsl(0,0%,30%)]">Terms</Link>
-                    {" & "}
-                    <Link to="/privacy" className="underline hover:text-[hsl(0,0%,30%)]">Privacy</Link>
-                  </p>
                 </div>
               </div>
             </div>
@@ -112,9 +73,6 @@ const Songs = () => {
               allowFullScreen
             />
           </div>
-          <p className="text-[hsl(0,0%,10%)] text-lg mt-4">
-            <a href="https://golokol.app/lls/ed9dc0d5-b974-43fa-b5c3-91e8763ccde7/pass" className="underline font-semibold hover:text-[hsl(0,0%,30%)]">Get Free Access</a> to Feb 15 Lokol Listening Sessions with Artist code
-          </p>
           </div>
         </div>
       </section>
@@ -137,7 +95,7 @@ const Songs = () => {
             </li>
             <li className="flex items-start gap-3">
               <span className="text-[hsl(0,0%,10%)] font-bold">3.</span>
-              <span>You must be able to perform live in Atlanta if selected.</span>
+              <span>You must be able to be present for the filming of Lokol Listening Sessions in your city.</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="text-[hsl(0,0%,10%)] font-bold">4.</span>
