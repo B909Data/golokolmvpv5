@@ -62,3 +62,6 @@ verify_jwt = false
 
 [functions.check-stripe-account-status]
 verify_jwt = false
+
+[functions.activate-pass]
+verify_jwt = false

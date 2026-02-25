@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
     : Deno.env.get("STRIPE_COUPON_50_LIVE");
 
   try {
-    const { eventId, attendeeId, origin, qrToken, promoCode } = await req.json();
+    const { eventId, attendeeId, origin, qrToken, accessToken, promoCode } = await req.json();
 
     if (!eventId || !attendeeId || !origin || !qrToken) {
       return new Response(
@@ -133,11 +133,11 @@ Deno.serve(async (req) => {
 
       console.log("Free promo redeemed for attendee:", attendeeId);
 
-      // Return success with redirect to pass page (no Stripe)
+      // Return success with redirect to pass page using access token
       return new Response(
         JSON.stringify({
           free: true,
-          redirectUrl: `${origin}/after-party/${eventId}/pass?token=${qrToken}`,
+          redirectUrl: `${origin}/after-party/${eventId}/pass?token=${accessToken || qrToken}`,
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -186,8 +186,8 @@ Deno.serve(async (req) => {
         application_fee_amount: feeCents,
         transfer_data: { destination: event.stripe_account_id },
       },
-      success_url: `${origin}/after-party/${eventId}/room?token=${qrToken}&paid=1`,
-      cancel_url: `${origin}/after-party/${eventId}?paid=0`,
+      success_url: `${origin}/after-party/${eventId}/pass?token=${accessToken || qrToken}`,
+      cancel_url: `${origin}/after-party/${eventId}/rsvp?paid=0`,
     };
 
     // Apply 50% coupon if promo kind matches

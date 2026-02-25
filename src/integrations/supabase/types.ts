@@ -126,6 +126,9 @@ export type Database = {
       }
       attendees: {
         Row: {
+          access_token: string | null
+          access_token_expires_at: string | null
+          activated_at: string | null
           checked_in_at: string | null
           checkin_method: Database["public"]["Enums"]["checkin_method"]
           created_at: string | null
@@ -136,12 +139,16 @@ export type Database = {
           paid_at: string | null
           payment_status: string | null
           phone: string | null
+          purchase_email: string | null
           qr_token: string | null
           sms_opt_in: boolean | null
           stripe_checkout_session_id: string | null
           stripe_payment_intent_id: string | null
         }
         Insert: {
+          access_token?: string | null
+          access_token_expires_at?: string | null
+          activated_at?: string | null
           checked_in_at?: string | null
           checkin_method?: Database["public"]["Enums"]["checkin_method"]
           created_at?: string | null
@@ -152,12 +159,16 @@ export type Database = {
           paid_at?: string | null
           payment_status?: string | null
           phone?: string | null
+          purchase_email?: string | null
           qr_token?: string | null
           sms_opt_in?: boolean | null
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
         }
         Update: {
+          access_token?: string | null
+          access_token_expires_at?: string | null
+          activated_at?: string | null
           checked_in_at?: string | null
           checkin_method?: Database["public"]["Enums"]["checkin_method"]
           created_at?: string | null
@@ -168,6 +179,7 @@ export type Database = {
           paid_at?: string | null
           payment_status?: string | null
           phone?: string | null
+          purchase_email?: string | null
           qr_token?: string | null
           sms_opt_in?: boolean | null
           stripe_checkout_session_id?: string | null
