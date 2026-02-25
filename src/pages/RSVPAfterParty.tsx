@@ -19,6 +19,7 @@ const RSVPAfterParty = () => {
   const { toast } = useToast();
   
   const [displayName, setDisplayName] = useState("");
+  const [purchaseEmail, setPurchaseEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [promoCode, setPromoCode] = useState("");
@@ -112,11 +113,23 @@ const RSVPAfterParty = () => {
     
     if (!eventId || !event) return;
 
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!purchaseEmail.trim() || !emailRegex.test(purchaseEmail.trim())) {
+      toast({
+        title: "Email required",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Generate QR token client-side
+      // Generate QR token and access token client-side
       const qrToken = crypto.randomUUID();
+      const accessToken = crypto.randomUUID() + "-" + crypto.randomUUID();
 
       // Create attendee record
       const { data: attendee, error: insertError } = await supabase
@@ -127,7 +140,9 @@ const RSVPAfterParty = () => {
           checkin_method: "qr",
           qr_token: qrToken,
           payment_status: isPaidEvent ? "pending" : "free",
-        })
+          purchase_email: purchaseEmail.trim(),
+          access_token: accessToken,
+        } as any)
         .select("id")
         .single();
 
@@ -147,6 +162,7 @@ const RSVPAfterParty = () => {
             attendeeId: attendee.id,
             origin: window.location.origin,
             qrToken,
+            accessToken,
             promoCode: promoCode.trim() || undefined,
           },
         });
@@ -174,7 +190,7 @@ const RSVPAfterParty = () => {
       } else if (!hasPriceSet && !isStripeConnected) {
         // Truly free event (no price AND no Stripe) - navigate directly to pass page
         console.log("[FanRSVP] Free event (no price, no Stripe), navigating to pass");
-        navigate(`/after-party/${eventId}/pass?token=${qrToken}`);
+        navigate(`/after-party/${eventId}/pass?token=${accessToken}`);
       } else {
         // Price set but Stripe not connected, or vice versa — should have been blocked earlier
         console.log("[FanRSVP] Configuration incomplete:", { hasPriceSet, isStripeConnected });
@@ -246,7 +262,7 @@ const RSVPAfterParty = () => {
                   <CheckCircle className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <p className="text-foreground font-sans">
-                  RSVP. download your access pass.
+                  Pay, download and save your access pass.
                 </p>
               </div>
               
@@ -316,6 +332,19 @@ const RSVPAfterParty = () => {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="purchaseEmail" className="text-foreground font-sans">Email</Label>
+                  <Input
+                    id="purchaseEmail"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={purchaseEmail}
+                    onChange={(e) => setPurchaseEmail(e.target.value)}
+                    className="bg-background border-2 border-muted-foreground/30 focus:border-primary text-foreground font-sans"
+                    required
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="displayName" className="text-foreground font-sans">Your Name (optional)</Label>
                   <Input
