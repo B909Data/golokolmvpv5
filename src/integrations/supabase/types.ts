@@ -438,6 +438,33 @@ export type Database = {
           },
         ]
       }
+      lls_curated_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_used: boolean
+          used_at: string | null
+          used_by_email: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+          used_by_email?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+          used_by_email?: string | null
+        }
+        Relationships: []
+      }
       lls_guest_claims: {
         Row: {
           artist_name: string
