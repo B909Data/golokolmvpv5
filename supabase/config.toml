@@ -65,3 +65,9 @@ verify_jwt = false
 
 [functions.activate-pass]
 verify_jwt = false
+
+[functions.validate-curated-code]
+verify_jwt = false
+
+[functions.redeem-curated-code]
+verify_jwt = false
