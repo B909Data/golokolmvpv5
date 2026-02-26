@@ -1,49 +1,86 @@
 
 
-# Remove Invite Code from LLS Guest Pass Form
+# Fix Curated Submission Flow (Parts A + B) and Email Template (Part C)
 
-## What's Changing
+## Overview
 
-The LLS Guest Pass form will no longer require an invite code. Anyone can claim a pass by simply selecting an artist from the dropdown. The artist selection will continue to drive the success page messaging, MailerLite sync, and tally tracking — no changes needed there.
+Three changes: fix the redirect/auth flow, update header text, and update the magic link email template directly in the Supabase Dashboard.
 
-## Changes Required
+---
 
-### 1. Frontend — `src/pages/LLSGuestPass.tsx`
-- Remove the `code` state variable
-- Remove the Invite Code input field from the form
-- Remove "Invite Code" from the client-side validation
-- Stop sending `code` in the payload to the edge function
+## Part A: Redirect + OTP Expired Fix + localStorage
 
-### 2. Backend Function — `supabase/functions/lls-claim-pass/index.ts`
-- Remove the `code` parameter requirement (no longer call `requireStr` for it)
-- Remove the entire invite code validation step (the query to `lls_invite_codes`)
-- Since `invite_code_id` is a required column in `lls_guest_claims`, the insert needs a value — we'll use a **sentinel/default invite code ID**. We have two options:
-  - **Option A**: Make `invite_code_id` nullable via a migration, then insert `null`
-  - **Option B**: Create a single "open access" row in `lls_invite_codes` for this event and hardcode that ID
+**File: `src/pages/SubmitCurated.tsx`**
 
-  We'll go with **Option A** (make `invite_code_id` nullable) since it's cleaner and the invite code system is being bypassed entirely.
+### 1. Add `useSearchParams` and new step type
+- Import `useSearchParams` from `react-router-dom`
+- Expand step type to `"gate" | "form" | "expired"`
+- Add `resendEmail` state for the expired link resend UI
 
-### 3. Database Migration
-- `ALTER TABLE lls_guest_claims ALTER COLUMN invite_code_id DROP NOT NULL;`
-- This allows new claims to be inserted without referencing an invite code
+### 2. Fix redirect URL
+- Change line 120 from `window.location.href` to:
+  `https://golokol.app/songs/submit-curated?step=form`
 
-## Technical Details
+### 3. Switch sessionStorage to localStorage
+- Replace all `sessionStorage.getItem("curated_code")` with `localStorage.getItem("lls_curated_code")`
+- Replace all `sessionStorage.setItem("curated_code", ...)` with `localStorage.setItem("lls_curated_code", ...)`
+- Replace all `sessionStorage.removeItem("curated_code")` with `localStorage.removeItem("lls_curated_code")`
 
-### Frontend changes (LLSGuestPass.tsx)
-- Delete `const [code, setCode] = useState("")`
-- Remove `const trimmedCode = code.trim()` and its validation line
-- Remove the Invite Code `<div>` block (lines 259-273)
-- Update payload to not include `code`
+### 4. Detect OTP expired on mount
+- On mount, parse URL search params for `error_code=otp_expired` or `error=access_denied`
+- Also check the hash fragment (Supabase sometimes puts errors there)
+- If detected, set step to `"expired"` and pre-fill email from localStorage if available
+- Store `gateEmail` in localStorage (key: `lls_curated_email`) during gate submit so it survives the redirect
 
-### Edge function changes (lls-claim-pass/index.ts)
-- Remove `const code = requireStr(body.code, "code")` line
-- Remove the entire invite code lookup block (lines 50-68)
-- Change the insert to use `invite_code_id: null` instead of `invite.id`
+### 5. Handle `?step=form` query param on mount
+- If `step=form` in URL + active session exists: attempt code redemption from localStorage, then show form
+- If `step=form` but no session: listen via `onAuthStateChange` for `SIGNED_IN` event
 
-### What stays the same
-- Artist dropdown selection still drives `artistName` in the claim record
-- Success page still shows the selected artist name dynamically
-- MailerLite still receives `lls_artistname` based on the dropdown selection
-- Tally queries still group by `artist_name` — no change needed
-- QR generation, check-in flow, and email confirmation are all unaffected
+### 6. Add expired link UI (new step)
+- Show message: "This link expired. Enter your email to resend a fresh link."
+- Email input pre-filled from stored email
+- "Resend link" button calls `supabase.auth.signInWithOtp()` with the same clean redirect URL
+- No invite code re-entry (code is already in localStorage)
+- After resend, show the "Check your email" confirmation
+
+---
+
+## Part B: Header Text Change
+
+- Gate screen header: change from `CURATED SUBMISSION` to `LOKOL LISTENING SESSIONS` with subtitle span `INVITATION`
+- Form screen header: change to `LOKOL LISTENING SESSIONS` with subtitle span `SUBMISSION`
+
+---
+
+## Part C: Magic Link Email Template (Manual Dashboard Update)
+
+This cannot be done via code. You need to update it directly in the **Supabase Dashboard**:
+
+**Go to: Authentication -> Email Templates -> Magic Link**
+
+| Field | Value |
+|-------|-------|
+| Subject | `Special link to submit your music` |
+| Sender name | `Lokol Listening Sessions` |
+
+**Email body HTML** (replace the existing template):
+
+```html
+<h2>One-time curator invite link to Lokol Listening Sessions</h2>
+<p>Click the button below to securely submit your music for the next LLS. We will confirm via text.</p>
+<p><a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:12px 24px;background:#000;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">Submit</a></p>
+<p style="color:#888;font-size:13px;margin-top:24px;">If you didn't request this, you can safely ignore this email.</p>
+```
+
+Remove any "Sign in to your account" or "GoLokol MVP-6" text from the template.
+
+---
+
+## Summary of File Changes
+
+| File | What changes |
+|------|-------------|
+| `src/pages/SubmitCurated.tsx` | Parts A + B: useSearchParams, localStorage, clean redirect URL, OTP expired UI, header text |
+
+No config.toml changes. No new edge functions. Part C is a manual Supabase Dashboard update.
 
