@@ -40,6 +40,7 @@ import LLSGuestPass from "./pages/LLSGuestPass";
 import LLSCheckin from "./pages/LLSCheckin";
 import LLSRelease from "./pages/LLSRelease";
 import LLSMusicRelease from "./pages/LLSMusicRelease";
+import SubmitCurated from "./pages/SubmitCurated";
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,7 @@ const App = () => (
           
           {/* Other Routes */}
           <Route path="/submit-song" element={<SubmitSong />} />
+          <Route path="/songs/submit-curated" element={<SubmitCurated />} />
           <Route path="/how-to-golokol" element={<HowToGoLokol />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
