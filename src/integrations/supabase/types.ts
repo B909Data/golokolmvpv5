@@ -700,7 +700,11 @@ export type Database = {
           contact_email: string
           created_at: string
           id: string
+          instagram_handle: string | null
           notes: string | null
+          payment_status: string | null
+          phone: string | null
+          promo_code: string | null
           song_title: string
           spotify_url: string
           status: string
@@ -713,7 +717,11 @@ export type Database = {
           contact_email: string
           created_at?: string
           id?: string
+          instagram_handle?: string | null
           notes?: string | null
+          payment_status?: string | null
+          phone?: string | null
+          promo_code?: string | null
           song_title: string
           spotify_url: string
           status?: string
@@ -726,7 +734,11 @@ export type Database = {
           contact_email?: string
           created_at?: string
           id?: string
+          instagram_handle?: string | null
           notes?: string | null
+          payment_status?: string | null
+          phone?: string | null
+          promo_code?: string | null
           song_title?: string
           spotify_url?: string
           status?: string
