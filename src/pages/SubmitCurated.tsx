@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Music, User, FileAudio, Phone, Instagram, Upload, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,14 +12,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link as LinkIcon } from "lucide-react";
 
-type Step = "gate" | "form";
+const REDIRECT_URL = "https://golokol.app/songs/submit-curated?step=form";
+const LS_CODE_KEY = "lls_curated_code";
+const LS_EMAIL_KEY = "lls_curated_email";
+
+type Step = "gate" | "form" | "expired";
 
 const SubmitCurated = () => {
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState<Step>("gate");
   const [gateEmail, setGateEmail] = useState("");
   const [gateCode, setGateCode] = useState("");
   const [isCheckingCode, setIsCheckingCode] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [isResending, setIsResending] = useState(false);
 
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,20 +42,57 @@ const SubmitCurated = () => {
     notes: "",
   });
 
-  // On mount / auth change, check if user just logged in with a pending code
+  // Detect OTP expired errors and handle step=form on mount
   useEffect(() => {
-    const checkSession = async () => {
+    // Check URL params and hash for OTP expired / access_denied
+    const errorCode = searchParams.get("error_code");
+    const error = searchParams.get("error");
+    const hashParams = new URLSearchParams(window.location.hash.replace("#", "?"));
+    const hashErrorCode = hashParams.get("error_code");
+    const hashError = hashParams.get("error");
+
+    if (
+      errorCode === "otp_expired" || error === "access_denied" ||
+      hashErrorCode === "otp_expired" || hashError === "access_denied"
+    ) {
+      const storedEmail = localStorage.getItem(LS_EMAIL_KEY) || "";
+      setResendEmail(storedEmail);
+      setStep("expired");
+      return;
+    }
+
+    const urlStep = searchParams.get("step");
+
+    const initFlow = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      const pendingCode = sessionStorage.getItem("curated_code");
-      if (session && pendingCode) {
-        await redeemCode(pendingCode);
+
+      if (urlStep === "form" && session) {
+        // Arrived back from magic link with active session
+        const pendingCode = localStorage.getItem(LS_CODE_KEY);
+        if (pendingCode) {
+          await redeemCode(pendingCode);
+        } else {
+          // Code already redeemed or missing — show form with session email
+          setFormData((prev) => ({ ...prev, contact_email: session.user.email || "" }));
+          setStep("form");
+        }
+        return;
+      }
+
+      if (session) {
+        const pendingCode = localStorage.getItem(LS_CODE_KEY);
+        if (pendingCode) {
+          await redeemCode(pendingCode);
+        }
       }
     };
-    checkSession();
 
+    initFlow();
+
+    // Listen for SIGNED_IN in case session arrives after mount (e.g. magic link token exchange)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
-        const pendingCode = sessionStorage.getItem("curated_code");
+        const pendingCode = localStorage.getItem(LS_CODE_KEY);
         if (pendingCode) {
           await redeemCode(pendingCode);
         }
@@ -71,19 +115,19 @@ const SubmitCurated = () => {
 
       if (!data.success) {
         toast.error(data.error || "Failed to redeem code.");
-        sessionStorage.removeItem("curated_code");
+        localStorage.removeItem(LS_CODE_KEY);
         setStep("gate");
         return;
       }
 
-      sessionStorage.removeItem("curated_code");
+      localStorage.removeItem(LS_CODE_KEY);
       setFormData((prev) => ({ ...prev, contact_email: data.email }));
       setStep("form");
       toast.success("Code redeemed! You can now submit your song.");
     } catch (err) {
       console.error("Code redemption error:", err);
       toast.error("Failed to redeem code. Please try again.");
-      sessionStorage.removeItem("curated_code");
+      localStorage.removeItem(LS_CODE_KEY);
       setStep("gate");
     }
   };
@@ -98,7 +142,6 @@ const SubmitCurated = () => {
     setIsCheckingCode(true);
 
     try {
-      // Validate code server-side
       const { data, error } = await supabase.functions.invoke("validate-curated-code", {
         body: { code: gateCode },
       });
@@ -111,13 +154,13 @@ const SubmitCurated = () => {
         return;
       }
 
-      // Store code for post-login redemption
-      sessionStorage.setItem("curated_code", gateCode.toUpperCase().trim());
+      // Persist code + email in localStorage so they survive the redirect
+      localStorage.setItem(LS_CODE_KEY, gateCode.toUpperCase().trim());
+      localStorage.setItem(LS_EMAIL_KEY, gateEmail);
 
-      // Send magic link
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: gateEmail,
-        options: { emailRedirectTo: window.location.href },
+        options: { emailRedirectTo: REDIRECT_URL },
       });
 
       if (authError) throw authError;
@@ -129,6 +172,28 @@ const SubmitCurated = () => {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsCheckingCode(false);
+    }
+  };
+
+  const handleResendLink = async () => {
+    if (!resendEmail) {
+      toast.error("Please enter your email.");
+      return;
+    }
+    setIsResending(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: resendEmail,
+        options: { emailRedirectTo: REDIRECT_URL },
+      });
+      if (error) throw error;
+      setMagicLinkSent(true);
+      toast.success("New link sent! Check your email.");
+    } catch (err) {
+      console.error("Resend error:", err);
+      toast.error("Failed to resend. Please try again.");
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -208,6 +273,63 @@ const SubmitCurated = () => {
     }
   };
 
+  // ─── Expired Link Screen ───
+  if (step === "expired") {
+    return (
+      <div className="min-h-screen flex flex-col bg-[hsl(60,10%,95%)]">
+        <Navbar />
+        <main className="flex-1 pt-24 pb-20">
+          <div className="container mx-auto px-4">
+            <Link to="/songs" className="inline-flex items-center gap-2 text-[hsl(0,0%,40%)] hover:text-[hsl(0,0%,10%)] transition-colors mb-8">
+              <ArrowLeft className="h-4 w-4" /> Back to Listening Sessions
+            </Link>
+            <div className="max-w-md mx-auto">
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[hsl(0,0%,85%)] mb-6">
+                  <Lock className="h-8 w-8 text-[hsl(0,0%,10%)]" />
+                </div>
+                <h1 className="font-display text-3xl md:text-4xl text-[hsl(0,0%,10%)] mb-4">
+                  Link Expired
+                </h1>
+                <p className="text-[hsl(0,0%,40%)] text-lg">This link expired. Enter your email to resend a fresh link.</p>
+              </div>
+
+              {magicLinkSent ? (
+                <div className="rounded-xl border border-[hsl(0,0%,80%)] p-8 bg-white text-center">
+                  <h3 className="text-[hsl(0,0%,10%)] mb-3">Check your email</h3>
+                  <p className="text-[hsl(0,0%,40%)] type-body-md">
+                    We sent a new link to <strong className="text-[hsl(0,0%,10%)]">{resendEmail}</strong>. Click the link in your email to continue.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="rounded-xl border border-[hsl(0,0%,80%)] p-6 bg-white space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="resend_email" className="text-[hsl(0,0%,10%)]">Email *</Label>
+                      <Input
+                        id="resend_email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={resendEmail}
+                        onChange={(e) => setResendEmail(e.target.value)}
+                        className="bg-[hsl(60,10%,95%)] border-[hsl(0,0%,80%)] text-[hsl(0,0%,10%)]"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button onClick={handleResendLink} size="lg" disabled={isResending} className="w-full">
+                    {isResending ? "Sending..." : "Resend Link"}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   // ─── Gate Screen ───
   if (step === "gate") {
     return (
@@ -224,7 +346,7 @@ const SubmitCurated = () => {
                   <Lock className="h-8 w-8 text-[hsl(0,0%,10%)]" />
                 </div>
                 <h1 className="font-display text-4xl md:text-5xl text-[hsl(0,0%,10%)] mb-4">
-                  CURATED <span className="text-[hsl(0,0%,30%)]">SUBMISSION</span>
+                  LOKOL LISTENING SESSIONS <span className="text-[hsl(0,0%,30%)]">INVITATION</span>
                 </h1>
                 <p className="text-[hsl(0,0%,40%)] text-lg">Enter your invite code and email to get started.</p>
               </div>
@@ -276,7 +398,7 @@ const SubmitCurated = () => {
                 <Music className="h-8 w-8 text-[hsl(0,0%,10%)]" />
               </div>
               <h1 className="font-display text-5xl md:text-6xl text-[hsl(0,0%,10%)] mb-4">
-                CURATED <span className="text-[hsl(0,0%,30%)]">SUBMISSION</span>
+                LOKOL LISTENING SESSIONS <span className="text-[hsl(0,0%,30%)]">SUBMISSION</span>
               </h1>
               <p className="text-[hsl(0,0%,40%)] text-lg">Submit your music for the next Lokol Listening Sessions event. One Artist, One Song.</p>
             </div>
