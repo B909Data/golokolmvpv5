@@ -728,6 +728,7 @@ export type Database = {
           created_at: string
           id: string
           instagram_handle: string | null
+          mp3_url: string | null
           notes: string | null
           payment_status: string | null
           phone: string | null
@@ -745,6 +746,7 @@ export type Database = {
           created_at?: string
           id?: string
           instagram_handle?: string | null
+          mp3_url?: string | null
           notes?: string | null
           payment_status?: string | null
           phone?: string | null
@@ -762,6 +764,7 @@ export type Database = {
           created_at?: string
           id?: string
           instagram_handle?: string | null
+          mp3_url?: string | null
           notes?: string | null
           payment_status?: string | null
           phone?: string | null
