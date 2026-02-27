@@ -30,9 +30,11 @@ const AdminCuratedCodes = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke(
-        `admin-curated-codes?key=${key}`
+        `admin-curated-codes?key=${key}`,
+        { body: { action: "list" } }
       );
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       setCodes(data?.codes || []);
     } catch (err) {
       console.error("Fetch error:", err);
