@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // GET = list codes
+    // GET or POST with action "list" = list codes
     if (req.method === "GET") {
       const { data, error } = await supabaseAdmin
         .from("lls_curated_codes")
@@ -43,10 +43,24 @@ Deno.serve(async (req) => {
       );
     }
 
-    // POST = generate or delete
+    // POST = list, generate, or delete
     if (req.method === "POST") {
       const body = await req.json();
       const action = body.action;
+
+      if (action === "list") {
+        const { data, error } = await supabaseAdmin
+          .from("lls_curated_codes")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        return new Response(
+          JSON.stringify({ codes: data }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
       if (action === "generate") {
         const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
