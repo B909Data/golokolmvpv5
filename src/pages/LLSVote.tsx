@@ -189,24 +189,6 @@ const LLSVote = () => {
                     )}
                   />
 
-                  {/* Notify Checkbox */}
-                  <FormField
-                    control={form.control}
-                    name="notify"
-                    render={({ field }) => (
-                      <FormItem className="flex items-start space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <Label className="text-muted-foreground type-body-sm cursor-pointer leading-snug">
-                          Do you want us to notify you with the results and when the compilation CD and digital download will be available.
-                        </Label>
-                      </FormItem>
-                    )}
-                  />
 
                   {submitError && (
                     <p className="text-destructive type-body-sm">{submitError}</p>
