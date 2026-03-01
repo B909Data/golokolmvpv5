@@ -806,6 +806,13 @@ export type Database = {
       }
     }
     Views: {
+      lls_vote_counts: {
+        Row: {
+          artist_choice: string | null
+          total_votes: number | null
+        }
+        Relationships: []
+      }
       paid_events: {
         Row: {
           admin_state: string | null
