@@ -35,8 +35,9 @@ const AdminLLSVotes = () => {
   const fetchVotes = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from("lls_votes" as any)
-      .select("artist_choice");
+      .from("lls_vote_counts")
+      .select("artist_choice, total_votes")
+      .order("total_votes", { ascending: false });
 
     if (error) {
       console.error("Error fetching votes:", error);
@@ -44,15 +45,10 @@ const AdminLLSVotes = () => {
       return;
     }
 
-    // Tally votes client-side since we can't do GROUP BY via SDK
-    const tally: Record<string, number> = {};
-    (data as any[])?.forEach((row: any) => {
-      tally[row.artist_choice] = (tally[row.artist_choice] || 0) + 1;
-    });
-
-    const sorted = Object.entries(tally)
-      .map(([artist_choice, vote_count]) => ({ artist_choice, vote_count }))
-      .sort((a, b) => b.vote_count - a.vote_count);
+    const sorted = (data ?? []).map((row) => ({
+      artist_choice: row.artist_choice ?? "",
+      vote_count: Number(row.total_votes ?? 0),
+    }));
 
     setVotes(sorted);
     setTotalVotes(sorted.reduce((sum, v) => sum + v.vote_count, 0));
