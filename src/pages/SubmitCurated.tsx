@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Music, User, FileAudio, Phone, Instagram, Upload, Lock } from "lucide-react";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -341,6 +342,17 @@ const SubmitCurated = () => {
               <ArrowLeft className="h-4 w-4" /> Back to Listening Sessions
             </Link>
             <div className="max-w-md mx-auto">
+              <div className="mb-8 rounded-lg overflow-hidden">
+                <AspectRatio ratio={16 / 9}>
+                  <iframe
+                    src="https://www.youtube.com/embed/2exJWgcJRlA"
+                    title="Lokol Listening Sessions"
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </AspectRatio>
+              </div>
               <div className="text-center mb-10">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[hsl(0,0%,85%)] mb-6">
                   <Lock className="h-8 w-8 text-[hsl(0,0%,10%)]" />
