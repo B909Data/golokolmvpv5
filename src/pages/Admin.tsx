@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from "react-router-dom";
-import { Shield, Music, Calendar, Ticket, Building2, MapPin, KeyRound } from "lucide-react";
+import { Shield, Music, Calendar, Ticket, Building2, MapPin, KeyRound, BarChart3 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -109,6 +109,19 @@ const Admin = () => {
               </div>
               <p className="text-muted-foreground text-sm">
                 Generate and manage invite codes for curated LLS submissions.
+              </p>
+            </Link>
+
+            <Link
+              to={`/admin/lls-votes?key=${key}`}
+              className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <BarChart3 className="w-6 h-6 text-primary" />
+                <h2 className="font-display text-xl text-foreground">LLS Votes</h2>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                View vote tallies for Lokol Listening Sessions by session, city, and artist.
               </p>
             </Link>
           </div>
