@@ -583,6 +583,33 @@ export type Database = {
           },
         ]
       }
+      lls_votes: {
+        Row: {
+          artist_choice: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          notify: boolean
+        }
+        Insert: {
+          artist_choice: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          notify?: boolean
+        }
+        Update: {
+          artist_choice?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          notify?: boolean
+        }
+        Relationships: []
+      }
       partners: {
         Row: {
           active: boolean
