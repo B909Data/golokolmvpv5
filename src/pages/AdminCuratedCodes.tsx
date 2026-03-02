@@ -30,8 +30,8 @@ const AdminCuratedCodes = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke(
-        `admin-curated-codes?key=${key}`,
-        { body: { action: "list" } }
+        "admin-curated-codes",
+        { body: { action: "list", key } }
       );
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -53,8 +53,8 @@ const AdminCuratedCodes = () => {
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke(
-        `admin-curated-codes?key=${key}`,
-        { body: { action: "generate" } }
+        "admin-curated-codes",
+        { body: { action: "generate", key } }
       );
       if (error) throw error;
       if (data?.code) {
@@ -73,8 +73,8 @@ const AdminCuratedCodes = () => {
     if (!key) return;
     try {
       const { error } = await supabase.functions.invoke(
-        `admin-curated-codes?key=${key}`,
-        { body: { action: "delete", id } }
+        "admin-curated-codes",
+        { body: { action: "delete", id, key } }
       );
       if (error) throw error;
       setCodes((prev) => prev.filter((c) => c.id !== id));
