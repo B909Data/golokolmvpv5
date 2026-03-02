@@ -235,8 +235,17 @@ const SubmitCurated = () => {
 
     setIsSubmitting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id || "anonymous";
+      // Try refreshing the session first, then check
+      const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+      const session = refreshedSession ?? (await supabase.auth.getSession()).data.session;
+
+      if (!session) {
+        toast.error("Your session has expired. Please refresh the page and sign in again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const userId = session.user.id;
       const safeName = `${Date.now()}.mp3`;
       const objectPath = `curated/${userId}/${safeName}`;
 
