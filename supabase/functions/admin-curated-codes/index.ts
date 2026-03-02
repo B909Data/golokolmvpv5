@@ -12,24 +12,24 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const url = new URL(req.url);
-    const key = url.searchParams.get("key");
     const adminKey = Deno.env.get("ADMIN_KEY");
-
-    if (!key || key !== adminKey) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    const url = new URL(req.url);
+    let key = url.searchParams.get("key");
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // GET or POST with action "list" = list codes
+    // GET: key from query string
     if (req.method === "GET") {
+      if (!key || key !== adminKey) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       const { data, error } = await supabaseAdmin
         .from("lls_curated_codes")
         .select("*")
@@ -43,10 +43,21 @@ Deno.serve(async (req) => {
       );
     }
 
-    // POST = list, generate, or delete
+    // POST: key from query string OR body
     if (req.method === "POST") {
       const body = await req.json();
       const action = body.action;
+
+      if (!key && body.key) {
+        key = body.key;
+      }
+
+      if (!key || key !== adminKey) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
       if (action === "list") {
         const { data, error } = await supabaseAdmin
