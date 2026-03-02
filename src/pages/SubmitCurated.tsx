@@ -235,15 +235,24 @@ const SubmitCurated = () => {
 
     setIsSubmitting(true);
     try {
-      const fileName = `${Date.now()}-${formData.artist_name.replace(/\s+/g, "_")}.mp3`;
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id || "anonymous";
+      const safeName = `${Date.now()}.mp3`;
+      const objectPath = `curated/${userId}/${safeName}`;
+
       const { error: uploadError } = await supabase.storage
         .from("submissions_audio")
-        .upload(fileName, mp3File, { contentType: "audio/mpeg" });
-      if (uploadError) throw uploadError;
+        .upload(objectPath, mp3File, { contentType: "audio/mpeg" });
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        toast.error(`Upload failed: ${uploadError.message}`);
+        setIsSubmitting(false);
+        return;
+      }
 
       const { data: urlData } = supabase.storage
         .from("submissions_audio")
-        .getPublicUrl(fileName);
+        .getPublicUrl(objectPath);
 
       const { error: insertError } = await supabase
         .from("submissions")
@@ -260,15 +269,20 @@ const SubmitCurated = () => {
           status: "Unreviewed",
           payment_status: "curated",
         });
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error("DB insert error:", insertError);
+        toast.error(`Submission failed: ${insertError.message}`);
+        setIsSubmitting(false);
+        return;
+      }
 
       toast.success("Song submitted successfully!");
       setFormData({ artist_name: "", contact_email: "", phone: "", instagram_handle: "", song_title: "", youtube_url: "", notes: "" });
       setMp3File(null);
       setMusicReleaseAgreed(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Submission error:", err);
-      toast.error("Failed to submit. Please try again.");
+      toast.error(err?.message || "Failed to submit. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
