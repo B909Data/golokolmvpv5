@@ -47,7 +47,7 @@ const GivenToInput = ({ code, adminKey }: { code: CuratedCode; adminKey: string 
       onChange={(e) => setValue(e.target.value)}
       onBlur={save}
       onKeyDown={(e) => e.key === "Enter" && (e.currentTarget.blur())}
-      placeholder="—"
+      placeholder="Artist name"
       disabled={saving}
       className="w-full bg-transparent border-b border-transparent hover:border-border/50 focus:border-primary focus:outline-none text-foreground placeholder:text-muted-foreground py-1 text-sm transition-colors"
     />
