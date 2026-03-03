@@ -95,6 +95,28 @@ Deno.serve(async (req) => {
         );
       }
 
+      if (action === "update_given_to") {
+        const { id, given_to } = body;
+        if (!id) {
+          return new Response(
+            JSON.stringify({ error: "ID required" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const { error } = await supabaseAdmin
+          .from("lls_curated_codes")
+          .update({ given_to: given_to || null })
+          .eq("id", id);
+
+        if (error) throw error;
+
+        return new Response(
+          JSON.stringify({ success: true }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       if (action === "delete") {
         const { id } = body;
         if (!id) {
