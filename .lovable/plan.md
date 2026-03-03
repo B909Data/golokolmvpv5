@@ -1,41 +1,25 @@
 
 
-# Fix: MP3 Upload Failures on Curated Submission
+# Add "Given To" Column to Curated Codes Admin
 
-## Root Cause
-
-The storage bucket `submissions_audio` has an RLS INSERT policy that requires **authenticated** users. If a user's magic-link session expires or isn't refreshed before they click "Submit," the upload (or the subsequent DB insert) fails silently. Some users are retrying multiple times (3 duplicate uploads seen), suggesting the upload succeeds but the DB insert fails -- or the session drops mid-flow.
+## Overview
+Add a `given_to` text column to the `lls_curated_codes` table and an inline editable input field in each row of the admin curated codes page. Typing a name and pressing Enter (or blurring) saves it immediately.
 
 ## Changes
 
-### 1. Add session guard before submission
-
-In `src/pages/SubmitCurated.tsx`, before attempting the upload:
-- Check `session` is non-null. If null, show a clear error: "Your session has expired. Please refresh and sign in again."
-- Do NOT fall back to `"anonymous"` -- fail explicitly instead.
-
-### 2. Add bucket-level constraints (database migration)
-
-Set `file_size_limit` and `allowed_mime_types` on the `submissions_audio` bucket for server-side enforcement:
-
+### 1. Database migration
+Add a nullable `given_to` text column to `lls_curated_codes`:
 ```sql
-UPDATE storage.buckets
-SET file_size_limit = 20971520,          -- 20 MB
-    allowed_mime_types = '{"audio/mpeg"}'
-WHERE id = 'submissions_audio';
+ALTER TABLE public.lls_curated_codes ADD COLUMN given_to text;
 ```
 
-### 3. Improve error UX for expired sessions
+### 2. Edge function update (`supabase/functions/admin-curated-codes/index.ts`)
+Add a new `update_given_to` action that accepts `{ id, given_to }` and updates the row.
 
-If the session check fails at submit time, show a toast with a "Refresh" action or automatically attempt `supabase.auth.refreshSession()` before giving up.
-
-## Technical Details
-
-**Files modified:**
-- `src/pages/SubmitCurated.tsx` -- session guard + refresh attempt in `handleSubmit`
-
-**Database migration:**
-- Update `submissions_audio` bucket with size/type limits
-
-**No new edge functions needed.** The existing upload flow is correct; it just needs a session validity check before proceeding.
+### 3. Frontend update (`src/pages/AdminCuratedCodes.tsx`)
+- Add `given_to` to the `CuratedCode` interface
+- Add a "Given To" column header between "Code" and "Status"
+- Render an `<input>` in each row pre-filled with the current `given_to` value
+- On blur or Enter keypress, call the edge function with `action: "update_given_to"` to persist
+- Show a brief toast on save
 
