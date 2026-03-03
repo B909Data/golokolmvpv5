@@ -1,0 +1,1 @@
+ALTER TABLE public.lls_curated_codes ADD COLUMN given_to text;

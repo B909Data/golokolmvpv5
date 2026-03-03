@@ -14,7 +14,45 @@ interface CuratedCode {
   used_by_email: string | null;
   used_at: string | null;
   created_at: string;
+  given_to: string | null;
 }
+
+const GivenToInput = ({ code, adminKey }: { code: CuratedCode; adminKey: string }) => {
+  const [value, setValue] = useState(code.given_to || "");
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    const trimmed = value.trim();
+    if (trimmed === (code.given_to || "")) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase.functions.invoke("admin-curated-codes", {
+        body: { action: "update_given_to", id: code.id, given_to: trimmed, key: adminKey },
+      });
+      if (error) throw error;
+      code.given_to = trimmed || null;
+      toast.success("Saved");
+    } catch {
+      toast.error("Failed to save");
+      setValue(code.given_to || "");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={save}
+      onKeyDown={(e) => e.key === "Enter" && (e.currentTarget.blur())}
+      placeholder="—"
+      disabled={saving}
+      className="w-full bg-transparent border-b border-transparent hover:border-border/50 focus:border-primary focus:outline-none text-foreground placeholder:text-muted-foreground py-1 text-sm transition-colors"
+    />
+  );
+};
 
 const AdminCuratedCodes = () => {
   const [searchParams] = useSearchParams();
@@ -147,6 +185,7 @@ const AdminCuratedCodes = () => {
                 <thead className="bg-card/50 border-b border-border/50">
                   <tr>
                     <th className="px-4 py-3 text-left text-muted-foreground font-medium">Code</th>
+                    <th className="px-4 py-3 text-left text-muted-foreground font-medium">Given To</th>
                     <th className="px-4 py-3 text-left text-muted-foreground font-medium">Status</th>
                     <th className="px-4 py-3 text-left text-muted-foreground font-medium">Used By</th>
                     <th className="px-4 py-3 text-left text-muted-foreground font-medium">Used At</th>
@@ -158,6 +197,9 @@ const AdminCuratedCodes = () => {
                   {codes.map((c) => (
                     <tr key={c.id} className="border-b border-border/30 hover:bg-card/30 transition-colors">
                       <td className="px-4 py-3 font-mono text-foreground">{c.code}</td>
+                      <td className="px-4 py-3 min-w-[140px]">
+                        <GivenToInput code={c} adminKey={key} />
+                      </td>
                       <td className="px-4 py-3">
                         <span
                           className={`inline-block px-2 py-1 rounded text-xs font-medium ${

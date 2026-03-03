@@ -442,6 +442,7 @@ export type Database = {
         Row: {
           code: string
           created_at: string
+          given_to: string | null
           id: string
           is_used: boolean
           used_at: string | null
@@ -450,6 +451,7 @@ export type Database = {
         Insert: {
           code: string
           created_at?: string
+          given_to?: string | null
           id?: string
           is_used?: boolean
           used_at?: string | null
@@ -458,6 +460,7 @@ export type Database = {
         Update: {
           code?: string
           created_at?: string
+          given_to?: string | null
           id?: string
           is_used?: boolean
           used_at?: string | null
