@@ -26,6 +26,10 @@ interface Submission {
   notes: string | null;
   status: string;
   admin_notes: string | null;
+  mp3_url: string | null;
+  mp3_path: string | null;
+  original_filename: string | null;
+  payment_status: string | null;
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
@@ -165,6 +169,8 @@ const AdminLLS = () => {
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">Date</th>
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">Artist</th>
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">Song</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-medium">Type</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-medium">MP3</th>
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">Status</th>
                       </tr>
                     </thead>
@@ -182,6 +188,18 @@ const AdminLLS = () => {
                           </td>
                           <td className="px-4 py-3 text-foreground">{sub.artist_name}</td>
                           <td className="px-4 py-3 text-foreground">{sub.song_title}</td>
+                          <td className="px-4 py-3 text-foreground text-xs">
+                            {sub.payment_status === "curated" ? "Curated" : "Paid"}
+                          </td>
+                          <td className="px-4 py-3">
+                            {sub.mp3_url ? (
+                              <a href={sub.mp3_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">
+                                {sub.original_filename || "Download"}
+                              </a>
+                            ) : (
+                              <span className="text-muted-foreground text-xs">—</span>
+                            )}
+                          </td>
                           <td className="px-4 py-3">
                             <span
                               className={`inline-block px-2 py-1 rounded text-xs font-medium ${
@@ -227,15 +245,28 @@ const AdminLLS = () => {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <a
-                      href={selectedSubmission.spotify_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Spotify
-                    </a>
+                    {selectedSubmission.mp3_url && (
+                      <a
+                        href={selectedSubmission.mp3_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        🎵 {selectedSubmission.original_filename || "MP3 Download"}
+                      </a>
+                    )}
+                    {selectedSubmission.spotify_url && selectedSubmission.spotify_url !== "curated-submission" && (
+                      <a
+                        href={selectedSubmission.spotify_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Spotify
+                      </a>
+                    )}
                     {selectedSubmission.youtube_url && (
                       <a
                         href={selectedSubmission.youtube_url}
