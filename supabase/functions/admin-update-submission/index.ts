@@ -37,6 +37,9 @@ serve(async (req) => {
     const updateData: Record<string, string> = {};
     if (status !== undefined) updateData.status = status;
     if (admin_notes !== undefined) updateData.admin_notes = admin_notes;
+    if (body.mp3_url !== undefined) updateData.mp3_url = body.mp3_url;
+    if (body.mp3_path !== undefined) updateData.mp3_path = body.mp3_path;
+    if (body.original_filename !== undefined) updateData.original_filename = body.original_filename;
 
     const { error } = await supabase
       .from("submissions")

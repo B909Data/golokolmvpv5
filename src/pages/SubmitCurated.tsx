@@ -245,13 +245,28 @@ const SubmitCurated = () => {
         return;
       }
 
-      const userId = session.user.id;
-      const safeName = `${Date.now()}.mp3`;
-      const objectPath = `curated/${userId}/${safeName}`;
+      // Generate a UUID client-side for the submission so we can use it in the storage path
+      const submissionId = crypto.randomUUID();
 
+      // Sanitize filename
+      const sanitizedName = mp3File.name
+        .toLowerCase()
+        .replace(/\.mp3$/i, "")
+        .replace(/[^a-z0-9\-]/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "")
+        + ".mp3";
+
+      const objectPath = `lls_curated/${submissionId}/${sanitizedName}`;
+
+      // 1. Upload the file first
       const { error: uploadError } = await supabase.storage
         .from("submissions_audio")
-        .upload(objectPath, mp3File, { contentType: "audio/mpeg" });
+        .upload(objectPath, mp3File, {
+          contentType: "audio/mpeg",
+          upsert: true,
+        });
+
       if (uploadError) {
         console.error("Storage upload error:", uploadError);
         toast.error(`Upload failed: ${uploadError.message}`);
@@ -259,13 +274,16 @@ const SubmitCurated = () => {
         return;
       }
 
+      // 2. Get public URL
       const { data: urlData } = supabase.storage
         .from("submissions_audio")
         .getPublicUrl(objectPath);
 
+      // 3. Insert submission row with all fields at once
       const { error: insertError } = await supabase
         .from("submissions")
         .insert({
+          id: submissionId,
           artist_name: formData.artist_name,
           contact_email: formData.contact_email,
           phone: formData.phone,
@@ -275,11 +293,16 @@ const SubmitCurated = () => {
           youtube_url: formData.youtube_url || null,
           notes: formData.notes || null,
           mp3_url: urlData.publicUrl,
+          mp3_path: objectPath,
+          original_filename: mp3File.name,
           status: "Unreviewed",
           payment_status: "curated",
         });
+
       if (insertError) {
         console.error("DB insert error:", insertError);
+        // Try to clean up the uploaded file
+        await supabase.storage.from("submissions_audio").remove([objectPath]).catch(() => {});
         toast.error(`Submission failed: ${insertError.message}`);
         setIsSubmitting(false);
         return;
