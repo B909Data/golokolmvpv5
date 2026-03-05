@@ -760,6 +760,8 @@ export type Database = {
           instagram_handle: string | null
           mp3_path: string | null
           mp3_url: string | null
+          music_release_agreed: boolean
+          music_release_agreed_at: string | null
           notes: string | null
           original_filename: string | null
           payment_status: string | null
@@ -780,6 +782,8 @@ export type Database = {
           instagram_handle?: string | null
           mp3_path?: string | null
           mp3_url?: string | null
+          music_release_agreed?: boolean
+          music_release_agreed_at?: string | null
           notes?: string | null
           original_filename?: string | null
           payment_status?: string | null
@@ -800,6 +804,8 @@ export type Database = {
           instagram_handle?: string | null
           mp3_path?: string | null
           mp3_url?: string | null
+          music_release_agreed?: boolean
+          music_release_agreed_at?: string | null
           notes?: string | null
           original_filename?: string | null
           payment_status?: string | null

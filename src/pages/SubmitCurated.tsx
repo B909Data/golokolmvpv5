@@ -297,6 +297,8 @@ const SubmitCurated = () => {
           original_filename: mp3File.name,
           status: "Unreviewed",
           payment_status: "curated",
+          music_release_agreed: true,
+          music_release_agreed_at: new Date().toISOString(),
         });
 
       if (insertError) {

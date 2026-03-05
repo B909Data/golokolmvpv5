@@ -55,6 +55,8 @@ serve(async (req) => {
 
     const metadata = session.metadata || {};
 
+    const musicReleaseAgreed = metadata.music_release_agreed === "true";
+
     const { error: insertError } = await supabase.from("submissions").insert({
       artist_name: metadata.artist_name,
       contact_email: metadata.contact_email,
@@ -63,6 +65,8 @@ serve(async (req) => {
       youtube_url: metadata.youtube_url || null,
       notes: metadata.notes || null,
       stripe_session_id: session_id,
+      music_release_agreed: musicReleaseAgreed,
+      music_release_agreed_at: musicReleaseAgreed ? new Date().toISOString() : null,
     });
 
     if (insertError) {

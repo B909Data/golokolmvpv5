@@ -30,6 +30,8 @@ interface Submission {
   mp3_path: string | null;
   original_filename: string | null;
   payment_status: string | null;
+  music_release_agreed: boolean;
+  music_release_agreed_at: string | null;
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
@@ -241,6 +243,18 @@ const AdminLLS = () => {
                     <p className="text-muted-foreground">
                       <span className="text-foreground">Submitted:</span>{" "}
                       {new Date(selectedSubmission.created_at).toLocaleString()}
+                    </p>
+                    <p className="text-muted-foreground">
+                      <span className="text-foreground">Release Agreement:</span>{" "}
+                      {selectedSubmission.music_release_agreed ? (
+                        <span className="text-green-600 font-medium">
+                          ✅ Signed{selectedSubmission.music_release_agreed_at
+                            ? ` on ${new Date(selectedSubmission.music_release_agreed_at).toLocaleString()}`
+                            : ""}
+                        </span>
+                      ) : (
+                        <span className="text-red-500 font-medium">❌ Not signed</span>
+                      )}
                     </p>
                   </div>
 

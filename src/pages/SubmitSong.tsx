@@ -46,7 +46,7 @@ const SubmitSong = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("create-lls-checkout", {
-        body: formData,
+        body: { ...formData, music_release_agreed: true },
       });
 
       if (error) throw error;
