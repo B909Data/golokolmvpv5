@@ -1,25 +1,38 @@
 
 
-# Add "Given To" Column to Curated Codes Admin
+# Store Music Release Agreement Consent in Database
 
-## Overview
-Add a `given_to` text column to the `lls_curated_codes` table and an inline editable input field in each row of the admin curated codes page. Typing a name and pressing Enter (or blurring) saves it immediately.
+## Problem
+Both submission forms (paid and curated) require artists to check the Music Release Agreement box, but this consent is only enforced client-side. No proof of agreement is persisted in the database.
 
-## Changes
+## Solution
+Add two columns to the `submissions` table and populate them from both submission flows.
 
-### 1. Database migration
-Add a nullable `given_to` text column to `lls_curated_codes`:
-```sql
-ALTER TABLE public.lls_curated_codes ADD COLUMN given_to text;
+### 1. Database Migration
+Add to `public.submissions`:
+- `music_release_agreed` (boolean, NOT NULL, DEFAULT false) — whether they checked the box
+- `music_release_agreed_at` (timestamptz, nullable) — timestamp of when they agreed
+
+### 2. Curated Flow (`SubmitCurated.tsx`)
+Add to the insert payload:
+```ts
+music_release_agreed: true,
+music_release_agreed_at: new Date().toISOString(),
 ```
+(This code only runs after the `musicReleaseAgreed` check passes.)
 
-### 2. Edge function update (`supabase/functions/admin-curated-codes/index.ts`)
-Add a new `update_given_to` action that accepts `{ id, given_to }` and updates the row.
+### 3. Paid Flow (`create-lls-checkout` + `verify-lls-payment`)
+- Pass `music_release_agreed: true` in the Stripe checkout metadata from `SubmitSong.tsx`
+- In `verify-lls-payment`, read that metadata and store both fields when inserting the submission row
 
-### 3. Frontend update (`src/pages/AdminCuratedCodes.tsx`)
-- Add `given_to` to the `CuratedCode` interface
-- Add a "Given To" column header between "Code" and "Status"
-- Render an `<input>` in each row pre-filled with the current `given_to` value
-- On blur or Enter keypress, call the edge function with `action: "update_given_to"` to persist
-- Show a brief toast on save
+### 4. Admin Visibility (`AdminLLS.tsx`)
+Add a column or indicator in the detail panel showing whether the artist agreed and when.
+
+### Files Changed
+- **Migration**: Add `music_release_agreed` + `music_release_agreed_at` columns
+- **`src/pages/SubmitCurated.tsx`**: Include both fields in insert
+- **`src/pages/SubmitSong.tsx`**: Pass agreement flag in checkout body
+- **`supabase/functions/create-lls-checkout/index.ts`**: Store flag in Stripe metadata
+- **`supabase/functions/verify-lls-payment/index.ts`**: Read metadata, insert fields
+- **`src/pages/AdminLLS.tsx`**: Display agreement status in detail panel
 
