@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Music, User, Link as LinkIcon, FileAudio, Phone, Instagram, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 
 const SubmitSong = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [musicReleaseAgreed, setMusicReleaseAgreed] = useState(false);
   const [formData, setFormData] = useState({
     artist_name: "",
@@ -42,6 +43,8 @@ const SubmitSong = () => {
       return;
     }
 
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setIsSubmitting(true);
 
     try {
@@ -68,6 +71,7 @@ const SubmitSong = () => {
       console.error("Checkout error:", err);
       toast.error("Failed to start checkout. Please try again.");
     } finally {
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   };
