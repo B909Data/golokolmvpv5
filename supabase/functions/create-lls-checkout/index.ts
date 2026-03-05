@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { artist_name, contact_email, song_title, spotify_url, youtube_url, notes } = await req.json();
+    const { artist_name, contact_email, song_title, spotify_url, youtube_url, notes, music_release_agreed } = await req.json();
 
     if (!artist_name || !contact_email || !song_title || !spotify_url) {
       throw new Error("Missing required fields");
@@ -43,6 +43,7 @@ serve(async (req) => {
         spotify_url,
         youtube_url: youtube_url || "",
         notes: notes || "",
+        music_release_agreed: music_release_agreed ? "true" : "false",
       },
     });
 
