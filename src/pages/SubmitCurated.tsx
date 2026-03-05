@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Music, User, FileAudio, Phone, Instagram, Upload, Lock } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -31,6 +31,7 @@ const SubmitCurated = () => {
 
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [musicReleaseAgreed, setMusicReleaseAgreed] = useState(false);
   const [mp3File, setMp3File] = useState<File | null>(null);
   const [formData, setFormData] = useState({
@@ -233,6 +234,8 @@ const SubmitCurated = () => {
       return;
     }
 
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setIsSubmitting(true);
     try {
       // Try refreshing the session first, then check
@@ -241,6 +244,7 @@ const SubmitCurated = () => {
 
       if (!session) {
         toast.error("Your session has expired. Please refresh the page and sign in again.");
+        submittingRef.current = false;
         setIsSubmitting(false);
         return;
       }
@@ -270,6 +274,7 @@ const SubmitCurated = () => {
       if (uploadError) {
         console.error("Storage upload error:", uploadError);
         toast.error(`Upload failed: ${uploadError.message}`);
+        submittingRef.current = false;
         setIsSubmitting(false);
         return;
       }
@@ -306,6 +311,7 @@ const SubmitCurated = () => {
         // Try to clean up the uploaded file
         await supabase.storage.from("submissions_audio").remove([objectPath]).catch(() => {});
         toast.error(`Submission failed: ${insertError.message}`);
+        submittingRef.current = false;
         setIsSubmitting(false);
         return;
       }
@@ -318,6 +324,7 @@ const SubmitCurated = () => {
       console.error("Submission error:", err);
       toast.error(err?.message || "Failed to submit. Please try again.");
     } finally {
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   };
