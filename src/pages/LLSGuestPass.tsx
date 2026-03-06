@@ -17,15 +17,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Download } from "lucide-react";
 
 const ARTISTS = [
-  "Sque3eze",
-  "Kantii",
-  "Alyx Ransom",
-  "Kavier Sundays",
-  "E-Coolin",
-  "Charlie Global",
-  "Big Prise",
-  "Mvsua",
-  "Trayonpass",
+  "Beef and Broccoli",
+  "Bluntana",
+  "Dude Dynamik",
+  "Fenix+Flo",
+  "Izan Da Man",
+  "Steven the Human",
+  "TD4Y",
+  "T.R.3.",
 ];
 
 const LLSGuestPass = () => {
@@ -187,9 +186,15 @@ const LLSGuestPass = () => {
             </div>
           ) : (
             <>
-              <h1 className="font-display text-2xl text-foreground text-center mb-6">
-                Get Your Lokol Listening Session Guest Pass
+              <h1 className="font-display text-2xl text-foreground text-center mb-4">
+                RSVP for Lokol Listening Session 2
               </h1>
+
+              <ul className="text-muted-foreground text-sm space-y-1 mb-6 list-disc list-inside">
+                <li>Pick the artist you come to support</li>
+                <li>Checkbox Filming Consent</li>
+                <li>Check your email</li>
+              </ul>
 
               {/* YouTube Video */}
               <div className="aspect-video mb-8 rounded-lg overflow-hidden">
@@ -237,7 +242,7 @@ const LLSGuestPass = () => {
 
                 {/* Artist Dropdown */}
                 <div className="space-y-2">
-                  <Label className="text-foreground">Artist</Label>
+                  <Label className="text-foreground">Artist You're Supporting</Label>
                   <Select value={artistName} onValueChange={setArtistName} required>
                     <SelectTrigger className="bg-background border-2 border-muted-foreground/30 focus:border-primary">
                       <SelectValue placeholder="Select the artist you're coming for" />
