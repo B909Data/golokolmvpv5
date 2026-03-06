@@ -43,6 +43,7 @@ import LLSMusicRelease from "./pages/LLSMusicRelease";
 import SubmitCurated from "./pages/SubmitCurated";
 import AdminCuratedCodes from "./pages/AdminCuratedCodes";
 import AdminLLSVotes from "./pages/AdminLLSVotes";
+import AdminSignatures from "./pages/AdminSignatures";
 import LLSVote from "./pages/LLSVote";
 
 const queryClient = new QueryClient();
@@ -74,6 +75,7 @@ const App = () => (
           <Route path="/admin/cities" element={<AdminCities />} />
           <Route path="/admin/curated-codes" element={<AdminCuratedCodes />} />
           <Route path="/admin/lls-votes" element={<AdminLLSVotes />} />
+          <Route path="/admin/signatures" element={<AdminSignatures />} />
           
           {/* Artist Auth Routes */}
           <Route path="/artist/login" element={<ArtistLogin />} />
