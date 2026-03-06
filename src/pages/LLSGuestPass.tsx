@@ -19,6 +19,7 @@ import { Download } from "lucide-react";
 const ARTISTS = [
   "Beef and Broccoli",
   "Bluntana",
+  "Chris Harry",
   "Dude Dynamik",
   "Fenix+Flo",
   "Izan Da Man",
