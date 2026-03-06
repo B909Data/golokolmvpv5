@@ -157,6 +157,9 @@ const SubmitSong = () => {
                       placeholder="your@email.com"
                       value={formData.contact_email}
                       onChange={(e) => handleChange("contact_email", e.target.value)}
+                      onBlur={(e) => {
+                        if (e.target.value) checkMusicRelease(e.target.value);
+                      }}
                       className="bg-[hsl(60,10%,95%)] border-[hsl(0,0%,80%)] text-[hsl(0,0%,10%)]"
                       required
                     />
