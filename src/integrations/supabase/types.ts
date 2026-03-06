@@ -586,6 +586,72 @@ export type Database = {
           },
         ]
       }
+      lls_music_release_signatures: {
+        Row: {
+          agreement_text: string
+          agreement_version: string
+          artist_name: string
+          created_at: string
+          email: string
+          event_id: string | null
+          id: string
+          ip_address: string | null
+          legal_name: string
+          release_confirmed: boolean
+          role: string | null
+          signature_name: string
+          submission_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          agreement_text: string
+          agreement_version?: string
+          artist_name: string
+          created_at?: string
+          email: string
+          event_id?: string | null
+          id?: string
+          ip_address?: string | null
+          legal_name: string
+          release_confirmed?: boolean
+          role?: string | null
+          signature_name: string
+          submission_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          agreement_text?: string
+          agreement_version?: string
+          artist_name?: string
+          created_at?: string
+          email?: string
+          event_id?: string | null
+          id?: string
+          ip_address?: string | null
+          legal_name?: string
+          release_confirmed?: boolean
+          role?: string | null
+          signature_name?: string
+          submission_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lls_music_release_signatures_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lls_music_release_signatures_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "paid_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lls_votes: {
         Row: {
           artist_choice: string
