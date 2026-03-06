@@ -24,7 +24,7 @@ const LLSRelease = () => {
           <div className="space-y-6 text-muted-foreground leading-relaxed">
             <div className="space-y-1">
               <p><strong className="text-foreground">Event:</strong> Lokol Listening Sessions</p>
-              <p><strong className="text-foreground">Date:</strong> February 15, 2026</p>
+              <p><strong className="text-foreground">Date:</strong> March 15, 2026</p>
               <p><strong className="text-foreground">Location:</strong> The Handlebar</p>
               <p><strong className="text-foreground">Produced by:</strong> GoLokol ("GoLokol," "we," "us")</p>
             </div>

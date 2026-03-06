@@ -266,7 +266,7 @@ const LLSGuestPass = () => {
                     className="mt-1"
                   />
                   <Label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                    I consent to be filmed/photographed at Lokol Listening Sessions on Feb 15, 2026 at The Handlebar, and I grant GoLokol permission to use my image/likeness in event-related media.{" "}
+                    I consent to be filmed/photographed at Lokol Listening Sessions on March 15, 2026 at The Handlebar, and I grant GoLokol permission to use my image/likeness in event-related media.{" "}
                     <Link to="/lls-release" className="text-primary hover:underline">
                       (Read more)
                     </Link>
