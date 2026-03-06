@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Music, User, Link as LinkIcon, FileAudio, Phone, Instagram, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +12,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const SubmitSong = () => {
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittingRef = useRef(false);
   const [musicReleaseAgreed, setMusicReleaseAgreed] = useState(false);
+  const [releaseSignedForEmail, setReleaseSignedForEmail] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     artist_name: "",
     contact_email: "",
