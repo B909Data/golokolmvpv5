@@ -260,19 +260,42 @@ const SubmitSong = () => {
 
                   {/* Music Release Agreement */}
                   <div className="flex items-start gap-3 pt-2">
-                    <Checkbox
-                      id="music_release"
-                      checked={musicReleaseAgreed}
-                      onCheckedChange={(checked) => setMusicReleaseAgreed(checked === true)}
-                      className="mt-0.5"
-                    />
-                    <Label htmlFor="music_release" className="text-[hsl(0,0%,10%)] text-sm leading-relaxed cursor-pointer">
-                      I agree to the{" "}
-                      <Link to="/lls-music-release" target="_blank" className="underline hover:text-[hsl(0,0%,30%)]">
-                        Blanket Artist Music Release Agreement
-                      </Link>{" "}
-                      and grant GoLokol the right to use my submitted music for Lokol Listening Sessions. *
-                    </Label>
+                    {releaseSignedForEmail === formData.contact_email.trim().toLowerCase() ? (
+                      <>
+                        <Checkbox
+                          id="music_release"
+                          checked={true}
+                          disabled
+                          className="mt-0.5"
+                        />
+                        <Label htmlFor="music_release" className="text-[hsl(0,0%,10%)] text-sm leading-relaxed">
+                          ✅ Music Release Agreement signed.{" "}
+                          <Link to="/lls-music-release" target="_blank" className="underline hover:text-[hsl(0,0%,30%)]">
+                            View Agreement
+                          </Link>
+                        </Label>
+                      </>
+                    ) : (
+                      <>
+                        <Checkbox
+                          id="music_release"
+                          checked={musicReleaseAgreed}
+                          onCheckedChange={(checked) => setMusicReleaseAgreed(checked === true)}
+                          className="mt-0.5"
+                        />
+                        <Label htmlFor="music_release" className="text-[hsl(0,0%,10%)] text-sm leading-relaxed cursor-pointer">
+                          I agree to the{" "}
+                          <Link to="/lls-music-release" target="_blank" className="underline hover:text-[hsl(0,0%,30%)]">
+                            Blanket Artist Music Release Agreement
+                          </Link>
+                          . You must{" "}
+                          <Link to={`/lls-music-release?email=${encodeURIComponent(formData.contact_email)}`} className="underline font-medium hover:text-[hsl(0,0%,30%)]">
+                            sign the agreement
+                          </Link>{" "}
+                          before submitting. *
+                        </Label>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
