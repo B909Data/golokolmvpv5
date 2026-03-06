@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Music, User, Link as LinkIcon, FileAudio, Phone, Instagram, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +12,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const SubmitSong = () => {
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittingRef = useRef(false);
   const [musicReleaseAgreed, setMusicReleaseAgreed] = useState(false);
+  const [releaseSignedForEmail, setReleaseSignedForEmail] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     artist_name: "",
     contact_email: "",
@@ -30,6 +32,23 @@ const SubmitSong = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Check if the email has a signed music release agreement
+  const checkMusicRelease = async (email: string) => {
+    try {
+      const { data } = await supabase.functions.invoke("check-music-release", {
+        body: { email: email.trim().toLowerCase() },
+      });
+      if (data?.signed) {
+        setReleaseSignedForEmail(email.trim().toLowerCase());
+        setMusicReleaseAgreed(true);
+      } else {
+        setReleaseSignedForEmail(null);
+      }
+    } catch {
+      // Silently fail – user can still check the box manually
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -39,7 +58,14 @@ const SubmitSong = () => {
     }
 
     if (!musicReleaseAgreed) {
-      toast.error("You must agree to the Music Release Agreement");
+      toast.error("You must agree to the Music Release Agreement. Please sign it first.");
+      return;
+    }
+
+    // If email doesn't have a signed release, redirect to sign
+    if (releaseSignedForEmail !== formData.contact_email.trim().toLowerCase()) {
+      toast.error("Please sign the Music Release Agreement before submitting.");
+      navigate(`/lls-music-release?email=${encodeURIComponent(formData.contact_email)}`);
       return;
     }
 
@@ -131,6 +157,9 @@ const SubmitSong = () => {
                       placeholder="your@email.com"
                       value={formData.contact_email}
                       onChange={(e) => handleChange("contact_email", e.target.value)}
+                      onBlur={(e) => {
+                        if (e.target.value) checkMusicRelease(e.target.value);
+                      }}
                       className="bg-[hsl(60,10%,95%)] border-[hsl(0,0%,80%)] text-[hsl(0,0%,10%)]"
                       required
                     />
@@ -231,19 +260,42 @@ const SubmitSong = () => {
 
                   {/* Music Release Agreement */}
                   <div className="flex items-start gap-3 pt-2">
-                    <Checkbox
-                      id="music_release"
-                      checked={musicReleaseAgreed}
-                      onCheckedChange={(checked) => setMusicReleaseAgreed(checked === true)}
-                      className="mt-0.5"
-                    />
-                    <Label htmlFor="music_release" className="text-[hsl(0,0%,10%)] text-sm leading-relaxed cursor-pointer">
-                      I agree to the{" "}
-                      <Link to="/lls-music-release" target="_blank" className="underline hover:text-[hsl(0,0%,30%)]">
-                        Blanket Artist Music Release Agreement
-                      </Link>{" "}
-                      and grant GoLokol the right to use my submitted music for Lokol Listening Sessions. *
-                    </Label>
+                    {releaseSignedForEmail === formData.contact_email.trim().toLowerCase() ? (
+                      <>
+                        <Checkbox
+                          id="music_release"
+                          checked={true}
+                          disabled
+                          className="mt-0.5"
+                        />
+                        <Label htmlFor="music_release" className="text-[hsl(0,0%,10%)] text-sm leading-relaxed">
+                          ✅ Music Release Agreement signed.{" "}
+                          <Link to="/lls-music-release" target="_blank" className="underline hover:text-[hsl(0,0%,30%)]">
+                            View Agreement
+                          </Link>
+                        </Label>
+                      </>
+                    ) : (
+                      <>
+                        <Checkbox
+                          id="music_release"
+                          checked={musicReleaseAgreed}
+                          onCheckedChange={(checked) => setMusicReleaseAgreed(checked === true)}
+                          className="mt-0.5"
+                        />
+                        <Label htmlFor="music_release" className="text-[hsl(0,0%,10%)] text-sm leading-relaxed cursor-pointer">
+                          I agree to the{" "}
+                          <Link to="/lls-music-release" target="_blank" className="underline hover:text-[hsl(0,0%,30%)]">
+                            Blanket Artist Music Release Agreement
+                          </Link>
+                          . You must{" "}
+                          <Link to={`/lls-music-release?email=${encodeURIComponent(formData.contact_email)}`} className="underline font-medium hover:text-[hsl(0,0%,30%)]">
+                            sign the agreement
+                          </Link>{" "}
+                          before submitting. *
+                        </Label>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
