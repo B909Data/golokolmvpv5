@@ -23,6 +23,7 @@ const ARTISTS = [
   "Dude Dynamik",
   "Fenix+Flo",
   "Izan Da Man",
+  "Jointdexter",
   "Steven the Human",
   "TD4Y",
   "T.R.3.",
