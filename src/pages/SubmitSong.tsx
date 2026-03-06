@@ -32,6 +32,23 @@ const SubmitSong = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Check if the email has a signed music release agreement
+  const checkMusicRelease = async (email: string) => {
+    try {
+      const { data } = await supabase.functions.invoke("check-music-release", {
+        body: { email: email.trim().toLowerCase() },
+      });
+      if (data?.signed) {
+        setReleaseSignedForEmail(email.trim().toLowerCase());
+        setMusicReleaseAgreed(true);
+      } else {
+        setReleaseSignedForEmail(null);
+      }
+    } catch {
+      // Silently fail – user can still check the box manually
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -41,7 +58,14 @@ const SubmitSong = () => {
     }
 
     if (!musicReleaseAgreed) {
-      toast.error("You must agree to the Music Release Agreement");
+      toast.error("You must agree to the Music Release Agreement. Please sign it first.");
+      return;
+    }
+
+    // If email doesn't have a signed release, redirect to sign
+    if (releaseSignedForEmail !== formData.contact_email.trim().toLowerCase()) {
+      toast.error("Please sign the Music Release Agreement before submitting.");
+      navigate(`/lls-music-release?email=${encodeURIComponent(formData.contact_email)}`);
       return;
     }
 
