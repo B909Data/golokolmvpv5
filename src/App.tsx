@@ -46,6 +46,8 @@ import AdminLLSVotes from "./pages/AdminLLSVotes";
 import AdminSignatures from "./pages/AdminSignatures";
 import LLSVote from "./pages/LLSVote";
 import LLSUs from "./pages/LLSUs";
+import LLSUsArtists from "./pages/LLSUsArtists";
+import LLSUsRetail from "./pages/LLSUsRetail";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +73,8 @@ const App = () => (
            <Route path="/lls-music-release" element={<LLSMusicRelease />} />
            <Route path="/llsvote" element={<LLSVote />} />
            <Route path="/lls-us" element={<LLSUs />} />
+           <Route path="/lls-us/artists" element={<LLSUsArtists />} />
+           <Route path="/lls-us/retail" element={<LLSUsRetail />} />
           <Route path="/admin/after-parties" element={<AdminAfterParties />} />
           <Route path="/admin/discount-codes" element={<AdminDiscountCodes />} />
           <Route path="/admin/partners" element={<AdminPartners />} />

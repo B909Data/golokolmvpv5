@@ -447,7 +447,11 @@ export type Database = {
           genre_style: string
           how_heard: string | null
           id: string
+          instagram_handle: string | null
+          music_link: string | null
           physical_product: string
+          short_bio: string | null
+          song_image_url: string | null
         }
         Insert: {
           artist_name: string
@@ -457,7 +461,11 @@ export type Database = {
           genre_style: string
           how_heard?: string | null
           id?: string
+          instagram_handle?: string | null
+          music_link?: string | null
           physical_product: string
+          short_bio?: string | null
+          song_image_url?: string | null
         }
         Update: {
           artist_name?: string
@@ -467,7 +475,11 @@ export type Database = {
           genre_style?: string
           how_heard?: string | null
           id?: string
+          instagram_handle?: string | null
+          music_link?: string | null
           physical_product?: string
+          short_bio?: string | null
+          song_image_url?: string | null
         }
         Relationships: []
       }
