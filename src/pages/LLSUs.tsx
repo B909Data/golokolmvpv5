@@ -29,7 +29,7 @@ const LLSUs = () => {
 
       {/* AUDIENCE SPLIT */}
       <section className="px-6 md:px-12 lg:px-20 pb-24 md:pb-32">
-        <p className="type-body-lg text-foreground-secondary mb-8">Who are you in Atlanta?</p>
+        <h2 className="text-foreground mb-8">Who are you in Atlanta?</h2>
         <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
           <Link
             to="/lls-us/artists"
