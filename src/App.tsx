@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import PostHogPageview from "./components/PostHogPageview";
 import Index from "./pages/Index";
+import ApUs from "./pages/ApUs";
 import Shows from "./pages/Shows";
 import Songs from "./pages/Songs";
 import SongsSuccess from "./pages/SongsSuccess";
