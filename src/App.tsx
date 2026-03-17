@@ -69,7 +69,8 @@ const App = () => (
           <Route path="/lls/:eventId/checkin" element={<LLSCheckin />} />
           <Route path="/lls-release" element={<LLSRelease />} />
            <Route path="/lls-music-release" element={<LLSMusicRelease />} />
-          <Route path="/llsvote" element={<LLSVote />} />
+           <Route path="/llsvote" element={<LLSVote />} />
+           <Route path="/lls-us" element={<LLSUs />} />
           <Route path="/admin/after-parties" element={<AdminAfterParties />} />
           <Route path="/admin/discount-codes" element={<AdminDiscountCodes />} />
           <Route path="/admin/partners" element={<AdminPartners />} />
