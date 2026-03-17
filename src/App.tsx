@@ -45,6 +45,7 @@ import AdminCuratedCodes from "./pages/AdminCuratedCodes";
 import AdminLLSVotes from "./pages/AdminLLSVotes";
 import AdminSignatures from "./pages/AdminSignatures";
 import LLSVote from "./pages/LLSVote";
+import LLSUs from "./pages/LLSUs";
 
 const queryClient = new QueryClient();
 
