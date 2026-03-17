@@ -1,38 +1,24 @@
 
 
-# Store Music Release Agreement Consent in Database
-
-## Problem
-Both submission forms (paid and curated) require artists to check the Music Release Agreement box, but this consent is only enforced client-side. No proof of agreement is persisted in the database.
-
-## Solution
-Add two columns to the `submissions` table and populate them from both submission flows.
+## Implementation Plan: /lls-us Landing Page
 
 ### 1. Database Migration
-Add to `public.submissions`:
-- `music_release_agreed` (boolean, NOT NULL, DEFAULT false) — whether they checked the box
-- `music_release_agreed_at` (timestamptz, nullable) — timestamp of when they agreed
+Create two tables:
 
-### 2. Curated Flow (`SubmitCurated.tsx`)
-Add to the insert payload:
-```ts
-music_release_agreed: true,
-music_release_agreed_at: new Date().toISOString(),
-```
-(This code only runs after the `musicReleaseAgreed` check passes.)
+**`lls_artist_submissions`**: id (uuid PK), artist_name (text NOT NULL), contact_email (text NOT NULL), genre_style (text NOT NULL), city_market (text NOT NULL), physical_product (text NOT NULL — stores full label e.g. "Yes", "In Production", "Not Yet"), how_heard (text, nullable), created_at (timestamptz, default now()). RLS enabled, public INSERT only.
 
-### 3. Paid Flow (`create-lls-checkout` + `verify-lls-payment`)
-- Pass `music_release_agreed: true` in the Stripe checkout metadata from `SubmitSong.tsx`
-- In `verify-lls-payment`, read that metadata and store both fields when inserting the submission row
+**`lls_retail_signups`**: id (uuid PK), store_name (text NOT NULL), city_location (text NOT NULL), store_type (text NOT NULL), has_listening_station (text NOT NULL), contact_name (text NOT NULL), contact_email (text NOT NULL), notes (text, nullable), created_at (timestamptz, default now()). RLS enabled, public INSERT only.
 
-### 4. Admin Visibility (`AdminLLS.tsx`)
-Add a column or indicator in the detail panel showing whether the artist agreed and when.
+### 2. New Page: `src/pages/LLSUs.tsx`
+- **Hero**: Dark bg, brand fonts, headline/subheadline, two CTAs (smooth scroll to anchors)
+- **Artist Section** (`#artist-submission`): Body copy, two-card visual split (In-Store / Live Event), form with all fields. `physical_product` uses RadioGroup with string values "Yes" / "In Production" / "Not Yet"
+- **Retail Section** (`#retail-signup`): Contrasting bg, form with Select components for store_type and has_listening_station
+- Both forms insert via Supabase client, show success state on completion, toast on error
+- Footer included
 
-### Files Changed
-- **Migration**: Add `music_release_agreed` + `music_release_agreed_at` columns
-- **`src/pages/SubmitCurated.tsx`**: Include both fields in insert
-- **`src/pages/SubmitSong.tsx`**: Pass agreement flag in checkout body
-- **`supabase/functions/create-lls-checkout/index.ts`**: Store flag in Stripe metadata
-- **`supabase/functions/verify-lls-payment/index.ts`**: Read metadata, insert fields
-- **`src/pages/AdminLLS.tsx`**: Display agreement status in detail panel
+### 3. Route
+Add `/lls-us` to App.tsx. No nav changes.
+
+### Key Detail
+The `physical_product` field stores the human-readable option label ("Yes", "In Production", "Not Yet") as confirmed — enabling downstream ICP filtering without needing a lookup.
 
