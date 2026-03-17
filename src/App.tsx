@@ -61,6 +61,7 @@ const App = () => (
         <PostHogPageview />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/ap-us" element={<ApUs />} />
           <Route path="/shows" element={<Shows />} />
           <Route path="/songs" element={<Songs />} />
           <Route path="/songs/success" element={<SongsSuccess />} />
