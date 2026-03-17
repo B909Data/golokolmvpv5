@@ -438,6 +438,39 @@ export type Database = {
           },
         ]
       }
+      lls_artist_submissions: {
+        Row: {
+          artist_name: string
+          city_market: string
+          contact_email: string
+          created_at: string
+          genre_style: string
+          how_heard: string | null
+          id: string
+          physical_product: string
+        }
+        Insert: {
+          artist_name: string
+          city_market: string
+          contact_email: string
+          created_at?: string
+          genre_style: string
+          how_heard?: string | null
+          id?: string
+          physical_product: string
+        }
+        Update: {
+          artist_name?: string
+          city_market?: string
+          contact_email?: string
+          created_at?: string
+          genre_style?: string
+          how_heard?: string | null
+          id?: string
+          physical_product?: string
+        }
+        Relationships: []
+      }
       lls_curated_codes: {
         Row: {
           code: string
@@ -651,6 +684,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lls_retail_signups: {
+        Row: {
+          city_location: string
+          contact_email: string
+          contact_name: string
+          created_at: string
+          has_listening_station: string
+          id: string
+          notes: string | null
+          store_name: string
+          store_type: string
+        }
+        Insert: {
+          city_location: string
+          contact_email: string
+          contact_name: string
+          created_at?: string
+          has_listening_station: string
+          id?: string
+          notes?: string | null
+          store_name: string
+          store_type: string
+        }
+        Update: {
+          city_location?: string
+          contact_email?: string
+          contact_name?: string
+          created_at?: string
+          has_listening_station?: string
+          id?: string
+          notes?: string | null
+          store_name?: string
+          store_type?: string
+        }
+        Relationships: []
       }
       lls_votes: {
         Row: {
