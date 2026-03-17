@@ -46,6 +46,8 @@ import AdminLLSVotes from "./pages/AdminLLSVotes";
 import AdminSignatures from "./pages/AdminSignatures";
 import LLSVote from "./pages/LLSVote";
 import LLSUs from "./pages/LLSUs";
+import LLSUsArtists from "./pages/LLSUsArtists";
+import LLSUsRetail from "./pages/LLSUsRetail";
 
 const queryClient = new QueryClient();
 
