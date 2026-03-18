@@ -38,7 +38,7 @@ const SelectAfterPartyPlan = () => {
               Choose your After Party plan
             </h1>
             <p className="text-muted-foreground text-base md:text-lg max-w-lg mx-auto">
-              Pick the plan that matches where you are right now. You'll see the setup fee and revenue cap before you continue.
+              Pick the plan that matches where you are right now.
             </p>
           </div>
 
