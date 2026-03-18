@@ -7,9 +7,7 @@ import Footer from "@/components/Footer";
 
 // Pricing constants
 const EMERGE_SETUP_FEE = "$25.99";
-const EMERGE_REVENUE_CAP = "$500";
 const TOURING_SETUP_FEE = "$49.99";
-const TOURING_REVENUE_CAP = "No cap";
 
 const SelectAfterPartyPlan = () => {
   const navigate = useNavigate();
