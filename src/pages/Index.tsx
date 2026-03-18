@@ -30,12 +30,9 @@ const Index = () => {
       <section className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24 border-t border-border">
         <div className="max-w-3xl">
           <h2 className="mb-4">
-            <span className="text-foreground">Go Local </span>
-            <span className="text-primary">Before Global</span>
+            <span className="text-foreground">Lokol </span>
+            <span className="text-primary">Listening Sessions</span>
           </h2>
-          <p className="type-subcaption text-foreground-secondary mb-6">
-            Lokol Listening Sessions places your music in Atlanta record stores and curated DJ sets, where active local fans discover new music.
-          </p>
           <p className="type-body-lg text-foreground-secondary mb-10">
             LLS is for emerging artists building local momentum. Get your music placed in our Lokol Listening kiosks inside record stores around Atlanta, get your music featured in an event series filmed for YouTube, and get honest feedback — whether you're selected or not.
           </p>
