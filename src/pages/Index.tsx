@@ -55,9 +55,20 @@ const Index = () => {
           <p className="type-subcaption text-foreground-secondary mb-6">
             Build momentum and revenue after each show.
           </p>
-          <p className="type-body-lg text-foreground-secondary mb-10">
+          <p className="type-body-lg text-foreground-secondary mb-8">
             A post-show online space curated by you that fans pay to access. Only 24 hours, to use how you want. Then poof — the party ends. Sell passes before and at the show. Easy to manage. Low overhead. High return.
           </p>
+          <div className="w-full max-w-2xl mb-10 rounded-xl overflow-hidden">
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src="https://www.youtube.com/embed/h5IwdHKv6rA?rel=0"
+                title="GoLokol After Party"
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
           <Link to="/create-after-party">
             <Button variant="default" size="lg">
               Create an After Party
