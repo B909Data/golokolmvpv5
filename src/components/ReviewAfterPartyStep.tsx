@@ -27,6 +27,7 @@ interface ReviewAfterPartyStepProps {
 
 const ReviewAfterPartyStep = ({
   formData,
+  plan,
   isConfirmed,
   onConfirmChange,
   isTermsAccepted,
