@@ -18,6 +18,7 @@ interface ReviewAfterPartyStepProps {
     youtube_url?: string;
     image_url: string;
   };
+  plan?: "emerge" | "touring" | null;
   isConfirmed: boolean;
   onConfirmChange: (checked: boolean) => void;
   isTermsAccepted: boolean;
