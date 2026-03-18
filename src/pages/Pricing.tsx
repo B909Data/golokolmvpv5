@@ -30,7 +30,7 @@ const Pricing = () => {
                   Best for emerging artists
                 </div>
                 <CardTitle className="font-display text-2xl text-card-foreground">
-                  Emerge
+                  Emerging
                 </CardTitle>
                 <div className="pt-2">
                   <span className="text-3xl font-display font-bold text-card-foreground">$25.99</span>
@@ -38,29 +38,28 @@ const Pricing = () => {
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
-                <p className="type-body text-card-foreground/80 mb-6">
-                  Designed for emerging artists testing value, building momentum, and learning what their fans will support.
+                <p className="type-body text-card-foreground/80 mb-2 font-medium">
+                  Perfect for your first After Party. Test, learn, scale.
+                </p>
+                <p className="type-body text-card-foreground/70 mb-6 text-sm">
+                  Emerging artists testing fan engagement and monetization.
                 </p>
 
                 {/* Features */}
                 <div className="mb-6">
                   <p className="text-sm font-medium text-card-foreground mb-3">Includes:</p>
                   <ul className="type-body text-card-foreground/80 space-y-2">
-                    <li>• Private After Party chat</li>
-                    <li>• Livestream access</li>
-                    <li>• Show badges</li>
-                    <li>• Special merch links</li>
-                    <li>• Chat moderation tools</li>
+                    <li>• Basic livestream embed</li>
+                    <li>• Live chat</li>
+                    <li>• Simple viewer analytics</li>
+                    <li>• Email support</li>
                   </ul>
                 </div>
 
-                {/* Limits & Revenue */}
+                {/* Revenue */}
                 <div className="border-t border-border pt-4 mb-6 space-y-2">
                   <p className="text-sm text-card-foreground-secondary">
-                    <strong className="text-card-foreground">Limit:</strong> $500 gross revenue cap per After Party
-                  </p>
-                  <p className="text-sm text-card-foreground-secondary">
-                    <strong className="text-card-foreground">Revenue:</strong> Artist keeps majority. GoLokol platform fee applies.
+                    <strong className="text-card-foreground">Revenue:</strong> 30% platform commission.
                   </p>
                 </div>
 
@@ -72,7 +71,7 @@ const Pricing = () => {
                     </Button>
                   </Link>
                   <p className="text-xs text-card-foreground-secondary text-center mt-3">
-                    Emerge is designed to help you prove value. Upgrade when you outgrow it.
+                    No limits. No caps. Run as many as you want.
                   </p>
                 </div>
               </CardContent>
@@ -82,7 +81,7 @@ const Pricing = () => {
             <Card className="bg-card border-border flex flex-col">
               <CardHeader className="pb-4">
                 <div className="text-xs text-card-foreground-secondary uppercase tracking-wide mb-2">
-                  No revenue cap
+                  For touring artists
                 </div>
                 <CardTitle className="font-display text-2xl text-card-foreground">
                   Touring
@@ -93,29 +92,29 @@ const Pricing = () => {
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
-                <p className="type-body text-card-foreground/80 mb-6">
-                  Built for artists actively touring and monetizing real fan demand.
+                <p className="type-body text-card-foreground/80 mb-2 font-medium">
+                  Built for touring artists running multiple shows.
+                </p>
+                <p className="type-body text-card-foreground/70 mb-6 text-sm">
+                  For artists actively touring and monetizing real fan demand.
                 </p>
 
                 {/* Features */}
                 <div className="mb-6">
                   <p className="text-sm font-medium text-card-foreground mb-3">Includes:</p>
                   <ul className="type-body text-card-foreground/80 space-y-2">
-                    <li>• Private After Party chat</li>
-                    <li>• Livestream access</li>
-                    <li>• Show badges</li>
-                    <li>• Special merch links</li>
-                    <li>• Chat moderation tools</li>
+                    <li>• Everything in Emerging, plus:</li>
+                    <li>• Priority support (24-hour response)</li>
+                    <li>• Branded landing page customization</li>
+                    <li>• Full analytics dashboard</li>
+                    <li>• Ability to manage multiple parties</li>
                   </ul>
                 </div>
 
-                {/* Limits & Revenue */}
+                {/* Revenue */}
                 <div className="border-t border-border pt-4 mb-6 space-y-2">
                   <p className="text-sm text-card-foreground-secondary">
-                    <strong className="text-card-foreground">Limit:</strong> No revenue cap
-                  </p>
-                  <p className="text-sm text-card-foreground-secondary">
-                    <strong className="text-card-foreground">Revenue:</strong> Artist keeps majority. GoLokol platform fee applies.
+                    <strong className="text-card-foreground">Revenue:</strong> 30% platform commission.
                   </p>
                 </div>
 
@@ -127,45 +126,48 @@ const Pricing = () => {
                     </Button>
                   </Link>
                   <p className="text-xs text-card-foreground-secondary text-center mt-3">
-                    Unlimited revenue. No ceiling.
+                    Premium features for serious touring artists.
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* PROFESSIONAL / BULK TIER */}
+            {/* BULK/ORG TIER */}
             <Card className="bg-card border-border flex flex-col">
               <CardHeader className="pb-4">
                 <div className="text-xs text-card-foreground-secondary uppercase tracking-wide mb-2">
-                  For teams & labels
+                  For labels, managers, and booking agents
                 </div>
                 <CardTitle className="font-display text-2xl text-card-foreground">
-                  Professional / Bulk
+                  Bulk/Org
                 </CardTitle>
                 <div className="pt-2">
-                  <span className="text-3xl font-display font-bold text-card-foreground">Custom</span>
-                  <span className="text-card-foreground-secondary ml-2">pricing</span>
+                  <span className="text-3xl font-display font-bold text-card-foreground">$30</span>
+                  <span className="text-card-foreground-secondary ml-2">per party (10+ per quarter min)</span>
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
-                <p className="type-body text-card-foreground/80 mb-6">
-                  For touring artists, venues, booking agents, labels, and live show curators who want to purchase After Parties in bulk.
+                <p className="type-body text-card-foreground/80 mb-2 font-medium">
+                  For labels, managers, and booking agents.
+                </p>
+                <p className="type-body text-card-foreground/70 mb-6 text-sm">
+                  Manage multiple roster artists from one centralized dashboard.
                 </p>
 
-                {/* Details */}
+                {/* Features */}
                 <div className="mb-6">
-                  <p className="text-sm font-medium text-card-foreground mb-3">Details:</p>
+                  <p className="text-sm font-medium text-card-foreground mb-3">Includes:</p>
                   <ul className="type-body text-card-foreground/80 space-y-2">
-                    <li>• Discounted bulk After Party purchases</li>
-                    <li>• Optional advanced workflows</li>
-                    <li>• Designed for teams managing multiple events</li>
+                    <li>• Everything in Touring, plus:</li>
+                    <li>• Centralized org dashboard</li>
+                    <li>• Manage multiple roster artists</li>
                   </ul>
                 </div>
 
-                {/* Spacer to align with other cards */}
+                {/* Revenue */}
                 <div className="border-t border-border pt-4 mb-6">
                   <p className="text-sm text-card-foreground-secondary">
-                    Custom pricing based on volume and needs.
+                    <strong className="text-card-foreground">Revenue:</strong> 30% platform commission.
                   </p>
                 </div>
 
@@ -180,7 +182,7 @@ const Pricing = () => {
                     </Button>
                   </a>
                   <p className="text-xs text-card-foreground-secondary text-center mt-3">
-                    Email backstage@golokol.app
+                    Volume pricing. Minimum commitment.
                   </p>
                 </div>
               </CardContent>

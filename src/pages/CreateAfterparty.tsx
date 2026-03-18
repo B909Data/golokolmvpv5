@@ -1046,9 +1046,9 @@ const CreateAfterparty = () => {
             ) : discountValidation.valid && discountValidation.type === "free" ? (
               "Create Free Listing"
             ) : discountValidation.valid && discountValidation.type === "50_percent" ? (
-              selectedPlan === "touring" ? "Pay — $24.99" : "Pay — $12.99"
+              selectedPlan === "touring" ? "Create After Party — $24.99" : "Create After Party — $12.99"
             ) : (
-              selectedPlan === "touring" ? "Pay — $49.99" : "Pay — $25.99"
+              selectedPlan === "touring" ? "Create After Party — $49.99" : "Create After Party — $25.99"
             )}
           </Button>
           {/* Inline error hints when button is disabled */}
