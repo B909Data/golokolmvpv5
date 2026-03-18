@@ -903,6 +903,7 @@ const CreateAfterparty = () => {
             youtube_url: formValues.youtube_url,
             image_url: filePreviewUrl || formValues.image_url || "",
           }}
+          plan={selectedPlan}
           isConfirmed={isReviewConfirmed}
           onConfirmChange={setIsReviewConfirmed}
           isTermsAccepted={isTermsAccepted}
