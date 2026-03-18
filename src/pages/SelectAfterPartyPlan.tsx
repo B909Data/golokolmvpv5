@@ -81,9 +81,6 @@ const SelectAfterPartyPlan = () => {
                   <p className="text-card-foreground/80">
                     <span className="text-card-foreground font-medium">Setup fee:</span> {TOURING_SETUP_FEE}
                   </p>
-                  <p className="text-card-foreground/80">
-                    <span className="text-card-foreground font-medium">Revenue cap:</span> {TOURING_REVENUE_CAP}
-                  </p>
                 </div>
 
                 <div className="mt-auto">
