@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import heroImage from "@/assets/golokol-hero.png";
 
 const Index = () => {
   return (
@@ -13,16 +14,15 @@ const Index = () => {
       <section className="px-6 md:px-12 lg:px-20 pt-24 pb-16 md:pt-32 md:pb-24">
         <div className="max-w-4xl">
           <h1 className="mb-6">
-            <span className="text-foreground">Every Stage of Your Career </span>
-            <span className="text-primary">Has a Tool.</span>
+            <span className="text-foreground">Tools That Build Every Stage of </span>
+            <span className="text-primary">Your Music Career</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary max-w-3xl mb-6">
-            GoLokol is a toolbox built for independent artists — from your first local buzz to your first national tour. Right now we offer two tools: Lokol Listening Sessions for emerging local artists and After Parties for established touring independents.
+            GoLokol is a toolbox built to support independent music discovery, scenes and tours.
           </p>
         </div>
-        {/* Hero image placeholder */}
-        <div className="mt-10 w-full h-64 md:h-96 rounded-xl bg-background-tertiary border border-border flex items-center justify-center">
-          <span className="text-muted-foreground type-body-md">Hero image coming soon</span>
+        <div className="mt-10 w-full">
+          <img src={heroImage} alt="GoLokol community illustration" className="w-full h-auto rounded-xl" />
         </div>
       </section>
 
@@ -30,12 +30,9 @@ const Index = () => {
       <section className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24 border-t border-border">
         <div className="max-w-3xl">
           <h2 className="mb-4">
-            <span className="text-foreground">Go Local </span>
-            <span className="text-primary">Before Global</span>
+            <span className="text-foreground">Lokol </span>
+            <span className="text-primary">Listening Sessions</span>
           </h2>
-          <p className="type-subcaption text-foreground-secondary mb-6">
-            Lokol Listening Sessions places your music in Atlanta record stores and curated DJ sets, where active local fans discover new music.
-          </p>
           <p className="type-body-lg text-foreground-secondary mb-10">
             LLS is for emerging artists building local momentum. Get your music placed in our Lokol Listening kiosks inside record stores around Atlanta, get your music featured in an event series filmed for YouTube, and get honest feedback — whether you're selected or not.
           </p>
@@ -52,7 +49,7 @@ const Index = () => {
       <section className="bg-background px-6 md:px-12 lg:px-20 py-16 md:py-24 border-t border-border">
         <div className="max-w-3xl">
           <h2 className="mb-4">
-            <span className="text-foreground">Already Touring? </span>
+            <span className="text-foreground">Touring? </span>
             <span className="text-primary">Make Every Show Count.</span>
           </h2>
           <p className="type-subcaption text-foreground-secondary mb-6">
