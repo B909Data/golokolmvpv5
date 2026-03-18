@@ -903,6 +903,7 @@ const CreateAfterparty = () => {
             youtube_url: formValues.youtube_url,
             image_url: filePreviewUrl || formValues.image_url || "",
           }}
+          plan={selectedPlan}
           isConfirmed={isReviewConfirmed}
           onConfirmChange={setIsReviewConfirmed}
           isTermsAccepted={isTermsAccepted}
@@ -1046,9 +1047,9 @@ const CreateAfterparty = () => {
             ) : discountValidation.valid && discountValidation.type === "free" ? (
               "Create Free Listing"
             ) : discountValidation.valid && discountValidation.type === "50_percent" ? (
-              selectedPlan === "touring" ? "Pay — $24.99" : "Pay — $12.99"
+              selectedPlan === "touring" ? "Create After Party — $24.99" : "Create After Party — $12.99"
             ) : (
-              selectedPlan === "touring" ? "Pay — $49.99" : "Pay — $25.99"
+              selectedPlan === "touring" ? "Create After Party — $49.99" : "Create After Party — $25.99"
             )}
           </Button>
           {/* Inline error hints when button is disabled */}
@@ -1119,7 +1120,7 @@ const CreateAfterparty = () => {
                 CREATE AN <span className="text-primary">AFTER PARTY</span>
               </h1>
               <p className="text-muted-foreground text-sm font-sans mb-1">
-                {selectedPlan === "touring" ? "Touring Plan — $49.99" : "Emerge Plan — $25.99"}
+                {selectedPlan === "touring" ? "Touring — $49.99 per After Party" : "Emerging — $25.99 per After Party"}
               </p>
               <Link to="/create-after-party" className="text-primary hover:underline text-sm font-sans">
                 Change plan →

@@ -18,6 +18,7 @@ interface ReviewAfterPartyStepProps {
     youtube_url?: string;
     image_url: string;
   };
+  plan?: "emerge" | "touring" | null;
   isConfirmed: boolean;
   onConfirmChange: (checked: boolean) => void;
   isTermsAccepted: boolean;
@@ -26,6 +27,7 @@ interface ReviewAfterPartyStepProps {
 
 const ReviewAfterPartyStep = ({
   formData,
+  plan,
   isConfirmed,
   onConfirmChange,
   isTermsAccepted,
@@ -74,6 +76,17 @@ const ReviewAfterPartyStep = ({
           />
         </div>
       </div>
+
+      {/* Tier Summary */}
+      {plan && (
+        <div className="bg-background/10 rounded-xl p-4">
+          <p className="text-sm font-sans text-primary-foreground/90">
+            {plan === "touring"
+              ? "Your After Party is on the Touring tier. You get: everything in Emerging, plus branded landing page, advanced analytics, and priority support."
+              : "Your After Party is on the Emerging tier. You get: basic livestream, chat, simple analytics, and email support."}
+          </p>
+        </div>
+      )}
 
       {/* What happens after you pay */}
       <div className="space-y-3">
