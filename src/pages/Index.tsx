@@ -33,9 +33,20 @@ const Index = () => {
             <span className="text-foreground">Lokol </span>
             <span className="text-primary">Listening Sessions</span>
           </h2>
-          <p className="type-body-lg text-foreground-secondary mb-10">
+          <p className="type-body-lg text-foreground-secondary mb-8">
             LLS is for emerging artists building local momentum. Get your music placed in our Lokol Listening kiosks inside record stores around Atlanta, get your music featured in an event series filmed for YouTube, and get honest feedback — whether you're selected or not.
           </p>
+          <div className="w-full max-w-2xl mb-10 rounded-xl overflow-hidden">
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src="https://www.youtube.com/embed/1uVDo5MMyV8?rel=0"
+                title="Lokol Listening Sessions"
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
           <Link to="/lls-us">
             <Button variant="default" size="lg">
               Learn More and go Lokol!
