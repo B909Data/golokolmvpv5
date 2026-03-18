@@ -7,9 +7,7 @@ import Footer from "@/components/Footer";
 
 // Pricing constants
 const EMERGE_SETUP_FEE = "$25.99";
-const EMERGE_REVENUE_CAP = "$500";
 const TOURING_SETUP_FEE = "$49.99";
-const TOURING_REVENUE_CAP = "No cap";
 
 const SelectAfterPartyPlan = () => {
   const navigate = useNavigate();
@@ -40,7 +38,7 @@ const SelectAfterPartyPlan = () => {
               Choose your After Party plan
             </h1>
             <p className="text-muted-foreground text-base md:text-lg max-w-lg mx-auto">
-              Pick the plan that matches where you are right now. You'll see the setup fee and revenue cap before you continue.
+              Pick the plan that matches where you are right now.
             </p>
           </div>
 
@@ -56,9 +54,6 @@ const SelectAfterPartyPlan = () => {
                 <div className="space-y-2 mb-6">
                   <p className="text-card-foreground/80">
                     <span className="text-card-foreground font-medium">Setup fee:</span> {EMERGE_SETUP_FEE}
-                  </p>
-                  <p className="text-card-foreground/80">
-                    <span className="text-card-foreground font-medium">Revenue cap:</span> {EMERGE_REVENUE_CAP}
                   </p>
                 </div>
 
@@ -85,9 +80,6 @@ const SelectAfterPartyPlan = () => {
                 <div className="space-y-2 mb-6">
                   <p className="text-card-foreground/80">
                     <span className="text-card-foreground font-medium">Setup fee:</span> {TOURING_SETUP_FEE}
-                  </p>
-                  <p className="text-card-foreground/80">
-                    <span className="text-card-foreground font-medium">Revenue cap:</span> {TOURING_REVENUE_CAP}
                   </p>
                 </div>
 
