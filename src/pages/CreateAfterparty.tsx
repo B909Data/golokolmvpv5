@@ -1119,7 +1119,7 @@ const CreateAfterparty = () => {
                 CREATE AN <span className="text-primary">AFTER PARTY</span>
               </h1>
               <p className="text-muted-foreground text-sm font-sans mb-1">
-                {selectedPlan === "touring" ? "Touring Plan — $49.99" : "Emerge Plan — $25.99"}
+                {selectedPlan === "touring" ? "Touring — $49.99 per After Party" : "Emerging — $25.99 per After Party"}
               </p>
               <Link to="/create-after-party" className="text-primary hover:underline text-sm font-sans">
                 Change plan →
