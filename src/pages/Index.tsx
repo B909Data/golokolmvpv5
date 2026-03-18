@@ -49,7 +49,7 @@ const Index = () => {
       <section className="bg-background px-6 md:px-12 lg:px-20 py-16 md:py-24 border-t border-border">
         <div className="max-w-3xl">
           <h2 className="mb-4">
-            <span className="text-foreground">Touring? </span>
+            <span className="text-foreground">After Parties. </span>
             <span className="text-primary">Make Every Show Count.</span>
           </h2>
           <p className="type-subcaption text-foreground-secondary mb-6">
