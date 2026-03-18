@@ -18,7 +18,7 @@ const Index = () => {
             <span className="text-primary">Your Music Career</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary max-w-3xl mb-6">
-            GoLokol is a toolbox built for independent artists — from your first local buzz to your first national tour. Right now we offer two tools: Lokol Listening Sessions for emerging local artists and After Parties for established touring independents.
+            GoLokol is a toolbox built to support independent music discovery, scenes and tours.
           </p>
         </div>
         {/* Hero image placeholder */}
