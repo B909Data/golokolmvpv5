@@ -21,9 +21,8 @@ const Index = () => {
             GoLokol is a toolbox built to support independent music discovery, scenes and tours.
           </p>
         </div>
-        {/* Hero image placeholder */}
-        <div className="mt-10 w-full h-64 md:h-96 rounded-xl bg-background-tertiary border border-border flex items-center justify-center">
-          <span className="text-muted-foreground type-body-md">Hero image coming soon</span>
+        <div className="mt-10 w-full">
+          <img src={heroImage} alt="GoLokol community illustration" className="w-full h-auto rounded-xl" />
         </div>
       </section>
 
