@@ -70,6 +70,10 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/lls" element={<AdminLLS />} />
           
+          {/* LLS Fan Kiosk */}
+          <Route path="/lls" element={<LokolListens />} />
+          <Route path="/lls/genre/:genre" element={<LokolListensGenre />} />
+          
           {/* LLS Guest Pass & Check-in */}
           <Route path="/lls/:eventId/pass" element={<LLSGuestPass />} />
           <Route path="/lls/:eventId/checkin" element={<LLSCheckin />} />
