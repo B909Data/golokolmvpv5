@@ -49,6 +49,8 @@ import LLSVote from "./pages/LLSVote";
 import LLSUs from "./pages/LLSUs";
 import LLSUsArtists from "./pages/LLSUsArtists";
 import LLSUsRetail from "./pages/LLSUsRetail";
+import LokolListens from "./pages/LokolListens";
+import LokolListensGenre from "./pages/LokolListensGenre";
 
 const queryClient = new QueryClient();
 
