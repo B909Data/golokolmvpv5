@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Music, Film, ArrowLeft, Upload, X } from "lucide-react";
+import { ArrowLeft, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -184,18 +184,17 @@ const LLSUsArtists = () => {
         </div>
       </section>
 
-      {/* Format cards */}
+      {/* Video */}
       <section className="px-6 md:px-12 lg:px-20 pb-12">
-        <div className="grid md:grid-cols-2 gap-4 max-w-3xl">
-          <div className="rounded-lg border border-border bg-background-tertiary p-6">
-            <Music className="h-8 w-8 text-primary mb-3" />
-            <h4 className="font-display text-foreground mb-1">In-Store</h4>
-            <p className="type-body-sm text-foreground-secondary">Your music in Atlanta record store listening kiosks</p>
-          </div>
-          <div className="rounded-lg border border-border bg-background-tertiary p-6">
-            <Film className="h-8 w-8 text-primary mb-3" />
-            <h4 className="font-display text-foreground mb-1">Live Event</h4>
-            <p className="type-body-sm text-foreground-secondary">DJ sets, dance parties, and YouTube content</p>
+        <div className="w-full max-w-3xl rounded-xl overflow-hidden">
+          <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+            <iframe
+              src="https://www.youtube.com/embed/gKznwkyfqlU?rel=0"
+              title="Lokol Listening Sessions"
+              className="absolute inset-0 w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </div>
         </div>
       </section>
