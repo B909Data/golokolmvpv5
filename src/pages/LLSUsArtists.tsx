@@ -172,15 +172,20 @@ const LLSUsArtists = () => {
           <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
             Lokol Listening Sessions puts your music in front of the fans who buy records, show up to local events, and tell their friends.
           </p>
-          <p className="type-body-lg text-foreground-secondary mb-4 max-w-2xl">
-            LLS places your music inside independent record stores in Atlanta. We invite you into a live event series of DJ sets and dance parties built around local independent artists — filmed for YouTube. The locals listen, vote, and decide what local songs are featured in seasonal compilations.
-          </p>
-          <p className="type-body-md text-foreground-secondary mb-4 max-w-2xl">
-            One submission. Two ways to get heard. You may be selected for one, both, or neither — but every artist who submits is considered for the full experience.
-          </p>
-          <p className="type-body-md text-foreground-secondary max-w-2xl">
-            Not selected? You still walk away with real feedback on your music.
-          </p>
+          <ul className="space-y-4 mb-6 max-w-2xl">
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
+              <span className="text-foreground text-lg md:text-xl font-medium">Submit your music.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
+              <span className="text-foreground text-lg md:text-xl font-medium">Local fans vote in record stores.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
+              <span className="text-foreground text-lg md:text-xl font-medium">Get featured in seasonal compilations and YouTube series.</span>
+            </li>
+          </ul>
         </div>
       </section>
 
