@@ -158,7 +158,7 @@ const LLSVote = () => {
               </h2>
 
               <p className="text-foreground text-lg md:text-xl font-medium mb-4 max-w-xl">
-                Select ONE session and artist. Artists with the highest number of votes will be featured in Golokol in-store music discovery kiosks found around Atlanta.
+                Select ONE session and artist. Artists with the highest number of votes will be featured in new music discovery stations found around Atlanta.
               </p>
               <p className="text-primary text-lg md:text-xl font-bold mb-10 max-w-xl">
                 The future of music is local.
