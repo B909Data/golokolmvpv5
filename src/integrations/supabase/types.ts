@@ -741,6 +741,7 @@ export type Database = {
           id: string
           name: string
           notify: boolean
+          session: string
         }
         Insert: {
           artist_choice: string
@@ -749,6 +750,7 @@ export type Database = {
           id?: string
           name: string
           notify?: boolean
+          session?: string
         }
         Update: {
           artist_choice?: string
@@ -757,6 +759,7 @@ export type Database = {
           id?: string
           name?: string
           notify?: boolean
+          session?: string
         }
         Relationships: []
       }
@@ -971,6 +974,7 @@ export type Database = {
       lls_vote_counts: {
         Row: {
           artist_choice: string | null
+          session: string | null
           total_votes: number | null
         }
         Relationships: []
