@@ -157,8 +157,11 @@ const LLSVote = () => {
                 Spring 2026 Vote
               </h2>
 
-              <p className="text-muted-foreground type-body-md mb-10 max-w-xl">
-                Select one artist you want featured in a seasonal compilation release representing the current sounds coming out of Atlanta in the Hip Hop and RnB genres. You can only vote once.
+              <p className="text-foreground text-lg md:text-xl font-medium mb-4 max-w-xl">
+                Select ONE session and artist. Artists with the highest number of votes will be featured in Golokol in-store music discovery kiosks found around Atlanta.
+              </p>
+              <p className="text-primary text-lg md:text-xl font-bold mb-10 max-w-xl">
+                The future of music is local.
               </p>
 
               <Form {...form}>
