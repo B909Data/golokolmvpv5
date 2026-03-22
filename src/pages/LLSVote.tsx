@@ -6,9 +6,15 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -19,7 +25,12 @@ import {
 } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
 
-const ARTISTS = [
+const SESSIONS = [
+  { value: "lls1", label: "Lokol Listening Session 1" },
+  { value: "lls2", label: "Lokol Listening Sessions 2" },
+] as const;
+
+const ARTISTS_LLS1 = [
   "Alyx Ransom — Back at it",
   "Sque3ze — Rock",
   "Big Pri$e — Holla",
@@ -31,9 +42,23 @@ const ARTISTS = [
   "Kantil — Dancin Flo",
 ] as const;
 
+const ARTISTS_LLS2 = [
+  "Bluntana - Red",
+  "Izan - ASWM",
+  "Dude Dynamik - Different Pocket",
+  "2D4Y - Let's Get it",
+  "JointDexter ft. Yoshi - Fye",
+  "Beef and Broccoli - Pillow",
+  "Steven the Human - Tell'em Today",
+  "Fenix&Flo - Who Said?, Pt.2",
+  "Chris Harry - Body Language",
+  "T.R.3. - Wearing Me Out",
+] as const;
+
 const voteSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
   email: z.string().trim().email("Please enter a valid email").max(255),
+  session: z.string().min(1, "Please select a session"),
   artist_choice: z.string().min(1, "Please select an artist"),
   notify: z.boolean().default(false),
 });
@@ -63,10 +88,19 @@ const LLSVote = () => {
     defaultValues: {
       name: "",
       email: "",
+      session: "",
       artist_choice: "",
       notify: false,
     },
   });
+
+  const selectedSession = form.watch("session");
+  const artists = selectedSession === "lls1" ? ARTISTS_LLS1 : selectedSession === "lls2" ? ARTISTS_LLS2 : [];
+
+  // Reset artist choice when session changes
+  useEffect(() => {
+    form.setValue("artist_choice", "");
+  }, [selectedSession, form]);
 
   const onSubmit = async (values: VoteForm) => {
     setSubmitError(null);
@@ -77,6 +111,7 @@ const LLSVote = () => {
         name: values.name,
         email: values.email.toLowerCase(),
         artist_choice: values.artist_choice,
+        session: values.session,
         notify: values.notify,
       });
 
@@ -158,37 +193,64 @@ const LLSVote = () => {
                     )}
                   />
 
-                  {/* Artist Selection */}
+                  {/* Session Selector */}
                   <FormField
                     control={form.control}
-                    name="artist_choice"
+                    name="session"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-foreground">Select an artist</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            value={field.value}
-                            className="space-y-3 mt-2"
-                          >
-                            {ARTISTS.map((artist) => (
-                              <div key={artist} className="flex items-center space-x-3">
-                                <RadioGroupItem value={artist} id={artist} />
-                                <Label
-                                  htmlFor={artist}
-                                  className="text-foreground cursor-pointer type-body-md"
-                                >
-                                  {artist}
-                                </Label>
-                              </div>
+                        <FormLabel className="text-foreground">Select a session</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Choose a Lokol Listening Session" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {SESSIONS.map((s) => (
+                              <SelectItem key={s.value} value={s.value}>
+                                {s.label}
+                              </SelectItem>
                             ))}
-                          </RadioGroup>
-                        </FormControl>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
+                  {/* Artist Selection (shown after session is picked) */}
+                  {selectedSession && (
+                    <FormField
+                      control={form.control}
+                      name="artist_choice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground">Select an artist</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              value={field.value}
+                              className="space-y-3 mt-2"
+                            >
+                              {artists.map((artist) => (
+                                <div key={artist} className="flex items-center space-x-3">
+                                  <RadioGroupItem value={artist} id={artist} />
+                                  <Label
+                                    htmlFor={artist}
+                                    className="text-foreground cursor-pointer type-body-md"
+                                  >
+                                    {artist}
+                                  </Label>
+                                </div>
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   {submitError && (
                     <p className="text-destructive type-body-sm">{submitError}</p>
