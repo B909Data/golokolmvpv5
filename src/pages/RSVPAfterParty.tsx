@@ -196,9 +196,13 @@ const RSVPAfterParty = () => {
         console.log("[FanRSVP] Opening Stripe checkout");
         openCheckout(data.url);
       } else if (!hasPriceSet && !isStripeConnected) {
-        // Truly free event (no price AND no Stripe) - navigate directly to pass page
-        console.log("[FanRSVP] Free event (no price, no Stripe), navigating to pass");
-        navigate(`/after-party/${eventId}/pass?token=${accessToken}`);
+        // Truly free event — route based on source
+        console.log("[FanRSVP] Free event, navigating", { isAtShowPayment });
+        if (isAtShowPayment) {
+          navigate(`/after-party/${eventId}/no-reentry?token=${accessToken}`);
+        } else {
+          navigate(`/after-party/${eventId}/pass?token=${accessToken}`);
+        }
       } else {
         // Price set but Stripe not connected, or vice versa — should have been blocked earlier
         console.log("[FanRSVP] Configuration incomplete:", { hasPriceSet, isStripeConnected });
