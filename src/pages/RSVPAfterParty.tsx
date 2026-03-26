@@ -166,6 +166,7 @@ const RSVPAfterParty = () => {
             qrToken,
             accessToken,
             promoCode: promoCode.trim() || undefined,
+            source: isAtShowPayment ? "merch" : undefined,
           },
         });
 
