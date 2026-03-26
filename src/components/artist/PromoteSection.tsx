@@ -16,7 +16,7 @@ interface PromoteSectionProps {
 
 const PromoteSection = ({ eventId, artistName, fixedPrice }: PromoteSectionProps) => {
   const [copied, setCopied] = useState(false);
-  const shareUrl = `${PUBLIC_BASE_URL}/after-party/${eventId}/rsvp`;
+  const shareUrl = `${PUBLIC_BASE_URL}/after-party/${eventId}/intro`;
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(shareUrl);
