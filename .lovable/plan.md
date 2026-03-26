@@ -1,16 +1,17 @@
 
 
-## Plan: Update QR Code Link to Intro Page
+## Plan: Conditional Value Bullets on RSVP Page
 
-Update the share URL in both promote components so the QR code and copy-link point fans to the new intro splash page instead of directly to RSVP.
+Replace the static value bullets in `src/pages/RSVPAfterParty.tsx` (lines ~259-286) with conditional rendering based on the existing `isAtShowPayment` flag.
 
-### Changes
+### Change
 
-1. **`src/components/artist/tabs/PromoteTab.tsx`** (line 21)
-   - Change `shareUrl` from `/after-party/${eventId}/rsvp` → `/after-party/${eventId}/intro`
+**File:** `src/pages/RSVPAfterParty.tsx`
 
-2. **`src/components/artist/PromoteSection.tsx`** (line 21)
-   - Same change to keep both promote components consistent
+Wrap the value bullets `<div>` in a ternary on `isAtShowPayment`:
 
-Both files have identical `shareUrl` definitions. This affects the QR code, the displayed link, the copy button, and the poster PDF download.
+- **At-show (`source=merch`)**: "Pay and get immediate access." / "Enter the party room now." / "Get 24 hours of exclusive access."
+- **Pre-show (default)**: Keep existing bullets unchanged.
+
+Same markup structure, icons, and styling — only the text content differs. No new dependencies or files needed.
 
