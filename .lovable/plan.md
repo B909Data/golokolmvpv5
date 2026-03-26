@@ -1,38 +1,16 @@
 
 
-# Store Music Release Agreement Consent in Database
+## Plan: Update QR Code Link to Intro Page
 
-## Problem
-Both submission forms (paid and curated) require artists to check the Music Release Agreement box, but this consent is only enforced client-side. No proof of agreement is persisted in the database.
+Update the share URL in both promote components so the QR code and copy-link point fans to the new intro splash page instead of directly to RSVP.
 
-## Solution
-Add two columns to the `submissions` table and populate them from both submission flows.
+### Changes
 
-### 1. Database Migration
-Add to `public.submissions`:
-- `music_release_agreed` (boolean, NOT NULL, DEFAULT false) — whether they checked the box
-- `music_release_agreed_at` (timestamptz, nullable) — timestamp of when they agreed
+1. **`src/components/artist/tabs/PromoteTab.tsx`** (line 21)
+   - Change `shareUrl` from `/after-party/${eventId}/rsvp` → `/after-party/${eventId}/intro`
 
-### 2. Curated Flow (`SubmitCurated.tsx`)
-Add to the insert payload:
-```ts
-music_release_agreed: true,
-music_release_agreed_at: new Date().toISOString(),
-```
-(This code only runs after the `musicReleaseAgreed` check passes.)
+2. **`src/components/artist/PromoteSection.tsx`** (line 21)
+   - Same change to keep both promote components consistent
 
-### 3. Paid Flow (`create-lls-checkout` + `verify-lls-payment`)
-- Pass `music_release_agreed: true` in the Stripe checkout metadata from `SubmitSong.tsx`
-- In `verify-lls-payment`, read that metadata and store both fields when inserting the submission row
-
-### 4. Admin Visibility (`AdminLLS.tsx`)
-Add a column or indicator in the detail panel showing whether the artist agreed and when.
-
-### Files Changed
-- **Migration**: Add `music_release_agreed` + `music_release_agreed_at` columns
-- **`src/pages/SubmitCurated.tsx`**: Include both fields in insert
-- **`src/pages/SubmitSong.tsx`**: Pass agreement flag in checkout body
-- **`supabase/functions/create-lls-checkout/index.ts`**: Store flag in Stripe metadata
-- **`supabase/functions/verify-lls-payment/index.ts`**: Read metadata, insert fields
-- **`src/pages/AdminLLS.tsx`**: Display agreement status in detail panel
+Both files have identical `shareUrl` definitions. This affects the QR code, the displayed link, the copy button, and the poster PDF download.
 
