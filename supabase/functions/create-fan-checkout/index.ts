@@ -186,7 +186,9 @@ Deno.serve(async (req) => {
         application_fee_amount: feeCents,
         transfer_data: { destination: event.stripe_account_id },
       },
-      success_url: `${origin}/after-party/${eventId}/pass?token=${accessToken || qrToken}`,
+      success_url: source === "merch"
+        ? `${origin}/after-party/${eventId}/no-reentry?token=${accessToken || qrToken}`
+        : `${origin}/after-party/${eventId}/pass?token=${accessToken || qrToken}`,
       cancel_url: `${origin}/after-party/${eventId}/rsvp?paid=0`,
     };
 
