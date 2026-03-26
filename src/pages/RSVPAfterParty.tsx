@@ -180,10 +180,15 @@ const RSVPAfterParty = () => {
           return;
         }
 
-        // FREE promo code path - immediate redirect to pass
+        // FREE promo code path - immediate redirect
         if (data.free && data.redirectUrl) {
-          console.log("[FanRSVP] Free promo redeemed, redirecting to pass");
-          navigate(data.redirectUrl.replace(window.location.origin, ""));
+          console.log("[FanRSVP] Free promo redeemed, redirecting");
+          const redirectPath = data.redirectUrl.replace(window.location.origin, "");
+          if (isAtShowPayment) {
+            navigate(`/after-party/${eventId}/no-reentry?token=${accessToken}`);
+          } else {
+            navigate(redirectPath);
+          }
           return;
         }
 
