@@ -24,7 +24,7 @@ const AfterPartyIntro = () => {
   const artistName = event?.artist_name || "the Artist";
 
   const handleContinue = () => {
-    navigate(`/after-party/${eventId}`);
+    navigate(`/after-party/${eventId}/rsvp?source=merch`);
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,9 @@ import { CheckCircle } from "lucide-react";
 const RSVPAfterParty = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const isAtShowPayment = searchParams.get("source") === "merch";
   
   const [displayName, setDisplayName] = useState("");
   const [purchaseEmail, setPurchaseEmail] = useState("");
@@ -164,6 +166,7 @@ const RSVPAfterParty = () => {
             qrToken,
             accessToken,
             promoCode: promoCode.trim() || undefined,
+            source: isAtShowPayment ? "merch" : undefined,
           },
         });
 
@@ -177,10 +180,15 @@ const RSVPAfterParty = () => {
           return;
         }
 
-        // FREE promo code path - immediate redirect to pass
+        // FREE promo code path - immediate redirect
         if (data.free && data.redirectUrl) {
-          console.log("[FanRSVP] Free promo redeemed, redirecting to pass");
-          navigate(data.redirectUrl.replace(window.location.origin, ""));
+          console.log("[FanRSVP] Free promo redeemed, redirecting");
+          const redirectPath = data.redirectUrl.replace(window.location.origin, "");
+          if (isAtShowPayment) {
+            navigate(`/after-party/${eventId}/no-reentry?token=${accessToken}`);
+          } else {
+            navigate(redirectPath);
+          }
           return;
         }
 
@@ -188,9 +196,13 @@ const RSVPAfterParty = () => {
         console.log("[FanRSVP] Opening Stripe checkout");
         openCheckout(data.url);
       } else if (!hasPriceSet && !isStripeConnected) {
-        // Truly free event (no price AND no Stripe) - navigate directly to pass page
-        console.log("[FanRSVP] Free event (no price, no Stripe), navigating to pass");
-        navigate(`/after-party/${eventId}/pass?token=${accessToken}`);
+        // Truly free event — route based on source
+        console.log("[FanRSVP] Free event, navigating", { isAtShowPayment });
+        if (isAtShowPayment) {
+          navigate(`/after-party/${eventId}/no-reentry?token=${accessToken}`);
+        } else {
+          navigate(`/after-party/${eventId}/pass?token=${accessToken}`);
+        }
       } else {
         // Price set but Stripe not connected, or vice versa — should have been blocked earlier
         console.log("[FanRSVP] Configuration incomplete:", { hasPriceSet, isStripeConnected });
