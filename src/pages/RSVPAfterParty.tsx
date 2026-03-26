@@ -268,34 +268,61 @@ const RSVPAfterParty = () => {
             </p>
             
           {/* Value Bullets */}
-            <div className="text-left space-y-4 mb-8">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <CheckCircle className="w-4 h-4 text-primary-foreground" />
+            {isAtShowPayment ? (
+              <div className="text-left space-y-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                  <p className="text-foreground font-sans">
+                    Pay and get immediate access.
+                  </p>
                 </div>
-                <p className="text-foreground font-sans">
-                  Pay, download and save your access pass.
-                </p>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                  <p className="text-foreground font-sans">
+                    Enter the party room now.
+                  </p>
                 </div>
-                <p className="text-foreground font-sans">
-                  Show your pass at the show.
-                </p>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                  <p className="text-foreground font-sans">
+                    Get 24 hours of exclusive access.
+                  </p>
                 </div>
-                <p className="text-foreground font-sans">
-                  Get access to 24 hours of after show glow.
-                </p>
               </div>
-            </div>
+            ) : (
+              <div className="text-left space-y-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                  <p className="text-foreground font-sans">
+                    Pay, download and save your access pass.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                  <p className="text-foreground font-sans">
+                    Show your pass at the show.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                  <p className="text-foreground font-sans">
+                    Get access to 24 hours of after show glow.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* RSVP Card Section */}
