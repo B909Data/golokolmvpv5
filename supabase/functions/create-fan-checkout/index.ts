@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
     : Deno.env.get("STRIPE_COUPON_50_LIVE");
 
   try {
-    const { eventId, attendeeId, origin, qrToken, accessToken, promoCode } = await req.json();
+    const { eventId, attendeeId, origin, qrToken, accessToken, promoCode, source } = await req.json();
 
     if (!eventId || !attendeeId || !origin || !qrToken) {
       return new Response(
