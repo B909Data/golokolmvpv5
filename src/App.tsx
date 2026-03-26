@@ -16,6 +16,7 @@ import AfterPartyPass from "./pages/AfterPartyPass";
 import QRDisplayPage from "./pages/QRDisplayPage";
 import VerifyQRPage from "./pages/VerifyQRPage";
 import WalkInIntro from "./pages/WalkInIntro";
+import AfterPartyIntro from "./pages/AfterPartyIntro";
 import CreateAfterparty from "./pages/CreateAfterparty";
 import CreateAfterpartySuccess from "./pages/CreateAfterpartySuccess";
 import SubmitSong from "./pages/SubmitSong";
