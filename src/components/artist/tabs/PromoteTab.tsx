@@ -18,7 +18,7 @@ const PromoteTab = ({ eventId, artistName, fixedPrice }: PromoteTabProps) => {
   const [linkCopied, setLinkCopied] = useState(false);
   const [posterHeadline, setPosterHeadline] = useState("");
 
-  const shareUrl = `${PUBLIC_BASE_URL}/after-party/${eventId}/rsvp`;
+  const shareUrl = `${PUBLIC_BASE_URL}/after-party/${eventId}/intro`;
 
   const handleCopyLink = async () => {
     await navigator.clipboard.writeText(shareUrl);
