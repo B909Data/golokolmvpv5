@@ -107,7 +107,7 @@ const App = () => (
           <Route path="/after-party/:eventId/pass" element={<AfterPartyPass />} />
           <Route path="/after-party/:eventId/qr/:qrToken" element={<QRDisplayPage />} />
           <Route path="/after-party/:eventId/verify/:qrToken" element={<VerifyQRPage />} />
-          <Route path="/after-party/:eventId/intro" element={<WalkInIntro />} />
+          <Route path="/after-party/:eventId/intro" element={<AfterPartyIntro />} />
           <Route path="/after-party/:eventId/room" element={<AfterPartyRoom />} />
           
           {/* Redirect legacy/duplicate routes */}
