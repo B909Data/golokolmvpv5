@@ -16,7 +16,9 @@ import { CheckCircle } from "lucide-react";
 const RSVPAfterParty = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const isAtShowPayment = searchParams.get("source") === "merch";
   
   const [displayName, setDisplayName] = useState("");
   const [purchaseEmail, setPurchaseEmail] = useState("");
