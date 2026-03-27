@@ -55,7 +55,7 @@ const Index = () => {
             <span className="text-[#FFD600]">where you are</span>
           </h1>
           <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
-            Host an invite-only experience for fans who showed up. No algorithm. No noise. No burnout.
+            GoLokol supports local music discovery, fan engagement and music scenes. We launch in Atlanta.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
