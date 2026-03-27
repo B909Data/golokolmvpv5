@@ -154,7 +154,7 @@ const Index = () => {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-[#F5F5F5] px-6 py-16 md:py-24 flex justify-center">
+      <section className="bg-[#111111] px-6 py-16 md:py-24 flex justify-center">
         <div className="bg-black rounded-2xl p-8 md:p-12 max-w-[600px] w-full text-center">
           <h2 className="font-display font-bold text-2xl md:text-[32px] text-white mb-4 leading-tight">
             One page, one collection of artists who make home, well home.
