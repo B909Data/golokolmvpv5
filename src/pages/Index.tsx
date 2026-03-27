@@ -136,12 +136,12 @@ const Index = () => {
       </section>
 
       {/* FAN CALLOUT */}
-      <section className="bg-white px-6 py-16 md:py-24 flex justify-center">
-        <div className="border-2 border-black rounded-[32px] p-8 max-w-[400px] w-full text-center">
-          <h3 className="font-display font-bold text-xl text-black mb-3">
+      <section className="bg-[#0E0E0E] px-6 py-16 md:py-24 flex justify-center">
+        <div className="border-2 border-[#333] rounded-[32px] p-8 max-w-[400px] w-full text-center">
+          <h3 className="font-display font-bold text-xl text-white mb-3">
             Are you a local fan?
           </h3>
-          <p className="text-base text-[#666666] mb-6">
+          <p className="text-base text-[#999999] mb-6">
             Discover and follow artists where you live.
           </p>
           <Link
