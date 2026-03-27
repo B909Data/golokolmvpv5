@@ -100,7 +100,7 @@ const Index = () => {
                 image={connectCard}
                 number={3}
                 title="Try GoLokol Connect"
-                description="Connect with fans who show up."
+                description="One dashboard that updates you about the shows, new music and news from all the artists you love city-wide."
                 to="/connect"
               />
             </div>
