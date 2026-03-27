@@ -95,9 +95,10 @@ const Connect = () => {
             )}
             <button
               type="submit"
-              className="w-full h-11 bg-[#FFD600] text-black font-semibold text-base rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg mt-2"
+              disabled={loading}
+              className="w-full h-11 bg-[#FFD600] text-black font-semibold text-base rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg mt-2 disabled:opacity-50"
             >
-              Notify Me
+              {loading ? "Submitting..." : "Notify Me"}
             </button>
           </form>
         </div>
