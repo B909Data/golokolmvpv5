@@ -75,8 +75,8 @@ const Index = () => {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="bg-white px-6 md:px-12 lg:px-20 py-16 md:py-24">
-        <h2 className="text-center font-display font-bold text-3xl md:text-[40px] text-black mb-12">
+      <section className="bg-[#0E0E0E] px-6 md:px-12 lg:px-20 py-16 md:py-24">
+        <h2 className="text-center font-display font-bold text-3xl md:text-[40px] text-white mb-12">
           How it works
         </h2>
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8">
