@@ -21,7 +21,7 @@ const HowItWorksCard = ({
 }) => (
   <Link
     to={to}
-    className="group block rounded-2xl border border-[hsl(0,0%,91%)] bg-white overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+    className="group block rounded-2xl border border-[hsl(0,0%,20%)] bg-[#1A1A1A] overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
   >
     <div className="h-[200px] w-full overflow-hidden">
       <img src={image} alt={title} className="w-full h-full object-cover" />
