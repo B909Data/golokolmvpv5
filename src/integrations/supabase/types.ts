@@ -258,6 +258,27 @@ export type Database = {
         }
         Relationships: []
       }
+      connect_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       email_optins: {
         Row: {
           created_at: string
