@@ -1,17 +1,13 @@
 
 
-## Plan: Conditional Value Bullets on RSVP Page
+## Plan: Replace Hero Image
 
-Replace the static value bullets in `src/pages/RSVPAfterParty.tsx` (lines ~259-286) with conditional rendering based on the existing `isAtShowPayment` flag.
+Replace the current hero background image (`golokol-hero.jpg`) with the newly uploaded image (`GOLOKOL_hero_1.png`).
 
-### Change
+### Steps
 
-**File:** `src/pages/RSVPAfterParty.tsx`
+1. **Copy uploaded image** to `src/assets/golokol-hero.png`
+2. **Update import** in `src/pages/Index.tsx` — change `import heroImage from "@/assets/golokol-hero.jpg"` to `import heroImage from "@/assets/golokol-hero.png"`
 
-Wrap the value bullets `<div>` in a ternary on `isAtShowPayment`:
-
-- **At-show (`source=merch`)**: "Pay and get immediate access." / "Enter the party room now." / "Get 24 hours of exclusive access."
-- **Pre-show (default)**: Keep existing bullets unchanged.
-
-Same markup structure, icons, and styling — only the text content differs. No new dependencies or files needed.
+No other changes needed — the `heroImage` variable is already used throughout the component.
 
