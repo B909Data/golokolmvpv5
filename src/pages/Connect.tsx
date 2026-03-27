@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
+import { supabase } from "@/integrations/supabase/client";
 import connectHero from "@/assets/connect-hero.jpg";
 
 const Connect = () => {
@@ -7,8 +8,9 @@ const Connect = () => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -18,7 +20,18 @@ const Connect = () => {
       return;
     }
 
-    // TODO: integrate with backend
+    setLoading(true);
+    const { error: dbError } = await supabase
+      .from("connect_waitlist" as any)
+      .insert({ first_name: firstName.trim() || null, email: trimmedEmail } as any);
+
+    setLoading(false);
+
+    if (dbError) {
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+
     setSubmitted(true);
     setFirstName("");
     setEmail("");
@@ -82,9 +95,10 @@ const Connect = () => {
             )}
             <button
               type="submit"
-              className="w-full h-11 bg-[#FFD600] text-black font-semibold text-base rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg mt-2"
+              disabled={loading}
+              className="w-full h-11 bg-[#FFD600] text-black font-semibold text-base rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg mt-2 disabled:opacity-50"
             >
-              Notify Me
+              {loading ? "Submitting..." : "Notify Me"}
             </button>
           </form>
         </div>
