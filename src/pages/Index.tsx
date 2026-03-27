@@ -21,7 +21,7 @@ const HowItWorksCard = ({
 }) => (
   <Link
     to={to}
-    className="group block rounded-2xl border border-[hsl(0,0%,91%)] bg-white overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+    className="group block rounded-2xl border border-[hsl(0,0%,20%)] bg-[#1A1A1A] overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
   >
     <div className="h-[200px] w-full overflow-hidden">
       <img src={image} alt={title} className="w-full h-full object-cover" />
@@ -30,8 +30,8 @@ const HowItWorksCard = ({
       <div className="absolute -top-5 left-6 w-10 h-10 rounded-full bg-[#FFD600] flex items-center justify-center text-black font-bold text-lg shadow-md">
         {number}
       </div>
-      <h3 className="mt-4 text-2xl font-bold text-black font-display">{title}</h3>
-      <p className="mt-2 text-base text-[#666666]">{description}</p>
+      <h3 className="mt-4 text-2xl font-bold text-white font-display">{title}</h3>
+      <p className="mt-2 text-base text-[#999999]">{description}</p>
     </div>
   </Link>
 );
@@ -75,8 +75,8 @@ const Index = () => {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="bg-white px-6 md:px-12 lg:px-20 py-16 md:py-24">
-        <h2 className="text-center font-display font-bold text-3xl md:text-[40px] text-black mb-12">
+      <section className="bg-[#0E0E0E] px-6 md:px-12 lg:px-20 py-16 md:py-24">
+        <h2 className="text-center font-display font-bold text-3xl md:text-[40px] text-white mb-12">
           How it works
         </h2>
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -136,12 +136,12 @@ const Index = () => {
       </section>
 
       {/* FAN CALLOUT */}
-      <section className="bg-white px-6 py-16 md:py-24 flex justify-center">
-        <div className="border-2 border-black rounded-[32px] p-8 max-w-[400px] w-full text-center">
-          <h3 className="font-display font-bold text-xl text-black mb-3">
+      <section className="bg-[#0E0E0E] px-6 py-16 md:py-24 flex justify-center">
+        <div className="border-2 border-[#333] rounded-[32px] p-8 max-w-[400px] w-full text-center">
+          <h3 className="font-display font-bold text-xl text-white mb-3">
             Are you a local fan?
           </h3>
-          <p className="text-base text-[#666666] mb-6">
+          <p className="text-base text-[#999999] mb-6">
             Discover and follow artists where you live.
           </p>
           <Link
@@ -154,7 +154,7 @@ const Index = () => {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-[#F5F5F5] px-6 py-16 md:py-24 flex justify-center">
+      <section className="bg-[#111111] px-6 py-16 md:py-24 flex justify-center">
         <div className="bg-black rounded-2xl p-8 md:p-12 max-w-[600px] w-full text-center">
           <h2 className="font-display font-bold text-2xl md:text-[32px] text-white mb-4 leading-tight">
             One page, one collection of artists who make home, well home.
