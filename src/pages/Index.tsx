@@ -31,7 +31,7 @@ const HowItWorksCard = ({
         {number}
       </div>
       <h3 className="mt-4 text-2xl font-bold text-white font-display">{title}</h3>
-      <p className="mt-2 text-base text-[#999999]">{description}</p>
+      <p className="mt-2 text-base text-[#CCCCCC]">{description}</p>
     </div>
   </Link>
 );
