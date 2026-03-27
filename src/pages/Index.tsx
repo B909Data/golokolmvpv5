@@ -31,7 +31,7 @@ const HowItWorksCard = ({
         {number}
       </div>
       <h3 className="mt-4 text-2xl font-bold text-white font-display">{title}</h3>
-      <p className="mt-2 text-base text-[#999999]">{description}</p>
+      <p className="mt-2 text-base text-[#CCCCCC]">{description}</p>
     </div>
   </Link>
 );
@@ -55,7 +55,7 @@ const Index = () => {
             <span className="text-[#FFD600]">where you are</span>
           </h1>
           <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
-            Host an invite-only experience for fans who showed up. No algorithm. No noise. No burnout.
+            GoLokol supports local music discovery, fan engagement and music scenes. We launch in Atlanta.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
@@ -84,14 +84,14 @@ const Index = () => {
             image={llsCard}
             number={1}
             title="Lokol Listening Sessions"
-            description="Music discovery city-wide."
+            description="Good music lives here. Discover and vote for local artists at your favorite record store. Find music you love where you live. Algorithms and AI can't call any place home. You do."
             to="/songs"
           />
           <HowItWorksCard
             image={afterpartyCard}
             number={2}
             title="After Parties"
-            description="Make every show count."
+            description="Make every show count. Reward and develop community with local fans who show up. A private 24 hour online chat/livestream you curate and your fans appreciate."
             to="/ap-us"
           />
           <div className="sm:col-span-2 flex justify-center">
@@ -100,7 +100,7 @@ const Index = () => {
                 image={connectCard}
                 number={3}
                 title="Try GoLokol Connect"
-                description="Connect with fans who show up."
+                description="One dashboard that updates you about the shows, new music and news from all the artists you love city-wide."
                 to="/connect"
               />
             </div>
