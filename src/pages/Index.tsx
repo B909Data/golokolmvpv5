@@ -91,7 +91,7 @@ const Index = () => {
             image={afterpartyCard}
             number={2}
             title="After Parties"
-            description="Make every show count."
+            description="Make every show count. Reward and develop community with local fans who show up. A private 24 hour online chat/livestream you curate and your fans appreciate."
             to="/ap-us"
           />
           <div className="sm:col-span-2 flex justify-center">
