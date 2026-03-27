@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import heroImage from "@/assets/golokol-hero.png";
+import heroImage from "@/assets/golokol-hero.svg";
 import llsCard from "@/assets/lls-card.jpg";
 import afterpartyCard from "@/assets/afterparty-card.jpg";
 import connectCard from "@/assets/connect-card.jpg";
