@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import heroImage from "@/assets/golokol-hero.png";
+import heroImage from "@/assets/golokol-hero.jpg";
 
 const Index = () => {
   return (
