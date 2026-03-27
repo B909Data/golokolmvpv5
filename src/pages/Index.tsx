@@ -4,7 +4,7 @@ import heroImage from "@/assets/golokol-hero.svg";
 import llsCard from "@/assets/lls-card.jpg";
 import afterpartyCard from "@/assets/afterparty-card.jpg";
 import connectCard from "@/assets/connect-card.jpg";
-import whyLocal from "@/assets/why-local.jpg";
+
 
 const HowItWorksCard = ({
   image,
