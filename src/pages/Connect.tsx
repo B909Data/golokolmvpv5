@@ -8,8 +8,9 @@ const Connect = () => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -19,7 +20,18 @@ const Connect = () => {
       return;
     }
 
-    // TODO: integrate with backend
+    setLoading(true);
+    const { error: dbError } = await supabase
+      .from("connect_waitlist" as any)
+      .insert({ first_name: firstName.trim() || null, email: trimmedEmail } as any);
+
+    setLoading(false);
+
+    if (dbError) {
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+
     setSubmitted(true);
     setFirstName("");
     setEmail("");
