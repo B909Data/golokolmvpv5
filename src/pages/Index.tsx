@@ -153,23 +153,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="bg-[#111111] px-6 py-16 md:py-24 flex justify-center">
-        <div className="bg-black rounded-2xl p-8 md:p-12 max-w-[600px] w-full text-center">
-          <h2 className="font-display font-bold text-2xl md:text-[32px] text-white mb-4 leading-tight">
-            One page, one collection of artists who make home, well home.
-          </h2>
-          <p className="text-lg text-white/90 mb-8">
-            Try GoLokol Connect now.
-          </p>
-          <Link
-            to="/connect"
-            className="inline-flex items-center justify-center bg-[#FFD600] text-black font-semibold text-base rounded-xl py-4 px-10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            Get Started
-          </Link>
-        </div>
-      </section>
 
       {/* FOOTER */}
       <footer className="bg-black py-8 text-center">
