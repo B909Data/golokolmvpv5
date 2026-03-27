@@ -1,102 +1,182 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import heroImage from "@/assets/golokol-hero.jpg";
+import llsCard from "@/assets/lls-card.jpg";
+import afterpartyCard from "@/assets/afterparty-card.jpg";
+import connectCard from "@/assets/connect-card.jpg";
+import whyLocal from "@/assets/why-local.jpg";
+
+const HowItWorksCard = ({
+  image,
+  number,
+  title,
+  description,
+  to,
+}: {
+  image: string;
+  number: number;
+  title: string;
+  description: string;
+  to: string;
+}) => (
+  <Link
+    to={to}
+    className="group block rounded-2xl border border-[hsl(0,0%,91%)] bg-white overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+  >
+    <div className="h-[200px] w-full overflow-hidden">
+      <img src={image} alt={title} className="w-full h-full object-cover" />
+    </div>
+    <div className="p-6 relative">
+      <div className="absolute -top-5 left-6 w-10 h-10 rounded-full bg-[#FFD600] flex items-center justify-center text-black font-bold text-lg shadow-md">
+        {number}
+      </div>
+      <h3 className="mt-4 text-2xl font-bold text-black font-display">{title}</h3>
+      <p className="mt-2 text-base text-[#666666]">{description}</p>
+    </div>
+  </Link>
+);
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* HERO SECTION */}
-      <section className="px-6 md:px-12 lg:px-20 pt-24 pb-16 md:pt-32 md:pb-24">
-        <div className="max-w-4xl">
-          <h1 className="mb-6">
-            <span className="text-foreground">Tools That Build Every Stage of </span>
-            <span className="text-primary">Your Music Career</span>
+      {/* HERO */}
+      <section className="relative min-h-[90vh] flex items-center justify-start overflow-hidden">
+        <img
+          src={heroImage}
+          alt="GoLokol community"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/45" />
+        <div className="relative z-10 px-6 md:px-12 lg:px-20 pt-32 pb-16 max-w-3xl">
+          <h1 className="font-display font-bold text-[32px] md:text-[48px] leading-[1.1] mb-4">
+            <span className="text-white">Find fans you love </span>
+            <span className="text-[#FFD600]">where you are</span>
           </h1>
-          <p className="type-subcaption text-foreground-secondary max-w-3xl mb-6">
-            GoLokol is a toolbox built to support independent music discovery, scenes and tours.
+          <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
+            Host an invite-only experience for fans who showed up. No algorithm. No noise. No burnout.
           </p>
-        </div>
-        <div className="mt-10 w-full">
-          <img src={heroImage} alt="GoLokol community illustration" className="w-full h-auto rounded-xl" />
-        </div>
-      </section>
-
-      {/* SECTION 2 — Lokol Listening Sessions */}
-      <section className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24 border-t border-border">
-        <div className="max-w-3xl">
-          <h2 className="mb-4">
-            <span className="text-foreground">Lokol </span>
-            <span className="text-primary">Listening Sessions</span>
-          </h2>
-          <p className="type-body-lg text-foreground-secondary mb-8">
-            LLS is for emerging artists building local momentum. Get your music placed in our Lokol Listening kiosks inside record stores around Atlanta, get your music featured in an event series filmed for YouTube, and get honest feedback — whether you're selected or not.
-          </p>
-          <div className="w-full max-w-2xl mb-10 rounded-xl overflow-hidden">
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                src="https://www.youtube.com/embed/1uVDo5MMyV8?rel=0"
-                title="Lokol Listening Sessions"
-                className="absolute inset-0 w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-          </div>
-          <Link to="/lls-us">
-            <Button variant="default" size="lg">
-              Learn More and go Lokol!
-              <ArrowRight className="h-5 w-5" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* SECTION 3 — After Parties */}
-      <section className="bg-background px-6 md:px-12 lg:px-20 py-16 md:py-24 border-t border-border">
-        <div className="max-w-3xl">
-          <h2 className="mb-4">
-            <span className="text-foreground">After Parties. </span>
-            <span className="text-primary">Make Every Show Count.</span>
-          </h2>
-          <p className="type-subcaption text-foreground-secondary mb-6">
-            Build momentum and revenue after each show.
-          </p>
-          <p className="type-body-lg text-foreground-secondary mb-8">
-            A post-show online space curated by you that fans pay to access. Only 24 hours, to use how you want. Then poof — the party ends. Sell passes before and at the show. Easy to manage. Low overhead. High return.
-          </p>
-          <div className="w-full max-w-2xl mb-10 rounded-xl overflow-hidden">
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                src="https://www.youtube.com/embed/h5IwdHKv6rA?rel=0"
-                title="GoLokol After Party"
-                className="absolute inset-0 w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-          </div>
-          <Link to="/create-after-party">
-            <Button variant="default" size="lg">
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <Link
+              to="/songs"
+              className="inline-flex items-center justify-center bg-white text-black font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              Lokol Listening Sessions
+            </Link>
+            <Link
+              to="/ap-us"
+              className="inline-flex items-center justify-center bg-[#FFD600] text-black font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+            >
               Create an After Party
-              <ArrowRight className="h-5 w-5" />
-            </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="bg-white px-6 md:px-12 lg:px-20 py-16 md:py-24">
+        <h2 className="text-center font-display font-bold text-3xl md:text-[40px] text-black mb-12">
+          How it works
+        </h2>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <HowItWorksCard
+            image={llsCard}
+            number={1}
+            title="Lokol Listening Sessions"
+            description="Music discovery city-wide."
+            to="/songs"
+          />
+          <HowItWorksCard
+            image={afterpartyCard}
+            number={2}
+            title="After Parties"
+            description="Make every show count."
+            to="/ap-us"
+          />
+          <div className="sm:col-span-2 flex justify-center">
+            <div className="w-full max-w-md">
+              <HowItWorksCard
+                image={connectCard}
+                number={3}
+                title="Try GoLokol Connect"
+                description="Connect with fans who show up."
+                to="/connect"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHY LOCAL */}
+      <section
+        className="px-6 md:px-12 lg:px-20 py-16 md:py-24"
+        style={{ background: "linear-gradient(135deg, #FFD600, #FFC300)" }}
+      >
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+          <div className="flex-1">
+            <h2 className="font-display font-bold text-3xl md:text-[40px] text-black mb-6 leading-tight">
+              Music isn't dead, it's local.
+            </h2>
+            <p className="text-lg text-black leading-relaxed mb-6">
+              Local music ecosystems have been disconnected by algorithms and individual passive viral moments. Artists struggle alone. Fans are overwhelmed with choice. Venues and music retail compete with digital monopolies.
+            </p>
+            <p className="text-lg text-black leading-relaxed">
+              We help reconnect the collective independent strength of artists, fans, venues, and retail with the city they call home.
+            </p>
+          </div>
+          <div className="flex-shrink-0">
+            <img
+              src={whyLocal}
+              alt="Local music ecosystem"
+              className="w-[280px] md:w-[300px] h-auto rounded-2xl shadow-lg"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* FAN CALLOUT */}
+      <section className="bg-white px-6 py-16 md:py-24 flex justify-center">
+        <div className="border-2 border-black rounded-[32px] p-8 max-w-[400px] w-full text-center">
+          <h3 className="font-display font-bold text-xl text-black mb-3">
+            Are you a local fan?
+          </h3>
+          <p className="text-base text-[#666666] mb-6">
+            Discover and follow artists where you live.
+          </p>
+          <Link
+            to="/connect"
+            className="inline-flex items-center justify-center bg-[#FFD600] text-black font-semibold text-base rounded-lg py-3 px-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            Join GoLokol Connect
           </Link>
         </div>
       </section>
 
-      {/* Footer Tagline */}
-      <section className="bg-background px-6 md:px-12 lg:px-20 py-12 text-center">
-        <p className="font-display font-bold text-lg md:text-xl text-foreground">
-          Artist curated. Fan appreciated.
-        </p>
+      {/* FINAL CTA */}
+      <section className="bg-[#F5F5F5] px-6 py-16 md:py-24 flex justify-center">
+        <div className="bg-black rounded-2xl p-8 md:p-12 max-w-[600px] w-full text-center">
+          <h2 className="font-display font-bold text-2xl md:text-[32px] text-white mb-4 leading-tight">
+            One page, one collection of artists who make home, well home.
+          </h2>
+          <p className="text-lg text-white/90 mb-8">
+            Try GoLokol Connect now.
+          </p>
+          <Link
+            to="/connect"
+            className="inline-flex items-center justify-center bg-[#FFD600] text-black font-semibold text-base rounded-xl py-4 px-10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            Get Started
+          </Link>
+        </div>
       </section>
 
-      <Footer />
+      {/* FOOTER */}
+      <footer className="bg-black py-8 text-center">
+        <p className="text-sm text-white">
+          GoLokol — The future of music is local.
+        </p>
+      </footer>
     </div>
   );
 };
