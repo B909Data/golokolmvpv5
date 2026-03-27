@@ -53,6 +53,7 @@ import LLSUsArtists from "./pages/LLSUsArtists";
 import LLSUsRetail from "./pages/LLSUsRetail";
 import LokolListens from "./pages/LokolListens";
 import LokolListensGenre from "./pages/LokolListensGenre";
+import Connect from "./pages/Connect";
 
 const queryClient = new QueryClient();
 
