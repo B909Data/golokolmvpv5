@@ -30,8 +30,8 @@ const HowItWorksCard = ({
       <div className="absolute -top-5 left-6 w-10 h-10 rounded-full bg-[#FFD600] flex items-center justify-center text-black font-bold text-lg shadow-md">
         {number}
       </div>
-      <h3 className="mt-4 text-2xl font-bold text-black font-display">{title}</h3>
-      <p className="mt-2 text-base text-[#666666]">{description}</p>
+      <h3 className="mt-4 text-2xl font-bold text-white font-display">{title}</h3>
+      <p className="mt-2 text-base text-[#999999]">{description}</p>
     </div>
   </Link>
 );
