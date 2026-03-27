@@ -80,10 +80,10 @@ const Index = () => {
           <h2 className="font-display font-bold text-3xl md:text-[40px] text-[#FFD600] mb-6 leading-tight">
             Music isn't dead, it's local.
           </h2>
-          <p className="text-[16px] text-white leading-relaxed mb-6">
+          <p className="text-[20px] text-white leading-relaxed mb-6">
             Local music ecosystems have been disconnected by algorithms and individual passive viral moments. Artists struggle alone. Fans are overwhelmed with choice. Venues and music retail compete with digital monopolies.
           </p>
-          <p className="text-[16px] text-white leading-relaxed">
+          <p className="text-[20px] text-white leading-relaxed">
             We help reconnect the collective independent strength of artists, fans, venues, and retail with the city they call home.
           </p>
         </div>
