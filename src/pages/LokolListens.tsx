@@ -18,12 +18,9 @@ const LokolListens = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-      {/* Hero Section */}
-      <section
-        className="relative w-full flex items-center justify-center"
-        style={{ minHeight: "90vh" }}
-      >
+    <div className="min-h-screen flex flex-col bg-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      {/* Hero Image */}
+      <section className="relative w-full" style={{ height: "45vh", minHeight: 260 }}>
         <img
           src={llsHero}
           alt="Lokol Listening Sessions Atlanta"
@@ -31,40 +28,39 @@ const LokolListens = () => {
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
-          <h1
-            className="text-white font-extrabold leading-[1.1] text-[32px] md:text-[48px]"
-          >
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 flex items-center justify-center h-full px-6">
+          <h1 className="text-white font-extrabold leading-[1.1] text-[32px] md:text-[48px] text-center max-w-3xl">
             Find new music you love where you live at Crate ATL.
           </h1>
-          <p
-            className="font-bold leading-[1.8] text-[16px] md:text-[18px] mt-6"
-            style={{ color: "#FFD600" }}
-          >
-            Pick a genre. Listen and discover a curated selection of Atlanta local artists.
-            Vote for your fav and we'll keep you connected. The future of music is local.
-          </p>
-          <button
-            onClick={scrollToGenres}
-            className="mt-10 inline-block font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
-            style={{
-              backgroundColor: "#FFD600",
-              color: "#000000",
-              width: 200,
-              height: 56,
-            }}
-          >
-            Get Started
-          </button>
         </div>
+      </section>
+
+      {/* Subcaption + CTA below hero */}
+      <section className="w-full px-6 py-8 text-center">
+        <p className="text-white font-normal leading-[1.8] text-[16px] md:text-[18px] max-w-2xl mx-auto">
+          Pick a genre. Listen and discover a curated selection of Atlanta local artists.
+          Vote for your fav and we'll keep you connected. The future of music is local.
+        </p>
+        <button
+          onClick={scrollToGenres}
+          className="mt-8 inline-block font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
+          style={{
+            backgroundColor: "#FFD600",
+            color: "#000000",
+            width: 200,
+            height: 56,
+          }}
+        >
+          Get Started
+        </button>
       </section>
 
       {/* Genre Selection Section */}
       <section
         id="genre-section"
         className="w-full py-12 md:py-16 px-4"
-        style={{ backgroundColor: "#FFFFFF" }}
+        style={{ backgroundColor: "#000000" }}
       >
         <div className="max-w-[1000px] mx-auto">
           <h2
