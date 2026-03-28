@@ -228,27 +228,22 @@ const LokolListensGenre = () => {
   return (
     <div className="min-h-screen flex flex-col bg-black">
       {/* Fixed Header */}
-      <header className="sticky top-0 z-50 px-6 py-4 flex items-center justify-between bg-black border-b border-gray-800">
+      <header className="sticky top-0 z-50 px-4 py-3 flex items-center justify-between bg-black border-b border-gray-800">
         <Link
           to={`/lls${storeId ? `?store=${storeId}` : ""}`}
           className="flex items-center gap-2 text-white hover:text-yellow-400 transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <div className="flex items-center gap-2">
-          <img src={golokolLogo} alt="GoLokol" className="h-6 w-6" />
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-yellow-400 font-bold">
-            Crate Points: {cratePoints}
-          </p>
-          <Link
-            to="/lls/signup"
-            className="text-xs text-white border border-white px-3 py-1 rounded hover:bg-white hover:text-black transition-colors"
-          >
-            Save
-          </Link>
-        </div>
+        <p className="text-base font-bold text-[#FFD600]">
+          Crate Points: {cratePoints}
+        </p>
+        <Link
+          to={`/lls/signup?points=${cratePoints}`}
+          className="bg-[#FFD600] text-black font-bold text-sm px-4 py-2 rounded-lg hover:brightness-110 transition-all"
+        >
+          Save
+        </Link>
       </header>
 
       {/* Genre Title */}
