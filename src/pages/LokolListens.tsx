@@ -31,7 +31,7 @@ const LokolListens = () => {
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
           <h1
             className="text-white font-extrabold leading-[1.1] text-[32px] md:text-[48px]"
