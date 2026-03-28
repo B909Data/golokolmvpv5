@@ -36,7 +36,7 @@ const LokolListens = () => {
         <p className="text-white font-normal leading-[1.8] text-[18px] md:text-[20px] max-w-2xl mx-auto">
           Listen and discover a curated selection of Atlanta local artists.
           <br /><br />
-          The future of music is local.
+          Earn points at Crates.
         </p>
         <button
           onClick={scrollToGenres}
