@@ -248,7 +248,7 @@ const LokolListensGenre = () => {
 
       {/* Genre Title */}
       <div className="px-6 py-6 text-center border-b border-gray-800">
-        <h1 className="font-bold text-3xl text-white">{genreName} Artists</h1>
+        <h1 className="font-bold text-3xl text-white">Lokol {genreName} Artists</h1>
       </div>
 
       {/* Artist Cards */}

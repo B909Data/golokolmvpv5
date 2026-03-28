@@ -63,6 +63,9 @@ const LLSSignup = () => {
           </div>
         ) : (
           <>
+            <p className="text-2xl sm:text-3xl font-bold text-[#FFD600] text-center mb-3">
+              {points} Crate Points
+            </p>
             <h1 className="text-[28px] sm:text-4xl font-bold text-white text-center mb-4">
               Sign up and Save your Points.
             </h1>
