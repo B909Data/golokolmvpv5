@@ -28,9 +28,9 @@ const LokolListens = () => {
           width={1920}
           height={1080}
         />
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/35" />
         <div className="relative z-10 flex items-center justify-center h-full px-6">
-          <h1 className="text-white font-extrabold leading-[1.1] text-[32px] md:text-[48px] text-center max-w-3xl">
+          <h1 className="text-white font-extrabold leading-[1.1] text-[32px] md:text-[48px] text-center max-w-3xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
             Find new music you love where you live at Crate ATL.
           </h1>
         </div>
