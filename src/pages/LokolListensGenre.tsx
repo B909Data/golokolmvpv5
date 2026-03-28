@@ -88,7 +88,7 @@ const LokolListensGenre = () => {
   const [votedArtists, setVotedArtists] = useState<Set<string>>(
     new Set()
   );
-  const [listeningProgress, setListeningProgress] = useState
+  const [listeningProgress, setListeningProgress] = useState<
     Record<string, number>
   >({});
   const [pointsAwarded, setPointsAwarded] = useState<Set<string>>(
