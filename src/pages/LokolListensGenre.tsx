@@ -3,56 +3,51 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Heart, Play, Pause } from "lucide-react";
 import golokolLogo from "@/assets/golokol-logo.svg";
 
+// Artist images
+import imgFenixFlo from "@/assets/Hiphop-fenixandflo.jpeg";
+import imgJointdexter from "@/assets/Hiphop-Jointdexter.png";
+import imgSque3eze from "@/assets/Hiphop-Sque3eze-Rock.png";
+
+// Audio files
+import audioFenixFlo from "@/assets/audio/Hiphop-FenixandFlo-WhoSaidP2.mp3";
+import audioJointdexter from "@/assets/audio/Hiphop-JointDexterandYoshi-Fye.mp3";
+import audioSque3eze from "@/assets/audio/Hiphop-Sque3eze-Rock.mp3";
+
 /* ── helpers ── */
 function slugToGenre(slug: string) {
-  return slug
-    .replace(/-and-/g, " & ")
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  const map: Record<string, string> = {
+    hiphop: "Hip Hop",
+    rnb: "RnB",
+    alternativesoul: "Alternative Soul",
+  };
+  return map[slug] || slug.replace(/\b\w/g, (c) => c.toUpperCase());
 }
-
-/* ── mock data per genre ── */
-interface Song {
-  id: string;
-  title: string;
-  artist: string;
-  imageUrl: string;
-  audioUrl: string;
-  duration: number; // seconds
-}
-
-const MOCK_SONGS: Record<string, Song[]> = {
-  "hip-hop": [
-    { id: "hh1", title: "Block Party", artist: "Kilo Tha God", imageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=480&h=480&fit=crop", audioUrl: "", duration: 194 },
-    { id: "hh2", title: "South Side Anthem", artist: "Lil Marlo", imageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=480&h=480&fit=crop", audioUrl: "", duration: 212 },
-    { id: "hh3", title: "Run It Up", artist: "Yung Blaze", imageUrl: "https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=480&h=480&fit=crop", audioUrl: "", duration: 178 },
-    { id: "hh4", title: "West End Flow", artist: "DJ Toomp Jr", imageUrl: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=480&h=480&fit=crop", audioUrl: "", duration: 205 },
-    { id: "hh5", title: "Trap Gospel", artist: "Pastor Troy Jr", imageUrl: "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=480&h=480&fit=crop", audioUrl: "", duration: 187 },
-    { id: "hh6", title: "404 Dreams", artist: "ATL Slim", imageUrl: "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?w=480&h=480&fit=crop", audioUrl: "", duration: 221 },
-  ],
-  rnb: [
-    { id: "rn1", title: "Midnight Drive", artist: "Sasha Renee", imageUrl: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=480&h=480&fit=crop", audioUrl: "", duration: 234 },
-    { id: "rn2", title: "Golden Hour", artist: "Devin Miles", imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&h=480&fit=crop", audioUrl: "", duration: 198 },
-    { id: "rn3", title: "Slow Burn", artist: "Kiana Ledé ATL", imageUrl: "https://images.unsplash.com/photo-1534308143481-c55f00be8bd7?w=480&h=480&fit=crop", audioUrl: "", duration: 245 },
-    { id: "rn4", title: "Honey Glow", artist: "Tyla Rose", imageUrl: "https://images.unsplash.com/photo-1529518969858-8baa65152fc8?w=480&h=480&fit=crop", audioUrl: "", duration: 210 },
-    { id: "rn5", title: "After Hours", artist: "Elijah Banks", imageUrl: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=480&h=480&fit=crop", audioUrl: "", duration: 189 },
-    { id: "rn6", title: "Velvet", artist: "Mya Sinclair", imageUrl: "https://images.unsplash.com/photo-1485579149621-3123dd979885?w=480&h=480&fit=crop", audioUrl: "", duration: 217 },
-  ],
-  "alternative-soul": [
-    { id: "as1", title: "Lucid State", artist: "Noname ATL", imageUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=480&h=480&fit=crop", audioUrl: "", duration: 256 },
-    { id: "as2", title: "Bloom", artist: "Indigo Sun", imageUrl: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=480&h=480&fit=crop", audioUrl: "", duration: 201 },
-    { id: "as3", title: "Dissolve", artist: "Aura James", imageUrl: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=480&h=480&fit=crop", audioUrl: "", duration: 278 },
-    { id: "as4", title: "Orbit", artist: "Sage Monroe", imageUrl: "https://images.unsplash.com/photo-1504898770365-14faca6a7320?w=480&h=480&fit=crop", audioUrl: "", duration: 192 },
-    { id: "as5", title: "Echo Chamber", artist: "Flux Velvet", imageUrl: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=480&h=480&fit=crop", audioUrl: "", duration: 230 },
-    { id: "as6", title: "Spirit Walk", artist: "Zora Neale", imageUrl: "https://images.unsplash.com/photo-1524368535928-5b5e00ddc30b?w=480&h=480&fit=crop", audioUrl: "", duration: 244 },
-  ],
-};
 
 function formatTime(s: number) {
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
+
+/* ── types & data ── */
+interface Song {
+  id: string;
+  title: string;
+  artist: string;
+  imageUrl: string;
+  audioUrl: string;
+  duration: number;
+}
+
+const SONGS_BY_GENRE: Record<string, Song[]> = {
+  hiphop: [
+    { id: "hh1", title: "Who Said? Pt.2", artist: "Fenix&Flo", imageUrl: imgFenixFlo, audioUrl: audioFenixFlo, duration: 164 },
+    { id: "hh2", title: "Fye", artist: "Jointdexter", imageUrl: imgJointdexter, audioUrl: audioJointdexter, duration: 129 },
+    { id: "hh3", title: "Rock", artist: "Sque3eze", imageUrl: imgSque3eze, audioUrl: audioSque3eze, duration: 153 },
+  ],
+  rnb: [],
+  alternativesoul: [],
+};
 
 const MAX_VOTES = 3;
 
@@ -62,7 +57,7 @@ const LokolListensGenre = () => {
   const [searchParams] = useSearchParams();
   const storeId = searchParams.get("store") || "";
   const genreName = genre ? slugToGenre(genre) : "Unknown";
-  const songs = (genre && MOCK_SONGS[genre]) || [];
+  const songs = (genre && SONGS_BY_GENRE[genre]) || [];
 
   // session state
   const [cratePoints, setCratePoints] = useState(0);
@@ -75,74 +70,100 @@ const LokolListensGenre = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Since we have no real audio URLs, simulate playback
-  const simulatedProgressRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const stopSimulation = useCallback(() => {
-    if (simulatedProgressRef.current) {
-      clearInterval(simulatedProgressRef.current);
-      simulatedProgressRef.current = null;
-    }
+  // Create a single shared audio element
+  useEffect(() => {
+    const audio = new Audio();
+    audio.preload = "metadata";
+    audioRef.current = audio;
+    return () => {
+      audio.pause();
+      audio.src = "";
+    };
   }, []);
 
-  const handlePlay = useCallback((song: Song) => {
-    if (playingSongId === song.id) {
-      // pause
-      setPlayingSongId(null);
-      stopSimulation();
-      return;
-    }
-    // start new
-    stopSimulation();
-    setPlayingSongId(song.id);
-    setCurrentTime(0);
-    setAudioDuration(song.duration);
+  // Wire up audio events
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    // simulate playback at 1s intervals
-    let elapsed = 0;
-    simulatedProgressRef.current = setInterval(() => {
-      elapsed += 1;
-      setCurrentTime(elapsed);
-      // 50% milestone
-      if (elapsed >= song.duration * 0.5 && !listenedSongs.has(song.id)) {
+    const onTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+      // 50% milestone check
+      if (
+        playingSongId &&
+        audio.duration > 0 &&
+        audio.currentTime >= audio.duration * 0.5
+      ) {
         setListenedSongs((prev) => {
-          if (prev.has(song.id)) return prev;
+          if (prev.has(playingSongId)) return prev;
           const next = new Set(prev);
-          next.add(song.id);
+          next.add(playingSongId);
+          setCratePoints((p) => p + 5);
           return next;
         });
-        setCratePoints((p) => p + 5);
       }
-      if (elapsed >= song.duration) {
-        clearInterval(simulatedProgressRef.current!);
-        simulatedProgressRef.current = null;
+    };
+
+    const onEnded = () => {
+      setPlayingSongId(null);
+      setCurrentTime(0);
+    };
+
+    const onLoadedMetadata = () => {
+      setAudioDuration(audio.duration);
+    };
+
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("ended", onEnded);
+    audio.addEventListener("loadedmetadata", onLoadedMetadata);
+
+    return () => {
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+    };
+  }, [playingSongId]);
+
+  const handlePlay = useCallback(
+    (song: Song) => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      if (playingSongId === song.id) {
+        // pause
+        audio.pause();
         setPlayingSongId(null);
-        setCurrentTime(0);
+        return;
       }
-    }, 1000);
-  }, [playingSongId, listenedSongs, stopSimulation]);
 
-  // award points for listen — effect watches listenedSongs to avoid double
-  // (handled inline above)
+      // play new song
+      audio.src = song.audioUrl;
+      audio.load();
+      audio.play().catch(() => {});
+      setPlayingSongId(song.id);
+      setCurrentTime(0);
+      setAudioDuration(song.duration);
+    },
+    [playingSongId]
+  );
 
-  const handleVote = useCallback((songId: string) => {
-    if (votedSongs.has(songId)) return;
-    if (votedSongs.size >= MAX_VOTES) {
-      setShowVoteLimit(true);
-      return;
-    }
-    setVotedSongs((prev) => {
-      const next = new Set(prev);
-      next.add(songId);
-      return next;
-    });
-    setCratePoints((p) => p + 5);
-  }, [votedSongs]);
-
-  // cleanup on unmount
-  useEffect(() => () => stopSimulation(), [stopSimulation]);
+  const handleVote = useCallback(
+    (songId: string) => {
+      if (votedSongs.has(songId)) return;
+      if (votedSongs.size >= MAX_VOTES) {
+        setShowVoteLimit(true);
+        return;
+      }
+      setVotedSongs((prev) => {
+        const next = new Set(prev);
+        next.add(songId);
+        return next;
+      });
+      setCratePoints((p) => p + 5);
+    },
+    [votedSongs]
+  );
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "#FFFFFF" }}>
@@ -187,8 +208,11 @@ const LokolListensGenre = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {songs.map((song) => {
               const isPlaying = playingSongId === song.id;
+              const progress =
+                isPlaying && audioDuration > 0
+                  ? (currentTime / audioDuration) * 100
+                  : 0;
               const hasVoted = votedSongs.has(song.id);
-              const progress = isPlaying && audioDuration > 0 ? (currentTime / audioDuration) * 100 : 0;
 
               return (
                 <div
@@ -205,16 +229,14 @@ const LokolListensGenre = () => {
                   {/* dark gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                  {/* artist name */}
+                  {/* artist name + song title */}
                   <span
                     className="absolute top-3 left-3 font-display font-bold text-[16px] text-white drop-shadow-lg leading-tight"
                     style={{ textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
                   >
                     {song.artist}
                   </span>
-                  <span
-                    className="absolute top-8 left-3 font-display text-[12px] text-white/70 drop-shadow"
-                  >
+                  <span className="absolute top-8 left-3 font-display text-[12px] text-white/70 drop-shadow">
                     {song.title}
                   </span>
 
@@ -255,15 +277,20 @@ const LokolListensGenre = () => {
 
                     {/* duration */}
                     <span className="font-mono text-[12px] text-white/80">
-                      {isPlaying ? formatTime(currentTime) : formatTime(song.duration)}
+                      {isPlaying
+                        ? `${formatTime(currentTime)} / ${formatTime(audioDuration)}`
+                        : formatTime(song.duration)}
                     </span>
                   </div>
 
                   {/* progress bar */}
                   {isPlaying && (
-                    <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "rgba(255,255,255,0.2)" }}>
+                    <div
+                      className="absolute bottom-0 left-0 right-0 h-1"
+                      style={{ background: "rgba(255,255,255,0.2)" }}
+                    >
                       <div
-                        className="h-full transition-all duration-1000 ease-linear"
+                        className="h-full transition-[width] duration-200 ease-linear"
                         style={{ width: `${progress}%`, background: "#FFD600" }}
                       />
                     </div>
