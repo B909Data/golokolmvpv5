@@ -77,6 +77,7 @@ const App = () => (
           {/* LLS Fan Kiosk */}
           <Route path="/lls" element={<LokolListens />} />
           <Route path="/lls/genre/:genre" element={<LokolListensGenre />} />
+          <Route path="/lls/signup" element={<LLSSignup />} />
           
           {/* LLS Guest Pass & Check-in */}
           <Route path="/lls/:eventId/pass" element={<LLSGuestPass />} />
