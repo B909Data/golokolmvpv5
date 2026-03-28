@@ -26,10 +26,19 @@ interface PlayerState {
 }
 
 function slugToGenre(slug: string) {
-  return slug
+  // Insert space before uppercase letters in camelCase slugs (e.g., "hiphop" → "hip hop")
+  const spaced = slug
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/-and-/g, " & ")
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .replace(/-/g, " ");
+  // Special cases for known compound words
+  const specialCases: Record<string, string> = {
+    hiphop: "Hip Hop",
+    rnb: "RnB",
+    alternativesoul: "Alternative Soul",
+  };
+  if (specialCases[slug]) return specialCases[slug];
+  return spaced.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 const formatTime = (seconds: number): string => {
