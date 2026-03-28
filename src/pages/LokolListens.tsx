@@ -38,9 +38,9 @@ const LokolListens = () => {
 
       {/* Subcaption + CTA below hero */}
       <section className="w-full px-6 py-8 text-center">
-        <p className="text-white font-normal leading-[1.8] text-[16px] md:text-[18px] max-w-2xl mx-auto">
-          Pick a genre. Listen and discover a curated selection of Atlanta local artists.
-          Vote for your fav and we'll keep you connected. The future of music is local.
+        <p className="text-white font-normal leading-[1.8] text-[18px] md:text-[20px] max-w-2xl mx-auto">
+          Listen and discover a curated selection of Atlanta local artists.
+          Vote for your fav and we'll keep you connected.
         </p>
         <button
           onClick={scrollToGenres}
@@ -54,6 +54,9 @@ const LokolListens = () => {
         >
           Get Started
         </button>
+        <p className="text-white/70 text-[14px] mt-4 font-normal">
+          The future of music is local.
+        </p>
       </section>
 
       {/* Genre Selection Section */}
