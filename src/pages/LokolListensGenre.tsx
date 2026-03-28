@@ -265,15 +265,16 @@ const LokolListensGenre = () => {
                 alt={artist.name}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute top-3 left-3">
-                <h3 className="text-xl font-bold text-white drop-shadow-lg">
-                  {artist.name}
-                </h3>
-              </div>
             </div>
 
-            {/* Controls Section (Off-Black Bar) */}
-            <div className="bg-gray-900 px-4 py-4 flex items-center justify-between">
+            {/* Artist Info */}
+            <div className="bg-[#2A2A2A] px-4 pt-3 pb-1">
+              <h3 className="text-lg font-bold text-white">{artist.name}</h3>
+              <p className="text-sm text-gray-400">{artist.song}</p>
+            </div>
+
+            {/* Controls Section */}
+            <div className="bg-[#2A2A2A] px-4 pb-4 pt-2 flex items-center justify-between">
               {/* Left: Heart */}
               <button
                 onClick={() => handleVote(artist.id)}
