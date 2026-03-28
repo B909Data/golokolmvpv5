@@ -29,7 +29,7 @@ const LokolListens = () => {
       </section>
 
       {/* Subcaption + CTA below hero */}
-      <section className="w-full px-6 py-8 text-center">
+      <section className="w-full px-6 py-8 text-center" style={{ marginTop: -50 }}>
         <p className="text-white font-normal leading-[1.8] text-[18px] md:text-[20px] max-w-2xl mx-auto">
           Listen and discover a curated selection of Atlanta local artists.
           <br /><br />
