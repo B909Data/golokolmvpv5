@@ -1,288 +1,368 @@
 import { useParams, useSearchParams, Link } from "react-router-dom";
-import { useState, useRef, useCallback, useEffect } from "react";
-import { Heart, Play, Pause, RotateCcw } from "lucide-react";
+import { ArrowLeft, Play, Pause, RotateCcw, Heart } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import fenixFloImg from "@/assets/Hiphop-fenixandflo.jpeg";
+import jointdexterImg from "@/assets/Hiphop-Jointdexter.png";
+import sque3ezeImg from "@/assets/Hiphop-Sque3eze-Rock.png";
+import fenixFloAudio from "@/assets/audio/Hiphop-FenixandFlo-WhoSaidP2.mp3";
+import jointdexterAudio from "@/assets/audio/Hiphop-JointDexterandYoshi-Fye.mp3";
+import sque3ezeAudio from "@/assets/audio/Hiphop-Sque3eze - Rock.mp3";
 
-import imgFenixFlo from "@/assets/Hiphop-fenixandflo.jpeg";
-import imgJointdexter from "@/assets/Hiphop-Jointdexter.png";
-import imgSque3eze from "@/assets/Hiphop-Sque3eze-Rock.png";
-
-import audioFenixFlo from "@/assets/audio/Hiphop-FenixandFlo-WhoSaidP2.mp3";
-import audioJointdexter from "@/assets/audio/Hiphop-JointDexterandYoshi-Fye.mp3";
-import audioSque3eze from "@/assets/audio/Hiphop-Sque3eze-Rock.mp3";
-
-function slugToGenre(slug: string) {
-  const map: Record<string, string> = {
-    hiphop: "Hip Hop",
-    rnb: "RnB",
-    alternativesoul: "Alternative Soul",
-  };
-  return map[slug] || slug.replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function formatTime(s: number) {
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return `${m}:${sec.toString().padStart(2, "0")}`;
-}
-
-interface Song {
+interface Artist {
   id: string;
-  title: string;
-  artist: string;
-  imageUrl: string;
-  audioUrl: string;
+  name: string;
+  image: string;
+  song: string;
+  duration: number;
+  audio: string;
+}
+
+interface PlayerState {
+  artistId: string;
+  isPlaying: boolean;
+  currentTime: number;
   duration: number;
 }
 
-const SONGS_BY_GENRE: Record<string, Song[]> = {
-  hiphop: [
-    { id: "hh1", title: "Who Said? Pt.2", artist: "Fenix&Flo", imageUrl: imgFenixFlo, audioUrl: audioFenixFlo, duration: 164 },
-    { id: "hh2", title: "Fye", artist: "Jointdexter", imageUrl: imgJointdexter, audioUrl: audioJointdexter, duration: 129 },
-    { id: "hh3", title: "Rock", artist: "Sque3eze", imageUrl: imgSque3eze, audioUrl: audioSque3eze, duration: 153 },
-  ],
-  rnb: [],
-  alternativesoul: [],
-};
+function slugToGenre(slug: string) {
+  return slug
+    .replace(/-and-/g, " & ")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
-const MAX_VOTES = 3;
+const formatTime = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
 
 const LokolListensGenre = () => {
   const { genre } = useParams<{ genre: string }>();
   const [searchParams] = useSearchParams();
   const storeId = searchParams.get("store") || "";
   const genreName = genre ? slugToGenre(genre) : "Unknown";
-  const songs = (genre && SONGS_BY_GENRE[genre]) || [];
+
+  const artists: Record<string, Artist[]> = {
+    hiphop: [
+      {
+        id: "fenix-flo",
+        name: "Fenix&Flo",
+        image: fenixFloImg,
+        song: "Who Said? Pt.2",
+        duration: 164,
+        audio: fenixFloAudio,
+      },
+      {
+        id: "jointdexter",
+        name: "Jointdexter",
+        image: jointdexterImg,
+        song: "Fye",
+        duration: 129,
+        audio: jointdexterAudio,
+      },
+      {
+        id: "sque3eze",
+        name: "Sque3eze",
+        image: sque3ezeImg,
+        song: "Rock",
+        duration: 153,
+        audio: sque3ezeAudio,
+      },
+    ],
+    rnb: [],
+    alternativesoul: [],
+  };
+
+  const currentArtists = artists[genre || ""] || [];
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playerState, setPlayerState] = useState<PlayerState>({
+    artistId: "",
+    isPlaying: false,
+    currentTime: 0,
+    duration: 0,
+  });
 
   const [cratePoints, setCratePoints] = useState(0);
-  const [votedSongs, setVotedSongs] = useState<Set<string>>(new Set());
-  const [listenedSongs, setListenedSongs] = useState<Set<string>>(new Set());
-  const [showVoteLimit, setShowVoteLimit] = useState(false);
+  const [votedArtists, setVotedArtists] = useState<Set<string>>(
+    new Set()
+  );
+  const [listeningProgress, setListeningProgress] = useState
+    Record<string, number>
+  >({});
+  const [pointsAwarded, setPointsAwarded] = useState<Set<string>>(
+    new Set()
+  );
+  const [voteCount, setVoteCount] = useState(0);
+  const [showVoteLimitModal, setShowVoteLimitModal] = useState(false);
 
-  const [playingSongId, setPlayingSongId] = useState<string | null>(null);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [audioDuration, setAudioDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    const audio = new Audio();
-    audio.preload = "metadata";
-    audioRef.current = audio;
-    return () => {
-      audio.pause();
-      audio.src = "";
-    };
-  }, []);
-
+  // Handle timeupdate event
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const onTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-      if (playingSongId && audio.duration > 0 && audio.currentTime >= audio.duration * 0.5) {
-        setListenedSongs((prev) => {
-          if (prev.has(playingSongId)) return prev;
-          const next = new Set(prev);
-          next.add(playingSongId);
-          setCratePoints((p) => p + 5);
-          return next;
-        });
+    const handleTimeUpdate = () => {
+      setPlayerState((prev) => ({
+        ...prev,
+        currentTime: audio.currentTime,
+      }));
+
+      // Check if 50% of song has been listened to
+      const progress = audio.currentTime / audio.duration;
+      if (progress >= 0.5 && !pointsAwarded.has(playerState.artistId)) {
+        setCratePoints((prev) => prev + 5);
+        setPointsAwarded(
+          (prev) => new Set([...prev, playerState.artistId])
+        );
       }
     };
 
-    const onEnded = () => {
-      setPlayingSongId(null);
-      setCurrentTime(0);
+    const handleLoadedMetadata = () => {
+      setPlayerState((prev) => ({
+        ...prev,
+        duration: audio.duration,
+      }));
     };
 
-    const onLoadedMetadata = () => setAudioDuration(audio.duration);
-
-    audio.addEventListener("timeupdate", onTimeUpdate);
-    audio.addEventListener("ended", onEnded);
-    audio.addEventListener("loadedmetadata", onLoadedMetadata);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
 
     return () => {
-      audio.removeEventListener("timeupdate", onTimeUpdate);
-      audio.removeEventListener("ended", onEnded);
-      audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
-  }, [playingSongId]);
+  }, [playerState.artistId, pointsAwarded]);
 
-  const handlePlay = useCallback(
-    (song: Song) => {
-      const audio = audioRef.current;
-      if (!audio) return;
+  const handlePlayPause = (artistId: string, audioUrl: string) => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-      if (playingSongId === song.id) {
-        audio.pause();
-        setPlayingSongId(null);
-        return;
-      }
-
-      if (playingSongId !== song.id) {
-        audio.src = song.audioUrl;
-        audio.load();
-        setCurrentTime(0);
-        setAudioDuration(song.duration);
-      }
-      audio.play().catch(() => {});
-      setPlayingSongId(song.id);
-    },
-    [playingSongId]
-  );
-
-  const handleRewind = useCallback(
-    (songId: string) => {
-      const audio = audioRef.current;
-      if (!audio || playingSongId !== songId) return;
+    // If switching to a different song, load it
+    if (playerState.artistId !== artistId) {
+      audio.src = audioUrl;
       audio.currentTime = 0;
-      setCurrentTime(0);
-    },
-    [playingSongId]
-  );
-
-  const handleVote = useCallback(
-    (songId: string) => {
-      if (votedSongs.has(songId)) return;
-      if (votedSongs.size >= MAX_VOTES) {
-        setShowVoteLimit(true);
-        return;
-      }
-      setVotedSongs((prev) => {
-        const next = new Set(prev);
-        next.add(songId);
-        return next;
+      audio.play();
+      setPlayerState({
+        artistId,
+        isPlaying: true,
+        currentTime: 0,
+        duration: 0,
       });
-      setCratePoints((p) => p + 5);
-    },
-    [votedSongs]
-  );
+    } else {
+      // Same song: toggle play/pause
+      if (playerState.isPlaying) {
+        audio.pause();
+        setPlayerState((prev) => ({ ...prev, isPlaying: false }));
+      } else {
+        audio.play();
+        setPlayerState((prev) => ({ ...prev, isPlaying: true }));
+      }
+    }
+  };
+
+  const handleRewind = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = 0;
+      setPlayerState((prev) => ({ ...prev, currentTime: 0 }));
+    }
+  };
+
+  const handleVote = (artistId: string) => {
+    if (votedArtists.has(artistId)) return;
+
+    if (voteCount >= 3) {
+      setShowVoteLimitModal(true);
+      return;
+    }
+
+    setVotedArtists((prev) => new Set([...prev, artistId]));
+    setVoteCount((prev) => prev + 1);
+    setCratePoints((prev) => prev + 5);
+  };
+
+  if (!currentArtists || currentArtists.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col bg-black">
+        <header className="sticky top-0 z-50 px-6 py-4 flex items-center justify-between bg-black border-b border-gray-800">
+          <Link
+            to={`/lls${storeId ? `?store=${storeId}` : ""}`}
+            className="flex items-center gap-2 text-white hover:text-yellow-400 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div className="flex items-center gap-2">
+            <img src={golokolLogo} alt="GoLokol" className="h-6 w-6" />
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-white">Crate Points: {cratePoints}</p>
+          </div>
+        </header>
+
+        <section className="flex-1 flex flex-col items-center justify-center px-6 py-16 text-center">
+          <h1 className="font-bold text-3xl text-white mb-4">{genreName}</h1>
+          <p className="text-lg text-gray-400 max-w-md">
+            Songs for this genre will appear here soon. Stay tuned.
+          </p>
+        </section>
+
+        <footer className="px-6 py-6 text-center border-t border-gray-800">
+          <p className="text-xs text-gray-400">
+            GoLokol — The future of music is local.
+          </p>
+        </footer>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#000000" }}>
-      {/* NAV */}
-      <nav className="sticky top-0 z-50 w-full flex items-center justify-between px-4 py-3" style={{ background: "#000000", borderBottom: "1px solid #222" }}>
-        <Link to={`/lls${storeId ? `?store=${storeId}` : ""}`}>
-          <img src={golokolLogo} alt="GoLokol" className="h-5 w-5" />
+    <div className="min-h-screen flex flex-col bg-black">
+      {/* Fixed Header */}
+      <header className="sticky top-0 z-50 px-6 py-4 flex items-center justify-between bg-black border-b border-gray-800">
+        <Link
+          to={`/lls${storeId ? `?store=${storeId}` : ""}`}
+          className="flex items-center gap-2 text-white hover:text-yellow-400 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
         </Link>
-        <span className="font-bold text-[18px] text-white">{genreName}</span>
         <div className="flex items-center gap-2">
-          <span className="font-bold text-[14px]" style={{ color: "#FFD600" }}>
+          <img src={golokolLogo} alt="GoLokol" className="h-6 w-6" />
+        </div>
+        <div className="text-right">
+          <p className="text-sm text-yellow-400 font-bold">
             Crate Points: {cratePoints}
-          </span>
+          </p>
           <Link
             to="/lls/signup"
-            className="font-bold text-[12px] text-white rounded-md border-2 border-white px-[16px] py-[8px] hover:bg-white/10 transition-colors"
+            className="text-xs text-white border border-white px-3 py-1 rounded hover:bg-white hover:text-black transition-colors"
           >
             Save
           </Link>
         </div>
-      </nav>
+      </header>
 
-      {/* MAIN */}
-      <main className="flex-1 w-full px-4 py-6">
-        <h1 className="font-bold text-center mb-8 text-white" style={{ fontSize: 32 }}>
-          {genreName} Artists
-        </h1>
+      {/* Genre Title */}
+      <div className="px-6 py-6 text-center border-b border-gray-800">
+        <h1 className="font-bold text-3xl text-white">{genreName} Artists</h1>
+      </div>
 
-        {songs.length === 0 ? (
-          <p className="text-center text-base" style={{ color: "#888" }}>
-            Songs for this genre coming soon. Stay tuned.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-6">
-            {songs.map((song) => {
-              const isPlaying = playingSongId === song.id;
-              const progress = isPlaying && audioDuration > 0 ? (currentTime / audioDuration) * 100 : 0;
-              const hasVoted = votedSongs.has(song.id);
+      {/* Artist Cards */}
+      <main className="flex-1 px-4 py-6 space-y-6">
+        {currentArtists.map((artist) => (
+          <div
+            key={artist.id}
+            className="rounded-lg overflow-hidden bg-black border border-gray-800"
+          >
+            {/* Image Section */}
+            <div className="relative w-full aspect-square rounded-t-lg overflow-hidden">
+              <img
+                src={artist.image}
+                alt={artist.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-3 left-3">
+                <h3 className="text-xl font-bold text-white drop-shadow-lg">
+                  {artist.name}
+                </h3>
+              </div>
+            </div>
 
-              return (
-                <div key={song.id} className="w-full rounded-xl overflow-hidden" style={{ background: "#1A1A1A" }}>
-                  {/* Image */}
-                  <div className="relative w-full aspect-square">
-                    <img src={song.imageUrl} alt={song.artist} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent" />
-                    <div className="absolute top-3 left-3">
-                      <span className="font-bold text-[20px] text-white drop-shadow-lg block" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.7)" }}>
-                        {song.artist}
-                      </span>
-                      <span className="text-[13px] text-white/70 drop-shadow">{song.title}</span>
-                    </div>
-                    {/* Progress bar on image bottom */}
-                    {isPlaying && (
-                      <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "rgba(255,255,255,0.15)" }}>
-                        <div className="h-full transition-[width] duration-200 ease-linear" style={{ width: `${progress}%`, background: "#FFD600" }} />
-                      </div>
-                    )}
-                  </div>
+            {/* Controls Section (Off-Black Bar) */}
+            <div className="bg-gray-900 px-4 py-4 flex items-center justify-between">
+              {/* Left: Heart */}
+              <button
+                onClick={() => handleVote(artist.id)}
+                disabled={votedArtists.has(artist.id)}
+                className={`transition-all ${
+                  votedArtists.has(artist.id)
+                    ? "text-yellow-400"
+                    : "text-gray-400 hover:text-yellow-400"
+                }`}
+              >
+                <Heart
+                  className={`h-6 w-6 ${
+                    votedArtists.has(artist.id) ? "fill-yellow-400" : ""
+                  }`}
+                />
+              </button>
 
-                  {/* Info bar */}
-                  <div className="flex items-center justify-between px-4" style={{ height: 70, background: "#1A1A1A" }}>
-                    {/* Vote */}
-                    <button onClick={() => handleVote(song.id)} className="transition-transform active:scale-90" aria-label={hasVoted ? "Voted" : "Vote"}>
-                      <Heart size={24} className={hasVoted ? "fill-[#FFD600] text-[#FFD600]" : "text-[#FFD600]"} strokeWidth={2} />
-                    </button>
+              {/* Center: Play/Pause + Rewind */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handlePlayPause(artist.id, artist.audio)}
+                  className="h-10 w-10 rounded-full bg-yellow-400 text-black flex items-center justify-center hover:bg-yellow-300 transition-all"
+                >
+                  {playerState.artistId === artist.id &&
+                  playerState.isPlaying ? (
+                    <Pause className="h-5 w-5 fill-black" />
+                  ) : (
+                    <Play className="h-5 w-5 ml-0.5 fill-black" />
+                  )}
+                </button>
 
-                    {/* Play + Rewind */}
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => handlePlay(song)}
-                        className="w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-90"
-                        style={{ background: "#FFD600" }}
-                        aria-label={isPlaying ? "Pause" : "Play"}
-                      >
-                        {isPlaying ? (
-                          <Pause size={20} className="text-black" fill="black" />
-                        ) : (
-                          <Play size={20} className="text-black ml-0.5" fill="black" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => handleRewind(song.id)}
-                        className="w-7 h-7 rounded-md border-2 flex items-center justify-center transition-transform active:scale-90"
-                        style={{ borderColor: "#FFD600" }}
-                        aria-label="Rewind"
-                      >
-                        <RotateCcw size={14} style={{ color: "#FFD600" }} />
-                      </button>
-                    </div>
+                <button
+                  onClick={handleRewind}
+                  disabled={playerState.artistId !== artist.id}
+                  className={`h-8 w-8 rounded border border-yellow-400 flex items-center justify-center transition-all ${
+                    playerState.artistId === artist.id
+                      ? "text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      : "text-gray-400 border-gray-400"
+                  }`}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </button>
+              </div>
 
-                    {/* Duration */}
-                    <span className="font-bold text-[14px] text-white">
-                      {isPlaying ? `${formatTime(currentTime)} / ${formatTime(audioDuration)}` : formatTime(song.duration)}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+              {/* Right: Duration */}
+              <div className="text-right">
+                <p className="text-sm font-bold text-white">
+                  {playerState.artistId === artist.id
+                    ? formatTime(playerState.currentTime)
+                    : "0:00"}{" "}
+                  / {formatTime(artist.duration)}
+                </p>
+              </div>
+            </div>
           </div>
-        )}
+        ))}
       </main>
 
-      {/* Vote limit modal */}
-      {showVoteLimit && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 px-6">
-          <div className="rounded-2xl p-8 max-w-sm w-full text-center" style={{ background: "#1A1A1A" }}>
-            <h2 className="font-bold text-[22px] text-white mb-3">All 3 Votes Used!</h2>
-            <p className="text-[16px] text-white/80 mb-6">
-              You've used all 3 votes this session. Sign up to save your points and unlock more votes!
+      {/* Hidden Audio Element */}
+      <audio ref={audioRef} />
+
+      {/* Vote Limit Modal */}
+      {showVoteLimitModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-lg p-6 max-w-sm w-full border border-gray-700">
+            <h2 className="text-xl font-bold text-white mb-3">
+              Vote Limit Reached
+            </h2>
+            <p className="text-gray-300 mb-6">
+              You've used all 3 votes this session. Sign up to save your points
+              and unlock more votes!
             </p>
-            <div className="flex gap-3 justify-center">
-              <button onClick={() => setShowVoteLimit(false)} className="px-6 py-3 rounded-lg border-2 border-white/30 text-white font-bold hover:bg-white/10 transition-colors">
-                Close
-              </button>
-              <Link to="/lls/signup" className="px-6 py-3 rounded-lg font-bold text-black hover:opacity-90 transition-opacity" style={{ background: "#FFD600" }}>
-                Sign Up
-              </Link>
-            </div>
+            <Link
+              to="/lls/signup"
+              className="w-full bg-yellow-400 text-black font-bold py-3 rounded text-center hover:bg-yellow-300 transition-all block"
+            >
+              Sign Up
+            </Link>
+            <button
+              onClick={() => setShowVoteLimitModal(false)}
+              className="w-full mt-2 border border-gray-600 text-white py-3 rounded hover:bg-gray-800 transition-all"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
 
       {/* Footer */}
-      <footer className="w-full py-6 text-center mt-12" style={{ background: "#000000" }}>
-        <p className="text-[12px] text-white">GoLokol — The future of music is local.</p>
+      <footer className="px-6 py-6 text-center border-t border-gray-800">
+        <p className="text-xs text-gray-400">
+          GoLokol — The future of music is local.
+        </p>
       </footer>
     </div>
   );
