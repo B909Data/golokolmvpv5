@@ -53,6 +53,7 @@ import LLSUsArtists from "./pages/LLSUsArtists";
 import LLSUsRetail from "./pages/LLSUsRetail";
 import LokolListens from "./pages/LokolListens";
 import LokolListensGenre from "./pages/LokolListensGenre";
+import LLSSignup from "./pages/LLSSignup";
 import Connect from "./pages/Connect";
 
 const queryClient = new QueryClient();
@@ -76,6 +77,7 @@ const App = () => (
           {/* LLS Fan Kiosk */}
           <Route path="/lls" element={<LokolListens />} />
           <Route path="/lls/genre/:genre" element={<LokolListensGenre />} />
+          <Route path="/lls/signup" element={<LLSSignup />} />
           
           {/* LLS Guest Pass & Check-in */}
           <Route path="/lls/:eventId/pass" element={<LLSGuestPass />} />
