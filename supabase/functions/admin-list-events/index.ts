@@ -34,6 +34,7 @@ serve(async (req) => {
       .select("*")
       .eq("type", "after_party")
       .eq("admin_state", "active")
+      .eq("payment_status", "paid")
       .order("start_at", { ascending: false });
 
     if (eventsError) {
