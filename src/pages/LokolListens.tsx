@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import llsHero from "@/assets/lls-tv-displays.svg";
+import llsHero from "@/assets/lls-hero-crates.svg";
 import genreHiphop from "@/assets/genre-hiphop.jpg";
 import genreRnb from "@/assets/genre-rnb.jpg";
 import genreAltsoul from "@/assets/genre-altsoul.jpg";
