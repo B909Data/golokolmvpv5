@@ -173,7 +173,7 @@ serve(async (req) => {
     const artistAccessToken = existingEvent.artist_access_token || crypto.randomUUID();
 
     // Update event to enable after party and set artist token (if new)
-    const updateData: Record<string, unknown> = { after_party_enabled: true };
+    const updateData: Record<string, unknown> = { after_party_enabled: true, payment_status: "paid" };
     if (!existingEvent.artist_access_token) {
       updateData.artist_access_token = artistAccessToken;
     }
