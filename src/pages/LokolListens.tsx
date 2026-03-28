@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import llsHero from "@/assets/lls-hero.jpg";
+import llsHero from "@/assets/lls-tv-displays.svg";
 import genreHiphop from "@/assets/genre-hiphop.jpg";
 import genreRnb from "@/assets/genre-rnb.jpg";
 import genreAltsoul from "@/assets/genre-altsoul.jpg";
@@ -29,11 +29,6 @@ const LokolListens = () => {
           height={1080}
         />
         <div className="absolute inset-0 bg-black/35" />
-        <div className="relative z-10 flex items-center justify-center h-full px-6">
-          <h1 className="text-white font-extrabold leading-[1.1] text-[32px] md:text-[48px] text-center max-w-3xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
-            Find new music you love where you live at Crate ATL.
-          </h1>
-        </div>
       </section>
 
       {/* Subcaption + CTA below hero */}
@@ -41,7 +36,7 @@ const LokolListens = () => {
         <p className="text-white font-normal leading-[1.8] text-[18px] md:text-[20px] max-w-2xl mx-auto">
           Listen and discover a curated selection of Atlanta local artists.
           <br /><br />
-          The future of music is local.
+          Earn points at Crates.
         </p>
         <button
           onClick={scrollToGenres}
