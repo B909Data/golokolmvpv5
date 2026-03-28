@@ -7,7 +7,7 @@ import jointdexterImg from "@/assets/Hiphop-Jointdexter.png";
 import sque3ezeImg from "@/assets/Hiphop-Sque3eze-Rock.png";
 import fenixFloAudio from "@/assets/audio/Hiphop-FenixandFlo-WhoSaidP2.mp3";
 import jointdexterAudio from "@/assets/audio/Hiphop-JointDexterandYoshi-Fye.mp3";
-import sque3ezeAudio from "@/assets/audio/Hiphop-Sque3eze - Rock.mp3";
+import sque3ezeAudio from "@/assets/audio/Hiphop-Sque3eze-Rock.mp3";
 
 interface Artist {
   id: string;
