@@ -39,7 +39,8 @@ const LokolListens = () => {
             Find new music you love where you live at Crate ATL.
           </h1>
           <p
-            className="text-white/90 font-normal leading-[1.8] text-[16px] md:text-[18px] mt-6"
+            className="font-bold leading-[1.8] text-[16px] md:text-[18px] mt-6"
+            style={{ color: "#FFD600" }}
           >
             Pick a genre. Listen and discover a curated selection of Atlanta local artists.
             Vote for your fav and we'll keep you connected. The future of music is local.
