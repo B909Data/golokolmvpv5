@@ -11,6 +11,8 @@ const LLSSignup = () => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const points = searchParams.get("points") || "0";
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
