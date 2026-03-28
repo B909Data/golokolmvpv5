@@ -64,8 +64,7 @@ const LokolListens = () => {
       >
         <div className="max-w-[1000px] mx-auto">
           <h2
-            className="text-center font-bold text-[28px] md:text-[32px] mb-10 md:mb-12"
-            style={{ color: "#000000" }}
+            className="text-center font-bold text-[28px] md:text-[32px] mb-10 md:mb-12 text-white"
           >
             Pick a genre
           </h2>
