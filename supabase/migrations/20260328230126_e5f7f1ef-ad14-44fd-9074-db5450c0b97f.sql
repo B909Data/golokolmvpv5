@@ -1,0 +1,1 @@
+UPDATE events SET admin_state = 'archived' WHERE type = 'after_party' AND admin_state = 'active' AND payment_status != 'paid';
