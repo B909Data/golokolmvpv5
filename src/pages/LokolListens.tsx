@@ -20,15 +20,12 @@ const LokolListens = () => {
   return (
     <div className="min-h-screen flex flex-col bg-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
       {/* Hero Image */}
-      <section className="relative w-full" style={{ height: "45vh", minHeight: 260 }}>
+      <section className="w-full flex items-center justify-center" style={{ height: "45vh", minHeight: 260 }}>
         <img
           src={llsHero}
           alt="Lokol Listening Sessions Atlanta"
-          className="absolute inset-0 w-full h-full object-cover"
-          width={1920}
-          height={1080}
+          className="max-w-full max-h-full object-contain"
         />
-        <div className="absolute inset-0 bg-black/35" />
       </section>
 
       {/* Subcaption + CTA below hero */}
