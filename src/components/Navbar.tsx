@@ -48,6 +48,7 @@ const Navbar = () => {
 
   const navItems = [
     { label: "Lokol Listening Sessions", path: "/lls-us", shortLabel: "Listening Sessions", colorClass: "text-primary" },
+    { label: "GoLokol Connect", path: "/connect", colorClass: "text-foreground" },
     { label: "Pricing", path: "/pricing", hideOnTablet: true, colorClass: "text-foreground" },
   ];
 
