@@ -22,7 +22,7 @@ const LLSUs = () => {
             <span className="text-primary">Is Local.</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
-            Lokol Listening Sessions re-envisions music discovery. We place local emerging music in discovery hubs like neighborhood record stores and filmed DJ sets featuring new sounds coming out of Atlanta.
+            We place local emerging music in discovery hubs like neighborhood record stores. Local music fans listen, vote and connect via Golokol Connect. Votes lead to artist features at Lokol Listening Session filmed events and direct-to-local fan sales and show promotions through Golokol Connect.
           </p>
         </div>
       </section>
@@ -38,7 +38,7 @@ const LLSUs = () => {
             <Music className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm an Artist</h2>
             <p className="type-body-md text-foreground-secondary">
-              Submit your music to be heard in stores and at live events.
+              Submit your music and build real momentum with Atlanta record store and Lokol event features. Get a free 1-month trial of Golokol Connect.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
               Get Started →
@@ -52,7 +52,7 @@ const LLSUs = () => {
             <Disc3 className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm Music Retail</h2>
             <p className="type-body-md text-foreground-secondary">
-              Partner your store to become a local music discovery hub.
+              Turn your store into a lokol music discovery hub. Generate more traffic, sales and cultural relevance.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
               Get Started →
