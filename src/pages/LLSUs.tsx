@@ -38,7 +38,7 @@ const LLSUs = () => {
             <Music className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm an Artist</h2>
             <p className="type-body-md text-foreground-secondary">
-              Submit your music to be heard in stores and at live events.
+              Submit your music and build real momentum with Atlanta record store and Lokol event features. Get a free 1-month trial of Golokol Connect.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
               Get Started →
