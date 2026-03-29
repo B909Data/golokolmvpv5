@@ -22,7 +22,7 @@ const LLSUs = () => {
             <span className="text-primary">Is Local.</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
-            Lokol Listening Sessions re-envisions music discovery. We place local emerging music in discovery hubs like neighborhood record stores and filmed DJ sets featuring new sounds coming out of Atlanta.
+            We place local emerging music in discovery hubs like neighborhood record stores. Local music fans listen, vote and connect via Golokol Connect. Votes lead to artist features at Lokol Listening Session filmed events and direct-to-local fan sales and show promotions through Golokol Connect.
           </p>
         </div>
       </section>
