@@ -1,36 +1,14 @@
 
 
-## Plan: Rebuild Genre Browse & Vote Page with Real Assets
+## Copy Updates on /lls-us Page
 
-### What changes
+Three text changes in `src/pages/LLSUs.tsx`:
 
-Replace the current mock-data-driven `LokolListensGenre.tsx` with real artist images and MP3 audio files for the Hip Hop genre.
+1. **Hero subcaption** (line ~27): Replace the current paragraph with the new copy about discovery hubs, voting, and GoLokol Connect.
 
-### Steps
+2. **Artist card description** (line ~43): Replace with new copy about building momentum with Atlanta record stores and free Connect trial.
 
-1. **Copy uploaded assets into the project**
-   - Images to `src/assets/`: `Hiphop-fenixandflo.jpeg`, `Hiphop-Jointdexter.png`, `Hiphop-Sque3eze-Rock.png`
-   - Audio to `src/assets/audio/`: all 3 MP3 files
+3. **Retail card description** (line ~55): Replace with new copy about turning stores into lokol music discovery hubs.
 
-2. **Rewrite `src/pages/LokolListensGenre.tsx`**
-   - Fix genre slug keys to match routing (`hiphop`, `rnb`, `alternativesoul` — no hyphens)
-   - Replace mock data for `hiphop` with 3 real artists:
-     - Fenix&Flo — "Who Said? Pt.2" (2:44 / 164s)
-     - Jointdexter — "Fye" (2:09 / 129s)
-     - Sque3eze — "Rock" (2:33 / 153s)
-   - Import images and audio files as ES modules
-   - Replace simulated playback with real `<audio>` element playback using `HTMLAudioElement`
-   - Track actual `timeupdate` events for progress bar and 50% milestone detection
-   - Keep all existing UI/UX: sticky nav, crate points, vote limit modal, responsive grid, footer
-   - Keep `rnb` and `alternativesoul` with placeholder "coming soon" state (empty arrays)
-
-3. **No routing changes needed** — route `/lls/genre/:genre` already exists in `App.tsx`
-
-### Technical details
-
-- Audio imports: Vite handles MP3 imports natively, returning a URL string
-- Real `<audio>` element replaces `setInterval` simulation — uses `onTimeUpdate`, `onEnded`, `onLoadedMetadata` events
-- Progress bar width calculated from `audio.currentTime / audio.duration`
-- 50% point detection: check `currentTime >= duration * 0.5` in `timeupdate` handler
-- Single shared `<audio>` element ref to avoid multiple simultaneous playbacks
+All changes are text-only in a single file. No layout, styling, or structural changes.
 
