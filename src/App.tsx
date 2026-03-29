@@ -37,7 +37,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Partners from "./pages/Partners";
 import ArtistRecognition from "./pages/ArtistRecognition";
-import Pricing from "./pages/Pricing";
+import AfterPartyPricing from "./pages/AfterPartyPricing";
 import SelectAfterPartyPlan from "./pages/SelectAfterPartyPlan";
 import LLSGuestPass from "./pages/LLSGuestPass";
 import LLSCheckin from "./pages/LLSCheckin";
