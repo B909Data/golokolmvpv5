@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Music, Disc3 } from "lucide-react";
 import Footer from "@/components/Footer";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import llsUsHero from "@/assets/lls-us-hero.jpg";
 
 const LLSUs = () => {
   return (
@@ -14,17 +15,31 @@ const LLSUs = () => {
         </Link>
       </header>
 
-      {/* HERO */}
-      <section className="px-6 md:px-12 lg:px-20 py-16 md:py-24">
-        <div className="max-w-3xl">
-          <h1 className="mb-6">
+      {/* HERO with image */}
+      <section className="relative w-full min-h-[420px] md:min-h-[520px] flex items-end">
+        <img
+          src={llsUsHero}
+          alt="Black woman with headphones listening to music with Atlanta map background"
+          className="absolute inset-0 w-full h-full object-cover object-top"
+          width={1920}
+          height={800}
+        />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
+        {/* Hero text */}
+        <div className="relative z-10 px-6 md:px-12 lg:px-20 pb-10 md:pb-14 max-w-3xl">
+          <h1 className="mb-0">
             <span className="text-foreground">The Future of Music </span>
             <span className="text-primary">Is Local.</span>
           </h1>
-          <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
-            We place local emerging music in discovery hubs like neighborhood record stores. Local music fans listen, vote and connect via Golokol Connect. Votes lead to artist features at Lokol Listening Session filmed events and direct-to-local fan sales and show promotions through Golokol Connect.
-          </p>
         </div>
+      </section>
+
+      {/* Body text below hero */}
+      <section className="px-6 md:px-12 lg:px-20 py-10 md:py-16">
+        <p className="type-subcaption text-[#F0EDE8] mb-0 max-w-2xl">
+          We place local emerging music in discovery hubs like neighborhood record stores. Local music fans listen, vote and connect via Golokol Connect. Votes lead to artist features at Lokol Listening Session filmed events and direct-to-local fan sales and show promotions through Golokol Connect.
+        </p>
       </section>
 
       {/* AUDIENCE SPLIT */}
@@ -37,7 +52,7 @@ const LLSUs = () => {
           >
             <Music className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm an Artist</h2>
-            <p className="type-body-md text-foreground-secondary">
+            <p className="type-body-md text-[#F0EDE8]">
               Submit your music and build real momentum with Atlanta record store and Lokol event features. Get a free 1-month trial of Golokol Connect.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
@@ -51,7 +66,7 @@ const LLSUs = () => {
           >
             <Disc3 className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm Music Retail</h2>
-            <p className="type-body-md text-foreground-secondary">
+            <p className="type-body-md text-[#F0EDE8]">
               Turn your store into a lokol music discovery hub. Generate more traffic, sales and cultural relevance.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
