@@ -38,6 +38,7 @@ import Privacy from "./pages/Privacy";
 import Partners from "./pages/Partners";
 import ArtistRecognition from "./pages/ArtistRecognition";
 import AfterPartyPricing from "./pages/AfterPartyPricing";
+import Pricing from "./pages/Pricing";
 import SelectAfterPartyPlan from "./pages/SelectAfterPartyPlan";
 import LLSGuestPass from "./pages/LLSGuestPass";
 import LLSCheckin from "./pages/LLSCheckin";
