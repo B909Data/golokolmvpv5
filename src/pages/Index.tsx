@@ -59,16 +59,16 @@ const Index = () => {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
-              to="/songs"
+              to="/lls-us"
               className="inline-flex items-center justify-center bg-white text-black font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
             >
               Lokol Listening Sessions
             </Link>
             <Link
-              to="/ap-us"
+              to="/connect"
               className="inline-flex items-center justify-center bg-[#FFD600] text-black font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
             >
-              Create an After Party
+              Try GoLokol Connect
             </Link>
           </div>
         </div>
