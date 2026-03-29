@@ -47,8 +47,7 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { label: "Create an After Party", path: "/create-after-party", hideOnTablet: true, colorClass: "text-foreground" },
-    { label: "Lokol Listening Sessions", path: "/songs", shortLabel: "Listening Sessions", colorClass: "text-primary" },
+    { label: "Lokol Listening Sessions", path: "/lls-us", shortLabel: "Listening Sessions", colorClass: "text-primary" },
     { label: "Pricing", path: "/pricing", hideOnTablet: true, colorClass: "text-foreground" },
   ];
 
