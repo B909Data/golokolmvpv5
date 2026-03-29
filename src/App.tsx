@@ -37,7 +37,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Partners from "./pages/Partners";
 import ArtistRecognition from "./pages/ArtistRecognition";
-import Pricing from "./pages/Pricing";
+import AfterPartyPricing from "./pages/AfterPartyPricing";
 import SelectAfterPartyPlan from "./pages/SelectAfterPartyPlan";
 import LLSGuestPass from "./pages/LLSGuestPass";
 import LLSCheckin from "./pages/LLSCheckin";
@@ -131,7 +131,7 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/partners" element={<Partners />} />
-           <Route path="/pricing" element={<Pricing />} />
+           <Route path="/pricing-ap" element={<AfterPartyPricing />} />
            <Route path="/connect" element={<Connect />} />
           <Route path="/for-artists" element={<ArtistRecognition />} />
           <Route path="/q/:code" element={<ShortLinkRedirect />} />
