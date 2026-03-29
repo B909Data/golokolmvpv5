@@ -103,23 +103,12 @@ const Index = () => {
             to="/songs"
           />
           <HowItWorksCard
-            image={afterpartyCard}
+            image={connectCard}
             number={2}
-            title="After Parties"
-            description="Make every show count. Reward and develop community with local fans who show up. A private 24 hour online chat/livestream you curate and your fans appreciate."
-            to="/ap-us"
+            title="Try GoLokol Connect"
+            description="One dashboard that updates you about the shows, new music and news from all the artists you love city-wide."
+            to="/connect"
           />
-          <div className="sm:col-span-2 flex justify-center">
-            <div className="w-full max-w-md">
-              <HowItWorksCard
-                image={connectCard}
-                number={3}
-                title="Try GoLokol Connect"
-                description="One dashboard that updates you about the shows, new music and news from all the artists you love city-wide."
-                to="/connect"
-              />
-            </div>
-          </div>
         </div>
       </section>
 
