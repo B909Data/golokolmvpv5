@@ -52,7 +52,7 @@ const LLSUs = () => {
             <Disc3 className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm Music Retail</h2>
             <p className="type-body-md text-foreground-secondary">
-              Partner your store to become a local music discovery hub.
+              Turn your store into a lokol music discovery hub. Generate more traffic, sales and cultural relevance.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
               Get Started →
