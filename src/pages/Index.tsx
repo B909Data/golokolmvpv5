@@ -51,8 +51,8 @@ const Index = () => {
         <div className="absolute inset-0 bg-black/45" />
         <div className="relative z-10 px-6 md:px-12 lg:px-20 pt-32 pb-16 max-w-3xl">
           <h1 className="font-display font-bold text-[32px] md:text-[48px] leading-[1.1] mb-4">
-            <span className="text-white">Find fans you love </span>
-            <span className="text-[#FFD600]">where you are</span>
+            <span className="text-white">Find music you love </span>
+            <span className="text-[#FFD600]">where you live</span>
           </h1>
           <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
             GoLokol supports local music discovery, fan engagement and music scenes. We launch in Atlanta.
