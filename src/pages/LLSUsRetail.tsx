@@ -88,7 +88,9 @@ const [form, setForm] = useState({
       store_logo_url = urlData.publicUrl;
     }
 
-    const { data: inserted, error } = await supabase.from("lls_retail_signups").insert({
+    const signupId = crypto.randomUUID();
+    const { error } = await supabase.from("lls_retail_signups").insert({
+      id: signupId,
       store_name: form.store_name.trim(),
       city_location: form.city_location,
       store_type: form.store_type,
@@ -98,14 +100,14 @@ const [form, setForm] = useState({
       contact_name: form.contact_name.trim(),
       contact_email: form.contact_email.trim(),
       notes: form.notes.trim() || null,
-    } as any).select("id").single();
+    } as any);
     setSubmitting(false);
     if (error) {
       toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
     } else {
       navigate("/lls-us/terms", {
         state: {
-          retail_signup_id: inserted?.id,
+          retail_signup_id: signupId,
           store_name: form.store_name.trim(),
           contact_name: form.contact_name.trim(),
           contact_email: form.contact_email.trim(),
