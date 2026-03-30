@@ -241,10 +241,10 @@ const LLSUsTerms = () => {
 
       <main className="flex-1 px-6 md:px-12 lg:px-20 py-12">
         <div className="max-w-2xl mx-auto">
-          <h1 className="font-display text-2xl md:text-3xl text-foreground mb-2">
+          <h1 className="font-display text-2xl md:text-3xl text-black mb-2">
             LOKOL LISTENING SESSIONS
           </h1>
-          <h2 className="font-display text-xl md:text-2xl text-foreground mb-8">
+          <h2 className="font-display text-xl md:text-2xl text-black mb-8">
             KIOSK PLACEMENT AGREEMENT
           </h2>
 
