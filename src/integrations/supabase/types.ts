@@ -718,6 +718,48 @@ export type Database = {
           },
         ]
       }
+      lls_partners: {
+        Row: {
+          city: string
+          contact_email: string
+          contact_name: string
+          created_at: string | null
+          has_local_music_space: string | null
+          id: string
+          notes: string | null
+          store_name: string
+          store_slug: string
+          store_type: string
+          terms_accepted: boolean | null
+        }
+        Insert: {
+          city: string
+          contact_email: string
+          contact_name: string
+          created_at?: string | null
+          has_local_music_space?: string | null
+          id?: string
+          notes?: string | null
+          store_name: string
+          store_slug: string
+          store_type: string
+          terms_accepted?: boolean | null
+        }
+        Update: {
+          city?: string
+          contact_email?: string
+          contact_name?: string
+          created_at?: string | null
+          has_local_music_space?: string | null
+          id?: string
+          notes?: string | null
+          store_name?: string
+          store_slug?: string
+          store_type?: string
+          terms_accepted?: boolean | null
+        }
+        Relationships: []
+      }
       lls_retail_signups: {
         Row: {
           city_location: string
@@ -924,9 +966,13 @@ export type Database = {
       submissions: {
         Row: {
           admin_notes: string | null
+          admin_status: string | null
           artist_name: string
+          city_market: string | null
           contact_email: string
           created_at: string
+          genre_style: string | null
+          how_heard: string | null
           id: string
           instagram_handle: string | null
           mp3_path: string | null
@@ -937,7 +983,10 @@ export type Database = {
           original_filename: string | null
           payment_status: string | null
           phone: string | null
+          physical_product: string | null
           promo_code: string | null
+          short_bio: string | null
+          song_image_url: string | null
           song_title: string
           spotify_url: string
           status: string
@@ -946,9 +995,13 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
+          admin_status?: string | null
           artist_name: string
+          city_market?: string | null
           contact_email: string
           created_at?: string
+          genre_style?: string | null
+          how_heard?: string | null
           id?: string
           instagram_handle?: string | null
           mp3_path?: string | null
@@ -959,7 +1012,10 @@ export type Database = {
           original_filename?: string | null
           payment_status?: string | null
           phone?: string | null
+          physical_product?: string | null
           promo_code?: string | null
+          short_bio?: string | null
+          song_image_url?: string | null
           song_title: string
           spotify_url: string
           status?: string
@@ -968,9 +1024,13 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
+          admin_status?: string | null
           artist_name?: string
+          city_market?: string | null
           contact_email?: string
           created_at?: string
+          genre_style?: string | null
+          how_heard?: string | null
           id?: string
           instagram_handle?: string | null
           mp3_path?: string | null
@@ -981,7 +1041,10 @@ export type Database = {
           original_filename?: string | null
           payment_status?: string | null
           phone?: string | null
+          physical_product?: string | null
           promo_code?: string | null
+          short_bio?: string | null
+          song_image_url?: string | null
           song_title?: string
           spotify_url?: string
           status?: string
