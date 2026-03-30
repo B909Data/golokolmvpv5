@@ -20,11 +20,12 @@ import golokolLogo from "@/assets/golokol-logo.svg";
 const LLSUsRetail = () => {
   const { toast } = useToast();
 
-  const [form, setForm] = useState({
+const [form, setForm] = useState({
     store_name: "",
     city_location: "",
     store_type: "",
     has_listening_station: "",
+    signage_preference: [] as string[],
     contact_name: "",
     contact_email: "",
     notes: "",
