@@ -392,7 +392,7 @@ const LLSUsTerms = () => {
 
             {/* Section 11 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">11. NO EXCLUSIVITY</h3>
+              <h3 className="text-black font-semibold mb-3">11. NO EXCLUSIVITY</h3>
               <p>GoLokol may place Lokol Listening Sessions kiosks in other record stores and retail locations in {city} and beyond. This agreement does not grant Store any exclusive rights.</p>
             </div>
 
