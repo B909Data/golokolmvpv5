@@ -652,6 +652,62 @@ export type Database = {
           },
         ]
       }
+      lls_kiosk_agreement_signatures: {
+        Row: {
+          agreement_text: string
+          agreement_version: string
+          city: string
+          contact_name: string
+          created_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          retail_signup_id: string | null
+          signature_name: string
+          signer_title: string | null
+          store_name: string
+          user_agent: string | null
+        }
+        Insert: {
+          agreement_text: string
+          agreement_version?: string
+          city: string
+          contact_name: string
+          created_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          retail_signup_id?: string | null
+          signature_name: string
+          signer_title?: string | null
+          store_name: string
+          user_agent?: string | null
+        }
+        Update: {
+          agreement_text?: string
+          agreement_version?: string
+          city?: string
+          contact_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          retail_signup_id?: string | null
+          signature_name?: string
+          signer_title?: string | null
+          store_name?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lls_kiosk_agreement_signatures_retail_signup_id_fkey"
+            columns: ["retail_signup_id"]
+            isOneToOne: false
+            referencedRelation: "lls_retail_signups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lls_music_release_signatures: {
         Row: {
           agreement_text: string
