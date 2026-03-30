@@ -205,7 +205,7 @@ const [form, setForm] = useState({
 
               {/* Signage Preference */}
               <div className="rounded-lg bg-[#2a2a2a] p-6">
-                <Label className="text-foreground mb-4 block">Choose store signage? (free)</Label>
+                <Label className="text-foreground mb-4 block">Choose 1 or both store signage? (free)</Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
                     { value: "14x14_foam_board", img: signageSquare, caption: '14x14 foam board. Great for table top or in aisle.' },
