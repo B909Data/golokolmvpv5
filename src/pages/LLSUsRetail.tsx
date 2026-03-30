@@ -99,6 +99,7 @@ const [form, setForm] = useState({
       has_listening_station: form.has_listening_station,
       signage_preference: form.signage_preference,
       store_logo_url,
+      terms_accepted: form.terms_accepted,
       contact_name: form.contact_name.trim(),
       contact_email: form.contact_email.trim(),
       notes: form.notes.trim() || null,
