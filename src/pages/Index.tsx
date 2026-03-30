@@ -100,7 +100,7 @@ const Index = () => {
             number={1}
             title="Lokol Listening Sessions"
             description="Good music lives here. Discover and vote for local artists at your favorite record store. Find music you love where you live. Algorithms and AI can't call any place home. You do."
-            to="/songs"
+            to="/lls-us"
           />
           <HowItWorksCard
             image={connectCard}
