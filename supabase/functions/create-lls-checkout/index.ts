@@ -12,9 +12,23 @@ serve(async (req) => {
   }
 
   try {
-    const { artist_name, contact_email, song_title, spotify_url, youtube_url, notes, music_release_agreed } = await req.json();
+    const {
+      artist_name,
+      contact_email,
+      instagram_handle,
+      genre_style,
+      city_market,
+      physical_product,
+      short_bio,
+      how_heard,
+      song_image_url,
+      mp3_url,
+      mp3_path,
+      original_filename,
+      music_release_agreed,
+    } = await req.json();
 
-    if (!artist_name || !contact_email || !song_title || !spotify_url) {
+    if (!artist_name || !contact_email || !genre_style || !city_market || !short_bio) {
       throw new Error("Missing required fields");
     }
 
@@ -22,32 +36,36 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    const origin = req.headers.get("origin") || "https://golokol.com";
+    const origin = req.headers.get("origin") || "https://golokol.app";
 
     const session = await stripe.checkout.sessions.create({
       customer_email: contact_email,
       line_items: [
         {
-          price: "price_1SnmYZPKcGpNZUZRTzMmQjUo", // Live mode: LLS Song Submission $5
+          price: "price_1SnmYZPKcGpNZUZRTzMmQjUo",
           quantity: 1,
         },
       ],
       mode: "payment",
-      success_url: `${origin}/songs/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/songs`,
+      success_url: `${origin}/lls-us/artists/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/lls-us/artists`,
       metadata: {
         type: "lls_submission",
         artist_name,
-        song_title,
         contact_email,
-        spotify_url,
-        youtube_url: youtube_url || "",
-        notes: notes || "",
+        instagram_handle: instagram_handle || "",
+        genre_style: Array.isArray(genre_style) ? genre_style.join(",") : genre_style,
+        city_market,
+        physical_product: physical_product || "",
+        short_bio,
+        how_heard: how_heard || "",
+        song_image_url: song_image_url || "",
+        mp3_url: mp3_url || "",
+        mp3_path: mp3_path || "",
+        original_filename: original_filename || "",
         music_release_agreed: music_release_agreed ? "true" : "false",
       },
     });
-
-    console.log("LLS checkout session created:", session.id);
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
