@@ -416,21 +416,21 @@ const LLSUsTerms = () => {
           </div>
 
           {/* Signature Section */}
-          <div className="border-t border-border pt-10">
-            <h2 className="font-display text-xl md:text-2xl text-foreground mb-8">
+          <div className="border-t border-black/20 pt-10">
+            <h2 className="font-display text-xl md:text-2xl text-black mb-8">
               Store Agreement Signature
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Pre-filled info */}
-              <div className="rounded-lg bg-background-secondary border border-border p-4 space-y-1">
-                <p className="type-body-sm text-foreground-secondary">Signing on behalf of: <span className="text-foreground font-medium">{store_name}</span></p>
-                <p className="type-body-sm text-foreground-secondary">Contact: <span className="text-foreground font-medium">{contact_name}</span></p>
-                <p className="type-body-sm text-foreground-secondary">Email: <span className="text-foreground font-medium">{contact_email}</span></p>
+              <div className="rounded-lg bg-gray-100 border border-black/10 p-4 space-y-1">
+                <p className="type-body-sm text-black/70">Signing on behalf of: <span className="text-black font-medium">{store_name}</span></p>
+                <p className="type-body-sm text-black/70">Contact: <span className="text-black font-medium">{contact_name}</span></p>
+                <p className="type-body-sm text-black/70">Email: <span className="text-black font-medium">{contact_email}</span></p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="signer_title" className="text-foreground">
+                <Label htmlFor="signer_title" className="text-black">
                   Title / Role
                 </Label>
                 <Input
@@ -439,6 +439,7 @@ const LLSUsTerms = () => {
                   value={formData.signer_title}
                   onChange={(e) => setFormData((p) => ({ ...p, signer_title: e.target.value }))}
                   maxLength={200}
+                  className="border-black/20 text-black"
                 />
               </div>
 
@@ -448,16 +449,16 @@ const LLSUsTerms = () => {
                   id="consent"
                   checked={consentChecked}
                   onCheckedChange={(checked) => setConsentChecked(checked === true)}
-                  className="mt-0.5"
+                  className="mt-0.5 border-black/40"
                 />
-                <Label htmlFor="consent" className="text-foreground text-sm leading-relaxed cursor-pointer">
+                <Label htmlFor="consent" className="text-black text-sm leading-relaxed cursor-pointer">
                   I confirm that I have read and agree to the Lokol Listening Sessions Kiosk Placement Agreement and that I have the authority to enter into this agreement on behalf of the Store. <span className="text-red-500">*</span>
                 </Label>
               </div>
 
               {/* Electronic Signature */}
               <div className="space-y-2">
-                <Label htmlFor="signature_name" className="text-foreground">
+                <Label htmlFor="signature_name" className="text-black">
                   Type your full legal name to sign <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -465,11 +466,11 @@ const LLSUsTerms = () => {
                   placeholder="Type your full legal name"
                   value={formData.signature_name}
                   onChange={(e) => setFormData((p) => ({ ...p, signature_name: e.target.value }))}
-                  className="font-serif italic text-lg"
+                  className="font-serif italic text-lg border-black/20 text-black"
                   required
                   maxLength={200}
                 />
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-black/50 mt-1">
                   By typing my name above and submitting this form, I acknowledge that this constitutes my electronic signature and that I am legally bound by the terms of this agreement.
                 </p>
               </div>
@@ -478,7 +479,7 @@ const LLSUsTerms = () => {
                 type="submit"
                 size="lg"
                 disabled={submitting || !consentChecked || !formData.signature_name.trim()}
-                className="w-full md:w-auto"
+                className="w-full md:w-auto bg-black text-yellow-400 hover:bg-black/90"
               >
                 {submitting ? "Signing..." : "Sign Agreement"}
               </Button>
