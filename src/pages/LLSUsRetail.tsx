@@ -146,7 +146,40 @@ const [form, setForm] = useState({
                 </Select>
               </div>
 
-              <div>
+              {/* Signage Preference */}
+              <div className="rounded-lg bg-[#2a2a2a] p-6">
+                <Label className="text-foreground mb-4 block">Choose store signage? (free)</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[
+                    { value: "14x14_foam_board", img: signageSquare, caption: '14x14 foam board. Great for table top or in aisle.' },
+                    { value: "11x17_foam_board", img: signageTall, caption: '11x17 foam board (Great to hang on wall)' },
+                  ].map((opt) => {
+                    const selected = form.signage_preference.includes(opt.value);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() =>
+                          setForm(f => ({
+                            ...f,
+                            signage_preference: selected
+                              ? f.signage_preference.filter(v => v !== opt.value)
+                              : [...f.signage_preference, opt.value],
+                          }))
+                        }
+                        className={`rounded-lg border-2 p-3 transition-all text-left ${
+                          selected
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border bg-input hover:border-foreground/30'
+                        }`}
+                      >
+                        <img src={opt.img} alt={opt.caption} className="w-full rounded-md mb-3 object-contain max-h-52" loading="lazy" />
+                        <p className="type-body-sm text-[#F0EDE8]">{opt.caption}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
                 <Label htmlFor="r-name" className="text-foreground">Contact Name *</Label>
                 <Input id="r-name" required value={form.contact_name} onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))} className="mt-1.5 bg-input border-border text-foreground" maxLength={200} />
               </div>
