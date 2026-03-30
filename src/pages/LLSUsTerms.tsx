@@ -331,7 +331,7 @@ const LLSUsTerms = () => {
 
             {/* Section 6 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">6. CUSTOMER DATA</h3>
+              <h3 className="text-black font-semibold mb-3">6. CUSTOMER DATA</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol owns all customer data collected through the kiosk (names, emails, voting history, music preferences, visit frequency).</li>
                 <li>Store does not receive customer lists or access to voting data.</li>
