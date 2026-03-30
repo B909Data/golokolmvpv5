@@ -90,6 +90,7 @@ const App = () => (
            <Route path="/lls-us" element={<LLSUs />} />
            <Route path="/lls-us/artists" element={<LLSUsArtists />} />
            <Route path="/lls-us/retail" element={<LLSUsRetail />} />
+           <Route path="/lls-us/terms" element={<LLSUsTerms />} />
           <Route path="/admin/after-parties" element={<AdminAfterParties />} />
           <Route path="/admin/discount-codes" element={<AdminDiscountCodes />} />
           <Route path="/admin/partners" element={<AdminPartners />} />
