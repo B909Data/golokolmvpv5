@@ -249,12 +249,12 @@ const LLSUsTerms = () => {
           </h2>
 
           {/* Agreement preamble */}
-          <div className="space-y-6 text-foreground-secondary leading-relaxed mb-12">
+          <div className="space-y-6 text-black/70 leading-relaxed mb-12">
             <p>This Agreement is entered into between:</p>
             <p>
-              <strong className="text-foreground">GoLokol, Inc.</strong> ("GoLokol")<br />
+              <strong className="text-black">GoLokol, Inc.</strong> ("GoLokol")<br />
               and<br />
-              <strong className="text-foreground">{store_name}</strong> and <strong className="text-foreground">{contact_name}</strong> ("Store")
+              <strong className="text-black">{store_name}</strong> and <strong className="text-black">{contact_name}</strong> ("Store")
             </p>
             <p>Effective Date: Date of Signature<br />Pilot Period: 90 days from installation</p>
 
