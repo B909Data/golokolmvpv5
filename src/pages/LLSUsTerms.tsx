@@ -382,7 +382,7 @@ const LLSUsTerms = () => {
 
             {/* Section 10 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">10. CHANGES & UPDATES</h3>
+              <h3 className="text-black font-semibold mb-3">10. CHANGES & UPDATES</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol may update the kiosk platform, voting mechanics, or features without additional notice.</li>
                 <li>Store acknowledges that technology evolves and that GoLokol may make improvements to the system.</li>
