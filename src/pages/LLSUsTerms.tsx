@@ -354,7 +354,7 @@ const LLSUsTerms = () => {
 
             {/* Section 8 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">8. LIABILITY & RESPONSIBILITY</h3>
+              <h3 className="text-black font-semibold mb-3">8. LIABILITY & RESPONSIBILITY</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol is liable for all technical failures, data loss, or platform malfunctions.</li>
                 <li>Store is not liable if customers experience issues with voting, points, or the platform.</li>
