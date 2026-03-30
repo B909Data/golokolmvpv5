@@ -365,8 +365,8 @@ const LLSUsTerms = () => {
 
             {/* Section 9 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">9. TERMINATION</h3>
-              <p className="font-medium text-foreground mb-2">During the 90-Day Pilot:</p>
+              <h3 className="text-black font-semibold mb-3">9. TERMINATION</h3>
+              <p className="font-medium text-black mb-2">During the 90-Day Pilot:</p>
               <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
                 <li>Either party may terminate this agreement with 3 days' written notice (email is acceptable).</li>
                 <li>Store honors all remaining customer points upon termination.</li>
