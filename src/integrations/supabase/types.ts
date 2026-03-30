@@ -773,6 +773,7 @@ export type Database = {
           store_logo_url: string | null
           store_name: string
           store_type: string
+          terms_accepted: boolean | null
         }
         Insert: {
           city_location: string
@@ -786,6 +787,7 @@ export type Database = {
           store_logo_url?: string | null
           store_name: string
           store_type: string
+          terms_accepted?: boolean | null
         }
         Update: {
           city_location?: string
@@ -799,6 +801,7 @@ export type Database = {
           store_logo_url?: string | null
           store_name?: string
           store_type?: string
+          terms_accepted?: boolean | null
         }
         Relationships: []
       }
