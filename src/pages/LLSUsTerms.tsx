@@ -342,7 +342,7 @@ const LLSUsTerms = () => {
 
             {/* Section 7 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">7. TECHNICAL SUPPORT & TROUBLESHOOTING</h3>
+              <h3 className="text-black font-semibold mb-3">7. TECHNICAL SUPPORT & TROUBLESHOOTING</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol is responsible for all platform issues, QR code functionality, and system troubleshooting.</li>
                 <li>Store's role: Notify GoLokol immediately by text or email if the kiosk isn't working or the QR code is damaged.</li>
