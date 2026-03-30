@@ -140,9 +140,20 @@ const [form, setForm] = useState({
           <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
             The record stores that win aren't just selling music — they're breaking it.
           </p>
-          <p className="type-body-lg text-foreground-secondary max-w-2xl">
-            We do the vetting. Artists submitted to LLS are crowdsourced and curated — so what plays in your store reflects your brand. Our simple QR code in-store touchpoint turns your space into a curated discovery experience as music fans browse your aisles.
-          </p>
+          <ul className="space-y-3 max-w-2xl">
+            {[
+              "Artists submitted to LLS are crowdsourced and curated.",
+              "QR code touchpoint turns your store into a local music discovery experience as music lovers browse your aisles.",
+              "Customers accrue points by engaging with music.",
+              "Those points, over time are redeemed at your store for discount on future purchase.",
+              "Engagement is locked to store location.",
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="mt-1.5 h-2 w-2 rounded-full bg-primary shrink-0" />
+                <span className="type-body-lg text-foreground-secondary">{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
