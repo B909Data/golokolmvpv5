@@ -198,27 +198,27 @@ const LLSUsTerms = () => {
 
   if (signed) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-white flex flex-col">
         <header className="px-6 md:px-12 lg:px-20 py-5 flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2">
             <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-            <span className="font-display text-xl text-foreground tracking-wide">GoLokol</span>
+            <span className="font-display text-xl text-black tracking-wide">GoLokol</span>
           </Link>
         </header>
         <main className="flex-1 px-6 md:px-12 lg:px-20 py-12">
           <div className="max-w-2xl mx-auto text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
-            <h1 className="font-display text-2xl md:text-3xl text-foreground mb-4">
+            <h1 className="font-display text-2xl md:text-3xl text-black mb-4">
               Agreement Signed Successfully
             </h1>
-            <p className="text-foreground-secondary mb-2">
-              Thank you, <span className="text-foreground font-medium">{contact_name}</span>.
+            <p className="text-black/70 mb-2">
+              Thank you, <span className="text-black font-medium">{contact_name}</span>.
             </p>
-            <p className="text-foreground-secondary mb-8">
+            <p className="text-black/70 mb-8">
               Your electronic signature for the Lokol Listening Sessions Kiosk Placement Agreement has been recorded. We'll be in touch shortly to get your store set up.
             </p>
             <Link to="/lls-us">
-              <Button>Back to LLS</Button>
+              <Button className="bg-black text-yellow-400 hover:bg-black/90">Back to LLS</Button>
             </Link>
           </div>
         </main>
