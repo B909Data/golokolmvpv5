@@ -398,18 +398,18 @@ const LLSUsTerms = () => {
 
             {/* Section 12 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">12. SIGNATURES</h3>
+              <h3 className="text-black font-semibold mb-3">12. SIGNATURES</h3>
               <p>By signing below, both parties agree to the terms of this Lokol Listening Sessions Kiosk Placement Agreement.</p>
 
               <div className="mt-6 space-y-4">
                 <div>
-                  <p className="font-medium text-foreground">For GoLokol, Inc.:</p>
-                  <p className="text-foreground-secondary">Name: Hanifah Walidah</p>
-                  <p className="text-foreground-secondary">Title: Founder</p>
+                  <p className="font-medium text-black">For GoLokol, Inc.:</p>
+                  <p className="text-black/70">Name: Hanifah Walidah</p>
+                  <p className="text-black/70">Title: Founder</p>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">For {store_name}:</p>
-                  <p className="text-foreground-secondary italic">To be signed electronically below.</p>
+                  <p className="font-medium text-black">For {store_name}:</p>
+                  <p className="text-black/70 italic">To be signed electronically below.</p>
                 </div>
               </div>
             </div>
