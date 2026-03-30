@@ -372,7 +372,7 @@ const LLSUsTerms = () => {
                 <li>Store honors all remaining customer points upon termination.</li>
                 <li>GoLokol removes the foam board and any signage within 5 business days.</li>
               </ul>
-              <p className="font-medium text-foreground mb-2">After the 90-Day Pilot:</p>
+              <p className="font-medium text-black mb-2">After the 90-Day Pilot:</p>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol and Store will meet to review results and decide on continuation.</li>
                 <li>If both parties agree to continue, a new agreement will be executed.</li>
