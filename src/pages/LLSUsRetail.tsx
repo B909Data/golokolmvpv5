@@ -21,6 +21,7 @@ import signageTall from "@/assets/lls-signage-tall.png";
 
 const LLSUsRetail = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
 const [form, setForm] = useState({
     store_name: "",
