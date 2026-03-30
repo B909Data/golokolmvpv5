@@ -312,8 +312,8 @@ const LLSUsTerms = () => {
 
             {/* Section 5 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">5. SPONSORSHIP & CONTENT</h3>
-              <p className="font-medium text-foreground mb-2">Sponsorship:</p>
+              <h3 className="text-black font-semibold mb-3">5. SPONSORSHIP & CONTENT</h3>
+              <p className="font-medium text-black mb-2">Sponsorship:</p>
               <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
                 <li>GoLokol places one sponsor logo on the foam board (local business—café, restaurant, neighborhood partner).</li>
                 <li>Store receives no sponsorship revenue. All sponsorship fees go to GoLokol.</li>
