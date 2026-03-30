@@ -55,7 +55,10 @@ const Index = () => {
             <span className="text-[#FFD600]">where you live</span>
           </h1>
           <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
-            GoLokol supports local music discovery, fan engagement and music scenes. We launch in Atlanta.
+            GoLokol supports local music discovery, fan engagement and music scenes.
+          </p>
+          <p className="text-white text-base md:text-lg mt-2 max-w-xl opacity-90">
+            We launch April 18 on Record Store Day in Atlanta.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
