@@ -1,0 +1,1 @@
+ALTER TABLE public.lls_retail_signups ADD COLUMN store_logo_url text DEFAULT NULL;

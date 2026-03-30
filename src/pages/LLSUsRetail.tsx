@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +34,32 @@ const [form, setForm] = useState({
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const allowed = ["image/jpeg", "image/png", "image/svg+xml"];
+    if (!allowed.includes(file.type)) {
+      toast({ title: "Please upload a JPG, PNG, or SVG file.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File must be under 5 MB.", variant: "destructive" });
+      return;
+    }
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+  };
+
+  const clearLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    if (logoInputRef.current) logoInputRef.current.value = "";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,12 +68,32 @@ const [form, setForm] = useState({
       return;
     }
     setSubmitting(true);
+
+    let store_logo_url: string | null = null;
+    if (logoFile) {
+      setUploadingLogo(true);
+      const ext = logoFile.name.split(".").pop() || "png";
+      const path = `lls-retail-logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("submissions_audio")
+        .upload(path, logoFile, { contentType: logoFile.type, upsert: false });
+      setUploadingLogo(false);
+      if (uploadErr) {
+        setSubmitting(false);
+        toast({ title: "Logo upload failed. Please try again.", variant: "destructive" });
+        return;
+      }
+      const { data: urlData } = supabase.storage.from("submissions_audio").getPublicUrl(path);
+      store_logo_url = urlData.publicUrl;
+    }
+
     const { error } = await supabase.from("lls_retail_signups").insert({
       store_name: form.store_name.trim(),
       city_location: form.city_location,
       store_type: form.store_type,
       has_listening_station: form.has_listening_station,
       signage_preference: form.signage_preference,
+      store_logo_url,
       contact_name: form.contact_name.trim(),
       contact_email: form.contact_email.trim(),
       notes: form.notes.trim() || null,
@@ -179,6 +225,35 @@ const [form, setForm] = useState({
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Store Logo Upload */}
+              <div>
+                <Label className="text-foreground mb-2 block">Upload your high resolution store logo. (jpg, svg or png)</Label>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.svg"
+                  onChange={handleLogoSelect}
+                  className="hidden"
+                />
+                {logoPreview ? (
+                  <div className="relative inline-block">
+                    <img src={logoPreview} alt="Store logo preview" className="h-24 w-24 object-contain rounded-md border border-border bg-input p-2" />
+                    <button type="button" onClick={clearLogo} className="absolute -top-2 -right-2 rounded-full bg-destructive text-destructive-foreground p-0.5">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => logoInputRef.current?.click()}
+                    className="flex items-center gap-2 rounded-lg border-2 border-dashed border-border bg-input px-5 py-4 text-foreground-secondary hover:border-foreground/30 transition-colors"
+                  >
+                    <Upload className="h-5 w-5" />
+                    <span className="type-body-sm">Choose file</span>
+                  </button>
+                )}
               </div>
 
               <div>

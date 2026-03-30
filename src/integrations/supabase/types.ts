@@ -770,6 +770,7 @@ export type Database = {
           id: string
           notes: string | null
           signage_preference: string[] | null
+          store_logo_url: string | null
           store_name: string
           store_type: string
         }
@@ -782,6 +783,7 @@ export type Database = {
           id?: string
           notes?: string | null
           signage_preference?: string[] | null
+          store_logo_url?: string | null
           store_name: string
           store_type: string
         }
@@ -794,6 +796,7 @@ export type Database = {
           id?: string
           notes?: string | null
           signage_preference?: string[] | null
+          store_logo_url?: string | null
           store_name?: string
           store_type?: string
         }
