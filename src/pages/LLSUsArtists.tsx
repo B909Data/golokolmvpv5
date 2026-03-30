@@ -175,15 +175,19 @@ const LLSUsArtists = () => {
           <ul className="space-y-4 mb-6 max-w-2xl">
             <li className="flex items-start gap-3">
               <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">Submit your music.</span>
+              <span className="text-foreground text-lg md:text-xl font-medium">Submit your music ($10).</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">Local fans vote in record stores.</span>
+              <span className="text-foreground text-lg md:text-xl font-medium">If selected, local fans discover and vote in record stores city wide.</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">Get featured in seasonal compilations and YouTube series.</span>
+              <span className="text-foreground text-lg md:text-xl font-medium">Votes lead to features and real fan connections, sales and show attendance.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
+              <span className="text-foreground text-lg md:text-xl font-medium">If not selected you get feedback and a 1-month free trial of <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">GoLokol Connect</Link>.</span>
             </li>
           </ul>
         </div>
