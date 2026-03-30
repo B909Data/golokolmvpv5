@@ -14,17 +14,13 @@ serve(async (req) => {
 
   try {
     const { session_id } = await req.json();
-
-    if (!session_id) {
-      throw new Error("Missing session_id");
-    }
+    if (!session_id) throw new Error("Missing session_id");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
     const session = await stripe.checkout.sessions.retrieve(session_id);
-    console.log("Retrieved session:", session.id, "status:", session.payment_status);
 
     if (session.payment_status !== "paid") {
       return new Response(JSON.stringify({ success: false, error: "Payment not completed" }), {
@@ -33,12 +29,9 @@ serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
+    const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
 
-    // Check if already processed
+    // Idempotency check
     const { data: existing } = await supabase
       .from("submissions")
       .select("id")
@@ -46,35 +39,37 @@ serve(async (req) => {
       .single();
 
     if (existing) {
-      console.log("Submission already exists for session:", session_id);
       return new Response(JSON.stringify({ success: true, already_exists: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
-    const metadata = session.metadata || {};
-
-    const musicReleaseAgreed = metadata.music_release_agreed === "true";
+    const meta = session.metadata || {};
+    const genres = meta.genre_style ? meta.genre_style.split(",") : [];
+    const musicReleaseAgreed = meta.music_release_agreed === "true";
 
     const { error: insertError } = await supabase.from("submissions").insert({
-      artist_name: metadata.artist_name,
-      contact_email: metadata.contact_email,
-      song_title: metadata.song_title,
-      spotify_url: metadata.spotify_url,
-      youtube_url: metadata.youtube_url || null,
-      notes: metadata.notes || null,
+      artist_name: meta.artist_name,
+      contact_email: meta.contact_email,
+      instagram_handle: meta.instagram_handle || null,
+      genre_style: meta.genre_style || null,
+      city_market: meta.city_market || null,
+      physical_product: meta.physical_product || null,
+      short_bio: meta.short_bio || null,
+      how_heard: meta.how_heard || null,
+      song_image_url: meta.song_image_url || null,
+      mp3_url: meta.mp3_url || null,
+      mp3_path: meta.mp3_path || null,
+      original_filename: meta.original_filename || null,
       stripe_session_id: session_id,
+      payment_status: "paid",
+      admin_status: "pending",
       music_release_agreed: musicReleaseAgreed,
       music_release_agreed_at: musicReleaseAgreed ? new Date().toISOString() : null,
     });
 
-    if (insertError) {
-      console.error("Error inserting submission:", insertError);
-      throw new Error("Failed to save submission");
-    }
-
-    console.log("Submission saved for session:", session_id);
+    if (insertError) throw new Error("Failed to save submission: " + insertError.message);
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
