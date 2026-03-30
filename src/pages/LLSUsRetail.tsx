@@ -45,10 +45,11 @@ const [form, setForm] = useState({
       city_location: form.city_location,
       store_type: form.store_type,
       has_listening_station: form.has_listening_station,
+      signage_preference: form.signage_preference,
       contact_name: form.contact_name.trim(),
       contact_email: form.contact_email.trim(),
       notes: form.notes.trim() || null,
-    });
+    } as any);
     setSubmitting(false);
     if (error) {
       toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
