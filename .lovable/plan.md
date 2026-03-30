@@ -1,14 +1,16 @@
 
 
-## Copy Updates on /lls-us Page
+## Problem
 
-Three text changes in `src/pages/LLSUs.tsx`:
+The store logo upload fails with **"mime type image/png is not supported"** because the code uploads to the `submissions_audio` bucket, which restricts MIME types to audio formats only.
 
-1. **Hero subcaption** (line ~27): Replace the current paragraph with the new copy about discovery hubs, voting, and GoLokol Connect.
+## Solution
 
-2. **Artist card description** (line ~43): Replace with new copy about building momentum with Atlanta record stores and free Connect trial.
+Switch the upload destination from `submissions_audio` to the existing **`partner_flyers`** bucket, which is public and accepts image files. This requires a one-line change in `src/pages/LLSUsRetail.tsx` — update both the `.upload()` and `.getPublicUrl()` calls to use `partner_flyers` instead of `submissions_audio`.
 
-3. **Retail card description** (line ~55): Replace with new copy about turning stores into lokol music discovery hubs.
+### File: `src/pages/LLSUsRetail.tsx`
+- Change `supabase.storage.from("submissions_audio")` to `supabase.storage.from("partner_flyers")` in both the upload and getPublicUrl calls
+- Keep the same path prefix (`lls-retail-logos/...`) for organization
 
-All changes are text-only in a single file. No layout, styling, or structural changes.
+No database changes needed. No new buckets needed.
 
