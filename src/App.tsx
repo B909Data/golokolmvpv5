@@ -68,6 +68,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <PostHogPageview />
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/ap-us" element={<ApUs />} />
