@@ -68,12 +68,32 @@ const [form, setForm] = useState({
       return;
     }
     setSubmitting(true);
+
+    let store_logo_url: string | null = null;
+    if (logoFile) {
+      setUploadingLogo(true);
+      const ext = logoFile.name.split(".").pop() || "png";
+      const path = `lls-retail-logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("submissions_audio")
+        .upload(path, logoFile, { contentType: logoFile.type, upsert: false });
+      setUploadingLogo(false);
+      if (uploadErr) {
+        setSubmitting(false);
+        toast({ title: "Logo upload failed. Please try again.", variant: "destructive" });
+        return;
+      }
+      const { data: urlData } = supabase.storage.from("submissions_audio").getPublicUrl(path);
+      store_logo_url = urlData.publicUrl;
+    }
+
     const { error } = await supabase.from("lls_retail_signups").insert({
       store_name: form.store_name.trim(),
       city_location: form.city_location,
       store_type: form.store_type,
       has_listening_station: form.has_listening_station,
       signage_preference: form.signage_preference,
+      store_logo_url,
       contact_name: form.contact_name.trim(),
       contact_email: form.contact_email.trim(),
       notes: form.notes.trim() || null,
