@@ -228,14 +228,14 @@ const LLSUsTerms = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <header className="px-6 md:px-12 lg:px-20 py-5 flex items-center gap-4">
-        <Link to="/lls-us/retail" className="text-foreground-secondary hover:text-foreground transition-colors">
+        <Link to="/lls-us/retail" className="text-black/60 hover:text-black transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <Link to="/" className="flex items-center gap-2">
           <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-          <span className="font-display text-xl text-foreground tracking-wide">GoLokol</span>
+          <span className="font-display text-xl text-black tracking-wide">GoLokol</span>
         </Link>
       </header>
 
