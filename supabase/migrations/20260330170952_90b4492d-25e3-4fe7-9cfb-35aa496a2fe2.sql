@@ -1,0 +1,1 @@
+ALTER TABLE public.lls_retail_signups ADD COLUMN signage_preference text[] DEFAULT '{}';

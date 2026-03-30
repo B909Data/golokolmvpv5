@@ -16,15 +16,18 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Footer from "@/components/Footer";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import signageSquare from "@/assets/lls-signage-square.png";
+import signageTall from "@/assets/lls-signage-tall.png";
 
 const LLSUsRetail = () => {
   const { toast } = useToast();
 
-  const [form, setForm] = useState({
+const [form, setForm] = useState({
     store_name: "",
     city_location: "",
     store_type: "",
     has_listening_station: "",
+    signage_preference: [] as string[],
     contact_name: "",
     contact_email: "",
     notes: "",
@@ -44,10 +47,11 @@ const LLSUsRetail = () => {
       city_location: form.city_location,
       store_type: form.store_type,
       has_listening_station: form.has_listening_station,
+      signage_preference: form.signage_preference,
       contact_name: form.contact_name.trim(),
       contact_email: form.contact_email.trim(),
       notes: form.notes.trim() || null,
-    });
+    } as any);
     setSubmitting(false);
     if (error) {
       toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
@@ -140,6 +144,41 @@ const LLSUsRetail = () => {
                     <SelectItem value="Something Informal">Something Informal</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Signage Preference */}
+              <div className="rounded-lg bg-[#2a2a2a] p-6">
+                <Label className="text-foreground mb-4 block">Choose store signage? (free)</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[
+                    { value: "14x14_foam_board", img: signageSquare, caption: '14x14 foam board. Great for table top or in aisle.' },
+                    { value: "11x17_foam_board", img: signageTall, caption: '11x17 foam board (Great to hang on wall)' },
+                  ].map((opt) => {
+                    const selected = form.signage_preference.includes(opt.value);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() =>
+                          setForm(f => ({
+                            ...f,
+                            signage_preference: selected
+                              ? f.signage_preference.filter(v => v !== opt.value)
+                              : [...f.signage_preference, opt.value],
+                          }))
+                        }
+                        className={`rounded-lg border-2 p-3 transition-all text-left ${
+                          selected
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border bg-input hover:border-foreground/30'
+                        }`}
+                      >
+                        <img src={opt.img} alt={opt.caption} className="w-full rounded-md mb-3 object-contain max-h-52" loading="lazy" />
+                        <p className="type-body-sm text-[#F0EDE8]">{opt.caption}</p>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>
