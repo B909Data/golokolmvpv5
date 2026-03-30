@@ -198,27 +198,27 @@ const LLSUsTerms = () => {
 
   if (signed) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-white flex flex-col">
         <header className="px-6 md:px-12 lg:px-20 py-5 flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2">
             <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-            <span className="font-display text-xl text-foreground tracking-wide">GoLokol</span>
+            <span className="font-display text-xl text-black tracking-wide">GoLokol</span>
           </Link>
         </header>
         <main className="flex-1 px-6 md:px-12 lg:px-20 py-12">
           <div className="max-w-2xl mx-auto text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
-            <h1 className="font-display text-2xl md:text-3xl text-foreground mb-4">
+            <h1 className="font-display text-2xl md:text-3xl text-black mb-4">
               Agreement Signed Successfully
             </h1>
-            <p className="text-foreground-secondary mb-2">
-              Thank you, <span className="text-foreground font-medium">{contact_name}</span>.
+            <p className="text-black/70 mb-2">
+              Thank you, <span className="text-black font-medium">{contact_name}</span>.
             </p>
-            <p className="text-foreground-secondary mb-8">
+            <p className="text-black/70 mb-8">
               Your electronic signature for the Lokol Listening Sessions Kiosk Placement Agreement has been recorded. We'll be in touch shortly to get your store set up.
             </p>
             <Link to="/lls-us">
-              <Button>Back to LLS</Button>
+              <Button className="bg-black text-yellow-400 hover:bg-black/90">Back to LLS</Button>
             </Link>
           </div>
         </main>
@@ -228,39 +228,39 @@ const LLSUsTerms = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <header className="px-6 md:px-12 lg:px-20 py-5 flex items-center gap-4">
-        <Link to="/lls-us/retail" className="text-foreground-secondary hover:text-foreground transition-colors">
+        <Link to="/lls-us/retail" className="text-black/60 hover:text-black transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <Link to="/" className="flex items-center gap-2">
           <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-          <span className="font-display text-xl text-foreground tracking-wide">GoLokol</span>
+          <span className="font-display text-xl text-black tracking-wide">GoLokol</span>
         </Link>
       </header>
 
       <main className="flex-1 px-6 md:px-12 lg:px-20 py-12">
         <div className="max-w-2xl mx-auto">
-          <h1 className="font-display text-2xl md:text-3xl text-foreground mb-2">
+          <h1 className="font-display text-2xl md:text-3xl text-black mb-2">
             LOKOL LISTENING SESSIONS
           </h1>
-          <h2 className="font-display text-xl md:text-2xl text-foreground mb-8">
+          <h2 className="font-display text-xl md:text-2xl text-black mb-8">
             KIOSK PLACEMENT AGREEMENT
           </h2>
 
           {/* Agreement preamble */}
-          <div className="space-y-6 text-foreground-secondary leading-relaxed mb-12">
+          <div className="space-y-6 text-black/70 leading-relaxed mb-12">
             <p>This Agreement is entered into between:</p>
             <p>
-              <strong className="text-foreground">GoLokol, Inc.</strong> ("GoLokol")<br />
+              <strong className="text-black">GoLokol, Inc.</strong> ("GoLokol")<br />
               and<br />
-              <strong className="text-foreground">{store_name}</strong> and <strong className="text-foreground">{contact_name}</strong> ("Store")
+              <strong className="text-black">{store_name}</strong> and <strong className="text-black">{contact_name}</strong> ("Store")
             </p>
             <p>Effective Date: Date of Signature<br />Pilot Period: 90 days from installation</p>
 
             {/* Section 1 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">1. WHAT IS LOKOL LISTENING SESSIONS?</h3>
+              <h3 className="text-black font-semibold mb-3">1. WHAT IS LOKOL LISTENING SESSIONS?</h3>
               <p className="mb-3">GoLokol provides a music discovery kiosk featuring local artists from {city}. Here's how it works:</p>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>Customers scan a QR code on a foam board poster placed in your store.</li>
@@ -275,7 +275,7 @@ const LLSUsTerms = () => {
 
             {/* Section 2 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">2. WHAT GOLOKOL PROVIDES</h3>
+              <h3 className="text-black font-semibold mb-3">2. WHAT GOLOKOL PROVIDES</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>Foam board poster with QR code (includes GoLokol branding and one rotating sponsor logo)</li>
                 <li>Full technical setup and troubleshooting — we handle all platform issues</li>
@@ -288,7 +288,7 @@ const LLSUsTerms = () => {
 
             {/* Section 3 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">3. WHAT THE STORE PROVIDES</h3>
+              <h3 className="text-black font-semibold mb-3">3. WHAT THE STORE PROVIDES</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>Store WiFi access (if available) for the kiosk platform</li>
                 <li>Physical space for the foam board poster in a visible customer area</li>
@@ -301,7 +301,7 @@ const LLSUsTerms = () => {
 
             {/* Section 4 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">4. POINTS & REDEMPTION</h3>
+              <h3 className="text-black font-semibold mb-3">4. POINTS & REDEMPTION</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>Customers earn points each time they vote on a song.</li>
                 <li>The Store sets the redemption rate — e.g., 50 points = $5 off, 100 points = $10 off. GoLokol will help design this with you.</li>
@@ -312,15 +312,15 @@ const LLSUsTerms = () => {
 
             {/* Section 5 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">5. SPONSORSHIP & CONTENT</h3>
-              <p className="font-medium text-foreground mb-2">Sponsorship:</p>
+              <h3 className="text-black font-semibold mb-3">5. SPONSORSHIP & CONTENT</h3>
+              <p className="font-medium text-black mb-2">Sponsorship:</p>
               <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
                 <li>GoLokol places one sponsor logo on the foam board (local business—café, restaurant, neighborhood partner).</li>
                 <li>Store receives no sponsorship revenue. All sponsorship fees go to GoLokol.</li>
                 <li>Sponsors are small, local businesses aligned with your store's community. GoLokol will not partner with alcohol, drug, or political organizations.</li>
                 <li>Sponsor logos may rotate (GoLokol may update the foam board with new sponsors during the 90-day period).</li>
               </ul>
-              <p className="font-medium text-foreground mb-2">Promotional Content:</p>
+              <p className="font-medium text-black mb-2">Promotional Content:</p>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol may film in-store to create promotional content (photos, video clips) featuring the kiosk and your store.</li>
                 <li>Store grants GoLokol permission to use this content in promotional materials (social media, website, case studies).</li>
@@ -331,7 +331,7 @@ const LLSUsTerms = () => {
 
             {/* Section 6 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">6. CUSTOMER DATA</h3>
+              <h3 className="text-black font-semibold mb-3">6. CUSTOMER DATA</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol owns all customer data collected through the kiosk (names, emails, voting history, music preferences, visit frequency).</li>
                 <li>Store does not receive customer lists or access to voting data.</li>
@@ -342,7 +342,7 @@ const LLSUsTerms = () => {
 
             {/* Section 7 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">7. TECHNICAL SUPPORT & TROUBLESHOOTING</h3>
+              <h3 className="text-black font-semibold mb-3">7. TECHNICAL SUPPORT & TROUBLESHOOTING</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol is responsible for all platform issues, QR code functionality, and system troubleshooting.</li>
                 <li>Store's role: Notify GoLokol immediately by text or email if the kiosk isn't working or the QR code is damaged.</li>
@@ -354,7 +354,7 @@ const LLSUsTerms = () => {
 
             {/* Section 8 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">8. LIABILITY & RESPONSIBILITY</h3>
+              <h3 className="text-black font-semibold mb-3">8. LIABILITY & RESPONSIBILITY</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol is liable for all technical failures, data loss, or platform malfunctions.</li>
                 <li>Store is not liable if customers experience issues with voting, points, or the platform.</li>
@@ -365,14 +365,14 @@ const LLSUsTerms = () => {
 
             {/* Section 9 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">9. TERMINATION</h3>
-              <p className="font-medium text-foreground mb-2">During the 90-Day Pilot:</p>
+              <h3 className="text-black font-semibold mb-3">9. TERMINATION</h3>
+              <p className="font-medium text-black mb-2">During the 90-Day Pilot:</p>
               <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
                 <li>Either party may terminate this agreement with 3 days' written notice (email is acceptable).</li>
                 <li>Store honors all remaining customer points upon termination.</li>
                 <li>GoLokol removes the foam board and any signage within 5 business days.</li>
               </ul>
-              <p className="font-medium text-foreground mb-2">After the 90-Day Pilot:</p>
+              <p className="font-medium text-black mb-2">After the 90-Day Pilot:</p>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol and Store will meet to review results and decide on continuation.</li>
                 <li>If both parties agree to continue, a new agreement will be executed.</li>
@@ -382,7 +382,7 @@ const LLSUsTerms = () => {
 
             {/* Section 10 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">10. CHANGES & UPDATES</h3>
+              <h3 className="text-black font-semibold mb-3">10. CHANGES & UPDATES</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol may update the kiosk platform, voting mechanics, or features without additional notice.</li>
                 <li>Store acknowledges that technology evolves and that GoLokol may make improvements to the system.</li>
@@ -392,45 +392,45 @@ const LLSUsTerms = () => {
 
             {/* Section 11 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">11. NO EXCLUSIVITY</h3>
+              <h3 className="text-black font-semibold mb-3">11. NO EXCLUSIVITY</h3>
               <p>GoLokol may place Lokol Listening Sessions kiosks in other record stores and retail locations in {city} and beyond. This agreement does not grant Store any exclusive rights.</p>
             </div>
 
             {/* Section 12 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">12. SIGNATURES</h3>
+              <h3 className="text-black font-semibold mb-3">12. SIGNATURES</h3>
               <p>By signing below, both parties agree to the terms of this Lokol Listening Sessions Kiosk Placement Agreement.</p>
 
               <div className="mt-6 space-y-4">
                 <div>
-                  <p className="font-medium text-foreground">For GoLokol, Inc.:</p>
-                  <p className="text-foreground-secondary">Name: Hanifah Walidah</p>
-                  <p className="text-foreground-secondary">Title: Founder</p>
+                  <p className="font-medium text-black">For GoLokol, Inc.:</p>
+                  <p className="text-black/70">Name: Hanifah Walidah</p>
+                  <p className="text-black/70">Title: Founder</p>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">For {store_name}:</p>
-                  <p className="text-foreground-secondary italic">To be signed electronically below.</p>
+                  <p className="font-medium text-black">For {store_name}:</p>
+                  <p className="text-black/70 italic">To be signed electronically below.</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Signature Section */}
-          <div className="border-t border-border pt-10">
-            <h2 className="font-display text-xl md:text-2xl text-foreground mb-8">
+          <div className="border-t border-black/20 pt-10">
+            <h2 className="font-display text-xl md:text-2xl text-black mb-8">
               Store Agreement Signature
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Pre-filled info */}
-              <div className="rounded-lg bg-background-secondary border border-border p-4 space-y-1">
-                <p className="type-body-sm text-foreground-secondary">Signing on behalf of: <span className="text-foreground font-medium">{store_name}</span></p>
-                <p className="type-body-sm text-foreground-secondary">Contact: <span className="text-foreground font-medium">{contact_name}</span></p>
-                <p className="type-body-sm text-foreground-secondary">Email: <span className="text-foreground font-medium">{contact_email}</span></p>
+              <div className="rounded-lg bg-gray-100 border border-black/10 p-4 space-y-1">
+                <p className="type-body-sm text-black/70">Signing on behalf of: <span className="text-black font-medium">{store_name}</span></p>
+                <p className="type-body-sm text-black/70">Contact: <span className="text-black font-medium">{contact_name}</span></p>
+                <p className="type-body-sm text-black/70">Email: <span className="text-black font-medium">{contact_email}</span></p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="signer_title" className="text-foreground">
+                <Label htmlFor="signer_title" className="text-black">
                   Title / Role
                 </Label>
                 <Input
@@ -439,6 +439,7 @@ const LLSUsTerms = () => {
                   value={formData.signer_title}
                   onChange={(e) => setFormData((p) => ({ ...p, signer_title: e.target.value }))}
                   maxLength={200}
+                  className="border-black/20 text-black"
                 />
               </div>
 
@@ -448,16 +449,16 @@ const LLSUsTerms = () => {
                   id="consent"
                   checked={consentChecked}
                   onCheckedChange={(checked) => setConsentChecked(checked === true)}
-                  className="mt-0.5"
+                  className="mt-0.5 border-black/40"
                 />
-                <Label htmlFor="consent" className="text-foreground text-sm leading-relaxed cursor-pointer">
+                <Label htmlFor="consent" className="text-black text-sm leading-relaxed cursor-pointer">
                   I confirm that I have read and agree to the Lokol Listening Sessions Kiosk Placement Agreement and that I have the authority to enter into this agreement on behalf of the Store. <span className="text-red-500">*</span>
                 </Label>
               </div>
 
               {/* Electronic Signature */}
               <div className="space-y-2">
-                <Label htmlFor="signature_name" className="text-foreground">
+                <Label htmlFor="signature_name" className="text-black">
                   Type your full legal name to sign <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -465,11 +466,11 @@ const LLSUsTerms = () => {
                   placeholder="Type your full legal name"
                   value={formData.signature_name}
                   onChange={(e) => setFormData((p) => ({ ...p, signature_name: e.target.value }))}
-                  className="font-serif italic text-lg"
+                  className="font-serif italic text-lg border-black/20 text-black"
                   required
                   maxLength={200}
                 />
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-black/50 mt-1">
                   By typing my name above and submitting this form, I acknowledge that this constitutes my electronic signature and that I am legally bound by the terms of this agreement.
                 </p>
               </div>
@@ -478,7 +479,7 @@ const LLSUsTerms = () => {
                 type="submit"
                 size="lg"
                 disabled={submitting || !consentChecked || !formData.signature_name.trim()}
-                className="w-full md:w-auto"
+                className="w-full md:w-auto bg-black text-yellow-400 hover:bg-black/90"
               >
                 {submitting ? "Signing..." : "Sign Agreement"}
               </Button>
