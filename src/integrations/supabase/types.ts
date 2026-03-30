@@ -769,6 +769,7 @@ export type Database = {
           has_listening_station: string
           id: string
           notes: string | null
+          signage_preference: string[] | null
           store_name: string
           store_type: string
         }
@@ -780,6 +781,7 @@ export type Database = {
           has_listening_station: string
           id?: string
           notes?: string | null
+          signage_preference?: string[] | null
           store_name: string
           store_type: string
         }
@@ -791,6 +793,7 @@ export type Database = {
           has_listening_station?: string
           id?: string
           notes?: string | null
+          signage_preference?: string[] | null
           store_name?: string
           store_type?: string
         }
