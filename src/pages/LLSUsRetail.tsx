@@ -68,6 +68,10 @@ const [form, setForm] = useState({
       toast({ title: "Please fill in all required fields.", variant: "destructive" });
       return;
     }
+    if (!form.terms_accepted) {
+      toast({ title: "Please accept the Terms of Service.", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
 
     let store_logo_url: string | null = null;
