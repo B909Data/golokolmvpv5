@@ -320,7 +320,7 @@ const LLSUsTerms = () => {
                 <li>Sponsors are small, local businesses aligned with your store's community. GoLokol will not partner with alcohol, drug, or political organizations.</li>
                 <li>Sponsor logos may rotate (GoLokol may update the foam board with new sponsors during the 90-day period).</li>
               </ul>
-              <p className="font-medium text-foreground mb-2">Promotional Content:</p>
+              <p className="font-medium text-black mb-2">Promotional Content:</p>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol may film in-store to create promotional content (photos, video clips) featuring the kiosk and your store.</li>
                 <li>Store grants GoLokol permission to use this content in promotional materials (social media, website, case studies).</li>
