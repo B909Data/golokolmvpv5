@@ -52,6 +52,7 @@ import LLSVote from "./pages/LLSVote";
 import LLSUs from "./pages/LLSUs";
 import LLSUsArtists from "./pages/LLSUsArtists";
 import LLSUsRetail from "./pages/LLSUsRetail";
+import LLSUsTerms from "./pages/LLSUsTerms";
 import LokolListens from "./pages/LokolListens";
 import LokolListensGenre from "./pages/LokolListensGenre";
 import LLSSignup from "./pages/LLSSignup";
