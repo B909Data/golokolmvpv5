@@ -31,6 +31,7 @@ const [form, setForm] = useState({
     contact_name: "",
     contact_email: "",
     notes: "",
+    terms_accepted: false,
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
