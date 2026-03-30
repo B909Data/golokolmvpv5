@@ -275,7 +275,7 @@ const LLSUsTerms = () => {
 
             {/* Section 2 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">2. WHAT GOLOKOL PROVIDES</h3>
+              <h3 className="text-black font-semibold mb-3">2. WHAT GOLOKOL PROVIDES</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>Foam board poster with QR code (includes GoLokol branding and one rotating sponsor logo)</li>
                 <li>Full technical setup and troubleshooting — we handle all platform issues</li>
