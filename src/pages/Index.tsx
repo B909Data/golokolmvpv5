@@ -84,10 +84,10 @@ const Index = () => {
             Music isn't dead, it's local.
           </h2>
           <p className="text-[20px] text-white leading-relaxed mb-6">
-            Local music ecosystems have been disconnected by algorithms and individual passive viral moments. Artists struggle alone. Fans are overwhelmed with choice. Venues and music retail compete with digital monopolies.
+            Local music ecosystems have been disconnected by algorithms and ungrounded viral moments. Artists struggle alone. Music lovers are overwhelmed with choice. Local venues and music retail compete with monopolies that prioritize the intangible.
           </p>
           <p className="text-[20px] text-white leading-relaxed">
-            We help reconnect the collective independent strength of artists, fans, venues, and retail with the city they call home.
+            We help reconnect the collective strength of local artists, fans, venues, and retail with the city they all call home.
           </p>
         </div>
       </section>
