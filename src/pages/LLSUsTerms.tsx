@@ -288,7 +288,7 @@ const LLSUsTerms = () => {
 
             {/* Section 3 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">3. WHAT THE STORE PROVIDES</h3>
+              <h3 className="text-black font-semibold mb-3">3. WHAT THE STORE PROVIDES</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>Store WiFi access (if available) for the kiosk platform</li>
                 <li>Physical space for the foam board poster in a visible customer area</li>
