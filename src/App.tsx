@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import PostHogPageview from "./components/PostHogPageview";
+import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import ApUs from "./pages/ApUs";
 import Shows from "./pages/Shows";
@@ -67,6 +68,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <PostHogPageview />
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/ap-us" element={<ApUs />} />
