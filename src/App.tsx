@@ -52,6 +52,7 @@ import LLSVote from "./pages/LLSVote";
 import LLSUs from "./pages/LLSUs";
 import LLSUsArtists from "./pages/LLSUsArtists";
 import LLSUsRetail from "./pages/LLSUsRetail";
+import LLSUsTerms from "./pages/LLSUsTerms";
 import LokolListens from "./pages/LokolListens";
 import LokolListensGenre from "./pages/LokolListensGenre";
 import LLSSignup from "./pages/LLSSignup";
@@ -89,6 +90,7 @@ const App = () => (
            <Route path="/lls-us" element={<LLSUs />} />
            <Route path="/lls-us/artists" element={<LLSUsArtists />} />
            <Route path="/lls-us/retail" element={<LLSUsRetail />} />
+           <Route path="/lls-us/terms" element={<LLSUsTerms />} />
           <Route path="/admin/after-parties" element={<AdminAfterParties />} />
           <Route path="/admin/discount-codes" element={<AdminDiscountCodes />} />
           <Route path="/admin/partners" element={<AdminPartners />} />

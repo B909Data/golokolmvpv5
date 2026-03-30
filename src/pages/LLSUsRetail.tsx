@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ import signageTall from "@/assets/lls-signage-tall.png";
 
 const LLSUsRetail = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
 const [form, setForm] = useState({
     store_name: "",
@@ -31,7 +32,6 @@ const [form, setForm] = useState({
     contact_name: "",
     contact_email: "",
     notes: "",
-    terms_accepted: false,
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -68,10 +68,6 @@ const [form, setForm] = useState({
       toast({ title: "Please fill in all required fields.", variant: "destructive" });
       return;
     }
-    if (!form.terms_accepted) {
-      toast({ title: "Please accept the Terms of Service.", variant: "destructive" });
-      return;
-    }
     setSubmitting(true);
 
     let store_logo_url: string | null = null;
@@ -92,23 +88,30 @@ const [form, setForm] = useState({
       store_logo_url = urlData.publicUrl;
     }
 
-    const { error } = await supabase.from("lls_retail_signups").insert({
+    const { data: inserted, error } = await supabase.from("lls_retail_signups").insert({
       store_name: form.store_name.trim(),
       city_location: form.city_location,
       store_type: form.store_type,
       has_listening_station: form.has_listening_station,
       signage_preference: form.signage_preference,
       store_logo_url,
-      terms_accepted: form.terms_accepted,
       contact_name: form.contact_name.trim(),
       contact_email: form.contact_email.trim(),
       notes: form.notes.trim() || null,
-    } as any);
+    } as any).select("id").single();
     setSubmitting(false);
     if (error) {
       toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
     } else {
-      setSuccess(true);
+      navigate("/lls-us/terms", {
+        state: {
+          retail_signup_id: inserted?.id,
+          store_name: form.store_name.trim(),
+          contact_name: form.contact_name.trim(),
+          contact_email: form.contact_email.trim(),
+          city: form.city_location,
+        },
+      });
     }
   };
 
@@ -277,23 +280,7 @@ const [form, setForm] = useState({
                 <Textarea id="r-notes" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} className="mt-1.5 bg-input border-border text-foreground" maxLength={2000} />
               </div>
 
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="r-terms"
-                  checked={form.terms_accepted}
-                  onChange={e => setForm(f => ({ ...f, terms_accepted: e.target.checked }))}
-                  className="mt-1 h-4 w-4 accent-primary"
-                />
-                <Label htmlFor="r-terms" className="text-foreground-secondary type-body-sm cursor-pointer">
-                  I have read and agree to the{" "}
-                  <Link to="/lls-us/terms" target="_blank" className="text-primary underline hover:text-primary/80">
-                    Terms of Service
-                  </Link>. *
-                </Label>
-              </div>
-
-              <Button type="submit" size="lg" disabled={submitting || !form.terms_accepted} className="w-full md:w-auto">
+              <Button type="submit" size="lg" disabled={submitting} className="w-full md:w-auto">
                 {submitting ? "Submitting…" : "Partner Your Store"}
               </Button>
             </form>
