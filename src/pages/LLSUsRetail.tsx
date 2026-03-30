@@ -76,7 +76,7 @@ const [form, setForm] = useState({
       const ext = logoFile.name.split(".").pop() || "png";
       const path = `lls-retail-logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error: uploadErr } = await supabase.storage
-        .from("submissions_audio")
+        .from("partner_flyers")
         .upload(path, logoFile, { contentType: logoFile.type, upsert: false });
       setUploadingLogo(false);
       if (uploadErr) {
@@ -84,7 +84,7 @@ const [form, setForm] = useState({
         toast({ title: "Logo upload failed. Please try again.", variant: "destructive" });
         return;
       }
-      const { data: urlData } = supabase.storage.from("submissions_audio").getPublicUrl(path);
+      const { data: urlData } = supabase.storage.from("partner_flyers").getPublicUrl(path);
       store_logo_url = urlData.publicUrl;
     }
 
