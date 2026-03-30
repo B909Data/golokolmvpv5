@@ -268,7 +268,7 @@ const [form, setForm] = useState({
               </div>
 
               <div>
-                <Label htmlFor="r-name" className="text-foreground">Contact Name *</Label>
+                <Label htmlFor="r-name" className="text-foreground">Contact Full Name (First and Last name) *</Label>
                 <Input id="r-name" required value={form.contact_name} onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))} className="mt-1.5 bg-input border-border text-foreground" maxLength={200} />
               </div>
 

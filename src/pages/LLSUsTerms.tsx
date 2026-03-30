@@ -260,7 +260,7 @@ const LLSUsTerms = () => {
 
             {/* Section 1 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">1. WHAT IS LOKOL LISTENING SESSIONS?</h3>
+              <h3 className="text-black font-semibold mb-3">1. WHAT IS LOKOL LISTENING SESSIONS?</h3>
               <p className="mb-3">GoLokol provides a music discovery kiosk featuring local artists from {city}. Here's how it works:</p>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>Customers scan a QR code on a foam board poster placed in your store.</li>
