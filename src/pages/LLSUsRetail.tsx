@@ -68,10 +68,6 @@ const [form, setForm] = useState({
       toast({ title: "Please fill in all required fields.", variant: "destructive" });
       return;
     }
-    if (!form.terms_accepted) {
-      toast({ title: "Please accept the Terms of Service.", variant: "destructive" });
-      return;
-    }
     setSubmitting(true);
 
     let store_logo_url: string | null = null;
@@ -92,23 +88,30 @@ const [form, setForm] = useState({
       store_logo_url = urlData.publicUrl;
     }
 
-    const { error } = await supabase.from("lls_retail_signups").insert({
+    const { data: inserted, error } = await supabase.from("lls_retail_signups").insert({
       store_name: form.store_name.trim(),
       city_location: form.city_location,
       store_type: form.store_type,
       has_listening_station: form.has_listening_station,
       signage_preference: form.signage_preference,
       store_logo_url,
-      terms_accepted: form.terms_accepted,
       contact_name: form.contact_name.trim(),
       contact_email: form.contact_email.trim(),
       notes: form.notes.trim() || null,
-    } as any);
+    } as any).select("id").single();
     setSubmitting(false);
     if (error) {
       toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
     } else {
-      setSuccess(true);
+      navigate("/lls-us/terms", {
+        state: {
+          retail_signup_id: inserted?.id,
+          store_name: form.store_name.trim(),
+          contact_name: form.contact_name.trim(),
+          contact_email: form.contact_email.trim(),
+          city: form.city_location,
+        },
+      });
     }
   };
 
