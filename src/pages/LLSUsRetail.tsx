@@ -31,6 +31,7 @@ const [form, setForm] = useState({
     contact_name: "",
     contact_email: "",
     notes: "",
+    terms_accepted: false,
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -65,6 +66,10 @@ const [form, setForm] = useState({
     e.preventDefault();
     if (!form.store_name || !form.city_location || !form.store_type || !form.has_listening_station || !form.contact_name || !form.contact_email) {
       toast({ title: "Please fill in all required fields.", variant: "destructive" });
+      return;
+    }
+    if (!form.terms_accepted) {
+      toast({ title: "Please accept the Terms of Service.", variant: "destructive" });
       return;
     }
     setSubmitting(true);
@@ -271,7 +276,23 @@ const [form, setForm] = useState({
                 <Textarea id="r-notes" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} className="mt-1.5 bg-input border-border text-foreground" maxLength={2000} />
               </div>
 
-              <Button type="submit" size="lg" disabled={submitting} className="w-full md:w-auto">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="r-terms"
+                  checked={form.terms_accepted}
+                  onChange={e => setForm(f => ({ ...f, terms_accepted: e.target.checked }))}
+                  className="mt-1 h-4 w-4 accent-primary"
+                />
+                <Label htmlFor="r-terms" className="text-foreground-secondary type-body-sm cursor-pointer">
+                  I have read and agree to the{" "}
+                  <Link to="/lls-us/terms" target="_blank" className="text-primary underline hover:text-primary/80">
+                    Terms of Service
+                  </Link>. *
+                </Label>
+              </div>
+
+              <Button type="submit" size="lg" disabled={submitting || !form.terms_accepted} className="w-full md:w-auto">
                 {submitting ? "Submitting…" : "Partner Your Store"}
               </Button>
             </form>
