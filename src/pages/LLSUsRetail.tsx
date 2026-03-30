@@ -16,6 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Footer from "@/components/Footer";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import signageSquare from "@/assets/lls-signage-square.png";
+import signageTall from "@/assets/lls-signage-tall.png";
 
 const LLSUsRetail = () => {
   const { toast } = useToast();
