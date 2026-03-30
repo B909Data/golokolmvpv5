@@ -301,7 +301,7 @@ const LLSUsTerms = () => {
 
             {/* Section 4 */}
             <div>
-              <h3 className="text-foreground font-semibold mb-3">4. POINTS & REDEMPTION</h3>
+              <h3 className="text-black font-semibold mb-3">4. POINTS & REDEMPTION</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>Customers earn points each time they vote on a song.</li>
                 <li>The Store sets the redemption rate — e.g., 50 points = $5 off, 100 points = $10 off. GoLokol will help design this with you.</li>
