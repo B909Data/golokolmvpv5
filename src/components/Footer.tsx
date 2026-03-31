@@ -15,7 +15,7 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-muted-foreground max-w-sm">
-              Make every show count. We help emerging artists cultivate fanbases that show up by rewarding those fans who do.
+              We help emerging artists cultivate local momentum.
             </p>
           </div>
 
