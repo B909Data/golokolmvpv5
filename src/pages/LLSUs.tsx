@@ -37,9 +37,27 @@ const LLSUs = () => {
 
       {/* Body text below hero */}
       <section className="px-6 md:px-12 lg:px-20 py-10 md:py-16">
-        <p className="type-subcaption text-[#F0EDE8] mb-0 max-w-2xl">
-          We place local emerging music in discovery hubs like neighborhood record stores. Local music fans listen, vote and connect via Golokol Connect. Votes lead to artist features at Lokol Listening Session filmed events and direct-to-local fan sales and show promotions through Golokol Connect.
-        </p>
+        <ul className="space-y-4 max-w-2xl">
+          <li className="flex items-start gap-3">
+            <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
+            <span className="type-subcaption text-[#F0EDE8]">
+              Lokol Listens Sessions turns your city's favorite record stores, retail and cafe's into local music discovery hubs.
+            </span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
+            <span className="type-subcaption text-[#F0EDE8]">
+              Music lovers listen, vote and collect their local favorites on{" "}
+              <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">Golokol Connect</Link>.
+            </span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
+            <span className="type-subcaption text-[#F0EDE8]">
+              Use it to promote shows and sell music direct to your local base.
+            </span>
+          </li>
+        </ul>
       </section>
 
       {/* AUDIENCE SPLIT */}
