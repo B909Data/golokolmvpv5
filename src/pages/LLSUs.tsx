@@ -41,21 +41,21 @@ const LLSUs = () => {
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Lokol Listens Sessions turns your city's favorite record stores, retail and cafe's into local music discovery hubs.
+              Lokol Listening Sessions turns record stores into local music discovery hubs.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Music lovers add their favs to their{" "}
+              Music lovers listen, vote and save their favs.
+            </span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
+            <span className="type-subcaption text-[#F0EDE8]">
+              We create local momentum with direct-to-fan promotion and sales.{" "}
               <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">Golokol Connect</Link>{" "}
-              dashboard. Your city. Your scene.
-            </span>
-          </li>
-          <li className="flex items-start gap-3">
-            <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
-            <span className="type-subcaption text-[#F0EDE8]">
-              Artists can promote local shows and sell music directly to the dashboards they're on. Local momentum w/o an algorithm.
+              coming soon.
             </span>
           </li>
         </ul>

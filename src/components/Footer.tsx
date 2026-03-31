@@ -15,7 +15,7 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-muted-foreground max-w-sm">
-              Make every show count. We help emerging artists cultivate fanbases that show up by rewarding those fans who do.
+              We help emerging artists cultivate local momentum.
             </p>
           </div>
 
@@ -23,8 +23,8 @@ const Footer = () => {
             <h4 className="font-display text-lg text-foreground mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/create-afterparty" className="text-muted-foreground hover:text-primary transition-colors">
-                  Create an After Party
+                <Link to="/connect" className="text-muted-foreground hover:text-primary transition-colors">
+                  Golokol Connect
                 </Link>
               </li>
               <li>
