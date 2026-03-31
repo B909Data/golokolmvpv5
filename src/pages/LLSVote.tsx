@@ -206,7 +206,7 @@ const LLSVote = () => {
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Choose a Lokol Listening Session" />
+                              <SelectValue placeholder="Choose a Lokol Listening Station" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>

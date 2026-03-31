@@ -191,7 +191,7 @@ const Terms = () => {
                 </ul>
 
                 <h3 className="font-display text-xl text-[hsl(0,0%,10%)] mt-6 mb-3">15.4 Likeness & Media Release (IMPORTANT)</h3>
-                <p className="font-semibold">BY PURCHASING A TICKET OR ATTENDING A LOKOL LISTENING SESSION, YOU GRANT GOLOKOL LLC PERMISSION TO CAPTURE, RECORD, AND USE YOUR LIKENESS, IMAGE, AND VOICE.</p>
+                <p className="font-semibold">BY PURCHASING A TICKET OR ATTENDING A LOKOL LISTENING STATION, YOU GRANT GOLOKOL LLC PERMISSION TO CAPTURE, RECORD, AND USE YOUR LIKENESS, IMAGE, AND VOICE.</p>
                 <p className="mt-4">This includes use in:</p>
                 <ul className="list-disc pl-6 space-y-1 mt-2">
                   <li>Lokol Listening Stations YouTube Series</li>
