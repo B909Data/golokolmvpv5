@@ -183,6 +183,7 @@ const Navbar = () => {
                 {user ? "My Dashboard" : "Artist Sign In"}
               </Button>
               */}
+              {/* GoLokol FAQ - temporarily hidden
               <div className="pt-2 mt-2 border-t border-border/50">
                 <Link to="/how-to-golokol" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="secondary" size="sm" className="w-full">
@@ -190,6 +191,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
               </div>
+              */}
             </div>
           </div>
         )}
