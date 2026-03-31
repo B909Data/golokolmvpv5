@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import heroImage from "@/assets/golokol-hero.svg";
 import llsCard from "@/assets/lls-card.jpg";
 import afterpartyCard from "@/assets/afterparty-card.jpg";
@@ -135,12 +136,7 @@ const Index = () => {
       </section>
 
 
-      {/* FOOTER */}
-      <footer className="bg-black py-8 text-center">
-        <p className="text-sm text-white">
-          GoLokol — The future of music is local.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import connectHero from "@/assets/connect-hero.jpg";
 
@@ -104,12 +105,7 @@ const Connect = () => {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-black py-8 text-center">
-        <p className="text-sm text-white">
-          GoLokol — The future of music is local.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 };
