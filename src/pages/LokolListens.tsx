@@ -23,7 +23,7 @@ const LokolListens = () => {
       <section className="w-full flex items-center justify-center px-4" style={{ height: "55vh", minHeight: 320 }}>
         <img
           src={llsHero}
-          alt="Lokol Listening Sessions Atlanta"
+          alt="Lokol Listening Stations Atlanta"
           className="w-full h-full object-contain"
         />
       </section>

@@ -41,7 +41,7 @@ const LLSUs = () => {
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Lokol Listening Sessions turns record stores into local music discovery hubs.
+              Lokol Listening Stations turns record stores into local music discovery hubs.
             </span>
           </li>
           <li className="flex items-start gap-3">

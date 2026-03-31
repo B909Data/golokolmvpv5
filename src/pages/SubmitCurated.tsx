@@ -401,7 +401,7 @@ const SubmitCurated = () => {
                 <AspectRatio ratio={16 / 9}>
                   <iframe
                     src="https://www.youtube.com/embed/2exJWgcJRlA"
-                    title="Lokol Listening Sessions"
+                    title="Lokol Listening Stations"
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -467,7 +467,7 @@ const SubmitCurated = () => {
               <h1 className="font-display text-5xl md:text-6xl text-[hsl(0,0%,10%)] mb-4">
                 LOKOL LISTENING SESSIONS <span className="text-[hsl(0,0%,30%)]">SUBMISSION</span>
               </h1>
-              <p className="text-[hsl(0,0%,40%)] text-lg">Submit your music for the next Lokol Listening Sessions event. One Artist, One Song.</p>
+              <p className="text-[hsl(0,0%,40%)] text-lg">Submit your music for the next Lokol Listening Stations event. One Artist, One Song.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -512,7 +512,7 @@ const SubmitCurated = () => {
                     <Label htmlFor="music_release" className="text-[hsl(0,0%,10%)] text-sm leading-relaxed cursor-pointer">
                       I agree to the{" "}
                       <Link to="/lls-music-release" target="_blank" className="underline hover:text-[hsl(0,0%,30%)]">Blanket Artist Music Release Agreement</Link>{" "}
-                      and grant GoLokol the right to use my submitted music for Lokol Listening Sessions. *
+                      and grant GoLokol the right to use my submitted music for Lokol Listening Stations. *
                     </Label>
                   </div>
                 </div>

@@ -121,7 +121,7 @@ const Admin = () => {
                 <h2 className="font-display text-xl text-foreground">LLS Votes</h2>
               </div>
               <p className="text-muted-foreground text-sm">
-                View vote tallies for Lokol Listening Sessions by session, city, and artist.
+                View vote tallies for Lokol Listening Stations by session, city, and artist.
               </p>
             </Link>
           </div>

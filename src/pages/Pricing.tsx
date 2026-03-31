@@ -13,7 +13,7 @@ const Pricing = () => {
             GoLokol Plans
           </h1>
           <p className="type-body text-foreground/80 text-lg mb-12">
-            Lokol Listening Sessions + GoLokol Connect
+            Lokol Listening Stations + GoLokol Connect
           </p>
 
           <Card className="bg-card border-border mx-auto max-w-md">

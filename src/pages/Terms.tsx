@@ -159,12 +159,12 @@ const Terms = () => {
               </section>
 
               <section>
-                <h2 className="font-display text-2xl text-[hsl(0,0%,10%)] mt-8 mb-4">15. Lokol Listening Sessions (LLS)</h2>
-                <p>Lokol Listening Sessions ("LLS") are curated music experiences that may include live events, ticket sales, music submissions, and recorded content.</p>
+                <h2 className="font-display text-2xl text-[hsl(0,0%,10%)] mt-8 mb-4">15. Lokol Listening Stations (LLS)</h2>
+                <p>Lokol Listening Stations ("LLS") are curated music experiences that may include live events, ticket sales, music submissions, and recorded content.</p>
                 <p className="mt-4">By submitting music to or purchasing tickets for an LLS event, you agree to the following:</p>
 
                 <h3 className="font-display text-xl text-[hsl(0,0%,10%)] mt-6 mb-3">15.1 Music Submissions</h3>
-                <p>Artists who submit music to Lokol Listening Sessions acknowledge that:</p>
+                <p>Artists who submit music to Lokol Listening Stations acknowledge that:</p>
                 <ul className="list-disc pl-6 space-y-1 mt-2">
                   <li>Submission fees are non-refundable</li>
                   <li>Submission does not guarantee selection</li>
@@ -174,13 +174,13 @@ const Terms = () => {
                 </ul>
 
                 <h3 className="font-display text-xl text-[hsl(0,0%,10%)] mt-6 mb-3">15.2 Ticket Purchases (Fans & Attendees)</h3>
-                <p>All ticket purchases for Lokol Listening Sessions are final.</p>
+                <p>All ticket purchases for Lokol Listening Stations are final.</p>
                 <ul className="list-disc pl-6 space-y-1 mt-2">
                   <li>No refunds or exchanges</li>
                   <li>Ticket issues must be directed to: backstage@golokol.app</li>
                 </ul>
                 <p className="mt-4">GoLokol is a technology and media platform and is not responsible for venue operations, safety, or event conditions.</p>
-                <p className="mt-2">Venues hosting Lokol Listening Sessions are independently owned and insured.</p>
+                <p className="mt-2">Venues hosting Lokol Listening Stations are independently owned and insured.</p>
 
                 <h3 className="font-display text-xl text-[hsl(0,0%,10%)] mt-6 mb-3">15.3 Assumption of Risk & Liability</h3>
                 <p>By attending an LLS event, you acknowledge that live music events carry inherent risks.</p>
@@ -191,10 +191,10 @@ const Terms = () => {
                 </ul>
 
                 <h3 className="font-display text-xl text-[hsl(0,0%,10%)] mt-6 mb-3">15.4 Likeness & Media Release (IMPORTANT)</h3>
-                <p className="font-semibold">BY PURCHASING A TICKET OR ATTENDING A LOKOL LISTENING SESSION, YOU GRANT GOLOKOL LLC PERMISSION TO CAPTURE, RECORD, AND USE YOUR LIKENESS, IMAGE, AND VOICE.</p>
+                <p className="font-semibold">BY PURCHASING A TICKET OR ATTENDING A LOKOL LISTENING STATION, YOU GRANT GOLOKOL LLC PERMISSION TO CAPTURE, RECORD, AND USE YOUR LIKENESS, IMAGE, AND VOICE.</p>
                 <p className="mt-4">This includes use in:</p>
                 <ul className="list-disc pl-6 space-y-1 mt-2">
-                  <li>Lokol Listening Sessions YouTube Series</li>
+                  <li>Lokol Listening Stations YouTube Series</li>
                   <li>GoLokol social platforms</li>
                   <li>Promotional and marketing materials</li>
                 </ul>
@@ -234,7 +234,7 @@ const Terms = () => {
 
               <section>
                 <h3 className="font-display text-xl text-[hsl(0,0%,10%)] mt-8 mb-3">LLS Conduct Guidelines</h3>
-                <p>During Lokol Listening Sessions (live or digital), users must:</p>
+                <p>During Lokol Listening Stations (live or digital), users must:</p>
                 <ul className="list-disc pl-6 space-y-1 mt-2">
                   <li>Respect performers, DJs, staff, and attendees</li>
                   <li>Avoid disruptive or unsafe behavior</li>

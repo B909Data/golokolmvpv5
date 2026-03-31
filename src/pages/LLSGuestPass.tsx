@@ -151,7 +151,7 @@ const LLSGuestPass = () => {
               </h1>
               
               <p className="text-muted-foreground">
-                You're attending Lokol Listening Sessions to support{" "}
+                You're attending Lokol Listening Stations to support{" "}
                 <span className="text-foreground font-semibold">{successData.artistName}</span>
               </p>
 
@@ -189,7 +189,7 @@ const LLSGuestPass = () => {
           ) : (
             <>
               <h1 className="font-display text-2xl text-foreground text-center mb-4">
-                RSVP for Lokol Listening Session 2
+                RSVP for Lokol Listening Station 2
               </h1>
 
               <ul className="text-muted-foreground text-sm space-y-1 mb-6 list-disc list-inside">
@@ -202,7 +202,7 @@ const LLSGuestPass = () => {
               <div className="aspect-video mb-8 rounded-lg overflow-hidden">
                 <iframe
                   src="https://www.youtube.com/embed/2exJWgcJRlA"
-                  title="Lokol Listening Sessions"
+                  title="Lokol Listening Stations"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="w-full h-full"
@@ -268,7 +268,7 @@ const LLSGuestPass = () => {
                     className="mt-1"
                   />
                   <Label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                    I consent to be filmed/photographed at Lokol Listening Sessions on March 15, 2026 at The Handlebar, and I grant GoLokol permission to use my image/likeness in event-related media.{" "}
+                    I consent to be filmed/photographed at Lokol Listening Stations on March 15, 2026 at The Handlebar, and I grant GoLokol permission to use my image/likeness in event-related media.{" "}
                     <Link to="/lls-release" className="text-primary hover:underline">
                       (Read more)
                     </Link>

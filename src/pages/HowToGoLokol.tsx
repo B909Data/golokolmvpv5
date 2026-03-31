@@ -78,7 +78,7 @@ const SECTIONS = [
   { id: "what-are-after-parties", title: "What Are After Parties?" },
   { id: "throw-great-after-party", title: "How Do I Throw a Great After Party?" },
   { id: "set-up-livestream", title: "How Do I Set Up a Livestream?" },
-  { id: "what-are-lls", title: "What Are Lokol Listening Sessions?" },
+  { id: "what-are-lls", title: "What Are Lokol Listening Stations?" },
   { id: "suggestion-box", title: "Suggestion Box" },
 ];
 
@@ -279,15 +279,15 @@ const HowToGoLokol = () => {
                 </ul>
               </AccordionItem>
 
-              {/* Section 4: What Are Lokol Listening Sessions? */}
+              {/* Section 4: What Are Lokol Listening Stations? */}
               <AccordionItem
                 id="what-are-lls"
-                title="What Are Lokol Listening Sessions?"
+                title="What Are Lokol Listening Stations?"
                 isOpen={openSections.has("what-are-lls")}
                 onToggle={() => toggleSection("what-are-lls")}
               >
                 <Paragraph>
-                  Lokol Listening Sessions are live, curated listening events that spotlight local music in real spaces.
+                  Lokol Listening Stations are live, curated listening events that spotlight local music in real spaces.
                 </Paragraph>
                 <Paragraph>Think:</Paragraph>
                 <ul className="space-y-3 text-[#0E0E0E] mb-6">

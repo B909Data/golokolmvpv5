@@ -18,19 +18,19 @@ const LLSRelease = () => {
           </Link>
 
           <h1 className="font-display text-2xl md:text-3xl text-foreground mb-8">
-            Photo & Video Release — Lokol Listening Sessions
+            Photo & Video Release — Lokol Listening Stations
           </h1>
 
           <div className="space-y-6 text-muted-foreground leading-relaxed">
             <div className="space-y-1">
-              <p><strong className="text-foreground">Event:</strong> Lokol Listening Sessions</p>
+              <p><strong className="text-foreground">Event:</strong> Lokol Listening Stations</p>
               <p><strong className="text-foreground">Date:</strong> March 15, 2026</p>
               <p><strong className="text-foreground">Location:</strong> The Handlebar</p>
               <p><strong className="text-foreground">Produced by:</strong> GoLokol ("GoLokol," "we," "us")</p>
             </div>
 
             <p>
-              By attending Lokol Listening Sessions and/or claiming an LLS pass, I acknowledge and agree that GoLokol and its authorized representatives may photograph, film, or record me during the event.
+              By attending Lokol Listening Stations and/or claiming an LLS pass, I acknowledge and agree that GoLokol and its authorized representatives may photograph, film, or record me during the event.
             </p>
 
             <p>

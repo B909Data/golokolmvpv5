@@ -125,7 +125,7 @@ const SubmitSong = () => {
                 SUBMIT A <span className="text-[hsl(0,0%,30%)]">LISTENING</span> SESSION
               </h1>
               <p className="text-[hsl(0,0%,40%)] text-lg">
-                Your music, get feedback and featured at the next Lokol Listening Sessions event. One Artist, One Song.
+                Your music, get feedback and featured at the next Lokol Listening Stations event. One Artist, One Song.
               </p>
             </div>
 

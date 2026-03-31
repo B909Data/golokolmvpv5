@@ -33,7 +33,7 @@ export const MagicLinkEmail = ({
       <Container style={container}>
         <Img src={LOGO_URL} alt="GoLokol" width="48" height="48" style={logoStyle} />
         <Heading style={h1}>
-          One-time curator invite link to Lokol Listening Sessions
+          One-time curator invite link to Lokol Listening Stations
         </Heading>
         <Text style={text}>
           Click the button below to securely submit your music for the next LLS.

@@ -26,8 +26,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 
 const SESSIONS = [
-  { value: "lls1", label: "Lokol Listening Session 1" },
-  { value: "lls2", label: "Lokol Listening Sessions 2" },
+  { value: "lls1", label: "Lokol Listening Station 1" },
+  { value: "lls2", label: "Lokol Listening Stations 2" },
 ] as const;
 
 const ARTISTS_LLS1 = [
@@ -74,11 +74,11 @@ const LLSVote = () => {
     document.title = "LLS Vote — Atlanta Spring 2026";
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
-      meta.setAttribute("content", "Vote for one Atlanta Hip Hop & RnB artist to be featured in the Lokol Listening Sessions Spring 2026 compilation.");
+      meta.setAttribute("content", "Vote for one Atlanta Hip Hop & RnB artist to be featured in the Lokol Listening Stations Spring 2026 compilation.");
     } else {
       const newMeta = document.createElement("meta");
       newMeta.name = "description";
-      newMeta.content = "Vote for one Atlanta Hip Hop & RnB artist to be featured in the Lokol Listening Sessions Spring 2026 compilation.";
+      newMeta.content = "Vote for one Atlanta Hip Hop & RnB artist to be featured in the Lokol Listening Stations Spring 2026 compilation.";
       document.head.appendChild(newMeta);
     }
   }, []);
@@ -151,7 +151,7 @@ const LLSVote = () => {
           ) : (
             <>
               <h1 className="font-display text-2xl md:text-3xl text-foreground mb-2 uppercase tracking-wide">
-                Lokol Listening Sessions Atlanta
+                Lokol Listening Stations Atlanta
               </h1>
               <h2 className="font-display text-xl md:text-2xl text-primary mb-6 uppercase tracking-wide">
                 Spring 2026 Vote
@@ -206,7 +206,7 @@ const LLSVote = () => {
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Choose a Lokol Listening Session" />
+                              <SelectValue placeholder="Choose a Lokol Listening Station" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -269,7 +269,7 @@ const LLSVote = () => {
                         href="https://golokol.app/songs"
                         className="text-primary hover:underline"
                       >
-                        Submit music for future Lokol Listening Sessions
+                        Submit music for future Lokol Listening Stations
                       </a>
                     </p>
                   </div>

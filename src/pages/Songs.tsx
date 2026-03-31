@@ -67,7 +67,7 @@ const Songs = () => {
             <div className="aspect-video w-full rounded-lg overflow-hidden">
             <iframe
               src={`https://www.youtube.com/embed/${extractYouTubeId("https://youtu.be/2exJWgcJRlA")}`}
-              title="Lokol Listening Sessions"
+              title="Lokol Listening Stations"
               className="w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -95,7 +95,7 @@ const Songs = () => {
             </li>
             <li className="flex items-start gap-3">
               <span className="text-[hsl(0,0%,10%)] font-bold">3.</span>
-              <span>You must be able to be present for the filming of Lokol Listening Sessions in your city.</span>
+              <span>You must be able to be present for the filming of Lokol Listening Stations in your city.</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="text-[hsl(0,0%,10%)] font-bold">4.</span>
