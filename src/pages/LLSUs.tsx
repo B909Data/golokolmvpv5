@@ -47,14 +47,15 @@ const LLSUs = () => {
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Music lovers listen, vote and collect their local favorites on{" "}
-              <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">Golokol Connect</Link>.
+              Music lovers add their favs to their{" "}
+              <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">Golokol Connect</Link>{" "}
+              dashboard. Your city. Your scene.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Use it to promote shows and sell music direct to your local base.
+              Artists can promote local shows and sell music directly to the dashboards they're on. Local momentum w/o an algorithm.
             </span>
           </li>
         </ul>
