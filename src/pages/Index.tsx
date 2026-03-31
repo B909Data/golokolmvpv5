@@ -136,12 +136,7 @@ const Index = () => {
       </section>
 
 
-      {/* FOOTER */}
-      <footer className="bg-black py-8 text-center">
-        <p className="text-sm text-white">
-          GoLokol — The future of music is local.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 };
