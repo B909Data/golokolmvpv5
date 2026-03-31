@@ -129,6 +129,7 @@ const Navbar = () => {
 
           {/* Desktop/Tablet CTA Buttons */}
           <div className="hidden md:flex items-center gap-2 flex-shrink-0 ml-2">
+            {/* Artist Sign In - temporarily hidden
             <button
               onClick={handleArtistClick}
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-sm"
@@ -136,6 +137,7 @@ const Navbar = () => {
               <User className="h-4 w-4" />
               {user ? "Dashboard" : "Artist Sign In"}
             </button>
+            */}
             <Link to="/how-to-golokol">
               <Button variant="secondary" size="sm" className="text-xs md:text-sm whitespace-nowrap">
                 GoLokol FAQ
