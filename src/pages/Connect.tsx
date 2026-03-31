@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import connectHero from "@/assets/connect-hero.jpg";
 
