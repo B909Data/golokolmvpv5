@@ -170,6 +170,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
               ))}
+              {/* Artist Sign In - temporarily hidden
               <Button
                 variant="ghost"
                 size="sm"
@@ -179,6 +180,7 @@ const Navbar = () => {
                 <User className="h-4 w-4 mr-2" />
                 {user ? "My Dashboard" : "Artist Sign In"}
               </Button>
+              */}
               <div className="pt-2 mt-2 border-t border-border/50">
                 <Link to="/how-to-golokol" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="secondary" size="sm" className="w-full">
