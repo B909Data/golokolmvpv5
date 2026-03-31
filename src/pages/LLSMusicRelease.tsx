@@ -25,28 +25,28 @@ BLANKET ARTIST MUSIC RELEASE AGREEMENT
 
 This Music Release Agreement ("Agreement") is entered into by and between Golokol LLC, a Georgia limited liability company ("Company"), and the undersigned submitting artist ("Artist").
 
-This Agreement applies to all music submitted by Artist through the Lokol Listening Sessions music submission form, including but not limited to the specific artist name and song title(s) provided in that submission.
+This Agreement applies to all music submitted by Artist through the Lokol Listening Stations music submission form, including but not limited to the specific artist name and song title(s) provided in that submission.
 
-By submitting music and participating in Lokol Listening Sessions, Artist agrees to the following:
+By submitting music and participating in Lokol Listening Stations, Artist agrees to the following:
 
 1. Grant of Rights
 
 Artist hereby grants to Company a non-exclusive, worldwide, perpetual, royalty-free license to:
 
-Play and publicly perform the submitted music during Lokol Listening Sessions events
+Play and publicly perform the submitted music during Lokol Listening Stations events
 
 Record, film, and capture such music in audio and audiovisual formats
 
-Edit, reproduce, distribute, stream, publicly display, and otherwise exploit such recordings in connection with Lokol Listening Sessions content
+Edit, reproduce, distribute, stream, publicly display, and otherwise exploit such recordings in connection with Lokol Listening Stations content
 
-Use such recordings in promotional materials, social media, digital platforms, websites, and marketing materials related to Lokol Listening Sessions
+Use such recordings in promotional materials, social media, digital platforms, websites, and marketing materials related to Lokol Listening Stations
 
 Exhibit and publicly play the submitted music through curated listening environments, including but not limited to:
 
-Lokol Listening Sessions events
-Lokol Listening Sessions listening stations or kiosks
+Lokol Listening Stations events
+Lokol Listening Stations listening stations or kiosks
 In-store listening installations located in record stores, retail locations, or partner venues
-Digital listening interfaces associated with Lokol Listening Sessions where listeners may preview and vote on music
+Digital listening interfaces associated with Lokol Listening Stations where listeners may preview and vote on music
 
 Such uses may include audio-only playback, audiovisual presentation, and digital listening experiences designed to showcase local artists and allow audiences to discover and vote on music.
 
@@ -64,7 +64,7 @@ No future licensing fees
 
 shall be owed by Company for the uses authorized under this Agreement.
 
-Participation in Lokol Listening Sessions is voluntary and promotional in nature.
+Participation in Lokol Listening Stations is voluntary and promotional in nature.
 
 3. Ownership and Authority
 
@@ -78,13 +78,13 @@ Artist agrees to indemnify and hold Company harmless from any claims arising fro
 
 4. Scope of Use
 
-This Agreement applies solely to uses connected to the Lokol Listening Sessions ecosystem, including:
+This Agreement applies solely to uses connected to the Lokol Listening Stations ecosystem, including:
 
-Lokol Listening Sessions live events
-Filmed and recorded Lokol Listening Sessions content
+Lokol Listening Stations live events
+Filmed and recorded Lokol Listening Stations content
 Online video and digital media distribution
 In-store listening kiosks and curated music listening installations
-Audience voting and music discovery experiences associated with Lokol Listening Sessions
+Audience voting and music discovery experiences associated with Lokol Listening Stations
 
 This Agreement does not transfer ownership of the music to Company.
 
@@ -94,7 +94,7 @@ Artist releases and discharges Company from any and all claims, demands, or liab
 
 6. Binding Effect
 
-By submitting music through the Lokol Listening Sessions submission form and agreeing to these terms, Artist acknowledges that this Agreement is legally binding.
+By submitting music through the Lokol Listening Stations submission form and agreeing to these terms, Artist acknowledges that this Agreement is legally binding.
 
 7. Governing Law
 
@@ -169,7 +169,7 @@ const LLSMusicRelease = () => {
               Thank you, <span className="text-foreground font-medium">{formData.legal_name}</span>.
             </p>
             <p className="text-muted-foreground mb-8">
-              Your electronic signature for the Lokol Listening Sessions Music Release Agreement has been recorded.
+              Your electronic signature for the Lokol Listening Stations Music Release Agreement has been recorded.
               A confirmation will be sent to <span className="text-foreground font-medium">{formData.email}</span>.
             </p>
             <Link to="/submit-song">
@@ -209,11 +209,11 @@ const LLSMusicRelease = () => {
             </p>
 
             <p>
-              This Agreement applies to all music submitted by Artist through the Lokol Listening Sessions music submission form, including but not limited to the specific artist name and song title(s) provided in that submission.
+              This Agreement applies to all music submitted by Artist through the Lokol Listening Stations music submission form, including but not limited to the specific artist name and song title(s) provided in that submission.
             </p>
 
             <p>
-              By submitting music and participating in Lokol Listening Sessions, Artist agrees to the following:
+              By submitting music and participating in Lokol Listening Stations, Artist agrees to the following:
             </p>
 
             <div>
@@ -222,17 +222,17 @@ const LLSMusicRelease = () => {
                 Artist hereby grants to Company a non-exclusive, worldwide, perpetual, royalty-free license to:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>Play and publicly perform the submitted music during Lokol Listening Sessions events</li>
+                <li>Play and publicly perform the submitted music during Lokol Listening Stations events</li>
                 <li>Record, film, and capture such music in audio and audiovisual formats</li>
-                <li>Edit, reproduce, distribute, stream, publicly display, and otherwise exploit such recordings in connection with Lokol Listening Sessions content</li>
-                <li>Use such recordings in promotional materials, social media, digital platforms, websites, and marketing materials related to Lokol Listening Sessions</li>
+                <li>Edit, reproduce, distribute, stream, publicly display, and otherwise exploit such recordings in connection with Lokol Listening Stations content</li>
+                <li>Use such recordings in promotional materials, social media, digital platforms, websites, and marketing materials related to Lokol Listening Stations</li>
                 <li>
                   Exhibit and publicly play the submitted music through curated listening environments, including but not limited to:
                   <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
-                    <li>Lokol Listening Sessions events</li>
-                    <li>Lokol Listening Sessions listening stations or kiosks</li>
+                    <li>Lokol Listening Stations events</li>
+                    <li>Lokol Listening Stations listening stations or kiosks</li>
                     <li>In-store listening installations located in record stores, retail locations, or partner venues</li>
-                    <li>Digital listening interfaces associated with Lokol Listening Sessions where listeners may preview and vote on music</li>
+                    <li>Digital listening interfaces associated with Lokol Listening Stations where listeners may preview and vote on music</li>
                   </ul>
                 </li>
               </ul>
@@ -258,7 +258,7 @@ const LLSMusicRelease = () => {
                 shall be owed by Company for the uses authorized under this Agreement.
               </p>
               <p className="mt-2">
-                Participation in Lokol Listening Sessions is voluntary and promotional in nature.
+                Participation in Lokol Listening Stations is voluntary and promotional in nature.
               </p>
             </div>
 
@@ -277,13 +277,13 @@ const LLSMusicRelease = () => {
 
             <div>
               <h3 className="text-foreground font-semibold mb-3">4. Scope of Use</h3>
-              <p className="mb-3">This Agreement applies solely to uses connected to the Lokol Listening Sessions ecosystem, including:</p>
+              <p className="mb-3">This Agreement applies solely to uses connected to the Lokol Listening Stations ecosystem, including:</p>
               <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>Lokol Listening Sessions live events</li>
-                <li>Filmed and recorded Lokol Listening Sessions content</li>
+                <li>Lokol Listening Stations live events</li>
+                <li>Filmed and recorded Lokol Listening Stations content</li>
                 <li>Online video and digital media distribution</li>
                 <li>In-store listening kiosks and curated music listening installations</li>
-                <li>Audience voting and music discovery experiences associated with Lokol Listening Sessions</li>
+                <li>Audience voting and music discovery experiences associated with Lokol Listening Stations</li>
               </ul>
               <p className="mt-3">
                 This Agreement does not transfer ownership of the music to Company.
@@ -300,7 +300,7 @@ const LLSMusicRelease = () => {
             <div>
               <h3 className="text-foreground font-semibold mb-3">6. Binding Effect</h3>
               <p>
-                By submitting music through the Lokol Listening Sessions submission form and agreeing to these terms, Artist acknowledges that this Agreement is legally binding.
+                By submitting music through the Lokol Listening Stations submission form and agreeing to these terms, Artist acknowledges that this Agreement is legally binding.
               </p>
             </div>
 
@@ -389,7 +389,7 @@ const LLSMusicRelease = () => {
                   className="mt-0.5"
                 />
                 <Label htmlFor="consent" className="text-foreground text-sm leading-relaxed cursor-pointer">
-                  I confirm that I have read and agree to the Lokol Listening Sessions Blanket Artist Music Release Agreement and that I have the authority to grant these rights on behalf of the artist or group. <span className="text-red-500">*</span>
+                  I confirm that I have read and agree to the Lokol Listening Stations Blanket Artist Music Release Agreement and that I have the authority to grant these rights on behalf of the artist or group. <span className="text-red-500">*</span>
                 </Label>
               </div>
 

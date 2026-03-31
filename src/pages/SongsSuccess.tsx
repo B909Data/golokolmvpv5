@@ -64,12 +64,12 @@ const SongsSuccess = () => {
                 Submission received.
               </h1>
               <p className="text-muted-foreground mb-8">
-                Thank you for submitting to Lokol Listening Sessions. We'll be in touch if you're selected.
+                Thank you for submitting to Lokol Listening Stations. We'll be in touch if you're selected.
               </p>
               <Link to="/songs">
                 <Button size="lg">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Lokol Listening Sessions
+                  Back to Lokol Listening Stations
                 </Button>
               </Link>
             </>
@@ -87,7 +87,7 @@ const SongsSuccess = () => {
               <Link to="/songs">
                 <Button size="lg" variant="outline">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Lokol Listening Sessions
+                  Back to Lokol Listening Stations
                 </Button>
               </Link>
             </>

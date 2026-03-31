@@ -74,7 +74,7 @@ const VotingCountdownOverlay = () => {
         {/* Secondary Subheader */}
         <div className="mb-8">
           <p className="text-lg md:text-xl text-primary font-semibold">
-            The next Lokol Listening Sessions
+            The next Lokol Listening Stations
           </p>
           <p className="text-muted-foreground mt-1">
             Handle Bar, Edgewood

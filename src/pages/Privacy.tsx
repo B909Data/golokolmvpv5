@@ -71,7 +71,7 @@ const Privacy = () => {
 
               <section>
                 <h2 className="font-display text-2xl text-[hsl(0,0%,10%)] mt-8 mb-4">8. LLS Media & Event Data</h2>
-                <p>For Lokol Listening Sessions, GoLokol may collect and process:</p>
+                <p>For Lokol Listening Stations, GoLokol may collect and process:</p>
                 <ul className="list-disc pl-6 space-y-1 mt-2">
                   <li>Event attendance data</li>
                   <li>Recorded audio/video footage</li>
@@ -79,7 +79,7 @@ const Privacy = () => {
                 </ul>
                 <p className="mt-4">This data is used solely for:</p>
                 <ul className="list-disc pl-6 space-y-1 mt-2">
-                  <li>Producing the Lokol Listening Sessions series</li>
+                  <li>Producing the Lokol Listening Stations series</li>
                   <li>Promotion of GoLokol and participating artists</li>
                   <li>Internal analytics</li>
                 </ul>

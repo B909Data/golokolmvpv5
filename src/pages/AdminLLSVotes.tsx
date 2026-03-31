@@ -27,8 +27,8 @@ interface SessionVotes {
 }
 
 const SESSION_META: Record<string, string> = {
-  lls1: "Lokol Listening Session 1",
-  lls2: "Lokol Listening Sessions 2",
+  lls1: "Lokol Listening Station 1",
+  lls2: "Lokol Listening Stations 2",
 };
 
 const AdminLLSVotes = () => {

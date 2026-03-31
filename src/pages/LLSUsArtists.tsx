@@ -170,7 +170,7 @@ const LLSUsArtists = () => {
             <span className="text-primary">Without an Algorithm</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
-            Lokol Listening Sessions puts your music in front of the fans who buy records, show up to local events, and tell their friends.
+            Lokol Listening Stations puts your music in front of the fans who buy records, show up to local events, and tell their friends.
           </p>
           <ul className="space-y-4 mb-6 max-w-2xl">
             <li className="flex items-start gap-3">
@@ -199,7 +199,7 @@ const LLSUsArtists = () => {
           <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
             <iframe
               src="https://www.youtube.com/embed/gKznwkyfqlU?rel=0"
-              title="Lokol Listening Sessions"
+              title="Lokol Listening Stations"
               className="absolute inset-0 w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

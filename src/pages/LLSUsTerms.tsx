@@ -118,12 +118,12 @@ Material changes (e.g., new customer data collection) will be communicated to St
 
 11. NO EXCLUSIVITY
 
-GoLokol may place Lokol Listening Sessions kiosks in other record stores and retail locations in ${city} and beyond.
+GoLokol may place Lokol Listening Stations kiosks in other record stores and retail locations in ${city} and beyond.
 This agreement does not grant Store any exclusive rights.
 
 12. SIGNATURES
 
-By signing below, both parties agree to the terms of this Lokol Listening Sessions Kiosk Placement Agreement.`;
+By signing below, both parties agree to the terms of this Lokol Listening Stations Kiosk Placement Agreement.`;
 
 interface LocationState {
   retail_signup_id?: string;
@@ -215,7 +215,7 @@ const LLSUsTerms = () => {
               Thank you, <span className="text-black font-medium">{contact_name}</span>.
             </p>
             <p className="text-black/70 mb-8">
-              Your electronic signature for the Lokol Listening Sessions Kiosk Placement Agreement has been recorded. We'll be in touch shortly to get your store set up.
+              Your electronic signature for the Lokol Listening Stations Kiosk Placement Agreement has been recorded. We'll be in touch shortly to get your store set up.
             </p>
             <Link to="/lls-us">
               <Button className="bg-black text-yellow-400 hover:bg-black/90">Back to LLS</Button>
@@ -393,13 +393,13 @@ const LLSUsTerms = () => {
             {/* Section 11 */}
             <div>
               <h3 className="text-black font-semibold mb-3">11. NO EXCLUSIVITY</h3>
-              <p>GoLokol may place Lokol Listening Sessions kiosks in other record stores and retail locations in {city} and beyond. This agreement does not grant Store any exclusive rights.</p>
+              <p>GoLokol may place Lokol Listening Stations kiosks in other record stores and retail locations in {city} and beyond. This agreement does not grant Store any exclusive rights.</p>
             </div>
 
             {/* Section 12 */}
             <div>
               <h3 className="text-black font-semibold mb-3">12. SIGNATURES</h3>
-              <p>By signing below, both parties agree to the terms of this Lokol Listening Sessions Kiosk Placement Agreement.</p>
+              <p>By signing below, both parties agree to the terms of this Lokol Listening Stations Kiosk Placement Agreement.</p>
 
               <div className="mt-6 space-y-4">
                 <div>
@@ -452,7 +452,7 @@ const LLSUsTerms = () => {
                   className="mt-0.5 border-black/40"
                 />
                 <Label htmlFor="consent" className="text-black text-sm leading-relaxed cursor-pointer">
-                  I confirm that I have read and agree to the Lokol Listening Sessions Kiosk Placement Agreement and that I have the authority to enter into this agreement on behalf of the Store. <span className="text-red-500">*</span>
+                  I confirm that I have read and agree to the Lokol Listening Stations Kiosk Placement Agreement and that I have the authority to enter into this agreement on behalf of the Store. <span className="text-red-500">*</span>
                 </Label>
               </div>
 

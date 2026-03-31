@@ -66,7 +66,7 @@ const Index = () => {
               to="/lls-us"
               className="inline-flex items-center justify-center bg-white text-black font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
             >
-              Lokol Listening Sessions
+              Lokol Listening Stations
             </Link>
             <Link
               to="/connect"
@@ -102,7 +102,7 @@ const Index = () => {
           <HowItWorksCard
             image={llsCard}
             number={1}
-            title="Lokol Listening Sessions"
+            title="Lokol Listening Stations"
             description="Good music lives here. Discover and vote for local artists at your favorite record store. Find music you love where you live. Algorithms and AI can't call any place home. You do."
             to="/lls-us"
           />

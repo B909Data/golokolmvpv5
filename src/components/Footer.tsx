@@ -34,7 +34,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/lls-us" className="text-muted-foreground hover:text-primary transition-colors">
-                  Lokol Listening Sessions
+                  Lokol Listening Stations
                 </Link>
               </li>
               <li>
