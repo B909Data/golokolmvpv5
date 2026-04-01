@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Music, Disc3 } from "lucide-react";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import golokolLogo from "@/assets/golokol-logo.svg";
+import llsUsHero from "@/assets/lls-us-hero.jpg";
 import llsUsHero from "@/assets/lls-us-hero.jpg";
 
 const LLSUs = () => {
