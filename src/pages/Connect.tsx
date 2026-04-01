@@ -2,7 +2,7 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
-import connectHero from "@/assets/connect-hero.jpg";
+import connectHero from "@/assets/connect-card.jpg";
 
 const Connect = () => {
   const [firstName, setFirstName] = useState("");
