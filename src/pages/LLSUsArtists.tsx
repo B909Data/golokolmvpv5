@@ -151,16 +151,7 @@ const LLSUsArtists = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="px-6 md:px-12 lg:px-20 py-5 flex items-center gap-4">
-        <Link to="/lls-us" className="text-foreground-secondary hover:text-foreground transition-colors">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <Link to="/" className="flex items-center gap-2">
-          <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-          <span className="font-display text-xl text-foreground tracking-wide">GoLokol</span>
-        </Link>
-      </header>
+      <Navbar />
 
       {/* Hero */}
       <section className="px-6 md:px-12 lg:px-20 py-12 md:py-20">
