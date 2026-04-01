@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

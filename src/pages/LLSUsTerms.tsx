@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, Navigate } from "react-router-dom";
-import { ArrowLeft, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
