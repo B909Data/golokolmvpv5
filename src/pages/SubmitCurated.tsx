@@ -174,7 +174,7 @@ const SubmitCurated = () => {
 
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: gateEmail,
-        options: { emailRedirectTo: REDIRECT_URL },
+        options: { emailRedirectTo: buildRedirectUrl(gateCode.toUpperCase().trim()) },
       });
 
       if (authError) {
