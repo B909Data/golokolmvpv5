@@ -61,7 +61,7 @@ const Connect = () => {
             </div>
             <div>
               <p className="font-bold text-[#FFD600] mb-1">For Fans</p>
-              <p>Build your local music dashboard. Discover artists through Lokol Listening Stations in the real world, vote for who moves you, and follow their journey on GoLokol Connect. Earn Lokol Points through real engagement — buying music, going to shows, sharing what you love — and redeem with local businesses that matter to you.</p>
+              <p>Build your local music dashboard. Discover artists through Lokol Listening Stations in the real world, vote for who moves you, and follow their journey on GoLokol Connect. Earn Lokol Points through real engagement, buying music, going to shows, sharing what you love, and redeem with local businesses that matter to you.</p>
             </div>
           </div>
         </div>
