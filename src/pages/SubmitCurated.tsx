@@ -141,6 +141,8 @@ const SubmitCurated = () => {
       toast.error("Failed to redeem code. Please try again.");
       localStorage.removeItem(LS_CODE_KEY);
       setStep("gate");
+    } finally {
+      redeemingRef.current = false;
     }
   };
 
