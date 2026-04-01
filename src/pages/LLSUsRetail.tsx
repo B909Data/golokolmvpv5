@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import golokolLogo from "@/assets/golokol-logo.svg";
 import signageSquare from "@/assets/lls-signage-square.png";
 import signageTall from "@/assets/lls-signage-tall.png";
 
