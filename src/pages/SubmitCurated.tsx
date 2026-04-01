@@ -74,7 +74,7 @@ const SubmitCurated = () => {
 
       if (urlStep === "form" && session) {
         // Arrived back from magic link with active session
-        const pendingCode = localStorage.getItem(LS_CODE_KEY);
+        const pendingCode = localStorage.getItem(LS_CODE_KEY) || searchParams.get("code");
         if (pendingCode) {
           await redeemCode(pendingCode);
         } else {
