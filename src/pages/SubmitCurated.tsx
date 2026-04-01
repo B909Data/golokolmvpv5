@@ -35,6 +35,7 @@ const SubmitCurated = () => {
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittingRef = useRef(false);
+  const redeemingRef = useRef(false);
   const [musicReleaseAgreed, setMusicReleaseAgreed] = useState(false);
   const [mp3File, setMp3File] = useState<File | null>(null);
   const [formData, setFormData] = useState({
