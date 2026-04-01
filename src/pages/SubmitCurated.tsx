@@ -13,7 +13,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link as LinkIcon } from "lucide-react";
 
-const REDIRECT_URL = "https://golokol.app/songs/submit-curated?step=form";
+const buildRedirectUrl = (code?: string) => {
+  const base = `${window.location.origin}/songs/submit-curated?step=form`;
+  return code ? `${base}&code=${encodeURIComponent(code)}` : base;
+};
 const LS_CODE_KEY = "lls_curated_code";
 const LS_EMAIL_KEY = "lls_curated_email";
 
@@ -32,6 +35,7 @@ const SubmitCurated = () => {
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittingRef = useRef(false);
+  const redeemingRef = useRef(false);
   const [musicReleaseAgreed, setMusicReleaseAgreed] = useState(false);
   const [mp3File, setMp3File] = useState<File | null>(null);
   const [formData, setFormData] = useState({
@@ -70,7 +74,7 @@ const SubmitCurated = () => {
 
       if (urlStep === "form" && session) {
         // Arrived back from magic link with active session
-        const pendingCode = localStorage.getItem(LS_CODE_KEY);
+        const pendingCode = localStorage.getItem(LS_CODE_KEY) || searchParams.get("code");
         if (pendingCode) {
           await redeemCode(pendingCode);
         } else {
@@ -94,9 +98,13 @@ const SubmitCurated = () => {
     // Listen for SIGNED_IN in case session arrives after mount (e.g. magic link token exchange)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
-        const pendingCode = localStorage.getItem(LS_CODE_KEY);
+        const pendingCode = localStorage.getItem(LS_CODE_KEY) || searchParams.get("code");
         if (pendingCode) {
           await redeemCode(pendingCode);
+        } else {
+          // Session arrived but no pending code — show form directly
+          setFormData((prev) => ({ ...prev, contact_email: session.user.email || "" }));
+          setStep("form");
         }
       }
     });
@@ -105,6 +113,8 @@ const SubmitCurated = () => {
   }, []);
 
   const redeemCode = async (code: string) => {
+    if (redeemingRef.current) return;
+    redeemingRef.current = true;
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -131,6 +141,8 @@ const SubmitCurated = () => {
       toast.error("Failed to redeem code. Please try again.");
       localStorage.removeItem(LS_CODE_KEY);
       setStep("gate");
+    } finally {
+      redeemingRef.current = false;
     }
   };
 
@@ -162,7 +174,7 @@ const SubmitCurated = () => {
 
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: gateEmail,
-        options: { emailRedirectTo: REDIRECT_URL },
+        options: { emailRedirectTo: buildRedirectUrl(gateCode.toUpperCase().trim()) },
       });
 
       if (authError) {
@@ -193,7 +205,7 @@ const SubmitCurated = () => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: resendEmail,
-        options: { emailRedirectTo: REDIRECT_URL },
+        options: { emailRedirectTo: buildRedirectUrl(localStorage.getItem(LS_CODE_KEY) || searchParams.get("code") || undefined) },
       });
       if (error) throw error;
       setMagicLinkSent(true);
