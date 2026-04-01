@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import golokolLogo from "@/assets/golokol-logo.svg";
 import signageSquare from "@/assets/lls-signage-square.png";
 import signageTall from "@/assets/lls-signage-tall.png";
 
@@ -119,16 +119,7 @@ const [form, setForm] = useState({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="px-6 md:px-12 lg:px-20 py-5 flex items-center gap-4">
-        <Link to="/lls-us" className="text-foreground-secondary hover:text-foreground transition-colors">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <Link to="/" className="flex items-center gap-2">
-          <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-          <span className="font-display text-xl text-foreground tracking-wide">GoLokol</span>
-        </Link>
-      </header>
+      <Navbar />
 
       {/* Hero */}
       <section className="px-6 md:px-12 lg:px-20 py-12 md:py-20">

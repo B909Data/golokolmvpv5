@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Link, useLocation, Navigate } from "react-router-dom";
-import { ArrowLeft, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import golokolLogo from "@/assets/golokol-logo.svg";
 
 const AGREEMENT_VERSION = "LLS_KIOSK_PLACEMENT_V1";
 
@@ -199,12 +199,7 @@ const LLSUsTerms = () => {
   if (signed) {
     return (
       <div className="min-h-screen bg-white flex flex-col">
-        <header className="px-6 md:px-12 lg:px-20 py-5 flex items-center gap-4">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-            <span className="font-display text-xl text-black tracking-wide">GoLokol</span>
-          </Link>
-        </header>
+        <Navbar />
         <main className="flex-1 px-6 md:px-12 lg:px-20 py-12">
           <div className="max-w-2xl mx-auto text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
@@ -229,15 +224,7 @@ const LLSUsTerms = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <header className="px-6 md:px-12 lg:px-20 py-5 flex items-center gap-4">
-        <Link to="/lls-us/retail" className="text-black/60 hover:text-black transition-colors">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <Link to="/" className="flex items-center gap-2">
-          <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-          <span className="font-display text-xl text-black tracking-wide">GoLokol</span>
-        </Link>
-      </header>
+      <Navbar />
 
       <main className="flex-1 px-6 md:px-12 lg:px-20 py-12">
         <div className="max-w-2xl mx-auto">

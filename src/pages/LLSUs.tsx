@@ -1,19 +1,13 @@
 import { Link } from "react-router-dom";
 import { Music, Disc3 } from "lucide-react";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import golokolLogo from "@/assets/golokol-logo.svg";
 import llsUsHero from "@/assets/lls-us-hero.jpg";
 
 const LLSUs = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Minimal header */}
-      <header className="px-6 md:px-12 lg:px-20 py-5">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-          <span className="font-display text-xl text-foreground tracking-wide">GoLokol</span>
-        </Link>
-      </header>
+      <Navbar />
 
       {/* HERO with image */}
       <section className="relative w-full min-h-[420px] md:min-h-[520px] flex items-end">
