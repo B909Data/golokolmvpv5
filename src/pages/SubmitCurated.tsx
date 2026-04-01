@@ -13,7 +13,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link as LinkIcon } from "lucide-react";
 
-const REDIRECT_URL = "https://golokol.app/songs/submit-curated?step=form";
+const buildRedirectUrl = (code?: string) => {
+  const base = `${window.location.origin}/songs/submit-curated?step=form`;
+  return code ? `${base}&code=${encodeURIComponent(code)}` : base;
+};
 const LS_CODE_KEY = "lls_curated_code";
 const LS_EMAIL_KEY = "lls_curated_email";
 
