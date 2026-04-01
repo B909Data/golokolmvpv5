@@ -205,7 +205,7 @@ const SubmitCurated = () => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: resendEmail,
-        options: { emailRedirectTo: REDIRECT_URL },
+        options: { emailRedirectTo: buildRedirectUrl(localStorage.getItem(LS_CODE_KEY) || searchParams.get("code") || undefined) },
       });
       if (error) throw error;
       setMagicLinkSent(true);
