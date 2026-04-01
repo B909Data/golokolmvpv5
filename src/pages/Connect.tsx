@@ -56,7 +56,7 @@ const Connect = () => {
           </h1>
           <div className="text-white text-[18px] md:text-[20px] leading-[1.8] max-w-2xl mx-auto text-left">
             <p className="font-bold text-[#FFD600] mb-1">For Artists</p>
-            <p>Your fans already found you. They voted for you at a Lokol Listening Station. GoLokol Connect lets you reach them directly. No chasing. No algorithm. Just a direct line to the local fans who already raised their hand for your music. $9.99/month.</p>
+            <p>Your fans already found you. They voted for you at a Lokol Listening Station. GoLokol Connect lets you reach them directly. No chasing. No algorithm. Just a direct line to local fans who want a direct line to you. Starting at $9.99/month.</p>
           </div>
         </div>
       </section>
