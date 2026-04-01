@@ -113,6 +113,8 @@ const SubmitCurated = () => {
   }, []);
 
   const redeemCode = async (code: string) => {
+    if (redeemingRef.current) return;
+    redeemingRef.current = true;
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
