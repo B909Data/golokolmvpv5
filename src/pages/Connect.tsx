@@ -49,21 +49,23 @@ const Connect = () => {
           alt="GoLokol Connect"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-black/65" />
         <div className="relative z-10 px-6 md:px-12 pt-32 pb-16 max-w-3xl text-center">
           <h1 className="font-display font-bold text-[32px] md:text-[48px] leading-[1.1] text-white mb-6">
             GoLokol Connect Coming Soon
           </h1>
-          <div className="text-white text-[18px] md:text-[20px] leading-[1.8] max-w-2xl mx-auto text-left space-y-6">
-            <div>
-              <p className="font-bold text-[#FFD600] mb-1">For Artists</p>
-              <p>Your fans already found you. They voted for you at a Lokol Listening Station. GoLokol Connect lets you reach them directly. No chasing. No algorithm. Just a direct line to the local fans who already raised their hand for your music. $9.99/month.</p>
-            </div>
-            <div>
-              <p className="font-bold text-[#FFD600] mb-1">For Fans</p>
-              <p>Build your local music dashboard. Discover artists through Lokol Listening Stations in the real world, vote for who moves you, and follow their journey on GoLokol Connect. Earn Lokol Points through real engagement, buying music, going to shows, sharing what you love, and redeem with local businesses that matter to you.</p>
-            </div>
+          <div className="text-white text-[18px] md:text-[20px] leading-[1.8] max-w-2xl mx-auto text-left">
+            <p className="font-bold text-[#FFD600] mb-1">For Artists</p>
+            <p>Your fans already found you. They voted for you at a Lokol Listening Station. GoLokol Connect lets you reach them directly. No chasing. No algorithm. Just a direct line to the local fans who already raised their hand for your music. $9.99/month.</p>
           </div>
+        </div>
+      </section>
+
+      {/* FOR FANS */}
+      <section className="bg-black px-6 md:px-12 py-16">
+        <div className="max-w-2xl mx-auto text-left">
+          <p className="font-bold text-[#FFD600] text-[18px] md:text-[20px] mb-1">For Fans</p>
+          <p className="text-white text-[18px] md:text-[20px] leading-[1.8]">Build your local music dashboard. Discover artists through Lokol Listening Stations in the real world, vote for who moves you, and follow their journey on GoLokol Connect. Earn Lokol Points through real engagement, buying music, going to shows, sharing what you love, and redeem with local businesses that matter to you.</p>
         </div>
       </section>
 
