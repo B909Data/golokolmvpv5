@@ -249,15 +249,9 @@ const SubmitCurated = () => {
         return;
       }
 
-      // Server-side dedup: check if this song was already submitted by this email
-      const { data: existingCheck } = await supabase.functions.invoke("check-music-release", {
-        body: { email: formData.contact_email },
-      });
-      // Check submissions table via edge — but we only have insert RLS, so use a simpler approach:
-      // We'll rely on the unique (contact_email + song_title + payment_status=curated) combo.
-      // Since we can't SELECT submissions client-side, we attempt insert and handle unique constraint.
-      // However, a pragmatic approach: just proceed — the submittingRef prevents double-click,
-      // and the user would need to manually re-fill the form to duplicate.
+      // Note: submissions table has INSERT-only RLS (no SELECT), so client-side dedup
+      // isn't possible. The submittingRef guard prevents double-click duplicates,
+      // and the form resets after success preventing accidental re-submission.
 
       // Generate a UUID client-side for the submission so we can use it in the storage path
       const submissionId = crypto.randomUUID();
