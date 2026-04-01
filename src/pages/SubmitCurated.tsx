@@ -207,7 +207,13 @@ const SubmitCurated = () => {
         email: resendEmail,
         options: { emailRedirectTo: buildRedirectUrl(localStorage.getItem(LS_CODE_KEY) || searchParams.get("code") || undefined) },
       });
-      if (error) throw error;
+      if (error) {
+        if (error.status === 429 || error.message?.toLowerCase().includes("rate limit")) {
+          toast.error("Too many attempts. Please wait a few minutes before trying again.");
+          return;
+        }
+        throw error;
+      }
       setMagicLinkSent(true);
       toast.success("New link sent! Check your email.");
     } catch (err) {
