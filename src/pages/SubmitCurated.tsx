@@ -165,7 +165,14 @@ const SubmitCurated = () => {
         options: { emailRedirectTo: REDIRECT_URL },
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        if (authError.status === 429 || authError.message?.toLowerCase().includes("rate limit")) {
+          toast.error("Too many attempts. Please wait a few minutes before trying again.");
+          setIsCheckingCode(false);
+          return;
+        }
+        throw authError;
+      }
 
       setMagicLinkSent(true);
       toast.success("Magic link sent! Check your email to continue.");
