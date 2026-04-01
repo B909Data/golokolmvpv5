@@ -1,30 +1,40 @@
 
 
-# Fix Duplicate Submissions in Music Release & Curated Song Flow
+## Problem
 
-## Problems Found
+Two related bugs in the curated submission flow:
 
-1. **Music Release Signature (`/lls-music-release`)**: No `submittingRef` guard — only uses React state (`submitting`), which has a race window allowing double-clicks to create duplicate signature rows. The edge function (`sign-music-release`) also has zero server-side duplicate detection.
+1. **"This code has already been used" error**: The code gets redeemed successfully during `initFlow` or `onAuthStateChange`, but then the *other* handler also fires and tries to redeem it again. The second attempt fails because the code is already marked as used, triggering the error toast and resetting to the gate screen.
 
-2. **Curated Song Submission (`/songs/submit-curated`)**: Client-side has a solid `submittingRef` guard, but no server-side duplicate check — if a user refreshes after submission and resubmits, a second row is created.
+2. **Cross-browser localStorage loss**: If the magic link opens in a different browser/tab (common on mobile), `localStorage` doesn't have the pending code, so there's nothing to redeem and the fallback logic fails.
 
-## Plan
+## Root Cause
 
-### 1. Harden `sign-music-release` edge function (server-side dedup)
-- Before inserting, query `lls_music_release_signatures` for an existing row matching `email + artist_name + agreement_version`
-- If a match exists, return `{ success: true }` with the existing record (idempotent) instead of inserting a duplicate
-- This makes the endpoint safe to call multiple times
+- The redirect URL (`?step=form`) does not carry the code, so it's only available via `localStorage` which is fragile.
+- There's no guard preventing `redeemCode` from being called twice (once by `initFlow`, once by `onAuthStateChange`).
+- The `onAuthStateChange` handler has no `else` branch — when the code is already redeemed and cleared from localStorage, it does nothing, leaving the user on the gate screen.
 
-### 2. Add `submittingRef` guard to `LLSMusicRelease.tsx`
-- Add a `useRef(false)` guard identical to the one in `SubmitCurated`
-- Check it at the top of `handleSubmit`, set it before the async call, reset in `finally`
+## Fix — Single file: `src/pages/SubmitCurated.tsx`
 
-### 3. Add server-side dedup to curated submission insert
-- In `SubmitCurated.tsx`, before inserting, query submissions for an existing row with the same `contact_email + song_title + payment_status='curated'`
-- If found, treat as success (show toast, reset form) without inserting again
+### 1. Include the code in the magic link redirect URL
+Change the `signInWithOtp` call to embed the code in the redirect:
+```
+emailRedirectTo: `${origin}/songs/submit-curated?step=form&code=${encodeURIComponent(code)}`
+```
 
-### Files Changed
-- `supabase/functions/sign-music-release/index.ts` — add duplicate check query
-- `src/pages/LLSMusicRelease.tsx` — add `submittingRef`
-- `src/pages/SubmitCurated.tsx` — add server-side dedup check before insert
+### 2. Read code from URL params as a fallback
+In `initFlow`, when `localStorage` has no pending code, check `searchParams.get("code")` as a fallback source.
+
+### 3. Add a redemption guard
+Add a `useRef` (e.g. `redeemingRef`) to prevent concurrent/duplicate calls to `redeemCode`. If already redeeming, skip.
+
+### 4. Add else branch to `onAuthStateChange`
+When `SIGNED_IN` fires but there's no pending code (already redeemed or missing), set `contact_email` from session and transition to `step = "form"` directly instead of doing nothing.
+
+### 5. Also apply to the resend flow
+The expired-link resend should also include the code in the redirect URL (read from localStorage or URL param).
+
+## Summary
+
+These changes ensure the code survives the redirect (via URL param), is only redeemed once (via ref guard), and the form always appears after successful authentication (via the else branch).
 
