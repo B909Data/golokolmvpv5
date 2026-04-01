@@ -103,6 +103,7 @@ This Agreement shall be governed by the laws of the State of Georgia.`;
 const LLSMusicRelease = () => {
   const [signed, setSigned] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [consentChecked, setConsentChecked] = useState(false);
   const [formData, setFormData] = useState({
     legal_name: "",
