@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -103,6 +103,7 @@ This Agreement shall be governed by the laws of the State of Georgia.`;
 const LLSMusicRelease = () => {
   const [signed, setSigned] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [consentChecked, setConsentChecked] = useState(false);
   const [formData, setFormData] = useState({
     legal_name: "",
@@ -129,6 +130,8 @@ const LLSMusicRelease = () => {
       return;
     }
 
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     try {
       const { data, error } = await supabase.functions.invoke("sign-music-release", {
@@ -151,6 +154,7 @@ const LLSMusicRelease = () => {
       console.error("Signature error:", err);
       toast.error("Failed to sign agreement. Please try again.");
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };

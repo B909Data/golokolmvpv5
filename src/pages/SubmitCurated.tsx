@@ -249,6 +249,10 @@ const SubmitCurated = () => {
         return;
       }
 
+      // Note: submissions table has INSERT-only RLS (no SELECT), so client-side dedup
+      // isn't possible. The submittingRef guard prevents double-click duplicates,
+      // and the form resets after success preventing accidental re-submission.
+
       // Generate a UUID client-side for the submission so we can use it in the storage path
       const submissionId = crypto.randomUUID();
 
