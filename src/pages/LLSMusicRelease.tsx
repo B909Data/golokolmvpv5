@@ -130,6 +130,8 @@ const LLSMusicRelease = () => {
       return;
     }
 
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     try {
       const { data, error } = await supabase.functions.invoke("sign-music-release", {
@@ -152,6 +154,7 @@ const LLSMusicRelease = () => {
       console.error("Signature error:", err);
       toast.error("Failed to sign agreement. Please try again.");
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };

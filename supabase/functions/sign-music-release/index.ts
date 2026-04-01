@@ -32,6 +32,25 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Dedup: check for existing signature with same email + artist_name + agreement_version
+    const { data: existing } = await supabaseAdmin
+      .from("lls_music_release_signatures")
+      .select("id, created_at")
+      .eq("email", email.toLowerCase().trim())
+      .eq("artist_name", artist_name.trim())
+      .eq("agreement_version", "LLS_MUSIC_RELEASE_V1")
+      .eq("release_confirmed", true)
+      .limit(1)
+      .maybeSingle();
+
+    if (existing) {
+      // Already signed — return idempotent success
+      return new Response(
+        JSON.stringify({ success: true, id: existing.id, created_at: existing.created_at }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { data, error } = await supabaseAdmin
       .from("lls_music_release_signatures")
       .insert({
