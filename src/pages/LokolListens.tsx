@@ -10,7 +10,7 @@ import genreMetal from "@/assets/genre-metal.jpg";
 const GENRES = [
   { label: "Hip Hop", slug: "hiphop", image: genreHiphop },
   { label: "RnB", slug: "rnb", image: genreRnb },
-  { label: "Alternative Soul", slug: "alternativesoul", image: genreAltsoul },
+  { label: "Alternative", slug: "alternativesoul", image: genreAltsoul },
   { label: "Indie Rock", slug: "indierock", image: genreIndierock },
   { label: "Punk", slug: "punk", image: genrePunk },
   { label: "Metal", slug: "metal", image: genreMetal },
