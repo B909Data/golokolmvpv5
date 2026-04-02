@@ -3,11 +3,17 @@ import llsHero from "@/assets/lls-hero-crates.png";
 import genreHiphop from "@/assets/genre-hiphop.jpg";
 import genreRnb from "@/assets/genre-rnb.jpg";
 import genreAltsoul from "@/assets/genre-altsoul.jpg";
+import genreIndierock from "@/assets/genre-indierock.jpg";
+import genrePunk from "@/assets/genre-punk.jpg";
+import genreMetal from "@/assets/genre-metal.jpg";
 
 const GENRES = [
   { label: "Hip Hop", slug: "hiphop", image: genreHiphop },
   { label: "RnB", slug: "rnb", image: genreRnb },
   { label: "Alternative Soul", slug: "alternativesoul", image: genreAltsoul },
+  { label: "Indie Rock", slug: "indierock", image: genreIndierock },
+  { label: "Punk", slug: "punk", image: genrePunk },
+  { label: "Metal", slug: "metal", image: genreMetal },
 ];
 
 const LokolListens = () => {
