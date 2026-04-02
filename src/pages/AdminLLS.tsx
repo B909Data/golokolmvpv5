@@ -99,8 +99,9 @@ const AdminLLS = () => {
 
     setSaving(true);
     try {
+      const submission = submissions.find(s => s.id === selectedId);
       const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
-        body: { id: selectedId, admin_notes },
+        body: { id: selectedId, admin_notes, submission_type: submission?.submission_type || "general" },
       });
 
       if (error) throw error;
