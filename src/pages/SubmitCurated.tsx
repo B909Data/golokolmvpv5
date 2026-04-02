@@ -24,6 +24,7 @@ type Step = "gate" | "form" | "expired";
 
 const SubmitCurated = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("gate");
   const [gateEmail, setGateEmail] = useState("");
   const [gateCode, setGateCode] = useState("");
