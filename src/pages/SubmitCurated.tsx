@@ -348,10 +348,7 @@ const SubmitCurated = () => {
         return;
       }
 
-      toast.success("Song submitted successfully!");
-      setFormData({ artist_name: "", contact_email: "", phone: "", instagram_handle: "", song_title: "", youtube_url: "", notes: "" });
-      setMp3File(null);
-      setMusicReleaseAgreed(false);
+      navigate("/songs/success?type=curated");
     } catch (err: any) {
       console.error("Submission error:", err);
       toast.error(err?.message || "Failed to submit. Please try again.");
