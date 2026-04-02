@@ -3,11 +3,17 @@ import llsHero from "@/assets/lls-hero-crates.png";
 import genreHiphop from "@/assets/genre-hiphop.jpg";
 import genreRnb from "@/assets/genre-rnb.jpg";
 import genreAltsoul from "@/assets/genre-altsoul.jpg";
+import genreIndierock from "@/assets/genre-indierock.jpg";
+import genrePunk from "@/assets/genre-punk.jpg";
+import genreMetal from "@/assets/genre-metal.jpg";
 
 const GENRES = [
   { label: "Hip Hop", slug: "hiphop", image: genreHiphop },
   { label: "RnB", slug: "rnb", image: genreRnb },
   { label: "Alternative Soul", slug: "alternativesoul", image: genreAltsoul },
+  { label: "Indie Rock", slug: "indierock", image: genreIndierock },
+  { label: "Punk", slug: "punk", image: genrePunk },
+  { label: "Metal", slug: "metal", image: genreMetal },
 ];
 
 const LokolListens = () => {
@@ -62,7 +68,7 @@ const LokolListens = () => {
             Pick a genre
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-2 gap-4 md:gap-6">
             {GENRES.map((genre) => (
               <button
                 key={genre.slug}
