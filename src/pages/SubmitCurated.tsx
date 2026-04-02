@@ -282,7 +282,12 @@ const SubmitCurated = () => {
       // Generate a UUID client-side for the submission so we can use it in the storage path
       const submissionId = crypto.randomUUID();
 
-      // Sanitize filename
+      // Sanitize artist name and filename for storage path
+      const sanitizedArtist = formData.artist_name
+        .toLowerCase()
+        .replace(/[^a-z0-9\-]/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
       const sanitizedName = mp3File.name
         .toLowerCase()
         .replace(/\.mp3$/i, "")
@@ -293,7 +298,7 @@ const SubmitCurated = () => {
 
       const now = new Date();
       const monthFolder = `LLS-${now.toLocaleString("en-US", { month: "long" })}-${now.getFullYear()}`;
-      const objectPath = `lls_curated/${monthFolder}/${sanitizedName}`;
+      const objectPath = `lls_curated/${monthFolder}/${sanitizedArtist}--${sanitizedName}`;
 
       // 1. Upload the file first
       const { error: uploadError } = await supabase.storage
