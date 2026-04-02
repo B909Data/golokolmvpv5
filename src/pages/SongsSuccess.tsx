@@ -9,9 +9,15 @@ import { supabase } from "@/integrations/supabase/client";
 const SongsSuccess = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const type = searchParams.get("type"); // "curated" or null (paid)
+  const isCurated = type === "curated";
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    isCurated ? "success" : "loading"
+  );
 
   useEffect(() => {
+    if (isCurated) return; // No payment verification needed for curated
+
     const verifyPayment = async () => {
       if (!sessionId) {
         setStatus("error");
@@ -37,7 +43,7 @@ const SongsSuccess = () => {
     };
 
     verifyPayment();
-  }, [sessionId]);
+  }, [sessionId, isCurated]);
 
   return (
     <div className="min-h-screen bg-background">
