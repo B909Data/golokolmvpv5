@@ -426,7 +426,7 @@ const LLSUsTerms = () => {
                   value={formData.signer_title}
                   onChange={(e) => setFormData((p) => ({ ...p, signer_title: e.target.value }))}
                   maxLength={200}
-                  className="border-black/20 text-black"
+                  className="border-black/20 text-black bg-white"
                 />
               </div>
 
