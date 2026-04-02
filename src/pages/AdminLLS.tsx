@@ -32,6 +32,7 @@ interface Submission {
   payment_status: string | null;
   music_release_agreed: boolean;
   music_release_agreed_at: string | null;
+  submission_type?: string;
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
