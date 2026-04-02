@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Music, User, FileAudio, Phone, Instagram, Upload, Lock } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ type Step = "gate" | "form" | "expired";
 
 const SubmitCurated = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("gate");
   const [gateEmail, setGateEmail] = useState("");
   const [gateCode, setGateCode] = useState("");
@@ -281,7 +282,12 @@ const SubmitCurated = () => {
       // Generate a UUID client-side for the submission so we can use it in the storage path
       const submissionId = crypto.randomUUID();
 
-      // Sanitize filename
+      // Sanitize artist name and filename for storage path
+      const sanitizedArtist = formData.artist_name
+        .toLowerCase()
+        .replace(/[^a-z0-9\-]/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
       const sanitizedName = mp3File.name
         .toLowerCase()
         .replace(/\.mp3$/i, "")
@@ -290,7 +296,9 @@ const SubmitCurated = () => {
         .replace(/^-|-$/g, "")
         + ".mp3";
 
-      const objectPath = `lls_curated/${submissionId}/${sanitizedName}`;
+      const now = new Date();
+      const monthFolder = `LLS-${now.toLocaleString("en-US", { month: "long" })}-${now.getFullYear()}`;
+      const objectPath = `lls_curated/${monthFolder}/${sanitizedArtist}--${sanitizedName}`;
 
       // 1. Upload the file first
       const { error: uploadError } = await supabase.storage
@@ -345,10 +353,7 @@ const SubmitCurated = () => {
         return;
       }
 
-      toast.success("Song submitted successfully!");
-      setFormData({ artist_name: "", contact_email: "", phone: "", instagram_handle: "", song_title: "", youtube_url: "", notes: "" });
-      setMp3File(null);
-      setMusicReleaseAgreed(false);
+      navigate("/songs/success?type=curated");
     } catch (err: any) {
       console.error("Submission error:", err);
       toast.error(err?.message || "Failed to submit. Please try again.");
