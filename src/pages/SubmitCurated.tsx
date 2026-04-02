@@ -321,9 +321,9 @@ const SubmitCurated = () => {
         .from("submissions_audio")
         .getPublicUrl(objectPath);
 
-      // 3. Insert submission row with all fields at once
+      // 3. Insert submission row into curated_submissions table
       const { error: insertError } = await supabase
-        .from("submissions")
+        .from("curated_submissions")
         .insert({
           id: submissionId,
           artist_name: formData.artist_name,
@@ -332,13 +332,10 @@ const SubmitCurated = () => {
           instagram_handle: formData.instagram_handle || null,
           song_title: formData.song_title,
           spotify_url: "curated-submission",
-          youtube_url: formData.youtube_url || null,
-          notes: formData.notes || null,
           mp3_url: urlData.publicUrl,
           mp3_path: objectPath,
           original_filename: mp3File.name,
           status: "Unreviewed",
-          payment_status: "curated",
           music_release_agreed: true,
           music_release_agreed_at: new Date().toISOString(),
         });

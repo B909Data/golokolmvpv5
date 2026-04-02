@@ -279,6 +279,81 @@ export type Database = {
         }
         Relationships: []
       }
+      curated_submissions: {
+        Row: {
+          admin_notes: string | null
+          admin_status: string | null
+          artist_name: string
+          city_market: string | null
+          contact_email: string
+          created_at: string
+          genre_style: string | null
+          how_heard: string | null
+          id: string
+          instagram_handle: string | null
+          mp3_path: string | null
+          mp3_url: string | null
+          music_release_agreed: boolean
+          music_release_agreed_at: string | null
+          original_filename: string | null
+          phone: string | null
+          physical_product: string | null
+          short_bio: string | null
+          song_image_url: string | null
+          song_title: string
+          spotify_url: string
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          admin_status?: string | null
+          artist_name: string
+          city_market?: string | null
+          contact_email: string
+          created_at?: string
+          genre_style?: string | null
+          how_heard?: string | null
+          id?: string
+          instagram_handle?: string | null
+          mp3_path?: string | null
+          mp3_url?: string | null
+          music_release_agreed?: boolean
+          music_release_agreed_at?: string | null
+          original_filename?: string | null
+          phone?: string | null
+          physical_product?: string | null
+          short_bio?: string | null
+          song_image_url?: string | null
+          song_title: string
+          spotify_url: string
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          admin_status?: string | null
+          artist_name?: string
+          city_market?: string | null
+          contact_email?: string
+          created_at?: string
+          genre_style?: string | null
+          how_heard?: string | null
+          id?: string
+          instagram_handle?: string | null
+          mp3_path?: string | null
+          mp3_url?: string | null
+          music_release_agreed?: boolean
+          music_release_agreed_at?: string | null
+          original_filename?: string | null
+          phone?: string | null
+          physical_product?: string | null
+          short_bio?: string | null
+          song_image_url?: string | null
+          song_title?: string
+          spotify_url?: string
+          status?: string
+        }
+        Relationships: []
+      }
       email_optins: {
         Row: {
           created_at: string
@@ -458,6 +533,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      general_submissions: {
+        Row: {
+          admin_notes: string | null
+          admin_status: string | null
+          artist_name: string
+          contact_email: string
+          created_at: string
+          id: string
+          instagram_handle: string | null
+          music_release_agreed: boolean
+          music_release_agreed_at: string | null
+          notes: string | null
+          payment_status: string | null
+          phone: string | null
+          promo_code: string | null
+          song_title: string
+          spotify_url: string
+          status: string
+          stripe_session_id: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          admin_status?: string | null
+          artist_name: string
+          contact_email: string
+          created_at?: string
+          id?: string
+          instagram_handle?: string | null
+          music_release_agreed?: boolean
+          music_release_agreed_at?: string | null
+          notes?: string | null
+          payment_status?: string | null
+          phone?: string | null
+          promo_code?: string | null
+          song_title: string
+          spotify_url: string
+          status?: string
+          stripe_session_id?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          admin_status?: string | null
+          artist_name?: string
+          contact_email?: string
+          created_at?: string
+          id?: string
+          instagram_handle?: string | null
+          music_release_agreed?: boolean
+          music_release_agreed_at?: string | null
+          notes?: string | null
+          payment_status?: string | null
+          phone?: string | null
+          promo_code?: string | null
+          song_title?: string
+          spotify_url?: string
+          status?: string
+          stripe_session_id?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
       }
       lls_artist_submissions: {
         Row: {

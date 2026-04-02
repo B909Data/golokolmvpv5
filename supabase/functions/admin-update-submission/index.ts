@@ -23,7 +23,8 @@ serve(async (req) => {
       });
     }
 
-    const { id, status, admin_notes } = await req.json();
+    const body = await req.json();
+    const { id, status, admin_notes, submission_type } = body;
 
     if (!id) {
       throw new Error("Missing submission id");
@@ -37,12 +38,12 @@ serve(async (req) => {
     const updateData: Record<string, string> = {};
     if (status !== undefined) updateData.status = status;
     if (admin_notes !== undefined) updateData.admin_notes = admin_notes;
-    if (body.mp3_url !== undefined) updateData.mp3_url = body.mp3_url;
-    if (body.mp3_path !== undefined) updateData.mp3_path = body.mp3_path;
-    if (body.original_filename !== undefined) updateData.original_filename = body.original_filename;
+
+    // Determine which table to update
+    const table = submission_type === "curated" ? "curated_submissions" : "general_submissions";
 
     const { error } = await supabase
-      .from("submissions")
+      .from(table)
       .update(updateData)
       .eq("id", id);
 
@@ -51,7 +52,7 @@ serve(async (req) => {
       throw new Error("Failed to update submission");
     }
 
-    console.log("Updated submission:", id, updateData);
+    console.log("Updated submission in", table, ":", id, updateData);
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
