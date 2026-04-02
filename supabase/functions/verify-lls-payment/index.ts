@@ -33,7 +33,7 @@ serve(async (req) => {
 
     // Idempotency check
     const { data: existing } = await supabase
-      .from("submissions")
+      .from("general_submissions")
       .select("id")
       .eq("stripe_session_id", session_id)
       .single();
@@ -46,22 +46,12 @@ serve(async (req) => {
     }
 
     const meta = session.metadata || {};
-    const genres = meta.genre_style ? meta.genre_style.split(",") : [];
     const musicReleaseAgreed = meta.music_release_agreed === "true";
 
-    const { error: insertError } = await supabase.from("submissions").insert({
+    const { error: insertError } = await supabase.from("general_submissions").insert({
       artist_name: meta.artist_name,
       contact_email: meta.contact_email,
       instagram_handle: meta.instagram_handle || null,
-      genre_style: meta.genre_style || null,
-      city_market: meta.city_market || null,
-      physical_product: meta.physical_product || null,
-      short_bio: meta.short_bio || null,
-      how_heard: meta.how_heard || null,
-      song_image_url: meta.song_image_url || null,
-      mp3_url: meta.mp3_url || null,
-      mp3_path: meta.mp3_path || null,
-      original_filename: meta.original_filename || null,
       stripe_session_id: session_id,
       payment_status: "paid",
       admin_status: "pending",
