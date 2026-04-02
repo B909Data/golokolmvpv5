@@ -291,7 +291,9 @@ const SubmitCurated = () => {
         .replace(/^-|-$/g, "")
         + ".mp3";
 
-      const objectPath = `lls_curated/${submissionId}/${sanitizedName}`;
+      const now = new Date();
+      const monthFolder = `LLS-${now.toLocaleString("en-US", { month: "long" })}-${now.getFullYear()}`;
+      const objectPath = `lls_curated/${monthFolder}/${sanitizedName}`;
 
       // 1. Upload the file first
       const { error: uploadError } = await supabase.storage
