@@ -210,8 +210,8 @@ const [form, setForm] = useState({
                 <Label className="text-foreground mb-4 block">Choose 1 or both store signage? (free)</Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { value: "14x14_foam_board", img: signageSquare, caption: '14x14 foam board. Great for table top or in aisle.' },
-                    { value: "11x17_foam_board", img: signageTall, caption: '11x17 foam board (Great to hang on wall)' },
+                    { value: "24x24_foam_board", img: signageSquare, caption: '24x24 foam board (Hang on the wall)' },
+                    { value: "7x9_foam_boards", img: signageTall, caption: 'Three (3) 7x9 foam boards (between racks)' },
                   ].map((opt) => {
                     const selected = form.signage_preference.includes(opt.value);
                     return (
