@@ -426,7 +426,7 @@ const LLSUsTerms = () => {
                   value={formData.signer_title}
                   onChange={(e) => setFormData((p) => ({ ...p, signer_title: e.target.value }))}
                   maxLength={200}
-                  className="border-black/20 text-black"
+                  className="border-black/20 text-black bg-white"
                 />
               </div>
 
@@ -453,7 +453,7 @@ const LLSUsTerms = () => {
                   placeholder="Type your full legal name"
                   value={formData.signature_name}
                   onChange={(e) => setFormData((p) => ({ ...p, signature_name: e.target.value }))}
-                  className="font-serif italic text-lg border-black/20 text-black"
+                  className="font-serif italic text-lg border-black/20 text-black bg-white"
                   required
                   maxLength={200}
                 />
