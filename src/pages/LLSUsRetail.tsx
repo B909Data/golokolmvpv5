@@ -129,15 +129,15 @@ const [form, setForm] = useState({
             <span className="text-primary">Discovers Its Sound?</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
-            The record stores that win aren't just selling music — they're breaking it.
+            The record stores that win aren't just selling music, they're breaking it.
           </p>
           <ul className="space-y-3 max-w-2xl">
             {[
-              "Artists submitted to LLS are crowdsourced and curated.",
-              "QR code touchpoint turns your store into a local music discovery experience as music lovers browse your aisles.",
+              "Artists submitted to Lokol Listening Stations are crowdsourced and curated.",
+              "A simple QR code touchpoint turns your store into a local music discovery experience as music lovers browse your aisles.",
               "Customers accrue points by engaging with music.",
               "Those points, over time are redeemed at your store for discount on future purchase.",
-              "Engagement is locked to store location.",
+              "Engagement is locked to store location. So points = repeat patronage.",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3">
                 <span className="mt-1.5 h-2 w-2 rounded-full bg-primary shrink-0" />
