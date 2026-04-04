@@ -58,6 +58,7 @@ import LokolListens from "./pages/LokolListens";
 import LokolListensGenre from "./pages/LokolListensGenre";
 import LLSSignup from "./pages/LLSSignup";
 import Connect from "./pages/Connect";
+import Unsubscribe from "./pages/Unsubscribe";
 
 const queryClient = new QueryClient();
 
