@@ -164,7 +164,9 @@ const LLSUsTerms = () => {
     }
     setSubmitting(true);
     try {
+      const signatureId = crypto.randomUUID();
       const { error } = await supabase.from("lls_kiosk_agreement_signatures" as any).insert({
+        id: signatureId,
         retail_signup_id: retail_signup_id || null,
         store_name,
         contact_name,
@@ -185,6 +187,28 @@ const LLSUsTerms = () => {
           .update({ terms_accepted: true } as any)
           .eq("id", retail_signup_id);
       }
+
+      // Send agreement copy via email (fire-and-forget)
+      const signedDate = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "kiosk-agreement-confirmation",
+          recipientEmail: contact_email,
+          idempotencyKey: `kiosk-agreement-${signatureId}`,
+          templateData: {
+            contact_name,
+            store_name,
+            city,
+            signed_date: signedDate,
+            agreement_text: agreementText,
+            agreement_version: AGREEMENT_VERSION,
+          },
+        },
+      }).catch((err: any) => console.error("Email send error:", err));
 
       setSigned(true);
       toast.success("Agreement signed successfully.");

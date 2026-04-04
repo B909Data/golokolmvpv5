@@ -140,6 +140,7 @@ const App = () => (
            <Route path="/pricing-ap" element={<AfterPartyPricing />} />
            <Route path="/pricing" element={<Pricing />} />
            <Route path="/connect" element={<Connect />} />
+           <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="/for-artists" element={<ArtistRecognition />} />
           <Route path="/q/:code" element={<ShortLinkRedirect />} />
           
