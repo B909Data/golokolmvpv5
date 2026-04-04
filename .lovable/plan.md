@@ -1,40 +1,46 @@
 
 
-## Problem
+# Send Kiosk Agreement Copy to Signers
 
-Two related bugs in the curated submission flow:
+## Overview
+After a store owner signs the Kiosk Placement Agreement on `/lls-us/terms`, automatically send them a confirmation email containing the full agreement text. This mirrors what already exists for the Music Release Agreement.
 
-1. **"This code has already been used" error**: The code gets redeemed successfully during `initFlow` or `onAuthStateChange`, but then the *other* handler also fires and tries to redeem it again. The second attempt fails because the code is already marked as used, triggering the error toast and resetting to the gate screen.
+## Approach
+Use Lovable's built-in email infrastructure (verified domain: `notify.golokol.app`) to send a branded transactional email triggered after each signature.
 
-2. **Cross-browser localStorage loss**: If the magic link opens in a different browser/tab (common on mobile), `localStorage` doesn't have the pending code, so there's nothing to redeem and the fallback logic fails.
+## Steps
 
-## Root Cause
+### 1. Set up email infrastructure
+Run the email infrastructure setup tool to create the necessary database tables, queues, and Edge Functions for transactional email sending.
 
-- The redirect URL (`?step=form`) does not carry the code, so it's only available via `localStorage` which is fragile.
-- There's no guard preventing `redeemCode` from being called twice (once by `initFlow`, once by `onAuthStateChange`).
-- The `onAuthStateChange` handler has no `else` branch — when the code is already redeemed and cleared from localStorage, it does nothing, leaving the user on the gate screen.
+### 2. Scaffold transactional email system
+Create the `send-transactional-email` Edge Function, unsubscribe handler, and suppression handler. This is a one-time setup since the project doesn't have transactional emails yet.
 
-## Fix — Single file: `src/pages/SubmitCurated.tsx`
+### 3. Create the email template
+Create a React Email template (`kiosk-agreement-confirmation.tsx`) that includes:
+- Branded header matching existing GoLokol email style (yellow #FFD400 buttons, black text, Roboto font)
+- Greeting with the signer's name
+- Confirmation that the agreement was signed, with store name and date
+- The full agreement text (formatted as plain text in a styled container)
+- Agreement version reference
 
-### 1. Include the code in the magic link redirect URL
-Change the `signInWithOtp` call to embed the code in the redirect:
-```
-emailRedirectTo: `${origin}/songs/submit-curated?step=form&code=${encodeURIComponent(code)}`
-```
+### 4. Create unsubscribe page
+Add a `/email-unsubscribe` page (or similar available path) to handle one-click unsubscribe from transactional emails, matching the project's existing design.
 
-### 2. Read code from URL params as a fallback
-In `initFlow`, when `localStorage` has no pending code, check `searchParams.get("code")` as a fallback source.
+### 5. Wire up the email trigger
+After the successful insert into `lls_kiosk_agreement_signatures` in `src/pages/LLSUsTerms.tsx`, invoke the `send-transactional-email` Edge Function with:
+- Template: `kiosk-agreement-confirmation`
+- Recipient: the signer's email (`contact_email`)
+- Template data: `store_name`, `contact_name`, `city`, `signed_date`
+- Idempotency key derived from the signature record
 
-### 3. Add a redemption guard
-Add a `useRef` (e.g. `redeemingRef`) to prevent concurrent/duplicate calls to `redeemCode`. If already redeeming, skip.
+### 6. Deploy Edge Functions
+Deploy all new and updated Edge Functions.
 
-### 4. Add else branch to `onAuthStateChange`
-When `SIGNED_IN` fires but there's no pending code (already redeemed or missing), set `contact_email` from session and transition to `step = "form"` directly instead of doing nothing.
-
-### 5. Also apply to the resend flow
-The expired-link resend should also include the code in the redirect URL (read from localStorage or URL param).
-
-## Summary
-
-These changes ensure the code survives the redirect (via URL param), is only redeemed once (via ref guard), and the form always appears after successful authentication (via the else branch).
+## Technical Details
+- Email domain `notify.golokol.app` is already verified and active
+- The project already uses branded auth emails with the same visual style
+- The `sign-music-release` function uses MailerLite for its confirmation; this new flow will use the built-in Lovable email system instead
+- No new database tables needed beyond what the email infrastructure tool creates
+- No new secrets needed
 
