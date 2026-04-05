@@ -76,7 +76,7 @@ const SubmitCurated = () => {
     setIsSubmitting(true);
 
     try {
-      // 1. Validate the code
+      // 1. Validate the code (don't redeem yet)
       const { data: validateData, error: validateError } = await supabase.functions.invoke("validate-curated-code", {
         body: { code: inviteCode.trim() },
       });
@@ -90,21 +90,7 @@ const SubmitCurated = () => {
         return;
       }
 
-      // 2. Redeem the code
-      const { data: redeemData, error: redeemError } = await supabase.functions.invoke("redeem-curated-code", {
-        body: { code: inviteCode.trim().toUpperCase(), email: formData.contact_email },
-      });
-
-      if (redeemError) throw redeemError;
-
-      if (!redeemData.success) {
-        toast.error(redeemData.error || "Failed to redeem code.");
-        submittingRef.current = false;
-        setIsSubmitting(false);
-        return;
-      }
-
-      // 3. Upload MP3
+      // 2. Upload MP3 first (before redeeming code so a failed upload doesn't burn the code)
       const submissionId = crypto.randomUUID();
       const sanitizedArtist = formData.artist_name
         .toLowerCase()
@@ -133,6 +119,24 @@ const SubmitCurated = () => {
       if (uploadError) {
         console.error("Storage upload error:", uploadError);
         toast.error(`Upload failed: ${uploadError.message}`);
+        submittingRef.current = false;
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 3. Now redeem the code (upload succeeded)
+      const { data: redeemData, error: redeemError } = await supabase.functions.invoke("redeem-curated-code", {
+        body: { code: inviteCode.trim().toUpperCase(), email: formData.contact_email },
+      });
+
+      if (redeemError) {
+        await supabase.storage.from("submissions_audio").remove([objectPath]).catch(() => {});
+        throw redeemError;
+      }
+
+      if (!redeemData.success) {
+        await supabase.storage.from("submissions_audio").remove([objectPath]).catch(() => {});
+        toast.error(redeemData.error || "Failed to redeem code.");
         submittingRef.current = false;
         setIsSubmitting(false);
         return;
