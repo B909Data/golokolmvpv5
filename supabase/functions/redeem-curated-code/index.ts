@@ -12,36 +12,18 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify the user is authenticated
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const supabaseUser = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
-    if (userError || !user) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const userEmail = user.email as string;
-
-    const { code } = await req.json();
+    const { code, email } = await req.json();
 
     if (!code || typeof code !== "string") {
       return new Response(
         JSON.stringify({ success: false, error: "Code is required." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!email || typeof email !== "string") {
+      return new Response(
+        JSON.stringify({ success: false, error: "Email is required." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -56,7 +38,7 @@ Deno.serve(async (req) => {
       .from("lls_curated_codes")
       .update({
         is_used: true,
-        used_by_email: userEmail,
+        used_by_email: email.trim().toLowerCase(),
         used_at: new Date().toISOString(),
       })
       .eq("code", code.toUpperCase().trim())
@@ -73,7 +55,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, email: userEmail }),
+      JSON.stringify({ success: true, email: email.trim().toLowerCase() }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
