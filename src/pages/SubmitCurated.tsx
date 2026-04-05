@@ -102,11 +102,8 @@ const SubmitCurated = () => {
         const pendingCode = localStorage.getItem(LS_CODE_KEY) || searchParams.get("code");
         if (pendingCode) {
           await redeemCode(pendingCode);
-        } else {
-          // Session arrived but no pending code — show form directly
-          setFormData((prev) => ({ ...prev, contact_email: session.user.email || "" }));
-          setStep("form");
         }
+        // If no pending code, stay on gate — don't skip the code requirement
       }
     });
 
