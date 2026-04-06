@@ -166,38 +166,28 @@ const LLSUsArtists = () => {
           <ul className="space-y-4 mb-6 max-w-2xl">
             <li className="flex items-start gap-3">
               <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">Submit your music ($10).</span>
+              <span className="text-foreground text-lg md:text-xl font-medium">Submit your music (first submission is free).</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">If selected, local fans discover and vote in record stores city wide.</span>
+              <span className="text-foreground text-lg md:text-xl font-medium">If selected, local fans can discover and save their favs in record stores at Lokol Listening Stations city-wide.</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">Votes lead to features and real fan connections, sales and show attendance.</span>
+              <span className="text-foreground text-lg md:text-xl font-medium">This leads to building your <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">GoLokol Connect</Link> relationship with your city.</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">If not selected you get feedback and a 1-month free trial of <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">GoLokol Connect</Link>.</span>
+              <span className="text-foreground text-lg md:text-xl font-medium">Direct-to-fan sales and show promotions. No algorithms. No BS.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
+              <span className="text-foreground text-lg md:text-xl font-medium">All selected artists get a 1-month free trial of <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">GoLokol Connect</Link>.</span>
             </li>
           </ul>
         </div>
       </section>
 
-      {/* Video */}
-      <section className="px-6 md:px-12 lg:px-20 pb-12">
-        <div className="w-full max-w-3xl rounded-xl overflow-hidden">
-          <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-            <iframe
-              src="https://www.youtube.com/embed/gKznwkyfqlU?rel=0"
-              title="Lokol Listening Stations"
-              className="absolute inset-0 w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </div>
-      </section>
 
       {/* Form */}
       <section className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24">
