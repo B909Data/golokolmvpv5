@@ -17,16 +17,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Download } from "lucide-react";
 
 const ARTISTS = [
-  "Beef and Broccoli",
-  "Bluntana",
-  "Chris Harry",
-  "Dude Dynamik",
-  "Fenix+Flo",
-  "Izan Da Man",
-  "Jointdexter",
-  "Steven the Human",
-  "TD4Y",
-  "T.R.3.",
+  "D Money Sign",
+  "DESTIN",
+  "Lady Ty",
+  "Priscilla Manning",
+  "Yn3",
 ];
 
 const LLSGuestPass = () => {
@@ -189,7 +184,7 @@ const LLSGuestPass = () => {
           ) : (
             <>
               <h1 className="font-display text-2xl text-foreground text-center mb-4">
-                RSVP for Lokol Listening Station 2
+                RSVP for Lokol Listening Station 3
               </h1>
 
               <ul className="text-muted-foreground text-sm space-y-1 mb-6 list-disc list-inside">
@@ -268,7 +263,7 @@ const LLSGuestPass = () => {
                     className="mt-1"
                   />
                   <Label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                    I consent to be filmed/photographed at Lokol Listening Stations on March 15, 2026 at The Handlebar, and I grant GoLokol permission to use my image/likeness in event-related media.{" "}
+                    I consent to be filmed/photographed at Lokol Listening Stations on April 19, 2026 at The Handlebar, and I grant GoLokol permission to use my image/likeness in event-related media.{" "}
                     <Link to="/lls-release" className="text-primary hover:underline">
                       (Read more)
                     </Link>
