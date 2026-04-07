@@ -295,13 +295,22 @@ const LLSUsArtists = () => {
       <section className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24">
         <div className="max-w-3xl mx-auto">
           {success ? (
-            <div className="rounded-lg border border-primary/30 bg-primary/10 p-8 text-center">
-              <h3 className="text-primary mb-2">We gotchu.</h3>
-              <p className="type-body-md text-foreground-secondary">Now check your email.</p>
+            <div className="rounded-lg border border-primary/30 bg-primary/10 p-10 text-center flex flex-col items-center">
+              <img src="/src/assets/golokol-logo.svg" alt="GoLokol" className="h-16 w-16 mb-6" />
+              <h3 className="text-foreground mb-3">Thank you for submitting your music to GoLokol!</h3>
+              <p className="type-body-md text-primary font-semibold mb-4">Check your email.</p>
+              <p className="type-body-md text-foreground-secondary max-w-md">
+                We'll be in touch within 48 hours to confirm if your song{" "}
+                <span className="text-foreground font-medium italic">{form.song_title || "your submission"}</span>{" "}
+                was selected or a reason why it wasn't.
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              <h2 className="text-foreground mb-2">Submit Your Music</h2>
+              <h1 className="text-foreground mb-2">Submit Your Music to <span className="text-primary">GoLokol Connect</span></h1>
+              <p className="italic text-foreground-secondary type-body-md -mt-2 mb-4">
+                GoLokol does not select songs that are grossly violent towards women, glorifies the drug trade or senseless criminality within our Atlanta communities. We call it the Tiana Robinson rule.
+              </p>
 
               {/* Artist Name */}
               <div>
@@ -510,7 +519,7 @@ const LLSUsArtists = () => {
               </div>
 
               <Button type="submit" size="lg" disabled={submitting} className="w-full md:w-auto">
-                {submitting ? "Submitting…" : "Submit Your Music"}
+                {submitting ? "Submitting…" : "Submit Your Music to GoLokol Connect"}
               </Button>
             </form>
           )}
