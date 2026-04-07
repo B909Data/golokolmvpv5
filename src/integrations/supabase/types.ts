@@ -795,7 +795,7 @@ export type Database = {
           guest_name: string
           guest_role: string
           id: string
-          invite_code_id: string
+          invite_code_id: string | null
           qr_image_url: string | null
           qr_token: string
         }
@@ -810,7 +810,7 @@ export type Database = {
           guest_name: string
           guest_role: string
           id?: string
-          invite_code_id: string
+          invite_code_id?: string | null
           qr_image_url?: string | null
           qr_token: string
         }
@@ -825,7 +825,7 @@ export type Database = {
           guest_name?: string
           guest_role?: string
           id?: string
-          invite_code_id?: string
+          invite_code_id?: string | null
           qr_image_url?: string | null
           qr_token?: string
         }

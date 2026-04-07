@@ -1,0 +1,1 @@
+ALTER TABLE public.lls_guest_claims ALTER COLUMN invite_code_id DROP NOT NULL;
