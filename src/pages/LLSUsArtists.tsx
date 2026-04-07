@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import golokolLogo from "@/assets/golokol-logo.svg";
 
 const GENRE_OPTIONS = [
   "Afrobeats", "Alternative", "Beats", "Blues", "Country", "EDM", "Emo",
@@ -296,7 +297,7 @@ const LLSUsArtists = () => {
         <div className="max-w-3xl mx-auto">
           {success ? (
             <div className="rounded-lg border border-primary/30 bg-primary/10 p-10 text-center flex flex-col items-center">
-              <img src="/src/assets/golokol-logo.svg" alt="GoLokol" className="h-16 w-16 mb-6" />
+              <img src={golokolLogo} alt="GoLokol" className="h-16 w-16 mb-6" />
               <h3 className="text-foreground mb-3">Thank you for submitting your music to GoLokol!</h3>
               <p className="type-body-md text-primary font-semibold mb-4">Check your email.</p>
               <p className="type-body-md text-foreground-secondary max-w-md">
