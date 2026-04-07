@@ -46,20 +46,7 @@ serve(async (req) => {
     const guestEmail = requireStr(body.guestEmail, "guestEmail").toLowerCase();
     const artistName = requireStr(body.artistName, "artistName");
 
-    // 1) Look up the invite code row by artist name + event (no user-entered code needed)
-    const { data: invite, error: inviteErr } = await supabase
-      .from("lls_invite_codes")
-      .select("id")
-      .eq("event_id", eventId)
-      .eq("artist_name", artistName)
-      .eq("is_active", true)
-      .limit(1)
-      .maybeSingle();
-
-    if (inviteErr) return res(400, { error: "Invite lookup failed", details: inviteErr.message });
-    if (!invite) return res(400, { error: "No active invite code found for this artist." });
-
-    // 2) If the same email already claimed for this event, return the existing claim
+    // 1) If the same email already claimed for this event, return the existing claim
     // (Matches your unique index: (event_id, lower(guest_email)))
     const { data: existing, error: existingErr } = await supabase
       .from("lls_guest_claims")
