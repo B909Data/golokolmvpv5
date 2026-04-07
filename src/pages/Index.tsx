@@ -52,8 +52,8 @@ const Index = () => {
         <div className="absolute inset-0 bg-black/45" />
         <div className="relative z-10 px-6 md:px-12 lg:px-20 pt-32 pb-16 max-w-3xl">
           <h1 className="font-display font-bold text-[32px] md:text-[48px] leading-[1.1] mb-4">
-            <span className="text-white">Find music you love </span>
-            <span className="text-[#FFD600]">where you live</span>
+            <span className="text-white">The Future of music </span>
+            <span className="text-[#FFD600]">is local</span>
           </h1>
           <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
             GoLokol supports local music discovery, fan engagement and music scenes.
@@ -63,16 +63,22 @@ const Index = () => {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
-              to="/lls-us"
+              to="/lls-us/retail"
               className="inline-flex items-center justify-center bg-white text-black font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
             >
-              Lokol Listening Stations
+              I am a record store
+            </Link>
+            <Link
+              to="/lls-us/artists"
+              className="inline-flex items-center justify-center bg-black text-[#FFD600] font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] border-2 border-[#FFD600] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              I am an artist
             </Link>
             <Link
               to="/connect"
               className="inline-flex items-center justify-center bg-[#FFD600] text-black font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
             >
-              Try GoLokol Connect
+              I love local music
             </Link>
           </div>
         </div>
@@ -103,7 +109,7 @@ const Index = () => {
             image={llsCard}
             number={1}
             title="Lokol Listening Stations"
-            description="Good music lives here. Discover and vote for local artists at your favorite record store. Find music you love where you live. Algorithms and AI can't call any place home. You do."
+            description="Place a Lokol Listening Station in your store or get your music placed in Stations city-wide."
             to="/lls-us"
           />
           <HowItWorksCard
