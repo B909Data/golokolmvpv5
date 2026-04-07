@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Download } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ARTISTS = [
   "D Money Sign",
