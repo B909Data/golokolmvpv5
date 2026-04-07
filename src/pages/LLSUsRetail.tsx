@@ -122,7 +122,7 @@ const [form, setForm] = useState({
       <Navbar />
 
       {/* Hero */}
-      <section className="px-6 md:px-12 lg:px-20 py-12 md:py-20">
+      <section className="px-6 md:px-12 lg:px-20 pt-24 md:pt-28 pb-12 md:pb-20">
         <div className="max-w-3xl">
           <h1 className="mb-4">
             <span className="text-foreground">Is Your Store Where Atlanta </span>
@@ -131,7 +131,7 @@ const [form, setForm] = useState({
           <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
             The record stores that win aren't just selling music, they're breaking it.
           </p>
-          <ul className="space-y-3 max-w-2xl">
+          <ol className="space-y-5 max-w-2xl list-none">
             {[
               "Artists submitted to Lokol Listening Stations are crowdsourced and curated.",
               "A simple QR code touchpoint turns your store into a local music discovery experience as music lovers browse your aisles.",
@@ -139,12 +139,14 @@ const [form, setForm] = useState({
               "Those points, over time are redeemed at your store for discount on future purchase.",
               "Engagement is locked to store location. So points = repeat patronage.",
             ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="mt-1.5 h-2 w-2 rounded-full bg-primary shrink-0" />
+              <li key={i} className="flex items-start gap-4">
+                <span className="mt-0.5 w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+                  <span className="text-background font-bold text-base">{i + 1}</span>
+                </span>
                 <span className="type-body-lg text-foreground-secondary">{item}</span>
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
       </section>
 
