@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 
+const LLS3_EVENT_ID = "3a076338-5e05-4499-ac18-6b41f615c255";
+
 const ARTISTS = [
   "D Money Sign",
   "DESTIN",
@@ -24,7 +26,8 @@ const ARTISTS = [
 ];
 
 const LLSGuestPass = () => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const { eventId: paramEventId } = useParams<{ eventId: string }>();
+  const eventId = paramEventId && paramEventId !== ":eventId" ? paramEventId : LLS3_EVENT_ID;
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [artistName, setArtistName] = useState("");
