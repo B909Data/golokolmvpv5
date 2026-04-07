@@ -119,14 +119,13 @@ serve(async (req) => {
         qrImageUrl = await generateAndUploadQR(existing.qr_token, claimId);
       }
     } else {
-      // 3) Insert new claim
+      // 2) Insert new claim
       const qrToken = crypto.randomUUID().replaceAll("-", "") + crypto.randomUUID().replaceAll("-", "");
 
       const { data: inserted, error: insertErr } = await supabase
         .from("lls_guest_claims")
         .insert({
           event_id: eventId,
-          invite_code_id: invite.id,
           guest_name: guestName,
           guest_email: guestEmail,
           guest_role: "Fan",
