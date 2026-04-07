@@ -140,46 +140,20 @@ const LLSGuestPass = () => {
         <div className="max-w-md mx-auto">
           {/* Success State */}
           {successData ? (
-            <div className="text-center space-y-6">
-              <h1 className="font-display text-2xl text-foreground">
-                Your Pass Is Ready
+            <div className="text-center space-y-6 px-2">
+              <h1 className="font-display text-3xl md:text-4xl text-foreground leading-tight">
+                Thank you for supporting{" "}
+                <span className="text-primary">{successData.artistName}</span>{" "}
+                and the Atlanta Local Music Scene!
               </h1>
-              
-              <p className="text-muted-foreground">
-                You're attending Lokol Listening Stations to support{" "}
-                <span className="text-foreground font-semibold">{successData.artistName}</span>
+
+              <p className="text-xl text-muted-foreground">
+                Check your email for more!
               </p>
 
-              <p className="text-sm text-muted-foreground">
-                Save or screenshot this QR code. You'll need it at the door.
-              </p>
-              
-              <div className="bg-white p-4 rounded-lg inline-block">
-                <img 
-                  src={successData.qrImageUrl} 
-                  alt="Your LLS Guest Pass QR Code" 
-                  className="w-64 h-64 mx-auto"
-                />
-              </div>
-
-              <p className="text-sm text-muted-foreground">
-                We've emailed you a copy of your pass. Check your inbox.
-              </p>
-              
-              <div className="space-y-3">
-                <a 
-                  href={successData.qrImageUrl} 
-                  download={`lls-pass-${successData.artistName.replace(/\s+/g, "-").toLowerCase()}.png`}
-                  className="inline-flex items-center justify-center w-full rounded-md bg-primary text-primary-foreground h-10 px-4 py-2 font-medium"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download QR
-                </a>
-                
-                <Button variant="outline" onClick={handleReset} className="w-full">
-                  Back
-                </Button>
-              </div>
+              <Button variant="outline" onClick={handleReset} className="w-full mt-4">
+                Back
+              </Button>
             </div>
           ) : (
             <>
