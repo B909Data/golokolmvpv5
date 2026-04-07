@@ -209,18 +209,18 @@ const LLSUsArtists = () => {
     setSubmitting(true);
 
     try {
-      // Upload image to partner_flyers bucket (accepts images)
+      // Upload image to station_submission_images bucket
       const imgExt = imageFile.name.split(".").pop() || "jpg";
-      const imgPath = `lls-artist-images/${Date.now()}-${Math.random().toString(36).slice(2)}.${imgExt}`;
-      const { error: imgErr } = await supabase.storage.from("partner_flyers").upload(imgPath, imageFile, { contentType: imageFile.type });
+      const imgPath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${imgExt}`;
+      const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, imageFile, { contentType: imageFile.type });
       if (imgErr) throw imgErr;
-      const { data: imgUrl } = supabase.storage.from("partner_flyers").getPublicUrl(imgPath);
+      const { data: imgUrl } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
 
-      // Upload MP3
-      const mp3Path = `lls-artist-mp3/${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
-      const { error: mp3Err } = await supabase.storage.from("submissions_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
+      // Upload MP3 to station_submission_audio bucket
+      const mp3Path = `${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
+      const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
       if (mp3Err) throw mp3Err;
-      const { data: mp3Url } = supabase.storage.from("submissions_audio").getPublicUrl(mp3Path);
+      const { data: mp3Url } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
 
       const { error } = await supabase.from("lls_artist_submissions").insert({
         artist_name: form.artist_name.trim(),
@@ -438,7 +438,7 @@ const LLSUsArtists = () => {
 
               {/* Short Bio */}
               <div>
-                <Label htmlFor="a-bio" className="text-foreground">Short Bio * <span className="text-foreground-secondary">({form.short_bio.length}/{MAX_BIO})</span></Label>
+                <Label htmlFor="a-bio" className="text-foreground">Short bio or greeting to new fans * <span className="text-foreground-secondary">({form.short_bio.length}/{MAX_BIO})</span></Label>
                 <textarea
                   id="a-bio"
                   required
