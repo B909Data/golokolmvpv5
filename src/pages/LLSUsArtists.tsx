@@ -209,12 +209,12 @@ const LLSUsArtists = () => {
     setSubmitting(true);
 
     try {
-      // Upload image
+      // Upload image to partner_flyers bucket (accepts images)
       const imgExt = imageFile.name.split(".").pop() || "jpg";
       const imgPath = `lls-artist-images/${Date.now()}-${Math.random().toString(36).slice(2)}.${imgExt}`;
-      const { error: imgErr } = await supabase.storage.from("submissions_audio").upload(imgPath, imageFile, { contentType: imageFile.type });
+      const { error: imgErr } = await supabase.storage.from("partner_flyers").upload(imgPath, imageFile, { contentType: imageFile.type });
       if (imgErr) throw imgErr;
-      const { data: imgUrl } = supabase.storage.from("submissions_audio").getPublicUrl(imgPath);
+      const { data: imgUrl } = supabase.storage.from("partner_flyers").getPublicUrl(imgPath);
 
       // Upload MP3
       const mp3Path = `lls-artist-mp3/${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
