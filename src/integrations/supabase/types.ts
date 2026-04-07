@@ -686,6 +686,7 @@ export type Database = {
       }
       lls_artist_submissions: {
         Row: {
+          account_freeze_confirmed: boolean
           artist_name: string
           city_market: string
           contact_email: string
@@ -694,12 +695,20 @@ export type Database = {
           how_heard: string | null
           id: string
           instagram_handle: string | null
+          mp3_path: string | null
+          mp3_url: string | null
           music_link: string | null
+          no_royalties_confirmed: boolean
+          original_filename: string | null
           physical_product: string
+          rights_confirmed: boolean
           short_bio: string | null
           song_image_url: string | null
+          song_title: string | null
+          terms_confirmed: boolean
         }
         Insert: {
+          account_freeze_confirmed?: boolean
           artist_name: string
           city_market: string
           contact_email: string
@@ -708,12 +717,20 @@ export type Database = {
           how_heard?: string | null
           id?: string
           instagram_handle?: string | null
+          mp3_path?: string | null
+          mp3_url?: string | null
           music_link?: string | null
+          no_royalties_confirmed?: boolean
+          original_filename?: string | null
           physical_product: string
+          rights_confirmed?: boolean
           short_bio?: string | null
           song_image_url?: string | null
+          song_title?: string | null
+          terms_confirmed?: boolean
         }
         Update: {
+          account_freeze_confirmed?: boolean
           artist_name?: string
           city_market?: string
           contact_email?: string
@@ -722,10 +739,17 @@ export type Database = {
           how_heard?: string | null
           id?: string
           instagram_handle?: string | null
+          mp3_path?: string | null
+          mp3_url?: string | null
           music_link?: string | null
+          no_royalties_confirmed?: boolean
+          original_filename?: string | null
           physical_product?: string
+          rights_confirmed?: boolean
           short_bio?: string | null
           song_image_url?: string | null
+          song_title?: string | null
+          terms_confirmed?: boolean
         }
         Relationships: []
       }
