@@ -52,6 +52,7 @@ import AdminSignatures from "./pages/AdminSignatures";
 import LLSVote from "./pages/LLSVote";
 import LLSUs from "./pages/LLSUs";
 import LLSUsArtists from "./pages/LLSUsArtists";
+import LLSUsArtistAgreement from "./pages/LLSUsArtistAgreement";
 import LLSUsRetail from "./pages/LLSUsRetail";
 import LLSUsTerms from "./pages/LLSUsTerms";
 import LokolListens from "./pages/LokolListens";
@@ -92,6 +93,7 @@ const App = () => (
            <Route path="/llsvote" element={<LLSVote />} />
            <Route path="/lls-us" element={<LLSUs />} />
            <Route path="/lls-us/artists" element={<LLSUsArtists />} />
+           <Route path="/lls-us/artist-agreement" element={<LLSUsArtistAgreement />} />
            <Route path="/lls-us/retail" element={<LLSUsRetail />} />
            <Route path="/lls-us/terms" element={<LLSUsTerms />} />
           <Route path="/admin/after-parties" element={<AdminAfterParties />} />
