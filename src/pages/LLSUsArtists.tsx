@@ -583,39 +583,38 @@ const LLSUsArtists = () => {
       <section className="px-6 md:px-12 lg:px-20 pt-24 md:pt-28 pb-12 md:pb-20">
         <div className="max-w-3xl">
           <h1 className="mb-4">
-            <span className="text-foreground">Build Local Momentum </span>
-            <span className="text-primary">Without an Algorithm</span>
+            <span className="text-foreground">Build Local </span>
+            <span className="text-primary">Momentum</span>
           </h1>
-          <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
-            Lokol Listening Sessions puts your music in front of the fans who buy records, show up to local events, and tell their friends.
+          <p className="type-subcaption text-foreground-secondary mb-8 max-w-2xl">
+            GoLokol puts your music in front of music lovers in your city that buy records, show up to local events, and tell their friends.
           </p>
-          <ul className="space-y-4 mb-6 max-w-2xl">
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">Submit your music (first submission is free).</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">If selected, local fans can discover and save their favs in record stores at Lokol Listening Sessions city-wide.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">This leads to building your <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">GoLokol Connect</Link> relationship with your city.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">Direct-to-fan sales and show promotions. No algorithms. No BS.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 h-3 w-3 rounded-full bg-primary shrink-0" />
-              <span className="text-foreground text-lg md:text-xl font-medium">All selected artists get a 1-month free trial of <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">GoLokol Connect</Link>.</span>
-            </li>
-          </ul>
+          <ol className="space-y-5 mb-8 max-w-2xl list-none">
+            {[
+              "Submit ONE song (first submission is free).",
+              "If selected, local fans can discover and connect with you at Lokol Listening Stations city-wide.",
+              "GoLokol lets you invite those new fans to your next show. No algorithms. No BS.",
+              "All selected artists get a 1-month free trial.",
+            ].map((text, i) => (
+              <li key={i} className="flex items-start gap-4">
+                <span className="mt-0.5 w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+                  <span className="text-background font-bold text-base">{i + 1}</span>
+                </span>
+                <span className="text-foreground text-lg md:text-xl font-medium">{text}</span>
+              </li>
+            ))}
+          </ol>
+          <a
+            href="#wizard"
+            className="inline-flex items-center justify-center bg-primary text-background font-display font-bold text-base rounded-2xl h-14 px-8 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            Submit a Song
+          </a>
         </div>
       </section>
 
       {/* Wizard */}
-      <section className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24">
+      <section id="wizard" className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24 scroll-mt-20">
         <div className="max-w-md mx-auto">
           {success ? (
             <div className="rounded-lg border border-primary/30 bg-primary/10 p-10 text-center flex flex-col items-center">
