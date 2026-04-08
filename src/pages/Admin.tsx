@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from "react-router-dom";
-import { Shield, Music, Calendar, Ticket, Building2, MapPin, KeyRound, BarChart3 } from "lucide-react";
+import { Shield, Music, Ticket, KeyRound, BarChart3 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
