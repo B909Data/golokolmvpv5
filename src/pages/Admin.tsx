@@ -35,19 +35,6 @@ const Admin = () => {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Link
-              to={`/admin/after-parties?key=${key}`}
-              className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <Calendar className="w-6 h-6 text-primary" />
-                <h2 className="font-display text-xl text-foreground">After Parties</h2>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Manage events, view RSVPs, send recaps, and generate artist links.
-              </p>
-            </Link>
-
-            <Link
               to={`/admin/lls?key=${key}`}
               className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
             >
@@ -69,33 +56,7 @@ const Admin = () => {
                 <h2 className="font-display text-xl text-foreground">Discount Codes</h2>
               </div>
               <p className="text-muted-foreground text-sm">
-                Generate one-time use discount codes for After Party listings.
-              </p>
-            </Link>
-
-            <Link
-              to={`/admin/partners?key=${key}`}
-              className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <Building2 className="w-6 h-6 text-primary" />
-                <h2 className="font-display text-xl text-foreground">Partners</h2>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Manage curators, event series, and venues for After Party dropdowns.
-              </p>
-            </Link>
-
-            <Link
-              to={`/admin/cities?key=${key}`}
-              className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <MapPin className="w-6 h-6 text-primary" />
-                <h2 className="font-display text-xl text-foreground">Cities</h2>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Manage cities where After Parties can be created.
+                Generate and manage one-time use discount codes for GoLokol payments.
               </p>
             </Link>
 
