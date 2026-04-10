@@ -688,6 +688,7 @@ export type Database = {
         Row: {
           account_freeze_confirmed: boolean
           artist_name: string
+          artist_user_id: string | null
           city_market: string
           contact_email: string
           created_at: string
@@ -710,6 +711,7 @@ export type Database = {
         Insert: {
           account_freeze_confirmed?: boolean
           artist_name: string
+          artist_user_id?: string | null
           city_market: string
           contact_email: string
           created_at?: string
@@ -732,6 +734,7 @@ export type Database = {
         Update: {
           account_freeze_confirmed?: boolean
           artist_name?: string
+          artist_user_id?: string | null
           city_market?: string
           contact_email?: string
           created_at?: string
@@ -1282,6 +1285,7 @@ export type Database = {
           admin_notes: string | null
           admin_status: string | null
           artist_name: string
+          artist_user_id: string | null
           city_market: string | null
           contact_email: string
           created_at: string
@@ -1311,6 +1315,7 @@ export type Database = {
           admin_notes?: string | null
           admin_status?: string | null
           artist_name: string
+          artist_user_id?: string | null
           city_market?: string | null
           contact_email: string
           created_at?: string
@@ -1340,6 +1345,7 @@ export type Database = {
           admin_notes?: string | null
           admin_status?: string | null
           artist_name?: string
+          artist_user_id?: string | null
           city_market?: string | null
           contact_email?: string
           created_at?: string

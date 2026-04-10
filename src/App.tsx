@@ -32,6 +32,7 @@ import AdminCities from "./pages/AdminCities";
 import ArtistEvent from "./pages/ArtistEvent";
 import ArtistLogin from "./pages/ArtistLogin";
 import ArtistAfterParties from "./pages/ArtistAfterParties";
+import ArtistDashboard from "./pages/ArtistDashboard";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
@@ -107,7 +108,7 @@ const App = () => (
           {/* Artist Auth Routes */}
           <Route path="/artist/login" element={<ArtistLogin />} />
           <Route path="/artist/after-parties" element={<ArtistAfterParties />} />
-          <Route path="/artist/dashboard" element={<Navigate to="/artist/after-parties" replace />} />
+          <Route path="/artist/dashboard" element={<ArtistDashboard />} />
           <Route path="/artist/event/:eventId" element={<ArtistEvent />} />
           
           {/* Song Detail */}
