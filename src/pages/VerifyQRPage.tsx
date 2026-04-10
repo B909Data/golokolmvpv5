@@ -27,7 +27,7 @@ const VerifyQRPage = () => {
     queryKey: ["verify-attendee-role", attendeeId],
     queryFn: async () => {
       if (!attendeeId) return null;
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("after_party_messages")
         .select("role")
         .eq("attendee_id", attendeeId)
@@ -63,7 +63,7 @@ const VerifyQRPage = () => {
 
       try {
         // Fetch attendee by eventId + qr_token
-        const { data: attendee, error } = await supabase
+        const { data: attendee, error } = await (supabase as any)
           .from("attendees")
           .select("id, display_name, checked_in_at")
           .eq("event_id", eventId)
@@ -84,7 +84,7 @@ const VerifyQRPage = () => {
         }
 
         // Update checked_in_at
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from("attendees")
           .update({ checked_in_at: new Date().toISOString() })
           .eq("id", attendee.id);

@@ -33,7 +33,7 @@ const RSVPAfterParty = () => {
     queryKey: ["event", eventId],
     queryFn: async () => {
       if (!eventId) throw new Error("No event ID");
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("events")
         .select("id, title, start_at, city, venue_name, ticket_url, artist_name, genres, youtube_url, image_url, pricing_mode, fixed_price, min_price, stripe_account_id, status")
         .eq("id", eventId)
@@ -134,7 +134,7 @@ const RSVPAfterParty = () => {
       const accessToken = crypto.randomUUID() + "-" + crypto.randomUUID();
 
       // Create attendee record
-      const { data: attendee, error: insertError } = await supabase
+      const { data: attendee, error: insertError } = await (supabase as any)
         .from("attendees")
         .insert({
           event_id: eventId,
@@ -158,7 +158,7 @@ const RSVPAfterParty = () => {
       if (isPaidEvent) {
         console.log("[FanRSVP] Paid event — creating checkout session", { eventId, attendeeId: attendee.id, promoCode: promoCode.trim() || "none" });
 
-        const { data, error } = await supabase.functions.invoke("create-fan-checkout", {
+        const { data, error } = await (supabase as any).functions.invoke("create-fan-checkout", {
           body: {
             eventId,
             attendeeId: attendee.id,
