@@ -59,6 +59,7 @@ import LLSUsRetail from "./pages/LLSUsRetail";
 import LLSUsTerms from "./pages/LLSUsTerms";
 import LokolListens from "./pages/LokolListens";
 import LokolListensGenre from "./pages/LokolListensGenre";
+import LLSStorePage from "./pages/LLSStorePage";
 import LLSSignup from "./pages/LLSSignup";
 import Connect from "./pages/Connect";
 import Unsubscribe from "./pages/Unsubscribe";
@@ -86,6 +87,8 @@ const App = () => (
           <Route path="/lls" element={<LokolListens />} />
           <Route path="/lls/genre/:genre" element={<LokolListensGenre />} />
           <Route path="/lls/signup" element={<LLSSignup />} />
+          <Route path="/lls/:storeSlug/genre/:genre" element={<LokolListensGenre />} />
+          <Route path="/lls/:storeSlug" element={<LLSStorePage />} />
           
           {/* LLS Guest Pass & Check-in */}
           <Route path="/lls/:eventId/pass" element={<LLSGuestPass />} />
