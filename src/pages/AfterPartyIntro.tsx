@@ -10,7 +10,7 @@ const AfterPartyIntro = () => {
   const { data: event } = useQuery({
     queryKey: ["event-intro", eventId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("events")
         .select("artist_name, title")
         .eq("id", eventId!)

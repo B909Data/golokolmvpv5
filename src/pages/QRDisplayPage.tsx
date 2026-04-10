@@ -14,7 +14,7 @@ const QRDisplayPage = () => {
       if (!eventId || !qrToken) throw new Error("Missing parameters");
 
       // Fetch attendee by eventId + qr_token
-      const { data: attendee, error: attendeeError } = await supabase
+      const { data: attendee, error: attendeeError } = await (supabase as any)
         .from("attendees")
         .select("id, display_name, event_id")
         .eq("event_id", eventId)
@@ -25,7 +25,7 @@ const QRDisplayPage = () => {
       if (!attendee) return null;
 
       // Fetch event details
-      const { data: event, error: eventError } = await supabase
+      const { data: event, error: eventError } = await (supabase as any)
         .from("events")
         .select("id, title")
         .eq("id", eventId)

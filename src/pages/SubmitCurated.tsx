@@ -148,7 +148,7 @@ const SubmitCurated = () => {
         .getPublicUrl(objectPath);
 
       // 5. Insert submission
-      const { error: insertError } = await supabase
+      const { error: insertError } = await (supabase as any)
         .from("curated_submissions")
         .insert({
           id: submissionId,

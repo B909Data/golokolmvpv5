@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+// Note: supabase is cast to `any` at call sites for tables not yet in generated types
 import { Button } from "@/components/ui/button";
 import { addDays, isAfter } from "date-fns";
 import { Clock } from "lucide-react";
@@ -84,7 +85,7 @@ const AfterPartyRoom = () => {
     queryKey: ["attendee-checkin", eventId, urlToken, storedAttendeeId],
     queryFn: async () => {
       if (urlToken) {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from("attendees")
           .select("id, checked_in_at, qr_token, display_name, payment_status")
           .eq("event_id", eventId)
@@ -95,7 +96,7 @@ const AfterPartyRoom = () => {
       }
       
       if (storedAttendeeId) {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from("attendees")
           .select("id, checked_in_at, qr_token, display_name, payment_status")
           .eq("id", storedAttendeeId)
@@ -175,7 +176,7 @@ const AfterPartyRoom = () => {
   const { data: event, isLoading, error: eventError, refetch: refetchEvent } = useQuery({
     queryKey: ["event-room", eventId, artistToken, isAdminMode],
     queryFn: async (): Promise<EventData> => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("events")
         .select(`
           id, title, artist_name, status, start_at, city, 
@@ -233,7 +234,7 @@ const AfterPartyRoom = () => {
   const { data: attendeeCount = 0 } = useQuery({
     queryKey: ["attendee-count", eventId],
     queryFn: async () => {
-      const { count, error } = await supabase
+      const { count, error } = await (supabase as any)
         .from("attendees")
         .select("*", { count: "exact", head: true })
         .eq("event_id", eventId)
@@ -251,7 +252,7 @@ const AfterPartyRoom = () => {
   const { refetch: refetchMessages } = useQuery({
     queryKey: ["after-party-messages", eventId],
     queryFn: async (): Promise<Message[]> => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("after_party_messages")
         .select("id, role, message, created_at, attendee_id, attendees(display_name)")
         .eq("event_id", eventId)
@@ -282,7 +283,7 @@ const AfterPartyRoom = () => {
         async (payload) => {
           const newMsg = payload.new as { id: string; role: string; message: string | null; created_at: string | null; attendee_id: string; event_id: string };
           
-          const { data: attendeeInfo } = await supabase
+          const { data: attendeeInfo } = await (supabase as any)
             .from("attendees")
             .select("display_name")
             .eq("id", newMsg.attendee_id)
@@ -348,7 +349,7 @@ const AfterPartyRoom = () => {
       }
 
       try {
-        const { data: existingArtist } = await supabase
+        const { data: existingArtist } = await (supabase as any)
           .from("attendees")
           .select("id")
           .eq("event_id", eventId)
@@ -360,7 +361,7 @@ const AfterPartyRoom = () => {
         if (existingArtist) {
           artistAttendeeId = existingArtist.id;
         } else {
-          const { data: newArtist, error: createError } = await supabase
+          const { data: newArtist, error: createError } = await (supabase as any)
             .from("attendees")
             .insert({
               event_id: eventId,
@@ -375,7 +376,7 @@ const AfterPartyRoom = () => {
           artistAttendeeId = newArtist.id;
         }
 
-        const { error: msgError } = await supabase
+        const { error: msgError } = await (supabase as any)
           .from("after_party_messages")
           .insert({
             event_id: eventId,
@@ -390,7 +391,7 @@ const AfterPartyRoom = () => {
           refetchMessages();
           
           try {
-            await supabase.functions.invoke("send-artist-entered-sms", {
+            await (supabase as any).functions.invoke("send-artist-entered-sms", {
               body: { event_id: eventId, token: artistToken },
             });
           } catch (smsErr) {
@@ -417,7 +418,7 @@ const AfterPartyRoom = () => {
       }
 
       try {
-        const { data: existingAdmin } = await supabase
+        const { data: existingAdmin } = await (supabase as any)
           .from("attendees")
           .select("id")
           .eq("event_id", eventId)
@@ -429,7 +430,7 @@ const AfterPartyRoom = () => {
         if (existingAdmin) {
           adminAttendeeId = existingAdmin.id;
         } else {
-          const { data: newAdmin, error: createError } = await supabase
+          const { data: newAdmin, error: createError } = await (supabase as any)
             .from("attendees")
             .insert({
               event_id: eventId,
@@ -444,7 +445,7 @@ const AfterPartyRoom = () => {
           adminAttendeeId = newAdmin.id;
         }
 
-        const { error: msgError } = await supabase
+        const { error: msgError } = await (supabase as any)
           .from("after_party_messages")
           .insert({
             event_id: eventId,
@@ -476,7 +477,7 @@ const AfterPartyRoom = () => {
       let senderAttendeeId = attendeeId;
 
       if (isArtistMode) {
-        const { data: existingArtist } = await supabase
+        const { data: existingArtist } = await (supabase as any)
           .from("attendees")
           .select("id")
           .eq("event_id", eventId)
@@ -486,7 +487,7 @@ const AfterPartyRoom = () => {
         if (existingArtist) {
           senderAttendeeId = existingArtist.id;
         } else {
-          const { data: newArtist, error: createError } = await supabase
+          const { data: newArtist, error: createError } = await (supabase as any)
             .from("attendees")
             .insert({
               event_id: eventId,
@@ -501,7 +502,7 @@ const AfterPartyRoom = () => {
           senderAttendeeId = newArtist.id;
         }
       } else if (isAdminMode) {
-        const { data: existingAdmin } = await supabase
+        const { data: existingAdmin } = await (supabase as any)
           .from("attendees")
           .select("id")
           .eq("event_id", eventId)
@@ -511,7 +512,7 @@ const AfterPartyRoom = () => {
         if (existingAdmin) {
           senderAttendeeId = existingAdmin.id;
         } else {
-          const { data: newAdmin, error: createError } = await supabase
+          const { data: newAdmin, error: createError } = await (supabase as any)
             .from("attendees")
             .insert({
               event_id: eventId,
@@ -527,7 +528,7 @@ const AfterPartyRoom = () => {
         }
       }
 
-      const { error } = await supabase.from("after_party_messages").insert({
+      const { error } = await (supabase as any).from("after_party_messages").insert({
         event_id: eventId,
         attendee_id: senderAttendeeId,
         role: isArtistMode ? "artist" : "fan",

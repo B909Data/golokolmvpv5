@@ -29,7 +29,7 @@ const HomeTab = ({ eventId, stripeStatus, fixedPrice, onSwitchTab }: HomeTabProp
   useEffect(() => {
     const fetchEarnings = async () => {
       try {
-        const { data: attendees, error } = await supabase
+        const { data: attendees, error } = await (supabase as any)
           .from("attendees")
           .select("paid_amount, paid_at, checked_in_at")
           .eq("event_id", eventId);

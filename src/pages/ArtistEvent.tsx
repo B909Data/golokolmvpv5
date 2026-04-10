@@ -108,7 +108,7 @@ const ArtistEvent = () => {
 
   const fetchCheckedInCount = useCallback(async () => {
     if (!eventId) return;
-    const { count } = await supabase
+    const { count } = await (supabase as any)
       .from("attendees")
       .select("*", { count: "exact", head: true })
       .eq("event_id", eventId)

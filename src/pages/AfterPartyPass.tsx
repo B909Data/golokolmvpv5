@@ -114,7 +114,7 @@ const AfterPartyPass = () => {
     queryKey: ["attendee-pass-legacy", eventId, storedQrToken],
     queryFn: async () => {
       if (!eventId || !storedQrToken) return null;
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("attendees")
         .select("id, display_name, qr_token")
         .eq("event_id", eventId)
@@ -142,7 +142,7 @@ const AfterPartyPass = () => {
     queryKey: ["event-pass", effectiveEventId],
     queryFn: async () => {
       if (!effectiveEventId) throw new Error("No event ID");
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("events")
         .select("id, title, artist_name, ticket_url, start_at, city, venue_name")
         .eq("id", effectiveEventId)

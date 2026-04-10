@@ -176,7 +176,7 @@ const CreateAfterparty = () => {
     const fetchData = async () => {
       try {
         const [partnersRes, citiesRes] = await Promise.all([
-          supabase.from("partners").select("*").eq("active", true).order("name"),
+          (supabase as any).from("partners").select("*").eq("active", true).order("name"),
           supabase.from("cities").select("*").eq("active", true).order("name"),
         ]);
         
@@ -271,7 +271,7 @@ const CreateAfterparty = () => {
     setDiscountValidation({ valid: false, type: null, checking: true });
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("afterparty_discount_codes")
         .select("discount_type, used_at, expires_at")
         .eq("code", code.toUpperCase())

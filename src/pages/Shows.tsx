@@ -23,7 +23,7 @@ const Shows = () => {
   const { data: events, isLoading } = useQuery({
     queryKey: ["shows-after-parties"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("events")
         .select("id, title, artist_name, start_at, city, venue_name, genres, youtube_url, image_url")
         .eq("type", "after_party")

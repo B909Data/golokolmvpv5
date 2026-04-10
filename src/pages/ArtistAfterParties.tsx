@@ -61,7 +61,7 @@ const ArtistAfterParties = () => {
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("events")
         .select("id, title, artist_name, start_at, city, venue_name, status, genres, youtube_url, image_url, fixed_price")
         .eq("artist_user_id", user.id)
