@@ -21,7 +21,7 @@ const AfterPartyNoReentry = () => {
   const { data: attendee } = useQuery({
     queryKey: ["no-reentry-attendee", accessToken],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("attendees")
         .select("id, display_name, event_id, phone, sms_opt_in")
         .eq("access_token", accessToken)
@@ -36,7 +36,7 @@ const AfterPartyNoReentry = () => {
   const { data: event } = useQuery({
     queryKey: ["no-reentry-event", eventId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("events")
         .select("artist_name, title")
         .eq("id", eventId!)
@@ -54,7 +54,7 @@ const AfterPartyNoReentry = () => {
     if (!phone.trim() || !attendee?.id) return;
     setPhoneSaving(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("attendees")
         .update({ phone: phone.trim(), sms_opt_in: true } as any)
         .eq("id", attendee.id);

@@ -25,7 +25,7 @@ const MoneyMadeSection = ({ eventId }: MoneyMadeSectionProps) => {
     const fetchEarnings = async () => {
       try {
         // Fetch attendees with payment data
-        const { data: attendees, error } = await supabase
+        const { data: attendees, error } = await (supabase as any)
           .from("attendees")
           .select("paid_amount, paid_at, checked_in_at")
           .eq("event_id", eventId);

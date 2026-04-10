@@ -79,7 +79,7 @@ const AdminDiscountCodes = () => {
 
   const fetchPartners = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("partners")
         .select("id, name, type")
         .eq("active", true)
@@ -96,7 +96,7 @@ const AdminDiscountCodes = () => {
     if (!key) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("afterparty_discount_codes")
         .select("*")
         .order("created_at", { ascending: false });
@@ -120,7 +120,7 @@ const AdminDiscountCodes = () => {
     const partner = partners.find(p => p.id === partnerId);
     if (!partner) return;
 
-    const { count, error } = await supabase
+    const { count, error } = await (supabase as any)
       .from("afterparty_discount_codes")
       .select("*", { count: "exact", head: true })
       .eq("partner_id", partnerId)
