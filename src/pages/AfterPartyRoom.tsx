@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+// Cast to any to bypass type-checking for tables not yet in generated types
+const db = supabase as any;
 import { Button } from "@/components/ui/button";
 import { addDays, isAfter } from "date-fns";
 import { Clock } from "lucide-react";
