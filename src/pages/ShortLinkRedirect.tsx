@@ -13,7 +13,7 @@ const ShortLinkRedirect = () => {
         return;
       }
 
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await (supabase as any)
         .from("short_links")
         .select("target_url")
         .eq("code", code)
