@@ -1,11 +1,10 @@
 import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Upload, X, Search, ChevronLeft, ChevronRight, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -116,12 +115,13 @@ const ATLANTA_NEIGHBORHOODS = [
 
 const MAX_BIO = 240;
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
-const MAX_MP3_SIZE = 10 * 1024 * 1024;
+const MAX_MP3_SIZE = 20 * 1024 * 1024;
 const MIN_IMAGE_DIM = 200;
 const TOTAL_STEPS = 4;
 
 const LLSUsArtists = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mp3InputRef = useRef<HTMLInputElement>(null);
 
@@ -132,7 +132,6 @@ const LLSUsArtists = () => {
     genre_style: [] as string[],
     city_market: "",
     physical_product: "",
-    music_link: "",
     song_title: "",
     short_bio: "",
     how_heard: "",
@@ -140,15 +139,9 @@ const LLSUsArtists = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [mp3File, setMp3File] = useState<File | null>(null);
-  
-  const [success, setSuccess] = useState(false);
+
   const [neighborhoodSearch, setNeighborhoodSearch] = useState("");
   const [neighborhoodOpen, setNeighborhoodOpen] = useState(false);
-
-  const [rightsConfirmed, setRightsConfirmed] = useState(false);
-  const [noRoyaltiesConfirmed, setNoRoyaltiesConfirmed] = useState(false);
-  const [accountFreezeConfirmed, setAccountFreezeConfirmed] = useState(false);
-  const [termsConfirmed, setTermsConfirmed] = useState(false);
 
   // Step 4 auth state
   const [authEmail, setAuthEmail] = useState("");
@@ -193,9 +186,9 @@ const LLSUsArtists = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.type !== "audio/mpeg" && !file.name.toLowerCase().endsWith(".mp3")) {
-      toast({ title: "Only MP3 files are accepted.", variant: "destructive" }); return;
+      toast({ title: "MP3 files only, max 20MB", variant: "destructive" }); return;
     }
-    if (file.size > MAX_MP3_SIZE) { toast({ title: "MP3 must be under 10MB.", variant: "destructive" }); return; }
+    if (file.size > MAX_MP3_SIZE) { toast({ title: "MP3 files only, max 20MB", variant: "destructive" }); return; }
     setMp3File(file);
   };
 
@@ -204,23 +197,19 @@ const LLSUsArtists = () => {
   const validateStep = (step: number): boolean => {
     if (step === 1) {
       if (!form.artist_name.trim()) { toast({ title: "Artist Name is required.", variant: "destructive" }); return false; }
+      if (form.genre_style.length === 0) { toast({ title: "Please select at least one genre.", variant: "destructive" }); return false; }
       if (!form.city_market) { toast({ title: "Please select your neighborhood.", variant: "destructive" }); return false; }
       return true;
     }
     if (step === 2) {
-      if (!form.song_title.trim()) { toast({ title: "Song Title is required.", variant: "destructive" }); return false; }
-      if (!form.music_link.trim()) { toast({ title: "Music Link is required.", variant: "destructive" }); return false; }
+      if (!form.physical_product) { toast({ title: "Please select a physical product option.", variant: "destructive" }); return false; }
       if (!mp3File) { toast({ title: "Please upload your MP3.", variant: "destructive" }); return false; }
-      if (!imageFile) { toast({ title: "Please upload a song image.", variant: "destructive" }); return false; }
-      if (form.genre_style.length === 0) { toast({ title: "Please select at least one genre.", variant: "destructive" }); return false; }
       return true;
     }
     if (step === 3) {
-      if (!form.physical_product) { toast({ title: "Please select a physical product option.", variant: "destructive" }); return false; }
+      if (!form.song_title.trim()) { toast({ title: "Song Title is required.", variant: "destructive" }); return false; }
       if (!form.short_bio.trim()) { toast({ title: "Short bio is required.", variant: "destructive" }); return false; }
-      if (!rightsConfirmed || !noRoyaltiesConfirmed || !accountFreezeConfirmed || !termsConfirmed) {
-        toast({ title: "Please confirm all checkboxes.", variant: "destructive" }); return false;
-      }
+      if (!imageFile) { toast({ title: "Please upload a song image.", variant: "destructive" }); return false; }
       return true;
     }
     return true;
@@ -239,25 +228,38 @@ const LLSUsArtists = () => {
   const saveSubmission = async (contactEmail: string, userId: string) => {
     if (!imageFile || !mp3File) throw new Error("Missing files");
 
-    const imgExt = imageFile.name.split(".").pop() || "jpg";
-    const imgPath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${imgExt}`;
-    const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, imageFile, { contentType: imageFile.type });
-    if (imgErr) throw imgErr;
-    const { data: imgUrl } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
+    // Check monthly submission limit
+    const now = new Date();
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const { count, error: countErr } = await supabase
+      .from("submissions")
+      .select("id", { count: "exact", head: true })
+      .eq("artist_user_id", userId)
+      .gte("created_at", firstOfMonth);
+    if (countErr) throw countErr;
+    if ((count ?? 0) >= 2) {
+      throw new Error("LIMIT_REACHED");
+    }
 
-    const mp3Path = `${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
-    const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
+    const ts = Date.now();
+    const mp3Path = `submissions/${userId}/${ts}-${mp3File.name}`;
+    const { error: mp3Err } = await supabase.storage.from("submissions_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
     if (mp3Err) throw mp3Err;
-    const { data: mp3Url } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
+    const { data: mp3Url } = supabase.storage.from("submissions_audio").getPublicUrl(mp3Path);
 
-    const { error } = await supabase.from("lls_artist_submissions").insert({
+    const imgExt = imageFile.name.split(".").pop() || "jpg";
+    const imgPath = `lls-artist-images/${userId}/${ts}-${imageFile.name}`;
+    const { error: imgErr } = await supabase.storage.from("submissions_audio").upload(imgPath, imageFile, { contentType: imageFile.type });
+    if (imgErr) throw imgErr;
+    const { data: imgUrl } = supabase.storage.from("submissions_audio").getPublicUrl(imgPath);
+
+    const { error } = await supabase.from("submissions").insert({
       artist_name: form.artist_name.trim(),
       contact_email: contactEmail,
       instagram_handle: form.instagram_handle.trim() || null,
       genre_style: form.genre_style.join(", "),
       city_market: form.city_market,
       physical_product: form.physical_product,
-      music_link: form.music_link.trim(),
       song_title: form.song_title.trim(),
       short_bio: form.short_bio.trim(),
       song_image_url: imgUrl.publicUrl,
@@ -265,12 +267,11 @@ const LLSUsArtists = () => {
       mp3_path: mp3Path,
       original_filename: mp3File.name,
       how_heard: form.how_heard.trim() || null,
-      rights_confirmed: rightsConfirmed,
-      no_royalties_confirmed: noRoyaltiesConfirmed,
-      account_freeze_confirmed: accountFreezeConfirmed,
-      terms_confirmed: termsConfirmed,
       artist_user_id: userId,
-    } as any);
+      payment_status: "free",
+      admin_status: "pending",
+      spotify_url: "",
+    });
 
     if (error) throw error;
   };
@@ -287,17 +288,19 @@ const LLSUsArtists = () => {
         return;
       }
       if (result.redirected) {
-        // Browser will redirect — just return
         return;
       }
-      // If we get tokens back directly, save submission
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await saveSubmission(user.email || "", user.id);
-        setSuccess(true);
+        navigate("/artist/dashboard");
       }
-    } catch {
-      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (err: any) {
+      if (err?.message === "LIMIT_REACHED") {
+        toast({ title: "You've reached your 2 submissions this month. Try again next month.", variant: "destructive" });
+      } else {
+        toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+      }
     } finally {
       setAuthLoading(false);
     }
@@ -323,16 +326,19 @@ const LLSUsArtists = () => {
       }
       if (data.user) {
         await saveSubmission(authEmail.trim(), data.user.id);
-        setSuccess(true);
+        navigate("/artist/dashboard");
       }
-    } catch {
-      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (err: any) {
+      if (err?.message === "LIMIT_REACHED") {
+        toast({ title: "You've reached your 2 submissions this month. Try again next month.", variant: "destructive" });
+      } else {
+        toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+      }
     } finally {
       setAuthLoading(false);
     }
   };
 
-  // Prevent default form submit on step 4 (handled by handleEmailSignUp)
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
@@ -364,11 +370,11 @@ const LLSUsArtists = () => {
     </div>
   );
 
-  // Step 1: Artist Name, Instagram Handle, Neighborhood (no contact email)
+  // Step 1: Your Artist Info
   const renderStep1 = () => (
     <div className="space-y-5">
       <div className="text-center mb-6">
-        <h2 className="font-display text-2xl text-primary-foreground">About You</h2>
+        <h2 className="font-display text-2xl text-primary-foreground">Your Artist Info</h2>
         <p className="text-primary-foreground/70 text-base font-sans mt-1">Tell us who you are</p>
       </div>
 
@@ -382,9 +388,30 @@ const LLSUsArtists = () => {
         <Input id="a-ig" value={form.instagram_handle} onChange={e => setForm(f => ({ ...f, instagram_handle: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground" maxLength={200} placeholder="@yourhandle" />
       </div>
 
+      {/* Genre */}
+      <div className="space-y-2">
+        <Label className="text-primary-foreground text-base font-sans">Genre / Style * <span className="text-primary-foreground/60">(select up to 3)</span></Label>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {GENRE_OPTIONS.map((genre) => (
+            <button
+              key={genre}
+              type="button"
+              onClick={() => toggleGenre(genre)}
+              className={`px-3 py-2 rounded-full text-sm font-sans font-medium transition-colors ${
+                form.genre_style.includes(genre)
+                  ? "bg-primary-foreground text-primary ring-2 ring-primary-foreground"
+                  : "bg-primary-foreground/10 text-primary-foreground/70 hover:bg-primary-foreground/20"
+              }`}
+            >
+              {genre}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Neighborhood */}
       <div className="space-y-2 relative">
-        <Label className="text-primary-foreground text-base font-sans">Atlanta Metro Neighborhood * <span className="text-primary-foreground/70">(Pick the one you call home)</span></Label>
+        <Label className="text-primary-foreground text-base font-sans">City / Market * <span className="text-primary-foreground/70">(Atlanta only for now)</span></Label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
@@ -426,7 +453,7 @@ const LLSUsArtists = () => {
     </div>
   );
 
-  // Step 2: Song Title, Music Link, Upload Song, Upload Image, Genre
+  // Step 2: Your Music
   const renderStep2 = () => (
     <div className="space-y-5">
       <div className="text-center mb-6">
@@ -434,20 +461,22 @@ const LLSUsArtists = () => {
         <p className="text-primary-foreground/70 text-base font-sans mt-1">Share your song</p>
       </div>
 
+      {/* Physical Product */}
       <div className="space-y-2">
-        <Label htmlFor="a-song-title" className="text-primary-foreground text-base font-sans">Song Title *</Label>
-        <Input id="a-song-title" value={form.song_title} onChange={e => setForm(f => ({ ...f, song_title: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground" maxLength={300} placeholder="Your song title" />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="a-music" className="text-primary-foreground text-base font-sans">Your Music Link *</Label>
-        <p className="text-sm text-primary-foreground/60 font-sans">Bandcamp, SoundCloud or Dropbox link (we do not support Spotify)</p>
-        <Input id="a-music" value={form.music_link} onChange={e => setForm(f => ({ ...f, music_link: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground" maxLength={500} placeholder="https://" />
+        <Label className="text-primary-foreground text-base font-sans">Do you have physical product available or in production? *</Label>
+        <RadioGroup value={form.physical_product} onValueChange={v => setForm(f => ({ ...f, physical_product: v }))} className="flex flex-col gap-3 mt-1">
+          {["Yes", "In Production", "Not Yet"].map(opt => (
+            <label key={opt} className="flex items-center gap-3 cursor-pointer">
+              <RadioGroupItem value={opt} className="border-primary-foreground/50 text-primary-foreground" />
+              <span className="text-primary-foreground text-base font-sans">{opt}</span>
+            </label>
+          ))}
+        </RadioGroup>
       </div>
 
       {/* Upload MP3 */}
       <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Upload Song Submission * <span className="text-primary-foreground/60">(MP3s ONLY, Max 10MB)</span></Label>
+        <Label className="text-primary-foreground text-base font-sans">Upload Your Song * <span className="text-primary-foreground/60">(MP3 only, max 20MB)</span></Label>
         {mp3File ? (
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-primary-foreground/30 bg-background">
             <span className="text-foreground text-sm font-sans truncate flex-1">{mp3File.name}</span>
@@ -466,6 +495,34 @@ const LLSUsArtists = () => {
           </button>
         )}
         <input ref={mp3InputRef} type="file" accept=".mp3,audio/mpeg" onChange={handleMp3Select} className="hidden" />
+      </div>
+    </div>
+  );
+
+  // Step 3: Your Song Details
+  const renderStep3 = () => (
+    <div className="space-y-5">
+      <div className="text-center mb-6">
+        <h2 className="font-display text-2xl text-primary-foreground">Your Song Details</h2>
+        <p className="text-primary-foreground/70 text-base font-sans mt-1">Tell us about the track</p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="a-song-title" className="text-primary-foreground text-base font-sans">Song Title *</Label>
+        <Input id="a-song-title" value={form.song_title} onChange={e => setForm(f => ({ ...f, song_title: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground" maxLength={300} placeholder="Your song title" />
+      </div>
+
+      {/* Short Bio */}
+      <div className="space-y-2">
+        <Label htmlFor="a-bio" className="text-primary-foreground text-base font-sans">Short Bio * <span className="text-primary-foreground/60">({form.short_bio.length}/{MAX_BIO})</span></Label>
+        <textarea
+          id="a-bio"
+          value={form.short_bio}
+          onChange={e => { if (e.target.value.length <= MAX_BIO) setForm(f => ({ ...f, short_bio: e.target.value })); }}
+          className="flex min-h-[100px] w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          maxLength={MAX_BIO}
+          placeholder="A short bio or greeting to new fans (max 240 characters)"
+        />
       </div>
 
       {/* Upload Image */}
@@ -492,96 +549,10 @@ const LLSUsArtists = () => {
         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
       </div>
 
-      {/* Genre */}
-      <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Genre / Style * <span className="text-primary-foreground/60">(select up to 3)</span></Label>
-        <div className="flex flex-wrap gap-2 mt-1">
-          {GENRE_OPTIONS.map((genre) => (
-            <button
-              key={genre}
-              type="button"
-              onClick={() => toggleGenre(genre)}
-              className={`px-3 py-2 rounded-full text-sm font-sans font-medium transition-colors ${
-                form.genre_style.includes(genre)
-                  ? "bg-primary-foreground text-primary ring-2 ring-primary-foreground"
-                  : "bg-primary-foreground/10 text-primary-foreground/70 hover:bg-primary-foreground/20"
-              }`}
-            >
-              {genre}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  // Step 3: Physical product, Short bio, How heard, Confirmations
-  const renderStep3 = () => (
-    <div className="space-y-5">
-      <div className="text-center mb-6">
-        <h2 className="font-display text-2xl text-primary-foreground">Final Details</h2>
-        <p className="text-primary-foreground/70 text-base font-sans mt-1">Almost there</p>
-      </div>
-
-      {/* Physical Product */}
-      <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Do you have physical product available or in production? *</Label>
-        <RadioGroup value={form.physical_product} onValueChange={v => setForm(f => ({ ...f, physical_product: v }))} className="flex flex-col gap-3 mt-1">
-          {["Yes", "In Production", "Not Yet"].map(opt => (
-            <label key={opt} className="flex items-center gap-3 cursor-pointer">
-              <RadioGroupItem value={opt} className="border-primary-foreground/50 text-primary-foreground" />
-              <span className="text-primary-foreground text-base font-sans">{opt}</span>
-            </label>
-          ))}
-        </RadioGroup>
-      </div>
-
-      {/* Short Bio */}
-      <div className="space-y-2">
-        <Label htmlFor="a-bio" className="text-primary-foreground text-base font-sans">Short bio or greeting to new fans * <span className="text-primary-foreground/60">({form.short_bio.length}/{MAX_BIO})</span></Label>
-        <textarea
-          id="a-bio"
-          value={form.short_bio}
-          onChange={e => { if (e.target.value.length <= MAX_BIO) setForm(f => ({ ...f, short_bio: e.target.value })); }}
-          className="flex min-h-[100px] w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          maxLength={MAX_BIO}
-        />
-      </div>
-
       {/* How Heard */}
       <div className="space-y-2">
         <Label htmlFor="a-heard" className="text-primary-foreground text-base font-sans">How did you hear about GoLokol?</Label>
         <Input id="a-heard" value={form.how_heard} onChange={e => setForm(f => ({ ...f, how_heard: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground" maxLength={500} />
-      </div>
-
-      {/* Confirmations */}
-      <div className="space-y-4 pt-3">
-        <p className="text-primary-foreground font-semibold text-base font-sans">Before you submit, please confirm:</p>
-
-        <label className="flex items-start gap-3 cursor-pointer">
-          <Checkbox checked={rightsConfirmed} onCheckedChange={(v) => setRightsConfirmed(v === true)} className="mt-0.5 border-primary-foreground/50" />
-          <span className="text-primary-foreground text-sm font-sans">I own the rights to this music</span>
-        </label>
-
-        <label className="flex items-start gap-3 cursor-pointer">
-          <Checkbox checked={noRoyaltiesConfirmed} onCheckedChange={(v) => setNoRoyaltiesConfirmed(v === true)} className="mt-0.5 border-primary-foreground/50" />
-          <span className="text-primary-foreground text-sm font-sans">I understand this is not a streaming service and I won't receive royalties</span>
-        </label>
-
-        <label className="flex items-start gap-3 cursor-pointer">
-          <Checkbox checked={accountFreezeConfirmed} onCheckedChange={(v) => setAccountFreezeConfirmed(v === true)} className="mt-0.5 border-primary-foreground/50" />
-          <span className="text-primary-foreground text-sm font-sans">I understand my account freezes if I don't pay for GoLokol Connect after my free trial</span>
-        </label>
-
-        <label className="flex items-start gap-3 cursor-pointer">
-          <Checkbox checked={termsConfirmed} onCheckedChange={(v) => setTermsConfirmed(v === true)} className="mt-0.5 border-primary-foreground/50" />
-          <span className="text-primary-foreground text-sm font-sans">
-            I have read and understand the GoLokol{" "}
-            <Link to="/lls-us/artist-agreement" className="text-primary-foreground underline hover:text-primary-foreground/80 transition-colors font-semibold" target="_blank">
-              Terms of Service agreement
-            </Link>
-          </span>
-        </label>
       </div>
     </div>
   );
@@ -591,7 +562,7 @@ const LLSUsArtists = () => {
     <div className="space-y-5">
       <div className="text-center mb-6">
         <h2 className="font-display text-2xl text-primary-foreground">Create Your Account</h2>
-        <p className="text-primary-foreground/70 text-base font-sans mt-1">Sign up to submit your music</p>
+        <p className="text-primary-foreground/70 text-base font-sans mt-1">Almost there. Create your account to submit.</p>
       </div>
 
       <Button
@@ -668,7 +639,7 @@ const LLSUsArtists = () => {
               Creating Account...
             </>
           ) : (
-            "Create Account"
+            "Create Account & Submit"
           )}
         </Button>
       </div>
@@ -677,19 +648,7 @@ const LLSUsArtists = () => {
 
   const renderNavButtons = () => (
     <div className="flex justify-end gap-3 mt-8">
-      {currentStep > 1 && currentStep < TOTAL_STEPS && (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleBack}
-          className="h-11 px-6 font-display font-bold text-base bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
-        >
-          <ChevronLeft className="mr-1 h-4 w-4" />
-          Back
-        </Button>
-      )}
-
-      {currentStep === TOTAL_STEPS && (
+      {currentStep > 1 && (
         <Button
           type="button"
           variant="outline"
@@ -755,49 +714,34 @@ const LLSUsArtists = () => {
       {/* Wizard */}
       <section id="wizard" className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24 scroll-mt-20">
         <div className="max-w-md mx-auto">
-          {success ? (
-            <div className="rounded-lg border border-primary/30 bg-primary/10 p-10 text-center flex flex-col items-center">
-              <img src={golokolLogo} alt="GoLokol" className="h-16 w-16 mb-6" />
-              <h3 className="text-foreground mb-3">You're in.</h3>
-              <p className="type-body-md text-primary font-semibold mb-4">Check your email to confirm your account.</p>
-              <p className="type-body-md text-foreground-secondary max-w-md">
-                We'll be in touch within 48 hours to confirm if your song{" "}
-                <span className="text-foreground font-medium italic">{form.song_title || "your submission"}</span>{" "}
-                was selected or a reason why it wasn't.
-              </p>
+          {/* Frozen header above wizard */}
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <img src={golokolLogo} alt="GoLokol" className="h-12 w-12" />
             </div>
-          ) : (
-            <>
-              {/* Frozen header above wizard */}
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <img src={golokolLogo} alt="GoLokol" className="h-12 w-12" />
-                </div>
-                <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
-                  Submit Your Music to <span className="text-primary">GoLokol Connect</span>
-                </h1>
-                <p className="italic text-foreground-secondary text-sm font-sans mt-3 max-w-sm mx-auto">
-                  GoLokol does not select songs that are grossly violent towards women, glorifies the drug trade or senseless criminality within our Atlanta communities. We call it the Tiana Robinson rule.
-                </p>
-              </div>
+            <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
+              Submit Your Music to <span className="text-primary">GoLokol Connect</span>
+            </h1>
+            <p className="italic text-foreground-secondary text-sm font-sans mt-3 max-w-sm mx-auto">
+              GoLokol does not select songs that are grossly violent towards women, glorifies the drug trade or senseless criminality within our Atlanta communities. We call it the Tiana Robinson rule.
+            </p>
+          </div>
 
-              <p className="text-center text-base font-sans text-muted-foreground mb-6">
-                Step {currentStep} of {TOTAL_STEPS}
-              </p>
+          <p className="text-center text-base font-sans text-muted-foreground mb-6">
+            Step {currentStep} of {TOTAL_STEPS}
+          </p>
 
-              {renderStepIndicator()}
+          {renderStepIndicator()}
 
-              <div className="bg-primary rounded-2xl p-6 md:p-8">
-                <form onSubmit={handleFormSubmit}>
-                  {currentStep === 1 && renderStep1()}
-                  {currentStep === 2 && renderStep2()}
-                  {currentStep === 3 && renderStep3()}
-                  {currentStep === 4 && renderStep4()}
-                  {renderNavButtons()}
-                </form>
-              </div>
-            </>
-          )}
+          <div className="bg-primary rounded-2xl p-6 md:p-8">
+            <form onSubmit={handleFormSubmit}>
+              {currentStep === 1 && renderStep1()}
+              {currentStep === 2 && renderStep2()}
+              {currentStep === 3 && renderStep3()}
+              {currentStep === 4 && renderStep4()}
+              {renderNavButtons()}
+            </form>
+          </div>
         </div>
       </section>
 
