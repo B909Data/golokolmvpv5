@@ -107,3 +107,6 @@ verify_jwt = false
 
 [functions.send-mailerlite-artist-welcome]
 verify_jwt = false
+
+[functions.admin-list-rsvps]
+verify_jwt = false
