@@ -108,7 +108,7 @@ const App = () => (
           {/* Artist Auth Routes */}
           <Route path="/artist/login" element={<ArtistLogin />} />
           <Route path="/artist/after-parties" element={<ArtistAfterParties />} />
-          <Route path="/artist/dashboard" element={<Navigate to="/artist/after-parties" replace />} />
+          <Route path="/artist/dashboard" element={<ArtistDashboard />} />
           <Route path="/artist/event/:eventId" element={<ArtistEvent />} />
           
           {/* Song Detail */}
