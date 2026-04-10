@@ -274,6 +274,11 @@ const LLSUsArtists = () => {
     });
 
     if (error) throw error;
+
+    // Fire-and-forget MailerLite welcome trigger
+    supabase.functions.invoke("send-mailerlite-artist-welcome", {
+      body: { email: contactEmail, artist_name: form.artist_name.trim() },
+    });
   };
 
   const handleGoogleSignIn = async () => {
