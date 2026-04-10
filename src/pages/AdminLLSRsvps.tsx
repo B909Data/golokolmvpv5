@@ -48,13 +48,6 @@ const AdminLLSRsvps = () => {
     if (!key) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("admin-list-rsvps", {
-        method: "GET",
-        headers: {},
-        body: undefined,
-      });
-
-      // Use fetch fallback for GET with query params
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-list-rsvps?key=${encodeURIComponent(key)}&event_id=${encodeURIComponent(selectedEvent)}`;
       const res = await fetch(url, {
         headers: {
