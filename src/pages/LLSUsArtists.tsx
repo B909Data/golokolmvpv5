@@ -140,7 +140,7 @@ const LLSUsArtists = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [mp3File, setMp3File] = useState<File | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  
   const [success, setSuccess] = useState(false);
   const [neighborhoodSearch, setNeighborhoodSearch] = useState("");
   const [neighborhoodOpen, setNeighborhoodOpen] = useState(false);

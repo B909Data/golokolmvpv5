@@ -32,6 +32,7 @@ import AdminCities from "./pages/AdminCities";
 import ArtistEvent from "./pages/ArtistEvent";
 import ArtistLogin from "./pages/ArtistLogin";
 import ArtistAfterParties from "./pages/ArtistAfterParties";
+import ArtistDashboard from "./pages/ArtistDashboard";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
