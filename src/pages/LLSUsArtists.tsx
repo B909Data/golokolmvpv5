@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Upload, X, Search, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Upload, X, Search, ChevronLeft, ChevronRight, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import golokolLogo from "@/assets/golokol-logo.svg";
@@ -117,6 +118,7 @@ const MAX_BIO = 240;
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
 const MAX_MP3_SIZE = 10 * 1024 * 1024;
 const MIN_IMAGE_DIM = 200;
+const TOTAL_STEPS = 4;
 
 const LLSUsArtists = () => {
   const { toast } = useToast();
@@ -126,7 +128,6 @@ const LLSUsArtists = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [form, setForm] = useState({
     artist_name: "",
-    contact_email: "",
     instagram_handle: "",
     genre_style: [] as string[],
     city_market: "",
@@ -148,6 +149,12 @@ const LLSUsArtists = () => {
   const [noRoyaltiesConfirmed, setNoRoyaltiesConfirmed] = useState(false);
   const [accountFreezeConfirmed, setAccountFreezeConfirmed] = useState(false);
   const [termsConfirmed, setTermsConfirmed] = useState(false);
+
+  // Step 4 auth state
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
 
   const filteredNeighborhoods = ATLANTA_NEIGHBORHOODS.filter((n) => {
     const q = neighborhoodSearch.toLowerCase();
@@ -197,7 +204,6 @@ const LLSUsArtists = () => {
   const validateStep = (step: number): boolean => {
     if (step === 1) {
       if (!form.artist_name.trim()) { toast({ title: "Artist Name is required.", variant: "destructive" }); return false; }
-      if (!form.contact_email.trim()) { toast({ title: "Contact Email is required.", variant: "destructive" }); return false; }
       if (!form.city_market) { toast({ title: "Please select your neighborhood.", variant: "destructive" }); return false; }
       return true;
     }
@@ -209,12 +215,20 @@ const LLSUsArtists = () => {
       if (form.genre_style.length === 0) { toast({ title: "Please select at least one genre.", variant: "destructive" }); return false; }
       return true;
     }
+    if (step === 3) {
+      if (!form.physical_product) { toast({ title: "Please select a physical product option.", variant: "destructive" }); return false; }
+      if (!form.short_bio.trim()) { toast({ title: "Short bio is required.", variant: "destructive" }); return false; }
+      if (!rightsConfirmed || !noRoyaltiesConfirmed || !accountFreezeConfirmed || !termsConfirmed) {
+        toast({ title: "Please confirm all checkboxes.", variant: "destructive" }); return false;
+      }
+      return true;
+    }
     return true;
   };
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, 3));
+      setCurrentStep((prev) => Math.min(prev + 1, TOTAL_STEPS));
     }
   };
 
@@ -222,66 +236,110 @@ const LLSUsArtists = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const saveSubmission = async (contactEmail: string, userId: string) => {
+    if (!imageFile || !mp3File) throw new Error("Missing files");
 
-    if (
-      !form.artist_name || !form.contact_email || form.genre_style.length === 0 ||
-      !form.city_market || !form.physical_product || !form.music_link ||
-      !form.song_title || !form.short_bio || !imageFile || !mp3File ||
-      !rightsConfirmed || !noRoyaltiesConfirmed || !accountFreezeConfirmed || !termsConfirmed
-    ) {
-      toast({ title: "Please fill in all required fields and confirm all checkboxes.", variant: "destructive" });
-      return;
-    }
+    const imgExt = imageFile.name.split(".").pop() || "jpg";
+    const imgPath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${imgExt}`;
+    const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, imageFile, { contentType: imageFile.type });
+    if (imgErr) throw imgErr;
+    const { data: imgUrl } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
 
-    setSubmitting(true);
+    const mp3Path = `${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
+    const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
+    if (mp3Err) throw mp3Err;
+    const { data: mp3Url } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
 
+    const { error } = await supabase.from("lls_artist_submissions").insert({
+      artist_name: form.artist_name.trim(),
+      contact_email: contactEmail,
+      instagram_handle: form.instagram_handle.trim() || null,
+      genre_style: form.genre_style.join(", "),
+      city_market: form.city_market,
+      physical_product: form.physical_product,
+      music_link: form.music_link.trim(),
+      song_title: form.song_title.trim(),
+      short_bio: form.short_bio.trim(),
+      song_image_url: imgUrl.publicUrl,
+      mp3_url: mp3Url.publicUrl,
+      mp3_path: mp3Path,
+      original_filename: mp3File.name,
+      how_heard: form.how_heard.trim() || null,
+      rights_confirmed: rightsConfirmed,
+      no_royalties_confirmed: noRoyaltiesConfirmed,
+      account_freeze_confirmed: accountFreezeConfirmed,
+      terms_confirmed: termsConfirmed,
+      artist_user_id: userId,
+    } as any);
+
+    if (error) throw error;
+  };
+
+  const handleGoogleSignIn = async () => {
+    setAuthLoading(true);
     try {
-      const imgExt = imageFile.name.split(".").pop() || "jpg";
-      const imgPath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${imgExt}`;
-      const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, imageFile, { contentType: imageFile.type });
-      if (imgErr) throw imgErr;
-      const { data: imgUrl } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
-
-      const mp3Path = `${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
-      const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
-      if (mp3Err) throw mp3Err;
-      const { data: mp3Url } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
-
-      const { error } = await supabase.from("lls_artist_submissions").insert({
-        artist_name: form.artist_name.trim(),
-        contact_email: form.contact_email.trim(),
-        instagram_handle: form.instagram_handle.trim() || null,
-        genre_style: form.genre_style.join(", "),
-        city_market: form.city_market,
-        physical_product: form.physical_product,
-        music_link: form.music_link.trim(),
-        song_title: form.song_title.trim(),
-        short_bio: form.short_bio.trim(),
-        song_image_url: imgUrl.publicUrl,
-        mp3_url: mp3Url.publicUrl,
-        mp3_path: mp3Path,
-        original_filename: mp3File.name,
-        how_heard: form.how_heard.trim() || null,
-        rights_confirmed: rightsConfirmed,
-        no_royalties_confirmed: noRoyaltiesConfirmed,
-        account_freeze_confirmed: accountFreezeConfirmed,
-        terms_confirmed: termsConfirmed,
-      } as any);
-
-      if (error) throw error;
-      setSuccess(true);
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/artist/dashboard",
+      });
+      if (result.error) {
+        toast({ title: "Google sign-in failed. Please try again.", variant: "destructive" });
+        setAuthLoading(false);
+        return;
+      }
+      if (result.redirected) {
+        // Browser will redirect — just return
+        return;
+      }
+      // If we get tokens back directly, save submission
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await saveSubmission(user.email || "", user.id);
+        setSuccess(true);
+      }
     } catch {
       toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
     } finally {
-      setSubmitting(false);
+      setAuthLoading(false);
     }
+  };
+
+  const handleEmailSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authEmail.trim()) { toast({ title: "Email is required.", variant: "destructive" }); return; }
+    if (authPassword.length < 8) { toast({ title: "Password must be at least 8 characters.", variant: "destructive" }); return; }
+
+    setAuthLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: authEmail.trim(),
+        password: authPassword,
+        options: {
+          emailRedirectTo: window.location.origin + "/artist/dashboard",
+        },
+      });
+      if (error) {
+        toast({ title: error.message, variant: "destructive" });
+        return;
+      }
+      if (data.user) {
+        await saveSubmission(authEmail.trim(), data.user.id);
+        setSuccess(true);
+      }
+    } catch {
+      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Prevent default form submit on step 4 (handled by handleEmailSignUp)
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
   };
 
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center gap-2 mb-8">
-      {[1, 2, 3].map((step) => (
+      {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((step) => (
         <div key={step} className="flex items-center">
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-sans font-semibold transition-colors ${
@@ -294,7 +352,7 @@ const LLSUsArtists = () => {
           >
             {step}
           </div>
-          {step < 3 && (
+          {step < TOTAL_STEPS && (
             <div
               className={`w-8 h-1 mx-1 rounded ${
                 step < currentStep ? "bg-primary" : "bg-muted/30"
@@ -306,7 +364,7 @@ const LLSUsArtists = () => {
     </div>
   );
 
-  // Step 1: Artist Name, Contact Email, Instagram Handle, Neighborhood
+  // Step 1: Artist Name, Instagram Handle, Neighborhood (no contact email)
   const renderStep1 = () => (
     <div className="space-y-5">
       <div className="text-center mb-6">
@@ -317,11 +375,6 @@ const LLSUsArtists = () => {
       <div className="space-y-2">
         <Label htmlFor="a-name" className="text-primary-foreground text-base font-sans">Artist Name *</Label>
         <Input id="a-name" value={form.artist_name} onChange={e => setForm(f => ({ ...f, artist_name: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground" maxLength={200} placeholder="Your artist or band name" />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="a-email" className="text-primary-foreground text-base font-sans">Contact Email *</Label>
-        <Input id="a-email" type="email" value={form.contact_email} onChange={e => setForm(f => ({ ...f, contact_email: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground" maxLength={255} placeholder="you@email.com" />
       </div>
 
       <div className="space-y-2">
@@ -533,9 +586,98 @@ const LLSUsArtists = () => {
     </div>
   );
 
+  // Step 4: Create Your Account
+  const renderStep4 = () => (
+    <div className="space-y-5">
+      <div className="text-center mb-6">
+        <h2 className="font-display text-2xl text-primary-foreground">Create Your Account</h2>
+        <p className="text-primary-foreground/70 text-base font-sans mt-1">Sign up to submit your music</p>
+      </div>
+
+      <Button
+        type="button"
+        onClick={handleGoogleSignIn}
+        disabled={authLoading}
+        className="w-full h-14 text-base font-display font-bold bg-background text-foreground hover:bg-background/90 border border-border"
+      >
+        {authLoading ? (
+          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+        ) : (
+          <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+          </svg>
+        )}
+        Continue with Google
+      </Button>
+
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-primary-foreground/30" />
+        <span className="text-primary-foreground/70 text-sm font-sans">or</span>
+        <div className="flex-1 h-px bg-primary-foreground/30" />
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="auth-email" className="text-primary-foreground text-base font-sans">Email</Label>
+          <Input
+            id="auth-email"
+            type="email"
+            value={authEmail}
+            onChange={e => setAuthEmail(e.target.value)}
+            className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
+            placeholder="you@email.com"
+            maxLength={255}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="auth-password" className="text-primary-foreground text-base font-sans">Password</Label>
+          <div className="relative">
+            <Input
+              id="auth-password"
+              type={showPassword ? "text" : "password"}
+              value={authPassword}
+              onChange={e => setAuthPassword(e.target.value)}
+              className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 focus:border-primary focus:ring-primary placeholder:text-muted-foreground pr-12"
+              placeholder="Min 8 characters"
+              minLength={8}
+              maxLength={128}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          onClick={handleEmailSignUp}
+          disabled={authLoading || !authEmail.trim() || authPassword.length < 8}
+          className="w-full h-14 text-base font-display font-bold bg-primary-foreground text-primary hover:bg-primary-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {authLoading ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Creating Account...
+            </>
+          ) : (
+            "Create Account"
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+
   const renderNavButtons = () => (
     <div className="flex justify-end gap-3 mt-8">
-      {currentStep > 1 && (
+      {currentStep > 1 && currentStep < TOTAL_STEPS && (
         <Button
           type="button"
           variant="outline"
@@ -547,7 +689,19 @@ const LLSUsArtists = () => {
         </Button>
       )}
 
-      {currentStep < 3 ? (
+      {currentStep === TOTAL_STEPS && (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleBack}
+          className="h-11 px-6 font-display font-bold text-base bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
+        >
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Back
+        </Button>
+      )}
+
+      {currentStep < TOTAL_STEPS && (
         <Button
           type="button"
           onClick={handleNext}
@@ -555,21 +709,6 @@ const LLSUsArtists = () => {
         >
           Next
           <ChevronRight className="ml-1 h-4 w-4" />
-        </Button>
-      ) : (
-        <Button
-          type="submit"
-          className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={submitting || !rightsConfirmed || !noRoyaltiesConfirmed || !accountFreezeConfirmed || !termsConfirmed || !form.physical_product || !form.short_bio}
-        >
-          {submitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Submitting...
-            </>
-          ) : (
-            "Submit Your Music to GoLokol Connect"
-          )}
         </Button>
       )}
     </div>
@@ -619,8 +758,8 @@ const LLSUsArtists = () => {
           {success ? (
             <div className="rounded-lg border border-primary/30 bg-primary/10 p-10 text-center flex flex-col items-center">
               <img src={golokolLogo} alt="GoLokol" className="h-16 w-16 mb-6" />
-              <h3 className="text-foreground mb-3">Thank you for submitting your music to GoLokol!</h3>
-              <p className="type-body-md text-primary font-semibold mb-4">Check your email.</p>
+              <h3 className="text-foreground mb-3">You're in.</h3>
+              <p className="type-body-md text-primary font-semibold mb-4">Check your email to confirm your account.</p>
               <p className="type-body-md text-foreground-secondary max-w-md">
                 We'll be in touch within 48 hours to confirm if your song{" "}
                 <span className="text-foreground font-medium italic">{form.song_title || "your submission"}</span>{" "}
@@ -643,16 +782,17 @@ const LLSUsArtists = () => {
               </div>
 
               <p className="text-center text-base font-sans text-muted-foreground mb-6">
-                Step {currentStep} of 3
+                Step {currentStep} of {TOTAL_STEPS}
               </p>
 
               {renderStepIndicator()}
 
               <div className="bg-primary rounded-2xl p-6 md:p-8">
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleFormSubmit}>
                   {currentStep === 1 && renderStep1()}
                   {currentStep === 2 && renderStep2()}
                   {currentStep === 3 && renderStep3()}
+                  {currentStep === 4 && renderStep4()}
                   {renderNavButtons()}
                 </form>
               </div>
