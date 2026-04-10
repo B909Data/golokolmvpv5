@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from "react-router-dom";
-import { Shield, Music, Ticket, KeyRound, BarChart3 } from "lucide-react";
+import { Shield, Music, Ticket, KeyRound, BarChart3, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -83,6 +83,18 @@ const Admin = () => {
               </div>
               <p className="text-muted-foreground text-sm">
                 View vote tallies for Lokol Listening Stations by session, city, and artist.
+              </p>
+            </Link>
+            <Link
+              to={`/admin/lls-rsvps?key=${key}`}
+              className="block p-6 border border-border/50 rounded-lg bg-card/30 hover:bg-card/50 transition-colors"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Users className="w-6 h-6 text-primary" />
+                <h2 className="font-display text-xl text-foreground">LLS RSVPs</h2>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                View guest RSVPs per Lokol Listening Station event with artist breakdowns.
               </p>
             </Link>
           </div>

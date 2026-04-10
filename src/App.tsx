@@ -29,6 +29,7 @@ import AdminAfterParties from "./pages/AdminAfterParties";
 import AdminDiscountCodes from "./pages/AdminDiscountCodes";
 import AdminPartners from "./pages/AdminPartners";
 import AdminCities from "./pages/AdminCities";
+import AdminLLSRsvps from "./pages/AdminLLSRsvps";
 import ArtistEvent from "./pages/ArtistEvent";
 import ArtistLogin from "./pages/ArtistLogin";
 import ArtistAfterParties from "./pages/ArtistAfterParties";
@@ -103,6 +104,7 @@ const App = () => (
           <Route path="/admin/cities" element={<AdminCities />} />
           <Route path="/admin/curated-codes" element={<AdminCuratedCodes />} />
           <Route path="/admin/lls-votes" element={<AdminLLSVotes />} />
+          <Route path="/admin/lls-rsvps" element={<AdminLLSRsvps />} />
           <Route path="/admin/signatures" element={<AdminSignatures />} />
           
           {/* Artist Auth Routes */}
