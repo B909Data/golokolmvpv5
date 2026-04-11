@@ -62,6 +62,7 @@ import LokolListensGenre from "./pages/LokolListensGenre";
 import LLSStorePage from "./pages/LLSStorePage";
 import LLSSignup from "./pages/LLSSignup";
 import FanScene from "./pages/FanScene";
+import FanInfo from "./pages/FanInfo";
 import Connect from "./pages/Connect";
 import Unsubscribe from "./pages/Unsubscribe";
 
