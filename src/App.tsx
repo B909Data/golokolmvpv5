@@ -90,6 +90,7 @@ const App = () => (
           <Route path="/lls/genre/:genre" element={<LokolListensGenre />} />
           <Route path="/lls/signup" element={<LLSSignup />} />
           <Route path="/fan/scene" element={<FanScene />} />
+          <Route path="/fan/info" element={<FanInfo />} />
           <Route path="/lls/:storeSlug/genre/:genre" element={<LokolListensGenre />} />
           <Route path="/lls/:storeSlug" element={<LLSStorePage />} />
           
