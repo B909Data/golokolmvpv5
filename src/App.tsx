@@ -61,6 +61,7 @@ import LokolListens from "./pages/LokolListens";
 import LokolListensGenre from "./pages/LokolListensGenre";
 import LLSStorePage from "./pages/LLSStorePage";
 import LLSSignup from "./pages/LLSSignup";
+import FanScene from "./pages/FanScene";
 import Connect from "./pages/Connect";
 import Unsubscribe from "./pages/Unsubscribe";
 
@@ -87,6 +88,7 @@ const App = () => (
           <Route path="/lls" element={<LokolListens />} />
           <Route path="/lls/genre/:genre" element={<LokolListensGenre />} />
           <Route path="/lls/signup" element={<LLSSignup />} />
+          <Route path="/fan/scene" element={<FanScene />} />
           <Route path="/lls/:storeSlug/genre/:genre" element={<LokolListensGenre />} />
           <Route path="/lls/:storeSlug" element={<LLSStorePage />} />
           
