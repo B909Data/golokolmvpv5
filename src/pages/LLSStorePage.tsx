@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import LLSOnboarding from "@/components/LLSOnboarding";
 import llsHero from "@/assets/lls-hero-crates.png";
 import genreHiphop from "@/assets/genre-hiphop.jpg";
 import genreRnb from "@/assets/genre-rnb.jpg";
