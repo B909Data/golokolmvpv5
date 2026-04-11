@@ -67,22 +67,29 @@ const LLSSignup = () => {
     if (user) {
       const pointsNum = parseInt(points) || 0;
 
-      // Create fan profile
-      await supabase.from("fan_profiles").insert({
-        fan_user_id: user.id,
-        name: name || null,
-        email,
-        city: "Atlanta",
-        lokol_points: pointsNum,
-      });
+      // Create fan profile - don't block redirect on failure
+      try {
+        await supabase.from("fan_profiles").upsert(
+          {
+            fan_user_id: user.id,
+            name: name.trim() || null,
+            email: email.trim(),
+            city: "Atlanta",
+            lokol_points: pointsNum,
+          },
+          { onConflict: "fan_user_id" }
+        );
 
-      // Record points in ledger
-      if (pointsNum > 0) {
-        await supabase.from("lokol_points_ledger").insert({
-          fan_user_id: user.id,
-          points_earned: pointsNum,
-          action_type: "station_scan",
-        });
+        // Record points in ledger
+        if (pointsNum > 0) {
+          await supabase.from("lokol_points_ledger").insert({
+            fan_user_id: user.id,
+            points_earned: pointsNum,
+            action_type: "station_scan",
+          });
+        }
+      } catch (dbError) {
+        console.error("Profile creation error:", dbError);
       }
 
       navigate("/fan/scene");
@@ -154,7 +161,7 @@ const LLSSignup = () => {
                 placeholder="Enter your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full h-11 px-3 text-base bg-[#F5F5F5] border border-transparent rounded-md focus:border-black focus:outline-none transition-colors"
+                className="w-full h-11 px-3 text-base text-black placeholder:text-[#999999] bg-[#F5F5F5] border border-transparent rounded-md focus:border-black focus:outline-none transition-colors"
               />
             </div>
 
@@ -171,7 +178,7 @@ const LLSSignup = () => {
                   setEmail(e.target.value);
                   if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
                 }}
-                className={`w-full h-11 px-3 text-base bg-[#F5F5F5] border rounded-md focus:outline-none transition-colors ${
+                className={`w-full h-11 px-3 text-base text-black placeholder:text-[#999999] bg-[#F5F5F5] border rounded-md focus:outline-none transition-colors ${
                   errors.email
                     ? "border-red-500 focus:border-red-500"
                     : "border-transparent focus:border-black"
@@ -197,7 +204,7 @@ const LLSSignup = () => {
                     if (errors.password)
                       setErrors((p) => ({ ...p, password: undefined }));
                   }}
-                  className={`w-full h-11 px-3 pr-10 text-base bg-[#F5F5F5] border rounded-md focus:outline-none transition-colors ${
+                  className={`w-full h-11 px-3 pr-10 text-base text-black placeholder:text-[#999999] bg-[#F5F5F5] border rounded-md focus:outline-none transition-colors ${
                     errors.password
                       ? "border-red-500 focus:border-red-500"
                       : "border-transparent focus:border-black"
