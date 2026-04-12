@@ -1,0 +1,1 @@
+ALTER TABLE public.lls_artist_submissions ADD COLUMN IF NOT EXISTS artist_neighborhood text;

@@ -258,6 +258,7 @@ export type Database = {
           account_freeze_confirmed: boolean
           admin_status: string | null
           artist_name: string
+          artist_neighborhood: string | null
           artist_slug: string | null
           artist_user_id: string | null
           city_market: string
@@ -286,6 +287,7 @@ export type Database = {
           account_freeze_confirmed?: boolean
           admin_status?: string | null
           artist_name: string
+          artist_neighborhood?: string | null
           artist_slug?: string | null
           artist_user_id?: string | null
           city_market: string
@@ -314,6 +316,7 @@ export type Database = {
           account_freeze_confirmed?: boolean
           admin_status?: string | null
           artist_name?: string
+          artist_neighborhood?: string | null
           artist_slug?: string | null
           artist_user_id?: string | null
           city_market?: string

@@ -1,6 +1,9 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, X, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Upload, X, Eye, EyeOff, Check, ChevronsUpDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +35,10 @@ const MAX_MP3_SIZE = 20 * 1024 * 1024;
 const MIN_IMAGE_DIM = 200;
 const TOTAL_STEPS = 4;
 
+const ATLANTA_NEIGHBORHOODS = [
+  "Adair Park","Adams Park","Adamsville","Almond Park","Ansley Park","Arden/Habersham","Argonne Forest","Arlington Estates","Atkins Park","Auburn Avenue","Austell","Avondale Estates","Bakers Ferry","Bankhead","Beecher Hills","Ben Hill","Berkshire Hills","Bowen Homes","Bower Hills","Brookhaven","Brookwood Hills","Buckhead","Buffalo Creek","Cabbagetown","Candler Park","Capitol Gateway","Capitol Hill","Capitol View","Capitol View Manor","Carey Park","Cascade Green","Cascade Heights","Cascade Road","Castleberry Hill","Chancel","Channing Valley","Chastain Park","Chester Avenue","Clairmont","Collier Heights","Collier Hills","Columbia","Conley Hills","Cornelia","Decatur","Deerwood","Downtown","Druid Hills","East Atlanta","East Lake","East Point","Edgewood","English Avenue","Fairburn","Fairburn Aces","Fairway Hills","Five Points","Flat Shoals","Forest Hills","Fort Valley","Garden Hills","Glenrose Heights","Glenwood Park","Grant Park","Grove Park","Hampton Oaks","Hanover West","Hapeville","Harris Chiles","Harvel Hills","Hillsdale","Historic West End","Holly Hills","Home Park","Inman Park","Jonesboro","Joyland","Kirkwood","Lake Claire","Lakewood","Lakewood Heights","Lenox","Linden","Lindbergh","Loring Heights","Lynwood Park","Mableton","Marietta","Mechanicsville","Memorial Park","Midtown","Midway Woods","Moreland Hills","Morningside","Morris Brandon","Mozley Park","Murphey Crossing","Napier/Thomasville","Norcross","North Buckhead","North Druid Hills","Oakland City","Oakview","Old Fourth Ward","Paces","Panthersville","Perkerson","Peters Street","Peyton Forest","Piedmont Heights","Pittsburgh","Plateau","Plunkettown","Ponce City Market area","Ponce De Leon","Princeton Lakes","Pyron","Rebel Valley Forest","Reynoldstown","Ridgewood Heights","Riverside","Rocky Mount","Rollingwood","Sandy Springs","Sherwood Forest","Smyrna","South Atlanta","South Buckhead","Southtowne","Stanton Road","Stone Mountain","Summerhill","Sylvan Hills","Thomasville Heights","Toco Hills","Tucker","Underwood Hills","Utoy Creek","Vine City","Virginia-Highland","Vinings","Waterford","Westview","Whittier Mill","Wildwood","Wilson Mill Meadows","Winn Park","Woodland Hills","Wyngate",
+];
+
 const LLSUsArtists = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -48,7 +55,9 @@ const LLSUsArtists = () => {
     song_title: "",
     short_bio: "",
     how_heard: "",
+    artist_neighborhood: "",
   });
+  const [neighborhoodOpen, setNeighborhoodOpen] = useState(false);
   const [mp3File, setMp3File] = useState<File | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -136,6 +145,7 @@ const LLSUsArtists = () => {
       song_title: form.song_title,
       short_bio: form.short_bio,
       how_heard: form.how_heard,
+      artist_neighborhood: form.artist_neighborhood,
     };
     localStorage.setItem(PENDING_SUBMISSION_KEY, JSON.stringify(payload));
   };
@@ -186,6 +196,7 @@ const LLSUsArtists = () => {
       mp3_path: mp3Path,
       original_filename: mp3File.name,
       how_heard: form.how_heard.trim() || null,
+      artist_neighborhood: form.artist_neighborhood || null,
       artist_user_id: userId,
       payment_status: "free",
       admin_status: "pending",
@@ -293,6 +304,46 @@ const LLSUsArtists = () => {
             <SelectItem value="Atlanta">Atlanta</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-primary-foreground text-base font-sans">What part of Atlanta are you based in? (optional)</Label>
+        <Popover open={neighborhoodOpen} onOpenChange={setNeighborhoodOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={neighborhoodOpen}
+              className="w-full h-14 justify-between text-base font-sans bg-background text-foreground border-primary-foreground/50 hover:bg-background/90"
+            >
+              {form.artist_neighborhood || "Select neighborhood..."}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+            <Command>
+              <CommandInput placeholder="Search neighborhoods..." />
+              <CommandList>
+                <CommandEmpty>No neighborhood found.</CommandEmpty>
+                <CommandGroup>
+                  {ATLANTA_NEIGHBORHOODS.map((hood) => (
+                    <CommandItem
+                      key={hood}
+                      value={hood}
+                      onSelect={() => {
+                        setForm(f => ({ ...f, artist_neighborhood: f.artist_neighborhood === hood ? "" : hood }));
+                        setNeighborhoodOpen(false);
+                      }}
+                    >
+                      <Check className={cn("mr-2 h-4 w-4", form.artist_neighborhood === hood ? "opacity-100" : "opacity-0")} />
+                      {hood}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
