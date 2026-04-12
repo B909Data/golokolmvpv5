@@ -74,12 +74,6 @@ const Index = () => {
             >
               I am an artist
             </Link>
-            <Link
-              to="/connect"
-              className="inline-flex items-center justify-center bg-[#FFD600] text-black font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              I love local music
-            </Link>
           </div>
         </div>
       </section>

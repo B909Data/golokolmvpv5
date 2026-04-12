@@ -75,10 +75,11 @@ const YouTubeEmbed = ({ videoId, startTime }: { videoId: string; startTime?: num
 };
 
 const SECTIONS = [
-  { id: "what-are-after-parties", title: "What Are After Parties?" },
-  { id: "throw-great-after-party", title: "How Do I Throw a Great After Party?" },
-  { id: "set-up-livestream", title: "How Do I Set Up a Livestream?" },
+  { id: "what-is-golokol", title: "What is GoLokol?" },
+  { id: "serve-artists", title: "How do we serve Artists?" },
+  { id: "serve-small-business", title: "How do we serve small business?" },
   { id: "what-are-lls", title: "What Are Lokol Listening Stations?" },
+  { id: "serve-fans", title: "How do we serve Local Music Fans?" },
   { id: "suggestion-box", title: "Suggestion Box" },
 ];
 
@@ -171,112 +172,34 @@ const HowToGoLokol = () => {
 
             {/* Accordion Sections */}
             <div className="border-t border-[#CCCCCC]">
-              {/* Section 1: What Are After Parties? */}
+              {/* Section 1: What is GoLokol? */}
               <AccordionItem
-                id="what-are-after-parties"
-                title="What Are After Parties?"
-                isOpen={openSections.has("what-are-after-parties")}
-                onToggle={() => toggleSection("what-are-after-parties")}
+                id="what-is-golokol"
+                title="What is GoLokol?"
+                isOpen={openSections.has("what-is-golokol")}
+                onToggle={() => toggleSection("what-is-golokol")}
               >
-                <Paragraph>
-                  After Parties are private, event-only group chats that open after a live show and disappear 24 hours later.
-                </Paragraph>
-                <Paragraph>
-                  Only fans who show up in real life can join.<br />
-                  No public feeds. No algorithms. Just real connection.
-                </Paragraph>
-                <Paragraph>
-                  Fans are notified by SMS when the artist enters the room.
-                </Paragraph>
-                <YouTubeEmbed videoId="rAsCj9e7FZo" />
+                <div className="py-4" />
               </AccordionItem>
 
-              {/* Section 2: How Do I Throw a Great After Party? */}
+              {/* Section 2: How do we serve Artists? */}
               <AccordionItem
-                id="throw-great-after-party"
-                title="How Do I Throw a Great After Party?"
-                isOpen={openSections.has("throw-great-after-party")}
-                onToggle={() => toggleSection("throw-great-after-party")}
+                id="serve-artists"
+                title="How do we serve Artists?"
+                isOpen={openSections.has("serve-artists")}
+                onToggle={() => toggleSection("serve-artists")}
               >
-                <Paragraph>
-                  An After Party works best when it's treated as part of the show — not something separate.
-                </Paragraph>
-                <Paragraph>
-                  It's another reason to come out, stay longer, and connect.
-                </Paragraph>
-
-                {/* Subsection: Artist Control Room */}
-                <div className="mt-6 mb-8">
-                  <h3 className="font-display text-lg font-bold text-[#0E0E0E] mb-2">
-                    How to Promote and Manage Your After Party with the Artist Control Room
-                  </h3>
-                  <Paragraph className="text-[#555555]">
-                    This video walks through how to use your Artist Control Room to promote, manage, and host your After Party — all in one place.
-                  </Paragraph>
-                  <YouTubeEmbed videoId="PlNn4tpYHQA" />
-                </div>
-
-                {/* Subsection: How to Promote */}
-                <div className="mb-8">
-                  <h3 className="font-display text-lg font-bold text-[#0E0E0E] mb-2">
-                    How to Promote Your After Party Before and During the Show
-                  </h3>
-                  <YouTubeEmbed videoId="PlNn4tpYHQA" />
-                </div>
-
-                {/* Steps */}
-                <ul className="space-y-3 text-[#0E0E0E] mb-6">
-                  <CheckBullet>Share your After Party link in your bio, Stories, texts, and website.</CheckBullet>
-                  <CheckBullet>Talk about the After Party from the stage — more than once.</CheckBullet>
-                  <CheckBullet>(Optional) Go live with fans after the show.</CheckBullet>
-                  <CheckBullet>Write a pinned message fans see when they first enter.</CheckBullet>
-                  <CheckBullet>Add merch or music links while the energy is still fresh.</CheckBullet>
-                </ul>
-
-                <Paragraph className="mt-6 italic text-[#555555]">
-                  You're an artist. Use your imagination, your voice, your music.<br />
-                  That's what GoLokol is built for.
-                </Paragraph>
+                <div className="py-4" />
               </AccordionItem>
 
-              {/* Section 3: How Do I Set Up a Livestream? */}
+              {/* Section 3: How do we serve small business? */}
               <AccordionItem
-                id="set-up-livestream"
-                title="How Do I Set Up a Livestream?"
-                isOpen={openSections.has("set-up-livestream")}
-                onToggle={() => toggleSection("set-up-livestream")}
+                id="serve-small-business"
+                title="How do we serve small business?"
+                isOpen={openSections.has("serve-small-business")}
+                onToggle={() => toggleSection("serve-small-business")}
               >
-                <Paragraph>
-                  GoLokol currently supports YouTube Live for After Parties.
-                </Paragraph>
-                <Paragraph>
-                  You don't need to be live the whole time — even a few minutes goes a long way.
-                </Paragraph>
-
-                {/* Subsection: Desktop */}
-                <div className="mt-6 mb-8">
-                  <h3 className="font-display text-lg font-bold text-[#0E0E0E] mb-2">
-                    Going Live from Your Desktop
-                  </h3>
-                  <YouTubeEmbed videoId="Rdta45g_hg8" startTime={161} />
-                </div>
-
-                {/* Subsection: Phone */}
-                <div className="mb-8">
-                  <h3 className="font-display text-lg font-bold text-[#0E0E0E] mb-2">
-                    Going Live from Your Phone
-                  </h3>
-                  <YouTubeEmbed videoId="Rdta45g_hg8" startTime={594} />
-                </div>
-
-                {/* Reminders */}
-                <h4 className="font-display text-base font-bold text-[#0E0E0E] mb-3">Reminders</h4>
-                <ul className="space-y-3 text-[#0E0E0E]">
-                  <CheckBullet>Turn off YouTube Live Chat</CheckBullet>
-                  <CheckBullet>Set the stream to Unlisted (not Public or Private)</CheckBullet>
-                  <CheckBullet>Paste the livestream link into your Artist Control Room</CheckBullet>
-                  <CheckBullet>(Optional) Add a thumbnail — this is what fans see before you go live</CheckBullet>
-                </ul>
+                <div className="py-4" />
               </AccordionItem>
 
               {/* Section 4: What Are Lokol Listening Stations? */}
@@ -286,19 +209,17 @@ const HowToGoLokol = () => {
                 isOpen={openSections.has("what-are-lls")}
                 onToggle={() => toggleSection("what-are-lls")}
               >
-                <Paragraph>
-                  Lokol Listening Stations are live, curated listening events that spotlight local music in real spaces.
-                </Paragraph>
-                <Paragraph>Think:</Paragraph>
-                <ul className="space-y-3 text-[#0E0E0E] mb-6">
-                  <CheckBullet>A DJ or host playing local artists alongside familiar records</CheckBullet>
-                  <CheckBullet>A real crowd, in a real room</CheckBullet>
-                  <CheckBullet>Recorded and edited into an ongoing YouTube series</CheckBullet>
-                </ul>
-                <Paragraph>
-                  It's a new way for artists to share music — and for fans to support their local scene.
-                </Paragraph>
-                <YouTubeEmbed videoId="2exJWgcJRlA" />
+                <div className="py-4" />
+              </AccordionItem>
+
+              {/* Section 5: How do we serve Local Music Fans? */}
+              <AccordionItem
+                id="serve-fans"
+                title="How do we serve Local Music Fans?"
+                isOpen={openSections.has("serve-fans")}
+                onToggle={() => toggleSection("serve-fans")}
+              >
+                <div className="py-4" />
               </AccordionItem>
 
               {/* Section 5: Suggestion Box */}
