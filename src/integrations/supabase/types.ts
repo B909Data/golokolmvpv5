@@ -50,27 +50,6 @@ export type Database = {
         }
         Relationships: []
       }
-      cities: {
-        Row: {
-          active: boolean
-          created_at: string
-          id: string
-          name: string
-        }
-        Insert: {
-          active?: boolean
-          created_at?: string
-          id?: string
-          name: string
-        }
-        Update: {
-          active?: boolean
-          created_at?: string
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
       email_optins: {
         Row: {
           created_at: string
@@ -277,7 +256,9 @@ export type Database = {
       lls_artist_submissions: {
         Row: {
           account_freeze_confirmed: boolean
+          admin_status: string | null
           artist_name: string
+          artist_slug: string | null
           artist_user_id: string | null
           city_market: string
           contact_email: string
@@ -291,16 +272,21 @@ export type Database = {
           music_link: string | null
           no_royalties_confirmed: boolean
           original_filename: string | null
+          payment_status: string | null
           physical_product: string
           rights_confirmed: boolean
           short_bio: string | null
           song_image_url: string | null
           song_title: string | null
+          stripe_session_id: string | null
           terms_confirmed: boolean
+          youtube_url: string | null
         }
         Insert: {
           account_freeze_confirmed?: boolean
+          admin_status?: string | null
           artist_name: string
+          artist_slug?: string | null
           artist_user_id?: string | null
           city_market: string
           contact_email: string
@@ -314,16 +300,21 @@ export type Database = {
           music_link?: string | null
           no_royalties_confirmed?: boolean
           original_filename?: string | null
+          payment_status?: string | null
           physical_product: string
           rights_confirmed?: boolean
           short_bio?: string | null
           song_image_url?: string | null
           song_title?: string | null
+          stripe_session_id?: string | null
           terms_confirmed?: boolean
+          youtube_url?: string | null
         }
         Update: {
           account_freeze_confirmed?: boolean
+          admin_status?: string | null
           artist_name?: string
+          artist_slug?: string | null
           artist_user_id?: string | null
           city_market?: string
           contact_email?: string
@@ -337,60 +328,15 @@ export type Database = {
           music_link?: string | null
           no_royalties_confirmed?: boolean
           original_filename?: string | null
+          payment_status?: string | null
           physical_product?: string
           rights_confirmed?: boolean
           short_bio?: string | null
           song_image_url?: string | null
           song_title?: string | null
+          stripe_session_id?: string | null
           terms_confirmed?: boolean
-        }
-        Relationships: []
-      }
-      lls_guest_claims: {
-        Row: {
-          artist_name: string
-          checked_in_at: string | null
-          checked_in_by: string | null
-          checkin_status: string
-          claimed_at: string
-          event_id: string
-          guest_email: string
-          guest_name: string
-          guest_role: string
-          id: string
-          invite_code_id: string | null
-          qr_image_url: string | null
-          qr_token: string
-        }
-        Insert: {
-          artist_name: string
-          checked_in_at?: string | null
-          checked_in_by?: string | null
-          checkin_status?: string
-          claimed_at?: string
-          event_id: string
-          guest_email: string
-          guest_name: string
-          guest_role: string
-          id?: string
-          invite_code_id?: string | null
-          qr_image_url?: string | null
-          qr_token: string
-        }
-        Update: {
-          artist_name?: string
-          checked_in_at?: string | null
-          checked_in_by?: string | null
-          checkin_status?: string
-          claimed_at?: string
-          event_id?: string
-          guest_email?: string
-          guest_name?: string
-          guest_role?: string
-          id?: string
-          invite_code_id?: string | null
-          qr_image_url?: string | null
-          qr_token?: string
+          youtube_url?: string | null
         }
         Relationships: []
       }
@@ -498,48 +444,6 @@ export type Database = {
           signature_name?: string
           submission_id?: string | null
           user_agent?: string | null
-        }
-        Relationships: []
-      }
-      lls_partners: {
-        Row: {
-          city: string
-          contact_email: string
-          contact_name: string
-          created_at: string | null
-          has_local_music_space: string | null
-          id: string
-          notes: string | null
-          store_name: string
-          store_slug: string
-          store_type: string
-          terms_accepted: boolean | null
-        }
-        Insert: {
-          city: string
-          contact_email: string
-          contact_name: string
-          created_at?: string | null
-          has_local_music_space?: string | null
-          id?: string
-          notes?: string | null
-          store_name: string
-          store_slug: string
-          store_type: string
-          terms_accepted?: boolean | null
-        }
-        Update: {
-          city?: string
-          contact_email?: string
-          contact_name?: string
-          created_at?: string | null
-          has_local_music_space?: string | null
-          id?: string
-          notes?: string | null
-          store_name?: string
-          store_slug?: string
-          store_type?: string
-          terms_accepted?: boolean | null
         }
         Relationships: []
       }
