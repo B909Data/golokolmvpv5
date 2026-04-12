@@ -244,16 +244,15 @@ const LLSUsArtists = () => {
     }
 
     const ts = Date.now();
-    const mp3Path = `submissions/${userId}/${ts}-${mp3File.name}`;
-    const { error: mp3Err } = await supabase.storage.from("submissions_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
+    const mp3Path = `${userId}/${ts}-${mp3File.name}`;
+    const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
     if (mp3Err) throw mp3Err;
-    const { data: mp3Url } = supabase.storage.from("submissions_audio").getPublicUrl(mp3Path);
+    const { data: mp3Url } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
 
-    const imgExt = imageFile.name.split(".").pop() || "jpg";
-    const imgPath = `lls-artist-images/${userId}/${ts}-${imageFile.name}`;
-    const { error: imgErr } = await supabase.storage.from("submissions_audio").upload(imgPath, imageFile, { contentType: imageFile.type });
+    const imgPath = `${userId}/${ts}-${imageFile.name}`;
+    const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, imageFile, { contentType: imageFile.type });
     if (imgErr) throw imgErr;
-    const { data: imgUrl } = supabase.storage.from("submissions_audio").getPublicUrl(imgPath);
+    const { data: imgUrl } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
 
     const { error } = await (supabase as any).from("lls_artist_submissions").insert({
       artist_name: form.artist_name.trim(),
