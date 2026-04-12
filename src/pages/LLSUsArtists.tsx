@@ -233,8 +233,8 @@ const LLSUsArtists = () => {
     // Check monthly submission limit
     const now = new Date();
     const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const { count, error: countErr } = await supabase
-      .from("submissions")
+    const { count, error: countErr } = await (supabase as any)
+      .from("lls_artist_submissions")
       .select("id", { count: "exact", head: true })
       .eq("artist_user_id", userId)
       .gte("created_at", firstOfMonth);
