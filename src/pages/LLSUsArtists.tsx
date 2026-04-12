@@ -255,7 +255,7 @@ const LLSUsArtists = () => {
     if (imgErr) throw imgErr;
     const { data: imgUrl } = supabase.storage.from("submissions_audio").getPublicUrl(imgPath);
 
-    const { error } = await supabase.from("submissions").insert({
+    const { error } = await (supabase as any).from("lls_artist_submissions").insert({
       artist_name: form.artist_name.trim(),
       contact_email: contactEmail,
       instagram_handle: form.instagram_handle.trim() || null,
@@ -350,7 +350,20 @@ const LLSUsArtists = () => {
       });
       if (error) {
         if (error.message.toLowerCase().includes("already registered")) {
-          setSignupExistsError(true);
+          // Try signing in instead
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: authEmail.trim(),
+            password: authPassword,
+          });
+          if (signInError) {
+            toast({ title: "Wrong password. Please try again.", variant: "destructive" });
+            return;
+          }
+          if (signInData.user) {
+            await saveSubmission(authEmail.trim(), signInData.user.id);
+            localStorage.removeItem(PENDING_SUBMISSION_KEY);
+            navigate("/artist/dashboard");
+          }
           return;
         }
         toast({ title: error.message, variant: "destructive" });
@@ -358,11 +371,25 @@ const LLSUsArtists = () => {
       }
       // Supabase returns a user with no identities if already registered (fake signup)
       if (data.user && data.user.identities && data.user.identities.length === 0) {
-        setSignupExistsError(true);
+        // Try signing in instead
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: authEmail.trim(),
+          password: authPassword,
+        });
+        if (signInError) {
+          toast({ title: "Wrong password. Please try again.", variant: "destructive" });
+          return;
+        }
+        if (signInData.user) {
+          await saveSubmission(authEmail.trim(), signInData.user.id);
+          localStorage.removeItem(PENDING_SUBMISSION_KEY);
+          navigate("/artist/dashboard");
+        }
         return;
       }
       if (data.user) {
         await saveSubmission(authEmail.trim(), data.user.id);
+        localStorage.removeItem(PENDING_SUBMISSION_KEY);
         navigate("/artist/dashboard");
       }
     } catch (err: any) {
