@@ -75,7 +75,7 @@ const ArtistSignup = () => {
           </h1>
           <p className="text-foreground/70 text-sm font-sans">
             {mode === "signup"
-              ? "Create your artist account to submit your music to Lokol Listening Stations."
+              ? "Create your artist account to submit your music, promote local shows and build your lokol fanbase."
               : "Sign in to your artist account."}
           </p>
         </div>

@@ -54,7 +54,6 @@ const ArtistSubmit = () => {
     song_title: "",
     physical_product: "",
     short_bio: "",
-    how_heard: "",
   });
 
   const [mp3File, setMp3File] = useState<File | null>(null);
@@ -172,8 +171,7 @@ const ArtistSubmit = () => {
         mp3_url: mp3Url.publicUrl,
         mp3_path: mp3Path,
         original_filename: mp3File.name,
-        how_heard: form.how_heard.trim() || null,
-        artist_user_id: user.id,
+      artist_user_id: user.id,
         payment_status: "free",
         admin_status: "pending",
       });
@@ -298,7 +296,7 @@ const ArtistSubmit = () => {
       </div>
 
       <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Short Bio * <span className="text-primary-foreground/60">({form.short_bio.length}/{MAX_BIO})</span></Label>
+        <Label className="text-primary-foreground text-base font-sans">Short Bio - New fans see this. * <span className="text-primary-foreground/60">({form.short_bio.length}/{MAX_BIO})</span></Label>
         <textarea
           value={form.short_bio}
           onChange={e => { if (e.target.value.length <= MAX_BIO) setForm(f => ({ ...f, short_bio: e.target.value })); }}
@@ -308,10 +306,6 @@ const ArtistSubmit = () => {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">How did you hear about GoLokol?</Label>
-        <Input value={form.how_heard} onChange={e => setForm(f => ({ ...f, how_heard: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground" maxLength={500} />
-      </div>
     </div>
   );
 
