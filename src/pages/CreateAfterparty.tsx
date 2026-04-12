@@ -177,7 +177,7 @@ const CreateAfterparty = () => {
       try {
         const [partnersRes, citiesRes] = await Promise.all([
           (supabase as any).from("partners").select("*").eq("active", true).order("name"),
-          supabase.from("cities").select("*").eq("active", true).order("name"),
+          (supabase as any).from("cities").select("*").eq("active", true).order("name"),
         ]);
         
         if (partnersRes.error) throw partnersRes.error;
