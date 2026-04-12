@@ -11,8 +11,6 @@ import golokolLogo from "@/assets/golokol-logo.svg";
 const ArtistSignup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState("");
-  const [artistName, setArtistName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -20,11 +18,6 @@ const ArtistSignup = () => {
   const [mode, setMode] = useState<"signup" | "signin">("signup");
 
   const handleGoogleSignIn = async () => {
-    if (mode === "signup") {
-      if (!firstName.trim()) { toast({ title: "First name is required.", variant: "destructive" }); return; }
-      if (!artistName.trim()) { toast({ title: "Artist name is required.", variant: "destructive" }); return; }
-      localStorage.setItem("pending_profile", JSON.stringify({ first_name: firstName.trim(), artist_name: artistName.trim() }));
-    }
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin + "/artist/dashboard" },
@@ -33,10 +26,6 @@ const ArtistSignup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mode === "signup") {
-      if (!firstName.trim()) { toast({ title: "First name is required.", variant: "destructive" }); return; }
-      if (!artistName.trim()) { toast({ title: "Artist name is required.", variant: "destructive" }); return; }
-    }
     if (!email.trim()) { toast({ title: "Email is required.", variant: "destructive" }); return; }
     if (password.length < 8) { toast({ title: "Password must be at least 8 characters.", variant: "destructive" }); return; }
 
@@ -54,7 +43,6 @@ const ArtistSignup = () => {
         password,
         options: {
           emailRedirectTo: window.location.origin + "/artist/dashboard",
-          data: { first_name: firstName.trim(), artist_name: artistName.trim() },
         },
       });
 
@@ -62,7 +50,6 @@ const ArtistSignup = () => {
         if (error.message.toLowerCase().includes("already registered")) {
           const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
           if (signInError) { toast({ title: "Wrong password. Try again.", variant: "destructive" }); return; }
-          await supabase.auth.updateUser({ data: { first_name: firstName.trim(), artist_name: artistName.trim() } });
           navigate("/artist/dashboard");
           return;
         }
@@ -72,7 +59,6 @@ const ArtistSignup = () => {
       if (data.user && data.user.identities && data.user.identities.length === 0) {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (signInError) { toast({ title: "Wrong password. Try again.", variant: "destructive" }); return; }
-        await supabase.auth.updateUser({ data: { first_name: firstName.trim(), artist_name: artistName.trim() } });
       }
 
       navigate("/artist/dashboard");
@@ -117,36 +103,6 @@ const ArtistSignup = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === "signup" && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="signup-firstname" className="text-white text-sm font-sans">First Name *</Label>
-                <Input
-                  id="signup-firstname"
-                  type="text"
-                  value={firstName}
-                  onChange={e => setFirstName(e.target.value)}
-                  className="h-14 text-base font-sans bg-[#1a1a1a] text-white border-white/20 focus:border-primary focus:ring-primary placeholder:text-white/40"
-                  placeholder="Your first name"
-                  maxLength={100}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="signup-artistname" className="text-white text-sm font-sans">Artist Name *</Label>
-                <Input
-                  id="signup-artistname"
-                  type="text"
-                  value={artistName}
-                  onChange={e => setArtistName(e.target.value)}
-                  className="h-14 text-base font-sans bg-[#1a1a1a] text-white border-white/20 focus:border-primary focus:ring-primary placeholder:text-white/40"
-                  placeholder="Your artist or band name"
-                  maxLength={200}
-                />
-              </div>
-            </>
-          )}
-
           <div className="space-y-2">
             <Label htmlFor="signup-email" className="text-white text-sm font-sans">Email</Label>
             <Input
@@ -185,7 +141,7 @@ const ArtistSignup = () => {
 
           <Button
             type="submit"
-            disabled={submitting || !email.trim() || password.length < 8 || (mode === "signup" && (!firstName.trim() || !artistName.trim()))}
+            disabled={submitting || !email.trim() || password.length < 8}
             className="w-full h-14 text-base font-display font-bold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {submitting
