@@ -691,6 +691,7 @@ const LLSUsArtists = () => {
           </div>
         )}
       </div>
+    </div>
   );
 
   const renderNavButtons = () => (
