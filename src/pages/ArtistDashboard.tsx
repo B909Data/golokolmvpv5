@@ -40,7 +40,7 @@ const ArtistDashboard = () => {
 
       // Read user metadata for first_name
       const meta = session.user.user_metadata;
-      if (!firstName && meta?.first_name) setFirstName(meta.first_name);
+      if (meta?.first_name) setFirstName(meta.first_name);
 
       const { data } = await (supabase as any)
         .from("lls_artist_submissions")
