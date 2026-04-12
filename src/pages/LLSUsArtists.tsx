@@ -233,8 +233,8 @@ const LLSUsArtists = () => {
     // Check monthly submission limit
     const now = new Date();
     const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const { count, error: countErr } = await supabase
-      .from("submissions")
+    const { count, error: countErr } = await (supabase as any)
+      .from("lls_artist_submissions")
       .select("id", { count: "exact", head: true })
       .eq("artist_user_id", userId)
       .gte("created_at", firstOfMonth);
@@ -244,18 +244,17 @@ const LLSUsArtists = () => {
     }
 
     const ts = Date.now();
-    const mp3Path = `submissions/${userId}/${ts}-${mp3File.name}`;
-    const { error: mp3Err } = await supabase.storage.from("submissions_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
+    const mp3Path = `${userId}/${ts}-${mp3File.name}`;
+    const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
     if (mp3Err) throw mp3Err;
-    const { data: mp3Url } = supabase.storage.from("submissions_audio").getPublicUrl(mp3Path);
+    const { data: mp3Url } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
 
-    const imgExt = imageFile.name.split(".").pop() || "jpg";
-    const imgPath = `lls-artist-images/${userId}/${ts}-${imageFile.name}`;
-    const { error: imgErr } = await supabase.storage.from("submissions_audio").upload(imgPath, imageFile, { contentType: imageFile.type });
+    const imgPath = `${userId}/${ts}-${imageFile.name}`;
+    const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, imageFile, { contentType: imageFile.type });
     if (imgErr) throw imgErr;
-    const { data: imgUrl } = supabase.storage.from("submissions_audio").getPublicUrl(imgPath);
+    const { data: imgUrl } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
 
-    const { error } = await supabase.from("submissions").insert({
+    const { error } = await (supabase as any).from("lls_artist_submissions").insert({
       artist_name: form.artist_name.trim(),
       contact_email: contactEmail,
       instagram_handle: form.instagram_handle.trim() || null,
@@ -350,7 +349,20 @@ const LLSUsArtists = () => {
       });
       if (error) {
         if (error.message.toLowerCase().includes("already registered")) {
-          setSignupExistsError(true);
+          // Try signing in instead
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: authEmail.trim(),
+            password: authPassword,
+          });
+          if (signInError) {
+            toast({ title: "Wrong password. Please try again.", variant: "destructive" });
+            return;
+          }
+          if (signInData.user) {
+            await saveSubmission(authEmail.trim(), signInData.user.id);
+            localStorage.removeItem(PENDING_SUBMISSION_KEY);
+            navigate("/artist/dashboard");
+          }
           return;
         }
         toast({ title: error.message, variant: "destructive" });
@@ -358,11 +370,25 @@ const LLSUsArtists = () => {
       }
       // Supabase returns a user with no identities if already registered (fake signup)
       if (data.user && data.user.identities && data.user.identities.length === 0) {
-        setSignupExistsError(true);
+        // Try signing in instead
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: authEmail.trim(),
+          password: authPassword,
+        });
+        if (signInError) {
+          toast({ title: "Wrong password. Please try again.", variant: "destructive" });
+          return;
+        }
+        if (signInData.user) {
+          await saveSubmission(authEmail.trim(), signInData.user.id);
+          localStorage.removeItem(PENDING_SUBMISSION_KEY);
+          navigate("/artist/dashboard");
+        }
         return;
       }
       if (data.user) {
         await saveSubmission(authEmail.trim(), data.user.id);
+        localStorage.removeItem(PENDING_SUBMISSION_KEY);
         navigate("/artist/dashboard");
       }
     } catch (err: any) {
