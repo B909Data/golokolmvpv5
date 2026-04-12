@@ -34,6 +34,8 @@ import ArtistEvent from "./pages/ArtistEvent";
 import ArtistLogin from "./pages/ArtistLogin";
 import ArtistAfterParties from "./pages/ArtistAfterParties";
 import ArtistDashboard from "./pages/ArtistDashboard";
+import ArtistSignup from "./pages/ArtistSignup";
+import ArtistSubmit from "./pages/ArtistSubmit";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
