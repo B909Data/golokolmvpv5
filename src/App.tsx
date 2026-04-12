@@ -34,6 +34,8 @@ import ArtistEvent from "./pages/ArtistEvent";
 import ArtistLogin from "./pages/ArtistLogin";
 import ArtistAfterParties from "./pages/ArtistAfterParties";
 import ArtistDashboard from "./pages/ArtistDashboard";
+import ArtistSignup from "./pages/ArtistSignup";
+import ArtistSubmit from "./pages/ArtistSubmit";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
@@ -115,9 +117,11 @@ const App = () => (
           <Route path="/admin/signatures" element={<AdminSignatures />} />
           
           {/* Artist Auth Routes */}
+          <Route path="/artist/signup" element={<ArtistSignup />} />
           <Route path="/artist/login" element={<ArtistLogin />} />
           <Route path="/artist/after-parties" element={<ArtistAfterParties />} />
           <Route path="/artist/dashboard" element={<ArtistDashboard />} />
+          <Route path="/artist/submit" element={<ArtistSubmit />} />
           <Route path="/artist/event/:eventId" element={<ArtistEvent />} />
           
           {/* Song Detail */}
