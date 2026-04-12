@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Upload, X, Search, ChevronLeft, ChevronRight, Loader2, Eye, EyeOff } from "lucide-react";
+
+const PENDING_SUBMISSION_KEY = "pending_artist_submission";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -281,9 +283,26 @@ const LLSUsArtists = () => {
     });
   };
 
+  const saveFormToLocalStorage = () => {
+    const payload = {
+      artist_name: form.artist_name,
+      instagram_handle: form.instagram_handle,
+      genre_style: form.genre_style,
+      city_market: form.city_market,
+      physical_product: form.physical_product,
+      song_title: form.song_title,
+      short_bio: form.short_bio,
+      how_heard: form.how_heard,
+    };
+    localStorage.setItem(PENDING_SUBMISSION_KEY, JSON.stringify(payload));
+  };
+
   const handleGoogleSignIn = async () => {
     setAuthLoading(true);
     try {
+      // Save form data before redirect
+      saveFormToLocalStorage();
+
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin + "/artist/dashboard",
       });
@@ -298,6 +317,7 @@ const LLSUsArtists = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await saveSubmission(user.email || "", user.id);
+        localStorage.removeItem(PENDING_SUBMISSION_KEY);
         navigate("/artist/dashboard");
       }
     } catch (err: any) {
@@ -311,12 +331,15 @@ const LLSUsArtists = () => {
     }
   };
 
+  const [signupExistsError, setSignupExistsError] = useState(false);
+
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!authEmail.trim()) { toast({ title: "Email is required.", variant: "destructive" }); return; }
     if (authPassword.length < 8) { toast({ title: "Password must be at least 8 characters.", variant: "destructive" }); return; }
 
     setAuthLoading(true);
+    setSignupExistsError(false);
     try {
       const { data, error } = await supabase.auth.signUp({
         email: authEmail.trim(),
@@ -326,7 +349,16 @@ const LLSUsArtists = () => {
         },
       });
       if (error) {
+        if (error.message.toLowerCase().includes("already registered")) {
+          setSignupExistsError(true);
+          return;
+        }
         toast({ title: error.message, variant: "destructive" });
+        return;
+      }
+      // Supabase returns a user with no identities if already registered (fake signup)
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        setSignupExistsError(true);
         return;
       }
       if (data.user) {
@@ -647,6 +679,17 @@ const LLSUsArtists = () => {
             "Create Account & Submit"
           )}
         </Button>
+
+        {signupExistsError && (
+          <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
+            <p className="text-destructive text-sm font-sans font-medium">
+              An account with this email already exists. Please{" "}
+              <Link to="/artist/dashboard" className="underline font-bold hover:text-destructive/80">
+                sign in instead
+              </Link>.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
