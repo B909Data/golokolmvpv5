@@ -18,6 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import golokolLogo from "@/assets/golokol-logo.svg";
 
 const PENDING_SUBMISSION_KEY = "pending_artist_submission";
@@ -548,6 +549,7 @@ const LLSUsArtists = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <Navbar />
       {/* Hero */}
       <section className="px-6 md:px-12 lg:px-20 pt-24 md:pt-28 pb-12 md:pb-20">
         <div className="max-w-3xl">
