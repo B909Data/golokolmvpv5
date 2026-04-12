@@ -117,9 +117,11 @@ const App = () => (
           <Route path="/admin/signatures" element={<AdminSignatures />} />
           
           {/* Artist Auth Routes */}
+          <Route path="/artist/signup" element={<ArtistSignup />} />
           <Route path="/artist/login" element={<ArtistLogin />} />
           <Route path="/artist/after-parties" element={<ArtistAfterParties />} />
           <Route path="/artist/dashboard" element={<ArtistDashboard />} />
+          <Route path="/artist/submit" element={<ArtistSubmit />} />
           <Route path="/artist/event/:eventId" element={<ArtistEvent />} />
           
           {/* Song Detail */}
