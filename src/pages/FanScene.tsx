@@ -6,6 +6,7 @@ import golokolLogo from "@/assets/golokol-logo.svg";
 import fanmenuArtists from "@/assets/fanmenu-artists.svg";
 import fanmenuShows from "@/assets/fanmenu-shows.svg";
 import fanmenuMarket from "@/assets/fanmenu-market.svg";
+import fanmenuHome from "@/assets/fanmenu-home.svg";
 import CratesATL from "@/assets/CratesATL.svg";
 import DBSlogo from "@/assets/DBSlogo.svg";
 import MoodsMusic from "@/assets/MoodsMusic.svg";
@@ -138,6 +139,7 @@ const FanScene = () => {
   }
 
   const tabs: { key: View; icon: string; label: string }[] = [
+    { key: "home", icon: fanmenuHome, label: "Home" },
     { key: "artists", icon: fanmenuArtists, label: "Artists" },
     { key: "shows", icon: fanmenuShows, label: "Shows" },
     { key: "market", icon: fanmenuMarket, label: "Market" },
