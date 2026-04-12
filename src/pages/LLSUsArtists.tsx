@@ -255,8 +255,6 @@ const LLSUsArtists = () => {
     }
   };
 
-  /* ── Render helpers ── */
-
   const renderStep1 = () => (
     <div className="space-y-5">
       <div className="text-center mb-6">
@@ -575,43 +573,30 @@ const LLSUsArtists = () => {
               </li>
             ))}
           </ol>
-          <a
-            href="#wizard"
+          <Link
+            to="/artist/signup"
             className="inline-flex items-center justify-center bg-primary text-background font-display font-bold text-base rounded-2xl h-14 px-8 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
           >
-            Submit a Song
-          </a>
+            Sign Up and Submit Music
+          </Link>
         </div>
       </section>
 
-      {/* Wizard */}
-      <section id="wizard" className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24 scroll-mt-20">
-        <div className="max-w-md mx-auto">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <img src={golokolLogo} alt="GoLokol" className="h-12 w-12" />
-            </div>
-            <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
-              Submit Your Music to <span className="text-primary">GoLokol Connect</span>
-            </h1>
-            <p className="italic text-foreground-secondary text-sm font-sans mt-3 max-w-sm mx-auto">
-              GoLokol does not select songs that are grossly violent towards women, glorifies the drug trade or senseless criminality within our Atlanta communities. We call it the Tiana Robinson rule.
-            </p>
-          </div>
-
-          <p className="text-center text-base font-sans text-muted-foreground mb-6">
-            Step {step} of {TOTAL_STEPS}
+      {/* CTA Section - Replaces the wizard form */}
+      <section className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24">
+        <div className="max-w-md mx-auto text-center">
+          <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
+            Ready to get your music heard?
+          </h2>
+          <p className="text-foreground-secondary text-base font-sans mb-8">
+            Submit your music to Lokol Listening Stations in Atlanta record stores. Free to submit. No algorithm.
           </p>
-
-          <div className="bg-primary rounded-2xl p-6 md:p-8">
-            <form onSubmit={e => e.preventDefault()}>
-              {step === 1 && renderStep1()}
-              {step === 2 && renderStep2()}
-              {step === 3 && renderStep3()}
-              {step === 4 && renderStep4()}
-              {renderNavButtons()}
-            </form>
-          </div>
+          <Link
+            to="/artist/signup"
+            className="inline-flex items-center justify-center bg-primary text-background font-display font-bold text-base rounded-2xl h-14 px-8 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            Sign Up and Submit Music
+          </Link>
         </div>
       </section>
 
