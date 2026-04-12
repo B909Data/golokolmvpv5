@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Music, RefreshCw, ExternalLink } from "lucide-react";
+import { Music, RefreshCw, ExternalLink, CheckCircle, XCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -33,9 +34,16 @@ interface Submission {
   music_release_agreed: boolean;
   music_release_agreed_at: string | null;
   submission_type?: string;
+  admin_status?: string | null;
+  rejection_reason?: string | null;
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
+
+const REJECTION_REASONS = [
+  "Violates our community standards",
+  "Poor mix/master quality",
+];
 
 const AdminLLS = () => {
   const [searchParams] = useSearchParams();
@@ -45,13 +53,14 @@ const AdminLLS = () => {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
 
   const fetchSubmissions = async () => {
     if (!key) return;
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke(`admin-list-submissions?key=${key}`);
-
       if (error) throw error;
       setSubmissions(data?.submissions || []);
     } catch (err) {
@@ -63,28 +72,21 @@ const AdminLLS = () => {
   };
 
   useEffect(() => {
-    if (key) {
-      fetchSubmissions();
-    }
+    if (key) fetchSubmissions();
   }, [key]);
 
   const selectedSubmission = submissions.find((s) => s.id === selectedId);
 
   const handleStatusChange = async (status: string) => {
     if (!selectedId || !key) return;
-
     setSaving(true);
     try {
       const submission = submissions.find(s => s.id === selectedId);
       const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
         body: { id: selectedId, status, submission_type: submission?.submission_type || "general" },
       });
-
       if (error) throw error;
-
-      setSubmissions((prev) =>
-        prev.map((s) => (s.id === selectedId ? { ...s, status } : s))
-      );
+      setSubmissions((prev) => prev.map((s) => (s.id === selectedId ? { ...s, status } : s)));
       toast.success("Status updated");
     } catch (err) {
       console.error("Update error:", err);
@@ -96,19 +98,14 @@ const AdminLLS = () => {
 
   const handleNotesChange = async (admin_notes: string) => {
     if (!selectedId || !key) return;
-
     setSaving(true);
     try {
       const submission = submissions.find(s => s.id === selectedId);
       const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
         body: { id: selectedId, admin_notes, submission_type: submission?.submission_type || "general" },
       });
-
       if (error) throw error;
-
-      setSubmissions((prev) =>
-        prev.map((s) => (s.id === selectedId ? { ...s, admin_notes } : s))
-      );
+      setSubmissions((prev) => prev.map((s) => (s.id === selectedId ? { ...s, admin_notes } : s)));
       toast.success("Notes saved");
     } catch (err) {
       console.error("Update error:", err);
@@ -116,6 +113,52 @@ const AdminLLS = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleApprove = async (id: string) => {
+    if (!key) return;
+    setSaving(true);
+    try {
+      const { error } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .update({ admin_status: "approved" })
+        .eq("id", id);
+      if (error) throw error;
+      setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, admin_status: "approved" } : s)));
+      toast.success("Submission approved");
+    } catch (err: any) {
+      console.error("Approve error:", err);
+      toast.error(err?.message || "Failed to approve");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    if (!key || selectedReasons.length === 0) return;
+    setSaving(true);
+    try {
+      const { error } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .update({ admin_status: "rejected", rejection_reason: selectedReasons.join(", ") })
+        .eq("id", id);
+      if (error) throw error;
+      setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, admin_status: "rejected", rejection_reason: selectedReasons.join(", ") } : s)));
+      setRejectingId(null);
+      setSelectedReasons([]);
+      toast.success("Submission rejected");
+    } catch (err: any) {
+      console.error("Reject error:", err);
+      toast.error(err?.message || "Failed to reject");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleReason = (reason: string) => {
+    setSelectedReasons(prev =>
+      prev.includes(reason) ? prev.filter(r => r !== reason) : [...prev, reason]
+    );
   };
 
   if (!key) {
@@ -177,6 +220,7 @@ const AdminLLS = () => {
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">Type</th>
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">MP3</th>
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">Status</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-medium">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -208,7 +252,11 @@ const AdminLLS = () => {
                           <td className="px-4 py-3">
                             <span
                               className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                                sub.status === "Selected"
+                                sub.admin_status === "approved"
+                                  ? "bg-green-500/20 text-green-500"
+                                  : sub.admin_status === "rejected"
+                                  ? "bg-red-500/20 text-red-500"
+                                  : sub.status === "Selected"
                                   ? "bg-primary/20 text-primary"
                                   : sub.status === "Shortlisted"
                                   ? "bg-yellow-500/20 text-yellow-500"
@@ -217,13 +265,72 @@ const AdminLLS = () => {
                                   : "bg-muted text-muted-foreground"
                               }`}
                             >
-                              {sub.status}
+                              {sub.admin_status === "approved" ? "Approved" : sub.admin_status === "rejected" ? "Rejected" : sub.status}
                             </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                              {sub.admin_status !== "approved" && (
+                                <button
+                                  onClick={() => handleApprove(sub.id)}
+                                  disabled={saving}
+                                  className="p-1 rounded hover:bg-green-500/20 text-green-500 transition-colors"
+                                  title="Approve"
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                </button>
+                              )}
+                              {sub.admin_status !== "rejected" && (
+                                <button
+                                  onClick={() => { setRejectingId(sub.id); setSelectedReasons([]); }}
+                                  disabled={saving}
+                                  className="p-1 rounded hover:bg-red-500/20 text-red-500 transition-colors"
+                                  title="Reject"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {/* Inline reject form */}
+              {rejectingId && (
+                <div className="border border-red-500/30 rounded-lg p-4 bg-red-500/5 space-y-3">
+                  <p className="text-foreground text-sm font-medium">
+                    Reject: {submissions.find(s => s.id === rejectingId)?.song_title}
+                  </p>
+                  {REJECTION_REASONS.map(reason => (
+                    <label key={reason} className="flex items-center gap-2 cursor-pointer">
+                      <Checkbox
+                        checked={selectedReasons.includes(reason)}
+                        onCheckedChange={() => toggleReason(reason)}
+                      />
+                      <span className="text-foreground text-sm">{reason}</span>
+                    </label>
+                  ))}
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={saving || selectedReasons.length === 0}
+                      onClick={() => handleReject(rejectingId)}
+                    >
+                      Confirm Reject
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => { setRejectingId(null); setSelectedReasons([]); }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
@@ -263,36 +370,22 @@ const AdminLLS = () => {
 
                   <div className="flex flex-col gap-2">
                     {selectedSubmission.mp3_url && (
-                      <a
-                        href={selectedSubmission.mp3_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                      >
+                      <a href={selectedSubmission.mp3_url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
                         <ExternalLink className="w-4 h-4" />
                         🎵 {selectedSubmission.original_filename || "MP3 Download"}
                       </a>
                     )}
                     {selectedSubmission.spotify_url && selectedSubmission.spotify_url !== "curated-submission" && (
-                      <a
-                        href={selectedSubmission.spotify_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        Spotify
+                      <a href={selectedSubmission.spotify_url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
+                        <ExternalLink className="w-4 h-4" />Spotify
                       </a>
                     )}
                     {selectedSubmission.youtube_url && (
-                      <a
-                        href={selectedSubmission.youtube_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        YouTube
+                      <a href={selectedSubmission.youtube_url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
+                        <ExternalLink className="w-4 h-4" />YouTube
                       </a>
                     )}
                   </div>
@@ -306,19 +399,13 @@ const AdminLLS = () => {
 
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground">Status</p>
-                    <Select
-                      value={selectedSubmission.status}
-                      onValueChange={handleStatusChange}
-                      disabled={saving}
-                    >
+                    <Select value={selectedSubmission.status} onValueChange={handleStatusChange} disabled={saving}>
                       <SelectTrigger className="bg-card/50 border-border/50">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {STATUS_OPTIONS.map((opt) => (
-                          <SelectItem key={opt} value={opt}>
-                            {opt}
-                          </SelectItem>
+                          <SelectItem key={opt} value={opt}>{opt}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -331,9 +418,7 @@ const AdminLLS = () => {
                       onChange={(e) => {
                         const newNotes = e.target.value;
                         setSubmissions((prev) =>
-                          prev.map((s) =>
-                            s.id === selectedId ? { ...s, admin_notes: newNotes } : s
-                          )
+                          prev.map((s) => s.id === selectedId ? { ...s, admin_notes: newNotes } : s)
                         );
                       }}
                       onBlur={(e) => handleNotesChange(e.target.value)}
