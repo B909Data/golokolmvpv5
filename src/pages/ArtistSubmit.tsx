@@ -234,8 +234,8 @@ const ArtistSubmit = () => {
           <SelectTrigger className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50">
             <SelectValue placeholder="Select city" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Atlanta">Atlanta</SelectItem>
+          <SelectContent className="bg-white text-black">
+            <SelectItem value="Atlanta" className="text-black">Atlanta</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -250,14 +250,14 @@ const ArtistSubmit = () => {
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+          <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-white text-black" align="start">
             <Command>
-              <CommandInput placeholder="Search neighborhoods..." />
+              <CommandInput placeholder="Search neighborhoods..." className="bg-white text-black placeholder:text-gray-500" />
               <CommandList>
-                <CommandEmpty>No neighborhood found.</CommandEmpty>
+                <CommandEmpty className="text-black">No neighborhood found.</CommandEmpty>
                 <CommandGroup>
                   {ATLANTA_NEIGHBORHOODS.map(hood => (
-                    <CommandItem key={hood} value={hood} onSelect={() => { setForm(f => ({ ...f, artist_neighborhood: f.artist_neighborhood === hood ? "" : hood })); setNeighborhoodOpen(false); }}>
+                    <CommandItem key={hood} value={hood} onSelect={() => { setForm(f => ({ ...f, artist_neighborhood: f.artist_neighborhood === hood ? "" : hood })); setNeighborhoodOpen(false); }} className="text-black hover:bg-gray-100 cursor-pointer">
                       <Check className={cn("mr-2 h-4 w-4", form.artist_neighborhood === hood ? "opacity-100" : "opacity-0")} />
                       {hood}
                     </CommandItem>

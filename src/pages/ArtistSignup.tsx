@@ -11,6 +11,8 @@ import golokolLogo from "@/assets/golokol-logo.svg";
 const ArtistSignup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [firstName, setFirstName] = useState("");
+  const [artistName, setArtistName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +20,11 @@ const ArtistSignup = () => {
   const [mode, setMode] = useState<"signup" | "signin">("signup");
 
   const handleGoogleSignIn = async () => {
+    if (mode === "signup") {
+      if (!firstName.trim()) { toast({ title: "First name is required.", variant: "destructive" }); return; }
+      if (!artistName.trim()) { toast({ title: "Artist name is required.", variant: "destructive" }); return; }
+      localStorage.setItem("pending_profile", JSON.stringify({ first_name: firstName.trim(), artist_name: artistName.trim() }));
+    }
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin + "/artist/dashboard" },
@@ -26,6 +33,10 @@ const ArtistSignup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (mode === "signup") {
+      if (!firstName.trim()) { toast({ title: "First name is required.", variant: "destructive" }); return; }
+      if (!artistName.trim()) { toast({ title: "Artist name is required.", variant: "destructive" }); return; }
+    }
     if (!email.trim()) { toast({ title: "Email is required.", variant: "destructive" }); return; }
     if (password.length < 8) { toast({ title: "Password must be at least 8 characters.", variant: "destructive" }); return; }
 
@@ -41,13 +52,17 @@ const ArtistSignup = () => {
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
-        options: { emailRedirectTo: window.location.origin + "/artist/dashboard" },
+        options: {
+          emailRedirectTo: window.location.origin + "/artist/dashboard",
+          data: { first_name: firstName.trim(), artist_name: artistName.trim() },
+        },
       });
 
       if (error) {
         if (error.message.toLowerCase().includes("already registered")) {
           const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
           if (signInError) { toast({ title: "Wrong password. Try again.", variant: "destructive" }); return; }
+          await supabase.auth.updateUser({ data: { first_name: firstName.trim(), artist_name: artistName.trim() } });
           navigate("/artist/dashboard");
           return;
         }
@@ -57,6 +72,7 @@ const ArtistSignup = () => {
       if (data.user && data.user.identities && data.user.identities.length === 0) {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (signInError) { toast({ title: "Wrong password. Try again.", variant: "destructive" }); return; }
+        await supabase.auth.updateUser({ data: { first_name: firstName.trim(), artist_name: artistName.trim() } });
       }
 
       navigate("/artist/dashboard");
@@ -66,14 +82,14 @@ const ArtistSignup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
           <img src={golokolLogo} alt="GoLokol" className="h-12 w-12 mx-auto mb-6" />
-          <h1 className="font-display text-4xl text-foreground mb-3">
+          <h1 className="font-display text-4xl text-white mb-3">
             {mode === "signup" ? "Join GoLokol" : "Welcome Back"}
           </h1>
-          <p className="text-foreground/70 text-sm font-sans">
+          <p className="text-white/70 text-sm font-sans">
             {mode === "signup"
               ? "Create your artist account to submit your music, promote local shows and build your lokol fanbase."
               : "Sign in to your artist account."}
@@ -83,7 +99,7 @@ const ArtistSignup = () => {
         <Button
           type="button"
           onClick={handleGoogleSignIn}
-          className="w-full h-14 text-base font-display font-bold bg-foreground text-background hover:bg-foreground/90"
+          className="w-full h-14 text-base font-display font-bold bg-white text-black hover:bg-white/90"
         >
           <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -95,34 +111,64 @@ const ArtistSignup = () => {
         </Button>
 
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-foreground/20" />
-          <span className="text-foreground/50 text-sm font-sans">or</span>
-          <div className="flex-1 h-px bg-foreground/20" />
+          <div className="flex-1 h-px bg-white/20" />
+          <span className="text-white/50 text-sm font-sans">or</span>
+          <div className="flex-1 h-px bg-white/20" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {mode === "signup" && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="signup-firstname" className="text-white text-sm font-sans">First Name *</Label>
+                <Input
+                  id="signup-firstname"
+                  type="text"
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                  className="h-14 text-base font-sans bg-[#1a1a1a] text-white border-white/20 focus:border-primary focus:ring-primary placeholder:text-white/40"
+                  placeholder="Your first name"
+                  maxLength={100}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="signup-artistname" className="text-white text-sm font-sans">Artist Name *</Label>
+                <Input
+                  id="signup-artistname"
+                  type="text"
+                  value={artistName}
+                  onChange={e => setArtistName(e.target.value)}
+                  className="h-14 text-base font-sans bg-[#1a1a1a] text-white border-white/20 focus:border-primary focus:ring-primary placeholder:text-white/40"
+                  placeholder="Your artist or band name"
+                  maxLength={200}
+                />
+              </div>
+            </>
+          )}
+
           <div className="space-y-2">
-            <Label htmlFor="signup-email" className="text-foreground text-sm font-sans">Email</Label>
+            <Label htmlFor="signup-email" className="text-white text-sm font-sans">Email</Label>
             <Input
               id="signup-email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="h-14 text-base font-sans bg-card text-foreground border-foreground/20 focus:border-primary focus:ring-primary placeholder:text-muted-foreground"
+              className="h-14 text-base font-sans bg-[#1a1a1a] text-white border-white/20 focus:border-primary focus:ring-primary placeholder:text-white/40"
               placeholder="you@email.com"
               maxLength={255}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="signup-password" className="text-foreground text-sm font-sans">Password</Label>
+            <Label htmlFor="signup-password" className="text-white text-sm font-sans">Password</Label>
             <div className="relative">
               <Input
                 id="signup-password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="h-14 text-base font-sans bg-card text-foreground border-foreground/20 focus:border-primary focus:ring-primary placeholder:text-muted-foreground pr-12"
+                className="h-14 text-base font-sans bg-[#1a1a1a] text-white border-white/20 focus:border-primary focus:ring-primary placeholder:text-white/40 pr-12"
                 placeholder="Min 8 characters"
                 minLength={8}
                 maxLength={128}
@@ -130,7 +176,7 @@ const ArtistSignup = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
@@ -139,7 +185,7 @@ const ArtistSignup = () => {
 
           <Button
             type="submit"
-            disabled={submitting || !email.trim() || password.length < 8}
+            disabled={submitting || !email.trim() || password.length < 8 || (mode === "signup" && (!firstName.trim() || !artistName.trim()))}
             className="w-full h-14 text-base font-display font-bold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {submitting
@@ -148,7 +194,7 @@ const ArtistSignup = () => {
           </Button>
         </form>
 
-        <p className="text-center text-sm font-sans text-foreground/60">
+        <p className="text-center text-sm font-sans text-white/60">
           {mode === "signup" ? (
             <>Already have an account?{" "}
               <button onClick={() => setMode("signin")} className="text-primary hover:underline font-medium">Sign in</button>
