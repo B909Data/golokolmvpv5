@@ -13,6 +13,7 @@ interface LatestSubmission {
 const ArtistDashboard = () => {
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string | null>(null);
   const [artistName, setArtistName] = useState<string | null>(null);
   const [latestSubmission, setLatestSubmission] = useState<LatestSubmission | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,23 @@ const ArtistDashboard = () => {
       if (!session) { navigate("/artist/signup", { replace: true }); return; }
 
       setUserEmail(session.user.email ?? null);
+
+      // Handle pending profile from Google OAuth signup
+      const pendingProfile = localStorage.getItem("pending_profile");
+      if (pendingProfile) {
+        try {
+          const profileData = JSON.parse(pendingProfile);
+          await supabase.auth.updateUser({ data: profileData });
+          localStorage.removeItem("pending_profile");
+          if (profileData.first_name) setFirstName(profileData.first_name);
+        } catch {
+          localStorage.removeItem("pending_profile");
+        }
+      }
+
+      // Read user metadata for first_name
+      const meta = session.user.user_metadata;
+      if (!firstName && meta?.first_name) setFirstName(meta.first_name);
 
       const { data } = await (supabase as any)
         .from("lls_artist_submissions")
@@ -50,6 +68,19 @@ const ArtistDashboard = () => {
     navigate("/artist/signup", { replace: true });
   };
 
+  const getWelcomeMessage = () => {
+    const hasSubmission = !!latestSubmission;
+    if (firstName) {
+      return hasSubmission
+        ? `Welcome back, ${firstName}.`
+        : `You're in, ${firstName}. Let's get your music heard.`;
+    }
+    if (artistName) {
+      return `Good to have you back, ${artistName}.`;
+    }
+    return "You're in. Let's get your music heard.";
+  };
+
   const renderStatusBadge = () => {
     if (!latestSubmission) return null;
     const { admin_status, rejection_reason } = latestSubmission;
@@ -57,11 +88,11 @@ const ArtistDashboard = () => {
     if (admin_status === "approved") {
       return (
         <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-5 space-y-2">
-          <p className="text-foreground font-bold text-lg font-sans">{latestSubmission.song_title}</p>
+          <p className="text-white font-bold text-lg font-sans">{latestSubmission.song_title}</p>
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-black">
             Added to Platform
           </span>
-          <p className="text-foreground text-sm font-sans">
+          <p className="text-white text-sm font-sans">
             Your song is now being discovered at our participating stores in Atlanta. Your free month trial begins today.
           </p>
         </div>
@@ -71,25 +102,24 @@ const ArtistDashboard = () => {
     if (admin_status === "rejected") {
       return (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-5 space-y-2">
-          <p className="text-foreground font-bold text-lg font-sans">{latestSubmission.song_title}</p>
+          <p className="text-white font-bold text-lg font-sans">{latestSubmission.song_title}</p>
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-red-500 text-white">
             Not Accepted
           </span>
           {rejection_reason && (
-            <p className="text-foreground/70 text-sm font-sans">{rejection_reason}</p>
+            <p className="text-white/70 text-sm font-sans">{rejection_reason}</p>
           )}
         </div>
       );
     }
 
-    // Default: pending
     return (
       <div className="rounded-xl border border-primary/30 bg-primary/10 p-5 space-y-2">
-        <p className="text-foreground font-bold text-lg font-sans">{latestSubmission.song_title}</p>
+        <p className="text-white font-bold text-lg font-sans">{latestSubmission.song_title}</p>
         <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-primary text-black">
           Pending Review
         </span>
-        <p className="text-foreground/70 text-sm font-sans">We'll be in touch soon.</p>
+        <p className="text-white/70 text-sm font-sans">We'll be in touch soon.</p>
       </div>
     );
   };
@@ -97,7 +127,7 @@ const ArtistDashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-foreground/50 font-sans">Loading...</div>
+        <div className="animate-pulse text-white/50 font-sans">Loading...</div>
       </div>
     );
   }
@@ -110,12 +140,8 @@ const ArtistDashboard = () => {
         </div>
 
         <section className="space-y-3">
-          <h1 className="font-display text-3xl md:text-4xl text-foreground">Welcome to GoLokol</h1>
-          <p className="text-foreground text-base font-sans">
-            {artistName
-              ? `Good to have you back, ${artistName}.`
-              : "You're in. Let's get your music heard."}
-          </p>
+          <h1 className="font-display text-3xl md:text-4xl text-white">Welcome to GoLokol</h1>
+          <p className="text-white text-base font-sans">{getWelcomeMessage()}</p>
           <p className="text-primary text-sm font-sans italic">The future of music is local.</p>
         </section>
 
@@ -127,7 +153,7 @@ const ArtistDashboard = () => {
               Submit Your Music
             </Button>
           </Link>
-          <ul className="space-y-1.5 text-foreground/60 text-sm font-sans list-disc list-inside">
+          <ul className="space-y-1.5 text-white/60 text-sm font-sans list-disc list-inside">
             <li>Up to 2 submissions per month</li>
             <li>MP3 files only, max 20MB</li>
             <li>Square song image required (min 200×200px)</li>
@@ -142,20 +168,20 @@ const ArtistDashboard = () => {
           >
             Submit a Show
           </Button>
-          <p className="text-foreground/50 text-sm font-sans">
+          <p className="text-white/50 text-sm font-sans">
             Coming soon. Every fan who adds you to their Lokol Atlanta Scene gets notified when you have a show — and earns points for showing up.
           </p>
         </section>
 
-        <div className="pt-6 border-t border-foreground/10 space-y-3">
+        <div className="pt-6 border-t border-white/10 space-y-3">
           {userEmail && (
-            <p className="text-foreground text-xs font-sans">Signed in as: {userEmail}</p>
+            <p className="text-white text-xs font-sans">Signed in as: {userEmail}</p>
           )}
           <Button
             variant="outline"
             size="sm"
             onClick={handleSignOut}
-            className="border-foreground/20 text-foreground/60 hover:text-foreground hover:bg-foreground/5"
+            className="border-white/20 text-white/60 hover:text-white hover:bg-white/5"
           >
             Sign Out
           </Button>
