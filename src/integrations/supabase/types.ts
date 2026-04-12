@@ -275,6 +275,7 @@ export type Database = {
           original_filename: string | null
           payment_status: string | null
           physical_product: string
+          rejection_reason: string | null
           rights_confirmed: boolean
           short_bio: string | null
           song_image_url: string | null
@@ -304,6 +305,7 @@ export type Database = {
           original_filename?: string | null
           payment_status?: string | null
           physical_product: string
+          rejection_reason?: string | null
           rights_confirmed?: boolean
           short_bio?: string | null
           song_image_url?: string | null
@@ -333,6 +335,7 @@ export type Database = {
           original_filename?: string | null
           payment_status?: string | null
           physical_product?: string
+          rejection_reason?: string | null
           rights_confirmed?: boolean
           short_bio?: string | null
           song_image_url?: string | null
