@@ -119,10 +119,9 @@ const AdminLLS = () => {
     if (!key) return;
     setSaving(true);
     try {
-      const { error } = await (supabase as any)
-        .from("lls_artist_submissions")
-        .update({ admin_status: "approved" })
-        .eq("id", id);
+      const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
+        body: { id, admin_status: "approved", submission_type: "lls_artist" },
+      });
       if (error) throw error;
       setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, admin_status: "approved" } : s)));
       toast.success("Submission approved");
@@ -138,12 +137,12 @@ const AdminLLS = () => {
     if (!key || selectedReasons.length === 0) return;
     setSaving(true);
     try {
-      const { error } = await (supabase as any)
-        .from("lls_artist_submissions")
-        .update({ admin_status: "rejected", rejection_reason: selectedReasons.join(", ") })
-        .eq("id", id);
+      const reason = selectedReasons.join(", ");
+      const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
+        body: { id, admin_status: "rejected", rejection_reason: reason, submission_type: "lls_artist" },
+      });
       if (error) throw error;
-      setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, admin_status: "rejected", rejection_reason: selectedReasons.join(", ") } : s)));
+      setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, admin_status: "rejected", rejection_reason: reason } : s)));
       setRejectingId(null);
       setSelectedReasons([]);
       toast.success("Submission rejected");
