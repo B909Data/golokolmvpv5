@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Upload, X, Search, ChevronLeft, ChevronRight, Loader2, Eye, EyeOff } from "lucide-react";
+
+const PENDING_SUBMISSION_KEY = "pending_artist_submission";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
