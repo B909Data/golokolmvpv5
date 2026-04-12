@@ -679,8 +679,18 @@ const LLSUsArtists = () => {
             "Create Account & Submit"
           )}
         </Button>
+
+        {signupExistsError && (
+          <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
+            <p className="text-destructive text-sm font-sans font-medium">
+              An account with this email already exists. Please{" "}
+              <Link to="/artist/dashboard" className="underline font-bold hover:text-destructive/80">
+                sign in instead
+              </Link>.
+            </p>
+          </div>
+        )}
       </div>
-    </div>
   );
 
   const renderNavButtons = () => (
