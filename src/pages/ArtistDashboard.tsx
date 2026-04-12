@@ -55,7 +55,14 @@ const ArtistDashboard = () => {
       const raw = localStorage.getItem(PENDING_SUBMISSION_KEY);
       if (raw) {
         try {
-          setPending(JSON.parse(raw));
+          const parsed = JSON.parse(raw);
+          // Only show if required fields are present
+          if (parsed?.artist_name?.trim() && parsed?.song_title?.trim()) {
+            setPending(parsed);
+          } else {
+            // Invalid/missing data - silently remove
+            localStorage.removeItem(PENDING_SUBMISSION_KEY);
+          }
         } catch {
           localStorage.removeItem(PENDING_SUBMISSION_KEY);
         }
