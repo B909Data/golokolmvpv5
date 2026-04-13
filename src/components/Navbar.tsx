@@ -12,7 +12,6 @@ const HIDDEN_EXACT = ["/fan/scene", "/fan/info"];
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
