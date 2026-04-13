@@ -118,7 +118,7 @@ const Index = () => {
             number={3}
             title="The Value of Local Music"
             description="Engaging with your city's music now has added value. Redeem that value to sustain the city you know."
-            to="/lls-us"
+            to="https://golokol.app/lls-us"
           />
         </div>
       </section>

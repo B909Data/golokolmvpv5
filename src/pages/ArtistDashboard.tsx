@@ -1,19 +1,14 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload } from "lucide-react";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import golokolLogo from "@/assets/golokol-logo.svg";
 
 const MAX_BIO = 240;
 
@@ -42,7 +37,7 @@ interface ArtistProfile {
 const ArtistDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  
 
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -53,20 +48,17 @@ const ArtistDashboard = () => {
 
   // Profile state
   const [profile, setProfile] = useState<ArtistProfile | null>(null);
-  const [showProfileForm, setShowProfileForm] = useState(false);
-  const [editMode, setEditMode] = useState(false);
 
   // Profile form fields
-  const [pFirstName, setPFirstName] = useState("");
   const [pCity, setPCity] = useState("Atlanta");
   const [pNeighborhood, setPNeighborhood] = useState("");
   const [pInstagram, setPInstagram] = useState("");
   const [pMusicLink, setPMusicLink] = useState("");
   const [pBio, setPBio] = useState("");
-  const [pPhotoFile, setPPhotoFile] = useState<File | null>(null);
-  const [pPhotoPreview, setPPhotoPreview] = useState<string | null>(null);
   const [profileSaving, setProfileSaving] = useState(false);
   const [neighborhoodOpen, setNeighborhoodOpen] = useState(false);
+
+  const isProfileIncomplete = !profile || !profile.city || !profile.neighborhood || !profile.instagram_handle || !profile.music_link || !profile.short_bio;
 
   useEffect(() => {
     const init = async () => {
@@ -77,7 +69,6 @@ const ArtistDashboard = () => {
       setUserId(session.user.id);
       setArtistName(session.user.user_metadata?.artist_name || null);
 
-      // Check for submission success flag
       const justSubmitted = sessionStorage.getItem("submission_success");
       if (justSubmitted) {
         setSuccessMessage("We got it! Check your dashboard for status.");
@@ -93,8 +84,24 @@ const ArtistDashboard = () => {
 
       if (profileData) {
         setProfile(profileData);
+        prefillForm(profileData);
       } else {
-        setShowProfileForm(true);
+        // Create a stub profile
+        const newProfile = {
+          artist_user_id: session.user.id,
+          artist_name: session.user.user_metadata?.artist_name || null,
+          first_name: session.user.user_metadata?.first_name || null,
+        };
+        await (supabase as any).from("artist_profiles").insert(newProfile);
+        const { data: created } = await (supabase as any)
+          .from("artist_profiles")
+          .select("*")
+          .eq("artist_user_id", session.user.id)
+          .maybeSingle();
+        if (created) {
+          setProfile(created);
+          prefillForm(created);
+        }
       }
 
       // Fetch submissions
@@ -113,89 +120,44 @@ const ArtistDashboard = () => {
     init();
   }, [navigate]);
 
-  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) { toast({ title: "Please select an image file.", variant: "destructive" }); return; }
-    if (file.size > 3 * 1024 * 1024) { toast({ title: "Image must be under 3MB.", variant: "destructive" }); return; }
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      if (img.width < 200 || img.height < 200) { toast({ title: "Image must be at least 200×200px.", variant: "destructive" }); URL.revokeObjectURL(url); return; }
-      const ratio = img.width / img.height;
-      if (ratio < 0.9 || ratio > 1.1) { toast({ title: "Image should be square (1:1 ratio).", variant: "destructive" }); URL.revokeObjectURL(url); return; }
-      setPPhotoFile(file);
-      setPPhotoPreview(url);
-    };
-    img.src = url;
-  };
-
-  const prefillEditForm = (p: ArtistProfile) => {
-    setPFirstName(p.first_name || "");
+  const prefillForm = (p: ArtistProfile) => {
     setPCity(p.city || "Atlanta");
     setPNeighborhood(p.neighborhood || "");
     setPInstagram(p.instagram_handle || "");
     setPMusicLink(p.music_link || "");
     setPBio(p.short_bio || "");
-    setPPhotoFile(null);
-    setPPhotoPreview(null);
   };
 
   const handleSaveProfile = async () => {
-    if (!pFirstName.trim()) { toast({ title: "First Name is required.", variant: "destructive" }); return; }
-    if (!pCity) { toast({ title: "City is required.", variant: "destructive" }); return; }
     if (!userId) return;
 
     setProfileSaving(true);
     try {
-      let publicUrl = profile?.profile_image_url || null;
-
-      if (pPhotoFile) {
-        const ext = pPhotoFile.name.split(".").pop() || "jpg";
-        const path = `${userId}/profile.${ext}`;
-        const { error: uploadErr } = await supabase.storage.from("artist-profiles").upload(path, pPhotoFile, { contentType: pPhotoFile.type, upsert: true });
-        if (uploadErr) throw uploadErr;
-        const { data: urlData } = supabase.storage.from("artist-profiles").getPublicUrl(path);
-        publicUrl = urlData.publicUrl;
-      }
-
       const profilePayload = {
         artist_user_id: userId,
-        first_name: pFirstName.trim(),
-        artist_name: artistName || null,
+        first_name: profile?.first_name || null,
+        artist_name: artistName || profile?.artist_name || null,
         city: pCity,
         neighborhood: pNeighborhood || null,
         instagram_handle: pInstagram.trim() || null,
         music_link: pMusicLink.trim() || null,
         short_bio: pBio.trim() || null,
-        profile_image_url: publicUrl,
+        profile_image_url: profile?.profile_image_url || null,
       };
 
-      if (profile) {
-        // Update existing
-        const { error } = await (supabase as any)
-          .from("artist_profiles")
-          .update(profilePayload)
-          .eq("id", profile.id);
-        if (error) throw error;
-      } else {
-        // Insert new
-        const { error } = await (supabase as any)
-          .from("artist_profiles")
-          .insert(profilePayload);
-        if (error) throw error;
-      }
+      const { error } = await (supabase as any)
+        .from("artist_profiles")
+        .upsert(profilePayload, { onConflict: "artist_user_id" });
+      if (error) throw error;
 
-      // Update auth metadata
       await supabase.auth.updateUser({
         data: {
-          first_name: pFirstName.trim(),
+          first_name: profile?.first_name,
           artist_name: artistName,
-          profile_image_url: publicUrl,
+          profile_image_url: profile?.profile_image_url,
         },
       });
 
-      // Refresh profile
       const { data: freshProfile } = await (supabase as any)
         .from("artist_profiles")
         .select("*")
@@ -203,9 +165,8 @@ const ArtistDashboard = () => {
         .maybeSingle();
 
       setProfile(freshProfile);
-      setShowProfileForm(false);
-      setEditMode(false);
-      toast({ title: "Profile saved!" });
+      if (freshProfile) prefillForm(freshProfile);
+      toast({ title: "Profile saved." });
     } catch (err: any) {
       toast({ title: err?.message || "Something went wrong.", variant: "destructive" });
     } finally {
@@ -251,143 +212,10 @@ const ArtistDashboard = () => {
     );
   };
 
-  const renderProfileForm = () => (
-    <div className="rounded-2xl bg-[#1a1a1a] p-6 md:p-8 space-y-5">
-      <div>
-        <h2 className="font-display text-xl font-bold text-[#FFD600]">
-          {editMode ? "Edit Profile" : "Complete Your Profile"}
-        </h2>
-        <p className="text-white/70 text-sm font-sans mt-1">This info helps fans connect with you.</p>
-      </div>
-
-      {/* Photo */}
-      <div className="flex flex-col items-center space-y-3">
-        <div
-          className="w-24 h-24 rounded-full bg-[#111] border-2 border-white/20 flex items-center justify-center overflow-hidden cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {pPhotoPreview ? (
-            <img src={pPhotoPreview} alt="Profile" className="w-full h-full object-cover" />
-          ) : profile?.profile_image_url ? (
-            <img src={profile.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
-          ) : (
-            <Upload className="w-6 h-6 text-white/40" />
-          )}
-        </div>
-        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoSelect} />
-        <button type="button" onClick={() => fileInputRef.current?.click()} className="text-white/70 text-sm font-sans underline">
-          {profile?.profile_image_url ? "Change Photo" : "Add Photo"}
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label className="text-white text-sm font-sans">First Name *</Label>
-          <Input value={pFirstName} onChange={e => setPFirstName(e.target.value)} className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40" placeholder="Your first name" maxLength={100} />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-white text-sm font-sans">City *</Label>
-          <Select value={pCity} onValueChange={setPCity}>
-            <SelectTrigger className="h-12 text-base font-sans bg-[#111] text-white border-white/20">
-              <SelectValue placeholder="Select city" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Atlanta">Atlanta</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-white text-sm font-sans">Neighborhood (optional)</Label>
-          <Popover open={neighborhoodOpen} onOpenChange={setNeighborhoodOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" role="combobox" aria-expanded={neighborhoodOpen}
-                className="w-full h-12 justify-between text-base font-sans bg-[#111] text-white border-white/20 hover:bg-[#222]">
-                {pNeighborhood || "Select neighborhood..."}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-              <Command>
-                <CommandInput placeholder="Search neighborhoods..." />
-                <CommandList>
-                  <CommandEmpty>No neighborhood found.</CommandEmpty>
-                  <CommandGroup>
-                    {ATLANTA_NEIGHBORHOODS.map(hood => (
-                      <CommandItem key={hood} value={hood} onSelect={() => { setPNeighborhood(pNeighborhood === hood ? "" : hood); setNeighborhoodOpen(false); }}>
-                        <Check className={cn("mr-2 h-4 w-4", pNeighborhood === hood ? "opacity-100" : "opacity-0")} />
-                        {hood}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-white text-sm font-sans">Instagram Handle (optional)</Label>
-          <Input value={pInstagram} onChange={e => setPInstagram(e.target.value)} className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40" placeholder="@yourhandle" maxLength={200} />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-white text-sm font-sans">Music Link (optional)</Label>
-          <Input value={pMusicLink} onChange={e => setPMusicLink(e.target.value)} className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40" placeholder="Where can people buy or stream your music?" maxLength={500} />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-white text-sm font-sans">Short Bio (optional) <span className="text-white/40">({pBio.length}/{MAX_BIO})</span></Label>
-          <textarea
-            value={pBio}
-            onChange={e => { if (e.target.value.length <= MAX_BIO) setPBio(e.target.value); }}
-            className="flex min-h-[80px] w-full rounded-md border border-white/20 bg-[#111] px-3 py-2 text-base font-sans text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD600]"
-            maxLength={MAX_BIO}
-            placeholder="A short bio (max 240 characters)"
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-3">
-        <Button
-          onClick={handleSaveProfile}
-          disabled={profileSaving}
-          className="flex-1 h-14 text-base font-display font-bold bg-[#FFD600] text-black hover:bg-[#FFD600]/90"
-        >
-          {profileSaving ? "Saving..." : "Save Profile"}
-        </Button>
-        {editMode && (
-          <Button
-            variant="outline"
-            onClick={() => setEditMode(false)}
-            className="h-14 px-6 border-white/20 text-white/60 hover:text-white hover:bg-white/5"
-          >
-            Cancel
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="animate-pulse text-white/50 font-sans">Loading...</div>
-      </div>
-    );
-  }
-
-  // Show profile form if no profile
-  if (showProfileForm && !profile) {
-    return (
-      <div className="min-h-screen bg-black flex flex-col">
-        <div className="flex-1 px-6 md:px-12 py-12 max-w-xl mx-auto w-full space-y-6">
-          <div className="text-center">
-            <img src={golokolLogo} alt="GoLokol" className="h-10 w-10 mx-auto mb-4" />
-          </div>
-          {renderProfileForm()}
-        </div>
       </div>
     );
   }
@@ -428,20 +256,6 @@ const ArtistDashboard = () => {
           )}
         </section>
 
-        {/* Edit Profile */}
-        {editMode ? (
-          renderProfileForm()
-        ) : (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => { prefillEditForm(profile!); setEditMode(true); }}
-            className="border-white/20 text-white/60 hover:text-white hover:bg-white/5"
-          >
-            Edit Profile
-          </Button>
-        )}
-
         {/* Submit Music */}
         <section className="space-y-3">
           <Link to="/artist/submit" className="block">
@@ -457,6 +271,13 @@ const ArtistDashboard = () => {
           </ul>
         </section>
 
+        {/* Complete / Edit Profile button */}
+        <a href="#artist-profile" className="block">
+          <Button className="w-full h-14 text-base font-display font-bold bg-[#FFD600] text-black hover:bg-[#FFD600]/90">
+            {isProfileIncomplete ? "Complete Your Profile" : "Edit Profile"}
+          </Button>
+        </a>
+
         {/* Submit a Show */}
         <section className="space-y-3">
           <Button
@@ -468,6 +289,77 @@ const ArtistDashboard = () => {
           <p className="text-white/50 text-sm font-sans">
             Coming soon. Fans who add you to their Lokol Scene get notified when you have a show and earn points for showing up.
           </p>
+        </section>
+
+        {/* Profile Section */}
+        <section id="artist-profile" className="rounded-2xl bg-[#1a1a1a] p-6 md:p-8 space-y-5 scroll-mt-24">
+          <h2 className="font-display text-xl font-bold text-white">Your Profile</h2>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">City</Label>
+              <Input value={pCity} onChange={e => setPCity(e.target.value)} className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40" placeholder="Atlanta" />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">Neighborhood</Label>
+              <Popover open={neighborhoodOpen} onOpenChange={setNeighborhoodOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={neighborhoodOpen}
+                    className="w-full h-12 justify-between text-base font-sans bg-[#111] text-white border-white/20 hover:bg-[#222]">
+                    {pNeighborhood || "Select neighborhood..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-white" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search neighborhoods..." style={{ color: 'black', backgroundColor: 'white' }} />
+                    <CommandList>
+                      <CommandEmpty className="text-black">No neighborhood found.</CommandEmpty>
+                      <CommandGroup className="bg-white">
+                        {ATLANTA_NEIGHBORHOODS.map(hood => (
+                          <CommandItem key={hood} value={hood} onSelect={() => { setPNeighborhood(pNeighborhood === hood ? "" : hood); setNeighborhoodOpen(false); }}
+                            className="text-black hover:bg-gray-100">
+                            <Check className={cn("mr-2 h-4 w-4", pNeighborhood === hood ? "opacity-100" : "opacity-0")} />
+                            {hood}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">Instagram Handle</Label>
+              <Input value={pInstagram} onChange={e => setPInstagram(e.target.value)} className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40" placeholder="@yourhandle" maxLength={200} />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">Where can people buy or stream your music?</Label>
+              <Input value={pMusicLink} onChange={e => setPMusicLink(e.target.value)} className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40" placeholder="Bandcamp, Groovetie, etc." maxLength={500} />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">Short Bio - New fans see this. <span className="text-white/40">({pBio.length}/{MAX_BIO})</span></Label>
+              <textarea
+                value={pBio}
+                onChange={e => { if (e.target.value.length <= MAX_BIO) setPBio(e.target.value); }}
+                className="flex min-h-[80px] w-full rounded-md border border-white/20 bg-[#111] px-3 py-2 text-base font-sans text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD600]"
+                maxLength={MAX_BIO}
+                placeholder="A short bio (max 240 characters)"
+              />
+            </div>
+          </div>
+
+          <Button
+            onClick={handleSaveProfile}
+            disabled={profileSaving}
+            className="w-full h-14 text-base font-display font-bold bg-[#FFD600] text-black hover:bg-[#FFD600]/90"
+          >
+            {profileSaving ? "Saving..." : "Save Profile"}
+          </Button>
         </section>
 
         {/* Bottom */}
