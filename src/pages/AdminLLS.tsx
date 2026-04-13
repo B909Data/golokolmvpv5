@@ -36,6 +36,8 @@ interface Submission {
   submission_type?: string;
   admin_status?: string | null;
   rejection_reason?: string | null;
+  song_image_url?: string | null;
+  short_bio?: string | null;
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
