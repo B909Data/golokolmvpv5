@@ -16,7 +16,7 @@ const GENRE_OPTIONS = [
   "Reggae","Rock","Ska","Spoken-Word","Techno",
 ];
 
-const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_MP3_SIZE = 20 * 1024 * 1024;
 const TOTAL_STEPS = 2;
 
