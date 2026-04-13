@@ -15,7 +15,7 @@ const CheckBullet = ({ children }: { children: React.ReactNode }) => (
     <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
       <Check className="w-3 h-3 text-[#0E0E0E]" strokeWidth={3} />
     </span>
-    <span className="font-normal">{children}</span>
+    <span className="font-normal text-[#0E0E0E]">{children}</span>
   </li>
 );
 
