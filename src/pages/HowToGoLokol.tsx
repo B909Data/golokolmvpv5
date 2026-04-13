@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Check, ChevronDown, ChevronUp, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const CheckBullet = ({ children }: { children: React.ReactNode }) => (
   <li className="flex items-start gap-3">
@@ -56,24 +59,6 @@ const AccordionItem = ({ id, title, children, isOpen, onToggle }: AccordionItemP
   </div>
 );
 
-const YouTubeEmbed = ({ videoId, startTime }: { videoId: string; startTime?: number }) => {
-  const src = startTime 
-    ? `https://www.youtube.com/embed/${videoId}?start=${startTime}`
-    : `https://www.youtube.com/embed/${videoId}`;
-  
-  return (
-    <div className="aspect-video w-full rounded-lg overflow-hidden my-6">
-      <iframe
-        src={src}
-        title="YouTube video"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        className="w-full h-full"
-      />
-    </div>
-  );
-};
-
 const SECTIONS = [
   { id: "what-is-golokol", title: "What is GoLokol?" },
   { id: "serve-artists", title: "How do we serve Artists?" },
@@ -84,13 +69,16 @@ const SECTIONS = [
 ];
 
 const HowToGoLokol = () => {
+  const navigate = useNavigate();
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
     if (typeof window !== "undefined" && window.innerWidth >= 768) {
       return new Set([SECTIONS[0].id]);
     }
     return new Set();
   });
-  const [suggestion, setSuggestion] = useState("");
+  const [feedbackName, setFeedbackName] = useState("");
+  const [feedbackEmail, setFeedbackEmail] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleSection = (id: string) => {
@@ -112,21 +100,29 @@ const HowToGoLokol = () => {
     }, 100);
   };
 
-  const handleSuggestionSubmit = () => {
-    if (!suggestion.trim()) {
-      toast.error("Please enter a suggestion first.");
+  const handleSuggestionSubmit = async () => {
+    if (!feedbackMessage.trim()) {
+      toast.error("Please enter a message first.");
       return;
     }
     setIsSubmitting(true);
-    // Open email client with pre-filled suggestion
-    const subject = encodeURIComponent("GoLokol Suggestion");
-    const body = encodeURIComponent(suggestion);
-    window.location.href = `mailto:backstage@golokol.app?subject=${subject}&body=${body}`;
-    setTimeout(() => {
-      setSuggestion("");
+    try {
+      const { error } = await supabase.from("suggestions").insert({
+        name: feedbackName.trim() || null,
+        email: feedbackEmail.trim() || null,
+        message: feedbackMessage.trim(),
+      });
+      if (error) throw error;
+      setFeedbackName("");
+      setFeedbackEmail("");
+      setFeedbackMessage("");
+      toast.success("Got it. Thank you for helping us build something real.");
+    } catch (err) {
+      console.error("Suggestion submit error:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      toast.success("Opening your email client...");
-    }, 500);
+    }
   };
 
   return (
@@ -179,7 +175,15 @@ const HowToGoLokol = () => {
                 isOpen={openSections.has("what-is-golokol")}
                 onToggle={() => toggleSection("what-is-golokol")}
               >
-                <div className="py-4" />
+                <Paragraph>
+                  GoLokol is a music discovery platform built for local artists and the fans who support them in person. We connect emerging artists with local music fans through Lokol Listening Stations — physical discovery kiosks placed inside independent record stores and music-friendly retail.
+                </Paragraph>
+                <Paragraph>
+                  No algorithm. No streaming. No followers required. Just real music, real fans, and real community.
+                </Paragraph>
+                <Paragraph className="font-semibold">
+                  GoLokol is built on one belief: the future of music is local.
+                </Paragraph>
               </AccordionItem>
 
               {/* Section 2: How do we serve Artists? */}
@@ -189,7 +193,33 @@ const HowToGoLokol = () => {
                 isOpen={openSections.has("serve-artists")}
                 onToggle={() => toggleSection("serve-artists")}
               >
-                <div className="py-4" />
+                <Paragraph>
+                  GoLokol gives emerging artists a direct line to local fans — without needing a label, a playlist, or a social media following.
+                </Paragraph>
+                <Paragraph className="font-semibold">Here is how it works:</Paragraph>
+                <ul className="space-y-3 mb-6">
+                  <CheckBullet>Submit up to 2 songs per month for free</CheckBullet>
+                  <CheckBullet>GoLokol reviews each submission for sound quality and community fit</CheckBullet>
+                  <CheckBullet>Selected songs are placed on Lokol Listening Stations inside Atlanta record stores</CheckBullet>
+                  <CheckBullet>Local fans discover, listen, and save your music in person</CheckBullet>
+                  <CheckBullet>Every fan who saves you gets notified when you have a show — and earns points for showing up</CheckBullet>
+                </ul>
+
+                <Paragraph className="font-semibold">When your song is selected you receive one free month of GoLokol Connect which includes:</Paragraph>
+                <ul className="space-y-3 mb-6">
+                  <CheckBullet>Dashboard showing how many fans have listened to and saved your song</CheckBullet>
+                  <CheckBullet>Fan neighborhood data so you know where your supporters are coming from</CheckBullet>
+                  <CheckBullet>Show promotion — alert your fans directly when you have an upcoming show</CheckBullet>
+                  <CheckBullet>After your free month GoLokol Connect is $9.99 per month</CheckBullet>
+                </ul>
+
+                <Paragraph className="font-semibold">Submission requirements:</Paragraph>
+                <ul className="space-y-3 mb-4">
+                  <CheckBullet>MP3 format only, max 20MB</CheckBullet>
+                  <CheckBullet>Square song artwork (minimum 200×200px, max 3MB)</CheckBullet>
+                  <CheckBullet>Short bio (240 characters max) — this is what new fans see</CheckBullet>
+                  <CheckBullet>Physical product status (vinyl, CD, merch — in production counts)</CheckBullet>
+                </ul>
               </AccordionItem>
 
               {/* Section 3: How do we serve small business? */}
@@ -199,7 +229,29 @@ const HowToGoLokol = () => {
                 isOpen={openSections.has("serve-small-business")}
                 onToggle={() => toggleSection("serve-small-business")}
               >
-                <div className="py-4" />
+                <Paragraph>
+                  GoLokol partners with independent record stores and music-friendly retail to bring local music discovery into your space.
+                </Paragraph>
+                <Paragraph className="font-semibold">What you get as a partner:</Paragraph>
+                <ul className="space-y-3 mb-6">
+                  <CheckBullet>A Lokol Listening Station — a QR code display that turns your store into a discovery hub</CheckBullet>
+                  <CheckBullet>Foot traffic from music fans who come in specifically to discover local artists</CheckBullet>
+                  <CheckBullet>A digital presence on the GoLokol platform listing your store as a discovery location</CheckBullet>
+                  <CheckBullet>Revenue share opportunities from future GoLokol market features</CheckBullet>
+                  <CheckBullet>Your store logo featured in the GoLokol Lokol Market rewards section</CheckBullet>
+                </ul>
+                <Paragraph>
+                  Partnership is free during our Atlanta pilot. We are currently placing stations in select Atlanta stores.
+                </Paragraph>
+                <Paragraph>
+                  Interested in becoming a partner?{" "}
+                  <button
+                    onClick={() => navigate("/lls-us/retail")}
+                    className="text-primary hover:underline font-semibold"
+                  >
+                    Visit our Record Stores page to apply.
+                  </button>
+                </Paragraph>
               </AccordionItem>
 
               {/* Section 4: What Are Lokol Listening Stations? */}
@@ -209,7 +261,21 @@ const HowToGoLokol = () => {
                 isOpen={openSections.has("what-are-lls")}
                 onToggle={() => toggleSection("what-are-lls")}
               >
-                <div className="py-4" />
+                <Paragraph>
+                  Lokol Listening Stations are physical QR code displays placed inside partner stores. When a fan scans the QR code they are taken to a mobile discovery experience where they can:
+                </Paragraph>
+                <ul className="space-y-3 mb-6">
+                  <CheckBullet>Browse local Atlanta artists by genre</CheckBullet>
+                  <CheckBullet>Listen to curated song previews</CheckBullet>
+                  <CheckBullet>Save artists they love to their Lokol Scene</CheckBullet>
+                  <CheckBullet>Earn Lokol Points for listening and saving</CheckBullet>
+                </ul>
+                <Paragraph>
+                  Fans do not need an account to browse. They create a free account to save artists and track their points.
+                </Paragraph>
+                <Paragraph>
+                  Lokol Listening Stations are currently live at Crate ATL in Atlanta as part of our Record Store Day 2026 pilot launch.
+                </Paragraph>
               </AccordionItem>
 
               {/* Section 5: How do we serve Local Music Fans? */}
@@ -219,10 +285,26 @@ const HowToGoLokol = () => {
                 isOpen={openSections.has("serve-fans")}
                 onToggle={() => toggleSection("serve-fans")}
               >
-                <div className="py-4" />
+                <Paragraph>
+                  GoLokol gives local music fans a way to discover and support artists before they blow up — and get rewarded for doing it early.
+                </Paragraph>
+                <Paragraph className="font-semibold">As a GoLokol fan you can:</Paragraph>
+                <ul className="space-y-3 mb-6">
+                  <CheckBullet>Discover local Atlanta artists at record stores through Lokol Listening Stations</CheckBullet>
+                  <CheckBullet>Build your Lokol Scene — a personal collection of artists you love</CheckBullet>
+                  <CheckBullet>Earn Lokol Points for listening, saving artists, and attending shows</CheckBullet>
+                  <CheckBullet>Redeem points for discounts at local partner stores</CheckBullet>
+                  <CheckBullet>Get notified when artists in your scene have upcoming shows</CheckBullet>
+                </ul>
+                <Paragraph>
+                  My Lokol Scene is your personal music dashboard. It lives on your phone and grows every time you engage with local music.
+                </Paragraph>
+                <Paragraph className="font-semibold">
+                  GoLokol fans do not pay anything. The platform is free to use.
+                </Paragraph>
               </AccordionItem>
 
-              {/* Section 5: Suggestion Box */}
+              {/* Section 6: Suggestion Box */}
               <AccordionItem
                 id="suggestion-box"
                 title="Suggestion Box"
@@ -230,24 +312,34 @@ const HowToGoLokol = () => {
                 onToggle={() => toggleSection("suggestion-box")}
               >
                 <Paragraph>
-                  GoLokol is a work in progress.
-                </Paragraph>
-                <Paragraph>
-                  If you have ideas, critiques, or things that didn't make sense — we want to hear it.
+                  We are building GoLokol with the community in mind. If you have ideas, feedback, or want to get involved we want to hear from you.
                 </Paragraph>
                 <div className="mt-6 space-y-4">
+                  <Input
+                    placeholder="Name"
+                    value={feedbackName}
+                    onChange={(e) => setFeedbackName(e.target.value)}
+                    className="bg-[#282828] border-primary text-white placeholder:text-gray-400"
+                  />
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={feedbackEmail}
+                    onChange={(e) => setFeedbackEmail(e.target.value)}
+                    className="bg-[#282828] border-primary text-white placeholder:text-gray-400"
+                  />
                   <Textarea
                     placeholder="Share your thoughts, ideas, or feedback..."
-                    value={suggestion}
-                    onChange={(e) => setSuggestion(e.target.value)}
+                    value={feedbackMessage}
+                    onChange={(e) => setFeedbackMessage(e.target.value)}
                     className="min-h-[120px] bg-[#282828] border-primary text-white placeholder:text-gray-400"
                   />
-                  <Button 
+                  <Button
                     onClick={handleSuggestionSubmit}
                     disabled={isSubmitting}
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto bg-[#FFD600] text-black font-bold hover:bg-[#FFD600]/90"
                   >
-                    {isSubmitting ? "Sending..." : "Submit Suggestion"}
+                    {isSubmitting ? "Sending..." : "Send"}
                   </Button>
                 </div>
               </AccordionItem>
