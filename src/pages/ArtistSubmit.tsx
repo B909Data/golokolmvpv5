@@ -186,9 +186,11 @@ const ArtistSubmit = () => {
 
       toast({ title: "You're in. We'll be in touch." });
 
-      supabase.functions.invoke("send-mailerlite-artist-welcome", {
-        body: { email: user.email, artist_name: form.artist_name.trim() },
-      });
+      try {
+        supabase.functions.invoke("send-mailerlite-artist-welcome", {
+          body: { email: user.email, artist_name: form.artist_name.trim() },
+        });
+      } catch (_) { /* fire and forget */ }
 
       navigate("/artist/dashboard");
     } catch (err: any) {
