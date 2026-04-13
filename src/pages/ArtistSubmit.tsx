@@ -36,6 +36,7 @@ const ArtistSubmit = () => {
     genre_style: [] as string[],
     song_title: "",
   });
+  const [termsConfirmed, setTermsConfirmed] = useState(false);
 
   const [mp3File, setMp3File] = useState<File | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -97,6 +98,10 @@ const ArtistSubmit = () => {
       if (form.genre_style.length === 0) { toast({ title: "Please select at least one genre.", variant: "destructive" }); return false; }
       return true;
     }
+    if (s === 2) {
+      if (!termsConfirmed) { toast({ title: "Please agree to the terms before submitting.", variant: "destructive" }); return false; }
+      return true;
+    }
     return true;
   };
 
@@ -144,6 +149,7 @@ const ArtistSubmit = () => {
         artist_user_id: user.id,
         payment_status: "free",
         admin_status: "pending",
+        terms_confirmed: true,
       });
       if (error) throw error;
 
@@ -255,14 +261,29 @@ const ArtistSubmit = () => {
             <Upload className="h-5 w-5" /><span className="text-base font-sans">Choose Image</span>
           </button>
         )}
-        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
       </div>
+
+      <label className="flex items-start gap-3 mt-4 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={termsConfirmed}
+          onChange={e => setTermsConfirmed(e.target.checked)}
+          className="mt-1 h-4 w-4 accent-[#FFD600]"
+        />
+        <span className="text-sm text-primary-foreground/80 font-sans">
+          I agree to the GoLokol{" "}
+          <a href="/lls-music-release" target="_blank" style={{ color: '#FFD600', textDecoration: 'underline' }}>
+            Artist Terms &amp; Music Release
+          </a>
+        </span>
+      </label>
 
       <Button
         type="button"
         onClick={handleSubmit}
-        disabled={submitting || !mp3File || !imageFile}
-        className="w-full h-14 text-base font-display font-bold bg-primary-foreground text-primary hover:bg-primary-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+        disabled={submitting || !mp3File || !imageFile || !termsConfirmed}
+        className={`w-full h-14 text-base font-display font-bold disabled:opacity-50 disabled:cursor-not-allowed mt-4 ${termsConfirmed ? "bg-[#FFD600] text-black hover:bg-[#FFD600]/90" : "bg-gray-500 text-white"}`}
       >
         {submitting ? "Submitting..." : "Submit"}
       </Button>
