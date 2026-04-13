@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      artist_profiles: {
+        Row: {
+          artist_name: string | null
+          artist_user_id: string
+          city: string | null
+          created_at: string | null
+          first_name: string | null
+          id: string
+          instagram_handle: string | null
+          music_link: string | null
+          neighborhood: string | null
+          profile_image_url: string | null
+          short_bio: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          artist_name?: string | null
+          artist_user_id: string
+          city?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          instagram_handle?: string | null
+          music_link?: string | null
+          neighborhood?: string | null
+          profile_image_url?: string | null
+          short_bio?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          artist_name?: string | null
+          artist_user_id?: string
+          city?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          instagram_handle?: string | null
+          music_link?: string | null
+          neighborhood?: string | null
+          profile_image_url?: string | null
+          short_bio?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           artist_id: string | null
