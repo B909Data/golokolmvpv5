@@ -36,6 +36,8 @@ interface Submission {
   submission_type?: string;
   admin_status?: string | null;
   rejection_reason?: string | null;
+  song_image_url?: string | null;
+  short_bio?: string | null;
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
@@ -60,9 +62,12 @@ const AdminLLS = () => {
     if (!key) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke(`admin-list-submissions?key=${key}`);
+      const { data, error } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .select("*")
+        .order("created_at", { ascending: false });
       if (error) throw error;
-      setSubmissions(data?.submissions || []);
+      setSubmissions(data || []);
     } catch (err) {
       console.error("Fetch error:", err);
       toast.error("Failed to load submissions");
@@ -119,9 +124,10 @@ const AdminLLS = () => {
     if (!key) return;
     setSaving(true);
     try {
-      const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
-        body: { id, admin_status: "approved", submission_type: "lls_artist" },
-      });
+      const { error } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .update({ admin_status: "approved" })
+        .eq("id", id);
       if (error) throw error;
       setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, admin_status: "approved" } : s)));
       toast.success("Submission approved");
@@ -138,9 +144,10 @@ const AdminLLS = () => {
     setSaving(true);
     try {
       const reason = selectedReasons.join(", ");
-      const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
-        body: { id, admin_status: "rejected", rejection_reason: reason, submission_type: "lls_artist" },
-      });
+      const { error } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .update({ admin_status: "rejected", rejection_reason: reason })
+        .eq("id", id);
       if (error) throw error;
       setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, admin_status: "rejected", rejection_reason: reason } : s)));
       setRejectingId(null);
@@ -338,6 +345,9 @@ const AdminLLS = () => {
             <div className="lg:col-span-1">
               {selectedSubmission ? (
                 <div className="border border-border/50 rounded-lg p-6 space-y-6 bg-card/30">
+                  {selectedSubmission.song_image_url && (
+                    <img src={selectedSubmission.song_image_url} className="w-full rounded-lg object-cover aspect-square mb-4" />
+                  )}
                   <div>
                     <h3 className="font-display text-xl text-foreground mb-1">
                       {selectedSubmission.song_title}
@@ -388,6 +398,13 @@ const AdminLLS = () => {
                       </a>
                     )}
                   </div>
+
+                  {selectedSubmission.short_bio && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Artist Bio</p>
+                      <p className="text-sm text-foreground">{selectedSubmission.short_bio}</p>
+                    </div>
+                  )}
 
                   {selectedSubmission.notes && (
                     <div>
