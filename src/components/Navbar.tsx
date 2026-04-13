@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
+
 import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
 
@@ -12,7 +12,6 @@ const HIDDEN_EXACT = ["/fan/scene", "/fan/info"];
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -38,6 +37,7 @@ const Navbar = () => {
     { label: "Record Stores", path: "/lls-us/retail" },
     { label: "Artists", path: "/lls-us/artists" },
     { label: "How to GoLokol", path: "/how-to-golokol" },
+    { label: "Pricing", path: "/pricing" },
   ];
 
   const handleSignOut = async () => {

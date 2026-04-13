@@ -1,16 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, X, Check, ChevronsUpDown } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { cn } from "@/lib/utils";
+import { ArrowLeft, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
@@ -23,15 +16,10 @@ const GENRE_OPTIONS = [
   "Reggae","Rock","Ska","Spoken-Word","Techno",
 ];
 
-const ATLANTA_NEIGHBORHOODS = [
-  "Adair Park","Adams Park","Adamsville","Almond Park","Ansley Park","Arden/Habersham","Argonne Forest","Arlington Estates","Atkins Park","Auburn Avenue","Austell","Avondale Estates","Bakers Ferry","Bankhead","Beecher Hills","Ben Hill","Berkshire Hills","Bowen Homes","Bower Hills","Brookhaven","Brookwood Hills","Buckhead","Buffalo Creek","Cabbagetown","Candler Park","Capitol Gateway","Capitol Hill","Capitol View","Capitol View Manor","Carey Park","Cascade Green","Cascade Heights","Cascade Road","Castleberry Hill","Chancel","Channing Valley","Chastain Park","Chester Avenue","Clairmont","Collier Heights","Collier Hills","Columbia","Conley Hills","Cornelia","Decatur","Deerwood","Downtown","Druid Hills","East Atlanta","East Lake","East Point","Edgewood","English Avenue","Fairburn","Fairburn Aces","Fairway Hills","Five Points","Flat Shoals","Forest Hills","Fort Valley","Garden Hills","Glenrose Heights","Glenwood Park","Grant Park","Grove Park","Hampton Oaks","Hanover West","Hapeville","Harris Chiles","Harvel Hills","Hillsdale","Historic West End","Holly Hills","Home Park","Inman Park","Jonesboro","Joyland","Kirkwood","Lake Claire","Lakewood","Lakewood Heights","Lenox","Linden","Lindbergh","Loring Heights","Lynwood Park","Mableton","Marietta","Mechanicsville","Memorial Park","Midtown","Midway Woods","Moreland Hills","Morningside","Morris Brandon","Mozley Park","Murphey Crossing","Napier/Thomasville","Norcross","North Buckhead","North Druid Hills","Oakland City","Oakview","Old Fourth Ward","Paces","Panthersville","Perkerson","Peters Street","Peyton Forest","Piedmont Heights","Pittsburgh","Plateau","Plunkettown","Ponce City Market area","Ponce De Leon","Princeton Lakes","Pyron","Rebel Valley Forest","Reynoldstown","Ridgewood Heights","Riverside","Rocky Mount","Rollingwood","Sandy Springs","Sherwood Forest","Smyrna","South Atlanta","South Buckhead","Southtowne","Stanton Road","Stone Mountain","Summerhill","Sylvan Hills","Thomasville Heights","Toco Hills","Tucker","Underwood Hills","Utoy Creek","Vine City","Virginia-Highland","Vinings","Waterford","Westview","Whittier Mill","Wildwood","Wilson Mill Meadows","Winn Park","Woodland Hills","Wyngate",
-];
-
-const MAX_BIO = 240;
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
 const MAX_MP3_SIZE = 20 * 1024 * 1024;
 const MIN_IMAGE_DIM = 200;
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 2;
 
 const ArtistSubmit = () => {
   const { toast } = useToast();
@@ -43,17 +31,11 @@ const ArtistSubmit = () => {
   const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
-  const [neighborhoodOpen, setNeighborhoodOpen] = useState(false);
 
   const [form, setForm] = useState({
     artist_name: "",
-    instagram_handle: "",
     genre_style: [] as string[],
-    city_market: "",
-    artist_neighborhood: "",
     song_title: "",
-    physical_product: "",
-    short_bio: "",
   });
 
   const [mp3File, setMp3File] = useState<File | null>(null);
@@ -120,14 +102,8 @@ const ArtistSubmit = () => {
   const validateStep = (s: number): boolean => {
     if (s === 1) {
       if (!form.artist_name.trim()) { toast({ title: "Artist Name is required.", variant: "destructive" }); return false; }
-      if (form.genre_style.length === 0) { toast({ title: "Please select at least one genre.", variant: "destructive" }); return false; }
-      if (!form.city_market) { toast({ title: "Please select a city.", variant: "destructive" }); return false; }
-      return true;
-    }
-    if (s === 2) {
       if (!form.song_title.trim()) { toast({ title: "Song Title is required.", variant: "destructive" }); return false; }
-      if (!form.physical_product) { toast({ title: "Please select a physical product option.", variant: "destructive" }); return false; }
-      if (!form.short_bio.trim()) { toast({ title: "Short bio is required.", variant: "destructive" }); return false; }
+      if (form.genre_style.length === 0) { toast({ title: "Please select at least one genre.", variant: "destructive" }); return false; }
       return true;
     }
     return true;
@@ -167,24 +143,18 @@ const ArtistSubmit = () => {
       const { error } = await (supabase as any).from("lls_artist_submissions").insert({
         artist_name: form.artist_name.trim(),
         contact_email: user.email,
-        instagram_handle: form.instagram_handle.trim() || null,
         genre_style: form.genre_style.join(", "),
-        city_market: form.city_market,
-        artist_neighborhood: form.artist_neighborhood || null,
-        physical_product: form.physical_product,
+        city_market: "Atlanta",
         song_title: form.song_title.trim(),
-        short_bio: form.short_bio.trim(),
         song_image_url: imgUrl.publicUrl,
         mp3_url: mp3Url.publicUrl,
         mp3_path: mp3Path,
         original_filename: mp3File.name,
-      artist_user_id: user.id,
+        artist_user_id: user.id,
         payment_status: "free",
         admin_status: "pending",
       });
       if (error) throw error;
-
-      toast({ title: "You're in. We'll be in touch." });
 
       try {
         const { data: mlData, error: mlError } = await supabase.functions.invoke(
@@ -215,8 +185,10 @@ const ArtistSubmit = () => {
   const renderStep1 = () => (
     <div className="space-y-5">
       <div className="text-center mb-4">
-        <h2 className="font-display text-2xl text-primary-foreground">Your Artist Info</h2>
-        <p className="text-primary-foreground/70 text-sm font-sans mt-1">Tell us who you are</p>
+        <h2 className="font-display text-2xl text-primary-foreground">Song Info</h2>
+        <p className="text-primary-foreground/70 text-sm font-sans mt-1">
+          This song will replace any song featured on ATL Lokol Listening Stations and distributed to fans who follow you already.
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -235,8 +207,8 @@ const ArtistSubmit = () => {
       </div>
 
       <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Instagram Handle</Label>
-        <Input value={form.instagram_handle} onChange={e => setForm(f => ({ ...f, instagram_handle: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground" maxLength={200} placeholder="@yourhandle" />
+        <Label className="text-primary-foreground text-base font-sans">Song Title *</Label>
+        <Input value={form.song_title} onChange={e => setForm(f => ({ ...f, song_title: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground" maxLength={300} placeholder="Your song title" />
       </div>
 
       <div className="space-y-2">
@@ -250,97 +222,18 @@ const ArtistSubmit = () => {
           ))}
         </div>
       </div>
-
-      <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">City / Market *</Label>
-        <Select value={form.city_market} onValueChange={v => setForm(f => ({ ...f, city_market: v }))}>
-          <SelectTrigger className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50">
-            <SelectValue placeholder="Select city" />
-          </SelectTrigger>
-          <SelectContent className="bg-white text-black">
-            <SelectItem value="Atlanta" className="text-black">Atlanta</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">What part of Atlanta are you based in? (optional)</Label>
-        <Popover open={neighborhoodOpen} onOpenChange={setNeighborhoodOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" aria-expanded={neighborhoodOpen}
-              className="w-full h-14 justify-between text-base font-sans bg-background text-foreground border-primary-foreground/50 hover:bg-background/90">
-              {form.artist_neighborhood || "Select neighborhood..."}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-white text-black" align="start">
-            <Command>
-              <CommandInput placeholder="Search neighborhoods..." className="bg-white text-black placeholder:text-gray-500" />
-              <CommandList>
-                <CommandEmpty className="text-black">No neighborhood found.</CommandEmpty>
-                <CommandGroup>
-                  {ATLANTA_NEIGHBORHOODS.map(hood => (
-                    <CommandItem key={hood} value={hood} onSelect={() => { setForm(f => ({ ...f, artist_neighborhood: f.artist_neighborhood === hood ? "" : hood })); setNeighborhoodOpen(false); }} className="text-black hover:bg-gray-100 cursor-pointer">
-                      <Check className={cn("mr-2 h-4 w-4", form.artist_neighborhood === hood ? "opacity-100" : "opacity-0")} />
-                      {hood}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </div>
     </div>
   );
 
   const renderStep2 = () => (
     <div className="space-y-5">
       <div className="text-center mb-4">
-        <h2 className="font-display text-2xl text-primary-foreground">Song Details</h2>
-        <p className="text-primary-foreground/70 text-sm font-sans mt-1">Tell us about your track</p>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Song Title *</Label>
-        <Input value={form.song_title} onChange={e => setForm(f => ({ ...f, song_title: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground" maxLength={300} placeholder="Your song title" />
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Do you have physical product available or in production? *</Label>
-        <RadioGroup value={form.physical_product} onValueChange={v => setForm(f => ({ ...f, physical_product: v }))} className="flex flex-col gap-3 mt-1">
-          {["Yes", "In Production", "Not Yet"].map(opt => (
-            <label key={opt} className="flex items-center gap-3 cursor-pointer">
-              <RadioGroupItem value={opt} className="border-primary-foreground/50 text-primary-foreground" />
-              <span className="text-primary-foreground text-base font-sans">{opt}</span>
-            </label>
-          ))}
-        </RadioGroup>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Short Bio - New fans see this. * <span className="text-primary-foreground/60">({form.short_bio.length}/{MAX_BIO})</span></Label>
-        <textarea
-          value={form.short_bio}
-          onChange={e => { if (e.target.value.length <= MAX_BIO) setForm(f => ({ ...f, short_bio: e.target.value })); }}
-          className="flex min-h-[100px] w-full rounded-md border border-primary-foreground/50 bg-background px-3 py-2 text-base font-sans text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          maxLength={MAX_BIO}
-          placeholder="A short bio or greeting to new fans (max 240 characters)"
-        />
-      </div>
-
-    </div>
-  );
-
-  const renderStep3 = () => (
-    <div className="space-y-5">
-      <div className="text-center mb-4">
         <h2 className="font-display text-2xl text-primary-foreground">Upload Files</h2>
-        <p className="text-primary-foreground/70 text-sm font-sans mt-1">Almost there — upload your song and image</p>
+        <p className="text-primary-foreground/70 text-sm font-sans mt-1">Upload your song and image</p>
       </div>
 
       <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Upload Your Song * <span className="text-primary-foreground/60">(MP3 only, max 20MB)</span></Label>
+        <Label className="text-primary-foreground text-base font-sans">Upload MP3 * <span className="text-primary-foreground/60">(MP3 only, max 20MB)</span></Label>
         {mp3File ? (
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-primary-foreground/30 bg-background">
             <span className="text-foreground text-sm font-sans truncate flex-1">{mp3File.name}</span>
@@ -400,7 +293,6 @@ const ArtistSubmit = () => {
           <form onSubmit={e => e.preventDefault()}>
             {step === 1 && renderStep1()}
             {step === 2 && renderStep2()}
-            {step === 3 && renderStep3()}
 
             {step < TOTAL_STEPS && (
               <div className="flex justify-between gap-3 mt-8">

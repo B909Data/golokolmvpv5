@@ -41,15 +41,19 @@ const LLSUs = () => {
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Music lovers listen, vote and save their favs.
+              Music lovers listen, add their favs to a customized Lokol Scene.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              We create local momentum with direct-to-fan promotion and sales.{" "}
-              <Link to="/connect" className="text-primary underline hover:text-primary/80 transition-colors">Golokol Connect</Link>{" "}
-              coming soon.
+              Artists create local momentum with direct-to-fan promotion, sales, and communication. No algorithms. No barriers.
+            </span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
+            <span className="type-subcaption text-[#F0EDE8]">
+              Fans earn points engaging at stations, on GoLokol and at shows. Then redeem those points with local business.
             </span>
           </li>
         </ul>
