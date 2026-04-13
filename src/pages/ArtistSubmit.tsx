@@ -197,8 +197,6 @@ const ArtistSubmit = () => {
       }
 
       navigate("/artist/dashboard");
-
-      navigate("/artist/dashboard");
     } catch (err: any) {
       toast({ title: err?.message || "Something went wrong.", variant: "destructive" });
     } finally {
