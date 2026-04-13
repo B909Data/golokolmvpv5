@@ -215,7 +215,17 @@ const ArtistSubmit = () => {
 
       <div className="space-y-2">
         <Label className="text-primary-foreground text-base font-sans">Artist Name *</Label>
-        <Input value={form.artist_name} onChange={e => setForm(f => ({ ...f, artist_name: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground" maxLength={200} placeholder="Your artist or band name" />
+        <Input
+          value={form.artist_name}
+          onChange={e => { if (!artistNameReadOnly) setForm(f => ({ ...f, artist_name: e.target.value })); }}
+          readOnly={artistNameReadOnly}
+          className={`h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground ${artistNameReadOnly ? "opacity-70 cursor-not-allowed" : ""}`}
+          maxLength={200}
+          placeholder="Your artist or band name"
+        />
+        {artistNameReadOnly && (
+          <p className="text-white/40 text-xs font-sans mt-1">This is your registered artist name.</p>
+        )}
       </div>
 
       <div className="space-y-2">
