@@ -319,7 +319,7 @@ export type Database = {
           no_royalties_confirmed: boolean
           original_filename: string | null
           payment_status: string | null
-          physical_product: string
+          physical_product: string | null
           rejection_reason: string | null
           rights_confirmed: boolean
           short_bio: string | null
@@ -336,7 +336,7 @@ export type Database = {
           artist_neighborhood?: string | null
           artist_slug?: string | null
           artist_user_id?: string | null
-          city_market: string
+          city_market?: string
           contact_email: string
           created_at?: string
           genre_style: string
@@ -349,7 +349,7 @@ export type Database = {
           no_royalties_confirmed?: boolean
           original_filename?: string | null
           payment_status?: string | null
-          physical_product: string
+          physical_product?: string | null
           rejection_reason?: string | null
           rights_confirmed?: boolean
           short_bio?: string | null
@@ -379,7 +379,7 @@ export type Database = {
           no_royalties_confirmed?: boolean
           original_filename?: string | null
           payment_status?: string | null
-          physical_product?: string
+          physical_product?: string | null
           rejection_reason?: string | null
           rights_confirmed?: boolean
           short_bio?: string | null

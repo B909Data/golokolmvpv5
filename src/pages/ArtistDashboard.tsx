@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Upload, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const MAX_BIO = 240;
+const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
 
 const ATLANTA_NEIGHBORHOODS = [
   "Adair Park","Adams Park","Adamsville","Almond Park","Ansley Park","Arden/Habersham","Argonne Forest","Arlington Estates","Atkins Park","Auburn Avenue","Austell","Avondale Estates","Bakers Ferry","Bankhead","Beecher Hills","Ben Hill","Berkshire Hills","Bowen Homes","Bower Hills","Brookhaven","Brookwood Hills","Buckhead","Buffalo Creek","Cabbagetown","Candler Park","Capitol Gateway","Capitol Hill","Capitol View","Capitol View Manor","Carey Park","Cascade Green","Cascade Heights","Cascade Road","Castleberry Hill","Chancel","Channing Valley","Chastain Park","Chester Avenue","Clairmont","Collier Heights","Collier Hills","Columbia","Conley Hills","Cornelia","Decatur","Deerwood","Downtown","Druid Hills","East Atlanta","East Lake","East Point","Edgewood","English Avenue","Fairburn","Fairburn Aces","Fairway Hills","Five Points","Flat Shoals","Forest Hills","Fort Valley","Garden Hills","Glenrose Heights","Glenwood Park","Grant Park","Grove Park","Hampton Oaks","Hanover West","Hapeville","Harris Chiles","Harvel Hills","Hillsdale","Historic West End","Holly Hills","Home Park","Inman Park","Jonesboro","Joyland","Kirkwood","Lake Claire","Lakewood","Lakewood Heights","Lenox","Linden","Lindbergh","Loring Heights","Lynwood Park","Mableton","Marietta","Mechanicsville","Memorial Park","Midtown","Midway Woods","Moreland Hills","Morningside","Morris Brandon","Mozley Park","Murphey Crossing","Napier/Thomasville","Norcross","North Buckhead","North Druid Hills","Oakland City","Oakview","Old Fourth Ward","Paces","Panthersville","Perkerson","Peters Street","Peyton Forest","Piedmont Heights","Pittsburgh","Plateau","Plunkettown","Ponce City Market area","Ponce De Leon","Princeton Lakes","Pyron","Rebel Valley Forest","Reynoldstown","Ridgewood Heights","Riverside","Rocky Mount","Rollingwood","Sandy Springs","Sherwood Forest","Smyrna","South Atlanta","South Buckhead","Southtowne","Stanton Road","Stone Mountain","Summerhill","Sylvan Hills","Thomasville Heights","Toco Hills","Tucker","Underwood Hills","Utoy Creek","Vine City","Virginia-Highland","Vinings","Waterford","Westview","Whittier Mill","Wildwood","Wilson Mill Meadows","Winn Park","Woodland Hills","Wyngate",
@@ -37,7 +38,8 @@ interface ArtistProfile {
 const ArtistDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+  const setupPhotoRef = useRef<HTMLInputElement>(null);
+  const profilePhotoRef = useRef<HTMLInputElement>(null);
 
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -48,13 +50,25 @@ const ArtistDashboard = () => {
 
   // Profile state
   const [profile, setProfile] = useState<ArtistProfile | null>(null);
+  const [isFirstTime, setIsFirstTime] = useState(false);
+  const [welcomeName, setWelcomeName] = useState<string>("");
+
+  // First-time setup fields
+  const [setupFirstName, setSetupFirstName] = useState("");
+  const [setupArtistName, setSetupArtistName] = useState("");
+  const [setupPhotoFile, setSetupPhotoFile] = useState<File | null>(null);
+  const [setupPhotoPreview, setSetupPhotoPreview] = useState<string | null>(null);
+  const [setupSaving, setSetupSaving] = useState(false);
 
   // Profile form fields
+  const [pArtistName, setPArtistName] = useState("");
   const [pCity, setPCity] = useState("Atlanta");
   const [pNeighborhood, setPNeighborhood] = useState("");
   const [pInstagram, setPInstagram] = useState("");
   const [pMusicLink, setPMusicLink] = useState("");
   const [pBio, setPBio] = useState("");
+  const [pPhotoFile, setPPhotoFile] = useState<File | null>(null);
+  const [pPhotoPreview, setPPhotoPreview] = useState<string | null>(null);
   const [profileSaving, setProfileSaving] = useState(false);
   const [neighborhoodOpen, setNeighborhoodOpen] = useState(false);
 
@@ -84,24 +98,14 @@ const ArtistDashboard = () => {
 
       if (profileData) {
         setProfile(profileData);
+        setIsFirstTime(false);
         prefillForm(profileData);
+        setWelcomeName(profileData.first_name || profileData.artist_name || session.user.user_metadata?.artist_name || "");
       } else {
-        // Create a stub profile
-        const newProfile = {
-          artist_user_id: session.user.id,
-          artist_name: session.user.user_metadata?.artist_name || null,
-          first_name: session.user.user_metadata?.first_name || null,
-        };
-        await (supabase as any).from("artist_profiles").insert(newProfile);
-        const { data: created } = await (supabase as any)
-          .from("artist_profiles")
-          .select("*")
-          .eq("artist_user_id", session.user.id)
-          .maybeSingle();
-        if (created) {
-          setProfile(created);
-          prefillForm(created);
-        }
+        // First time — no profile record
+        setIsFirstTime(true);
+        setSetupArtistName(session.user.user_metadata?.artist_name || "");
+        setWelcomeName("");
       }
 
       // Fetch submissions
@@ -121,11 +125,81 @@ const ArtistDashboard = () => {
   }, [navigate]);
 
   const prefillForm = (p: ArtistProfile) => {
+    setPArtistName(p.artist_name || "");
     setPCity(p.city || "Atlanta");
     setPNeighborhood(p.neighborhood || "");
     setPInstagram(p.instagram_handle || "");
     setPMusicLink(p.music_link || "");
     setPBio(p.short_bio || "");
+    setPPhotoPreview(p.profile_image_url || null);
+  };
+
+  const handleSetupPhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast({ title: "Please select an image file.", variant: "destructive" }); return; }
+    if (file.size > MAX_IMAGE_SIZE) { toast({ title: "Image must be under 3MB.", variant: "destructive" }); return; }
+    setSetupPhotoFile(file);
+    setSetupPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const handleProfilePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast({ title: "Please select an image file.", variant: "destructive" }); return; }
+    if (file.size > MAX_IMAGE_SIZE) { toast({ title: "Image must be under 3MB.", variant: "destructive" }); return; }
+    setPPhotoFile(file);
+    setPPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const uploadPhoto = async (file: File, uid: string): Promise<string> => {
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${uid}/profile.${ext}`;
+    const { error } = await supabase.storage.from("artist-profiles").upload(path, file, { contentType: file.type, upsert: true });
+    if (error) throw error;
+    const { data } = supabase.storage.from("artist-profiles").getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const handleSetupSave = async () => {
+    if (!userId) return;
+    if (!setupFirstName.trim()) { toast({ title: "First Name is required.", variant: "destructive" }); return; }
+    if (!setupArtistName.trim()) { toast({ title: "Artist Name is required.", variant: "destructive" }); return; }
+    if (!setupPhotoFile) { toast({ title: "Please upload a profile photo.", variant: "destructive" }); return; }
+
+    setSetupSaving(true);
+    try {
+      const publicUrl = await uploadPhoto(setupPhotoFile, userId);
+
+      await supabase.auth.updateUser({
+        data: { first_name: setupFirstName.trim(), artist_name: setupArtistName.trim(), profile_image_url: publicUrl },
+      });
+
+      const profilePayload = {
+        artist_user_id: userId,
+        first_name: setupFirstName.trim(),
+        artist_name: setupArtistName.trim(),
+        profile_image_url: publicUrl,
+      };
+
+      await (supabase as any).from("artist_profiles").upsert(profilePayload, { onConflict: "artist_user_id" });
+
+      const { data: freshProfile } = await (supabase as any)
+        .from("artist_profiles")
+        .select("*")
+        .eq("artist_user_id", userId)
+        .maybeSingle();
+
+      setProfile(freshProfile);
+      if (freshProfile) prefillForm(freshProfile);
+      setArtistName(setupArtistName.trim());
+      setWelcomeName(setupFirstName.trim());
+      setIsFirstTime(false);
+    } catch (err: any) {
+      toast({ title: err?.message || "Something went wrong.", variant: "destructive" });
+    } finally {
+      setSetupSaving(false);
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -133,16 +207,22 @@ const ArtistDashboard = () => {
 
     setProfileSaving(true);
     try {
+      let photoUrl = profile?.profile_image_url || null;
+      if (pPhotoFile) {
+        photoUrl = await uploadPhoto(pPhotoFile, userId);
+        setPPhotoFile(null);
+      }
+
       const profilePayload = {
         artist_user_id: userId,
         first_name: profile?.first_name || null,
-        artist_name: artistName || profile?.artist_name || null,
+        artist_name: pArtistName.trim() || artistName || null,
         city: pCity,
         neighborhood: pNeighborhood || null,
         instagram_handle: pInstagram.trim() || null,
         music_link: pMusicLink.trim() || null,
         short_bio: pBio.trim() || null,
-        profile_image_url: profile?.profile_image_url || null,
+        profile_image_url: photoUrl,
       };
 
       const { error } = await (supabase as any)
@@ -153,8 +233,8 @@ const ArtistDashboard = () => {
       await supabase.auth.updateUser({
         data: {
           first_name: profile?.first_name,
-          artist_name: artistName,
-          profile_image_url: profile?.profile_image_url,
+          artist_name: pArtistName.trim() || artistName,
+          profile_image_url: photoUrl,
         },
       });
 
@@ -166,6 +246,7 @@ const ArtistDashboard = () => {
 
       setProfile(freshProfile);
       if (freshProfile) prefillForm(freshProfile);
+      setArtistName(pArtistName.trim() || artistName);
       toast({ title: "Profile saved." });
     } catch (err: any) {
       toast({ title: err?.message || "Something went wrong.", variant: "destructive" });
@@ -220,19 +301,76 @@ const ArtistDashboard = () => {
     );
   }
 
+  // First-time setup card
+  if (isFirstTime) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col">
+        <div className="flex-1 px-6 md:px-12 py-12 max-w-xl mx-auto w-full space-y-8">
+          <div className="rounded-2xl bg-[#1a1a1a] p-6 md:p-8 space-y-5">
+            <h2 className="font-display text-2xl font-bold text-white">Let's set up your profile</h2>
+
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">First Name *</Label>
+              <Input value={setupFirstName} onChange={e => setSetupFirstName(e.target.value)}
+                className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40"
+                placeholder="Your first name" maxLength={100} />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">Artist Name *</Label>
+              <Input value={setupArtistName} onChange={e => setSetupArtistName(e.target.value)}
+                className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40"
+                placeholder="Your artist or band name" maxLength={200} />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">Profile Photo *</Label>
+              {setupPhotoPreview ? (
+                <div className="relative inline-block">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-white/20">
+                    <img src={setupPhotoPreview} alt="Profile preview" className="w-full h-full object-cover" />
+                  </div>
+                  <button type="button" onClick={() => { setSetupPhotoFile(null); if (setupPhotoPreview) URL.revokeObjectURL(setupPhotoPreview); setSetupPhotoPreview(null); if (setupPhotoRef.current) setupPhotoRef.current.value = ""; }}
+                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1"><X className="h-4 w-4" /></button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => setupPhotoRef.current?.click()}
+                  className="flex items-center gap-3 px-6 py-4 rounded-lg border-2 border-dashed border-white/30 bg-white/5 text-white/70 hover:border-white hover:text-white transition-colors w-full">
+                  <Upload className="h-5 w-5" /><span className="text-base font-sans">Choose Photo</span>
+                </button>
+              )}
+              <input ref={setupPhotoRef} type="file" accept="image/*" onChange={handleSetupPhotoSelect} className="hidden" />
+              <p className="text-white/40 text-xs font-sans">Max 3MB. Will be displayed as a circle.</p>
+            </div>
+
+            <Button onClick={handleSetupSave} disabled={setupSaving}
+              className="w-full h-14 text-base font-display font-bold bg-[#FFD600] text-black hover:bg-[#FFD600]/90">
+              {setupSaving ? "Saving..." : "Save and Continue"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const displayName = welcomeName || profile?.first_name || profile?.artist_name || artistName || "";
+  const isReturning = !!profile;
+
   return (
     <div className="min-h-screen bg-black flex flex-col">
       <div className="flex-1 px-6 md:px-12 py-12 max-w-xl mx-auto w-full space-y-8">
         {/* Header with profile */}
         <div className="flex items-center gap-4">
           {profile?.profile_image_url ? (
-            <img src={profile.profile_image_url} alt="Profile" className="w-14 h-14 rounded-full object-cover flex-shrink-0" />
+            <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
+              <img src={profile.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
+            </div>
           ) : (
             <div className="w-14 h-14 rounded-full bg-[#1a1a1a] flex-shrink-0" />
           )}
           <div>
             <h1 className="text-white font-bold text-xl font-display">
-              Welcome back, {profile?.first_name || "Artist"}
+              {isReturning ? `Welcome back, ${displayName}` : `Welcome, ${displayName}`}
             </h1>
             {(profile?.artist_name || artistName) && (
               <p className="text-[#FFD600] text-sm font-sans">{profile?.artist_name || artistName}</p>
@@ -256,6 +394,13 @@ const ArtistDashboard = () => {
           )}
         </section>
 
+        {/* Complete / Edit Profile button */}
+        <a href="#artist-profile" className="block">
+          <Button className="w-full h-14 text-base font-display font-bold bg-[#FFD600] text-black hover:bg-[#FFD600]/90">
+            {isProfileIncomplete ? "Complete Your Profile" : "Edit Profile"}
+          </Button>
+        </a>
+
         {/* Submit Music */}
         <section className="space-y-3">
           <Link to="/artist/submit" className="block">
@@ -270,13 +415,6 @@ const ArtistDashboard = () => {
             <li>Free to submit</li>
           </ul>
         </section>
-
-        {/* Complete / Edit Profile button */}
-        <a href="#artist-profile" className="block">
-          <Button className="w-full h-14 text-base font-display font-bold bg-[#FFD600] text-black hover:bg-[#FFD600]/90">
-            {isProfileIncomplete ? "Complete Your Profile" : "Edit Profile"}
-          </Button>
-        </a>
 
         {/* Submit a Show */}
         <section className="space-y-3">
@@ -296,6 +434,31 @@ const ArtistDashboard = () => {
           <h2 className="font-display text-xl font-bold text-white">Your Profile</h2>
 
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">Artist Name</Label>
+              <Input value={pArtistName} onChange={e => setPArtistName(e.target.value)} className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40" placeholder="Your artist or band name" maxLength={200} />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white text-sm font-sans">Profile Photo</Label>
+              {pPhotoPreview ? (
+                <div className="relative inline-block">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20">
+                    <img src={pPhotoPreview} alt="Profile" className="w-full h-full object-cover" />
+                  </div>
+                  <button type="button" onClick={() => { setPPhotoFile(null); setPPhotoPreview(profile?.profile_image_url || null); if (profilePhotoRef.current) profilePhotoRef.current.value = ""; }}
+                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1"><X className="h-3 w-3" /></button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => profilePhotoRef.current?.click()}
+                  className="flex items-center gap-3 px-6 py-4 rounded-lg border-2 border-dashed border-white/30 bg-white/5 text-white/70 hover:border-white hover:text-white transition-colors w-full">
+                  <Upload className="h-5 w-5" /><span className="text-base font-sans">Upload Photo</span>
+                </button>
+              )}
+              <input ref={profilePhotoRef} type="file" accept="image/*" onChange={handleProfilePhotoSelect} className="hidden" />
+              <p className="text-white/40 text-xs font-sans">Max 3MB. Displayed as a circle.</p>
+            </div>
+
             <div className="space-y-2">
               <Label className="text-white text-sm font-sans">City</Label>
               <Input value={pCity} onChange={e => setPCity(e.target.value)} className="h-12 text-base font-sans bg-[#111] text-white border-white/20 placeholder:text-white/40" placeholder="Atlanta" />

@@ -18,7 +18,6 @@ const GENRE_OPTIONS = [
 
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
 const MAX_MP3_SIZE = 20 * 1024 * 1024;
-const MIN_IMAGE_DIM = 200;
 const TOTAL_STEPS = 2;
 
 const ArtistSubmit = () => {
@@ -73,16 +72,8 @@ const ArtistSubmit = () => {
     if (!file) return;
     if (!file.type.startsWith("image/")) { toast({ title: "Please select an image file.", variant: "destructive" }); return; }
     if (file.size > MAX_IMAGE_SIZE) { toast({ title: "Image must be under 3MB.", variant: "destructive" }); return; }
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      if (img.width < MIN_IMAGE_DIM || img.height < MIN_IMAGE_DIM) { toast({ title: `Image must be at least ${MIN_IMAGE_DIM}×${MIN_IMAGE_DIM}px.`, variant: "destructive" }); URL.revokeObjectURL(url); return; }
-      const ratio = img.width / img.height;
-      if (ratio < 0.9 || ratio > 1.1) { toast({ title: "Image should be square (1:1 ratio).", variant: "destructive" }); URL.revokeObjectURL(url); return; }
-      setImageFile(file);
-      setImagePreview(url);
-    };
-    img.src = url;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const clearImage = () => { setImageFile(null); if (imagePreview) URL.revokeObjectURL(imagePreview); setImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = ""; };
@@ -250,10 +241,12 @@ const ArtistSubmit = () => {
 
       <div className="space-y-2">
         <Label className="text-primary-foreground text-base font-sans">Upload Song Image *</Label>
-        <p className="text-sm text-primary-foreground/60 font-sans">Square (1:1), min 200×200px, max 3MB</p>
+        <p className="text-sm text-primary-foreground/60 font-sans">Any image, max 3MB (will be cropped to square)</p>
         {imagePreview ? (
           <div className="relative inline-block">
-            <img src={imagePreview} alt="Song preview" className="w-32 h-32 rounded-lg object-cover border border-primary-foreground/30" />
+            <div className="w-32 h-32 rounded-lg overflow-hidden border border-primary-foreground/30">
+              <img src={imagePreview} alt="Song preview" className="w-full h-full object-cover" />
+            </div>
             <button type="button" onClick={clearImage} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"><X className="h-4 w-4" /></button>
           </div>
         ) : (
