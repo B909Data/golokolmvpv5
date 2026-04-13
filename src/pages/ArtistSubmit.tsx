@@ -16,7 +16,7 @@ const GENRE_OPTIONS = [
   "Reggae","Rock","Ska","Spoken-Word","Techno",
 ];
 
-const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_MP3_SIZE = 20 * 1024 * 1024;
 const TOTAL_STEPS = 2;
 
@@ -72,7 +72,7 @@ const ArtistSubmit = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) { toast({ title: "Please select an image file.", variant: "destructive" }); return; }
-    if (file.size > MAX_IMAGE_SIZE) { toast({ title: "Image must be under 3MB.", variant: "destructive" }); return; }
+    if (file.size > MAX_IMAGE_SIZE) { toast({ title: "Image must be under 5MB.", variant: "destructive" }); return; }
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
   };
@@ -99,6 +99,8 @@ const ArtistSubmit = () => {
       return true;
     }
     if (s === 2) {
+      if (!mp3File) { toast({ title: "Please upload your MP3.", variant: "destructive" }); return false; }
+      if (!imageFile) { toast({ title: "Please upload a song image.", variant: "destructive" }); return false; }
       if (!termsConfirmed) { toast({ title: "Please agree to the terms before submitting.", variant: "destructive" }); return false; }
       return true;
     }
@@ -228,7 +230,7 @@ const ArtistSubmit = () => {
     <div className="space-y-5">
       <div className="text-center mb-4">
         <h2 className="font-display text-2xl text-primary-foreground">Upload Files</h2>
-        <p className="text-primary-foreground/70 text-sm font-sans mt-1">Upload your song and image</p>
+        <p className="text-primary-foreground/70 text-sm font-sans mt-1">Almost there — upload your song and artwork.</p>
       </div>
 
       <div className="space-y-2">
@@ -249,7 +251,7 @@ const ArtistSubmit = () => {
 
       <div className="space-y-2">
         <Label className="text-primary-foreground text-base font-sans">Upload Song Image *</Label>
-        <p className="text-sm text-primary-foreground/60 font-sans">Any image, max 3MB (will be cropped to square)</p>
+        <p className="text-sm text-primary-foreground/60 font-sans">Any image, max 5MB (will be cropped to square)</p>
         {imagePreview ? (
           <div className="relative inline-block">
             <div className="w-32 h-32 rounded-lg overflow-hidden border border-primary-foreground/30">
@@ -275,7 +277,7 @@ const ArtistSubmit = () => {
         />
         <span className="text-sm text-primary-foreground/80 font-sans">
           I agree to the GoLokol{" "}
-          <a href="/lls-music-release" target="_blank" style={{ color: '#000000', textDecoration: 'underline' }}>
+          <a href="/lls-music-release" target="_blank" style={{ color: '#FFD600', textDecoration: 'underline' }}>
             Artist Terms &amp; Music Release
           </a>
         </span>
