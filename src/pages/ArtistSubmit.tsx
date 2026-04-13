@@ -60,11 +60,18 @@ const ArtistSubmit = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+  const [artistNameReadOnly, setArtistNameReadOnly] = useState(false);
+
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { navigate("/artist/signup", { replace: true }); return; }
       setUser(session.user);
+      const metaArtistName = session.user.user_metadata?.artist_name;
+      if (metaArtistName) {
+        setForm(f => ({ ...f, artist_name: metaArtistName }));
+        setArtistNameReadOnly(true);
+      }
       setLoading(false);
     };
     init();
