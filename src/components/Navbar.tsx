@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
 
+const HIDDEN_PREFIXES = ["/lls"];
+const HIDDEN_EXACT = ["/fan/scene", "/fan/info"];
+
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -22,13 +26,25 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const isActive = (path: string) => location.pathname === path;
+  // Hide navbar on certain routes
+  const path = location.pathname;
+  if (HIDDEN_EXACT.includes(path) || HIDDEN_PREFIXES.some(p => path.startsWith(p))) {
+    return null;
+  }
+
+  const isActive = (p: string) => path === p;
 
   const navItems = [
     { label: "Record Stores", path: "/lls-us/retail" },
     { label: "Artists", path: "/lls-us/artists" },
     { label: "How to GoLokol", path: "/how-to-golokol" },
   ];
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setMobileMenuOpen(false);
+    navigate("/");
+  };
 
   const authButton = (
     <Link to={isLoggedIn ? "/artist/dashboard" : "/artist/signup"}>
@@ -45,7 +61,6 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl pt-[env(safe-area-inset-top)]">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
             <img src={golokolLogo} alt="GoLokol" className="h-10 w-10" />
             <span className="font-display text-2xl text-foreground tracking-wide">GoLokol</span>
@@ -64,15 +79,12 @@ const Navbar = () => {
                 </Button>
               </Link>
             ))}
-            {/* Auth button - Desktop */}
             {authButton}
           </div>
 
           {/* Mobile: Auth button + Hamburger */}
           <div className="md:hidden flex items-center gap-2">
-            {/* Auth button - Mobile (outside hamburger, to the left) */}
             {authButton}
-            {/* Mobile Hamburger */}
             <button
               className="flex items-center justify-center h-10 w-10 text-foreground"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -98,6 +110,17 @@ const Navbar = () => {
                   </Button>
                 </Link>
               ))}
+              {isLoggedIn && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                  style={{ color: "#FFD600" }}
+                  onClick={handleSignOut}
+                >
+                  Sign Out
+                </Button>
+              )}
             </div>
           </div>
         )}
