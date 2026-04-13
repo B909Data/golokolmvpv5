@@ -126,12 +126,14 @@ const ArtistSubmit = () => {
       if ((count ?? 0) >= 2) { toast({ title: "You've reached your 2 submissions this month. Try again next month.", variant: "destructive" }); return; }
 
       const ts = Date.now();
-      const mp3Path = `submissions/${user.id}/${ts}-${mp3File.name}`;
+      const sanitizedMp3Name = mp3File.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const mp3Path = `submissions/${user.id}/${ts}-${sanitizedMp3Name}`;
       const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
       if (mp3Err) throw mp3Err;
       const { data: mp3Url } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
 
-      const imgPath = `${user.id}/${ts}-${imageFile.name}`;
+      const sanitizedImgName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const imgPath = `${user.id}/${ts}-${sanitizedImgName}`;
       const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, imageFile, { contentType: imageFile.type });
       if (imgErr) throw imgErr;
       const { data: imgUrl } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
