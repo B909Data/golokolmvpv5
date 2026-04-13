@@ -277,7 +277,7 @@ const ArtistSubmit = () => {
         />
         <span className="text-sm text-primary-foreground/80 font-sans">
           I agree to the GoLokol{" "}
-          <a href="/lls-music-release" target="_blank" style={{ color: '#FFD600', textDecoration: 'underline' }}>
+          <a href="/lls-music-release" target="_blank" style={{ color: '#000000', textDecoration: 'underline' }}>
             Artist Terms &amp; Music Release
           </a>
         </span>
