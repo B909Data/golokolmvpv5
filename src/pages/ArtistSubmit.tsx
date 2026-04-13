@@ -187,10 +187,14 @@ const ArtistSubmit = () => {
       toast({ title: "You're in. We'll be in touch." });
 
       try {
-        supabase.functions.invoke("send-mailerlite-artist-welcome", {
-          body: { email: user.email, artist_name: form.artist_name.trim() },
-        });
-      } catch (_) { /* fire and forget */ }
+        const { data: mlData, error: mlError } = await supabase.functions.invoke(
+          "send-mailerlite-artist-welcome",
+          { body: { email: user.email, artist_name: form.artist_name.trim() } }
+        );
+        console.log("MailerLite response:", mlData, mlError);
+      } catch (mlErr) {
+        console.error("MailerLite error:", mlErr);
+      }
 
       navigate("/artist/dashboard");
     } catch (err: any) {
