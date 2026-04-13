@@ -3,8 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import heroImage from "@/assets/golokol-hero.svg";
 import llsCard from "@/assets/lls-us-hero.jpg";
-import afterpartyCard from "@/assets/afterparty-card.jpg";
 import connectCard from "@/assets/connect-card.jpg";
+import img3Card from "@/assets/img3.svg";
 
 
 const HowItWorksCard = ({
@@ -98,7 +98,7 @@ const Index = () => {
         <h2 className="text-center font-display font-bold text-3xl md:text-[40px] text-white mb-12">
           How it works
         </h2>
-        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8">
           <HowItWorksCard
             image={llsCard}
             number={1}
@@ -109,32 +109,19 @@ const Index = () => {
           <HowItWorksCard
             image={connectCard}
             number={2}
-            title="Try GoLokol Connect"
-            description="One dashboard that updates you about the shows, new music and news from all the artists you love city-wide."
+            title="Your City Your Scene"
+            description="Local music lovers discover and support artists added to their Lokol Scene dashboard, earning points along the way."
             to="/connect"
+          />
+          <HowItWorksCard
+            image={img3Card}
+            number={3}
+            title="The Value of Local Music"
+            description="Engaging with your city's music now has added value. Redeem that value to sustain the city you know."
+            to="/lls-us"
           />
         </div>
       </section>
-
-
-      {/* FAN CALLOUT */}
-      <section className="bg-[#0E0E0E] px-6 py-16 md:py-24 flex justify-center">
-        <div className="border-2 border-[#333] rounded-[32px] p-8 max-w-[400px] w-full text-center">
-          <h3 className="font-display font-bold text-xl text-white mb-3">
-            Are you a local fan?
-          </h3>
-          <p className="text-base text-[#999999] mb-6">
-            Discover and follow artists where you live.
-          </p>
-          <Link
-            to="/connect"
-            className="inline-flex items-center justify-center bg-[#FFD600] text-black font-semibold text-base rounded-lg py-3 px-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            Join GoLokol Connect
-          </Link>
-        </div>
-      </section>
-
 
       <Footer />
     </div>
