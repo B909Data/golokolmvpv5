@@ -67,6 +67,7 @@ import FanScene from "./pages/FanScene";
 import FanInfo from "./pages/FanInfo";
 import Connect from "./pages/Connect";
 import Unsubscribe from "./pages/Unsubscribe";
+import ClaimAccount from "./pages/ClaimAccount";
 
 const queryClient = new QueryClient();
 
@@ -157,11 +158,12 @@ const App = () => (
            <Route path="/pricing" element={<Pricing />} />
            <Route path="/connect" element={<Connect />} />
            <Route path="/unsubscribe" element={<Unsubscribe />} />
-          <Route path="/for-artists" element={<ArtistRecognition />} />
-          <Route path="/q/:code" element={<ShortLinkRedirect />} />
-          
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
+           <Route path="/for-artists" element={<ArtistRecognition />} />
+           <Route path="/q/:code" element={<ShortLinkRedirect />} />
+           <Route path="/claim/:code" element={<ClaimAccount />} />
+           
+           {/* 404 */}
+           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

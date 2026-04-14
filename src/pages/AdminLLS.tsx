@@ -530,6 +530,25 @@ const AdminLLS = () => {
                     <p className="text-muted-foreground">
                       <span className="text-foreground">Email:</span> {selectedSubmission.contact_email}
                     </p>
+                    {selectedSubmission.claim_code && (
+                      <div className="space-y-1">
+                        <p className="text-muted-foreground text-xs">Claim Code:</p>
+                        <p className="text-foreground font-mono text-sm">{selectedSubmission.claim_code}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-foreground text-sm">golokol.app/claim/{selectedSubmission.claim_code}</p>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(`golokol.app/claim/${selectedSubmission.claim_code}`);
+                              toast.success("Link copied!");
+                            }}
+                            className="p-1 rounded hover:bg-primary/20 transition-colors"
+                            title="Copy Link"
+                          >
+                            <Copy className="w-4 h-4 text-muted-foreground" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     <p className="text-muted-foreground">
                       <span className="text-foreground">Submitted:</span>{" "}
                       {new Date(selectedSubmission.created_at).toLocaleString()}
