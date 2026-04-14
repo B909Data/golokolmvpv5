@@ -110,7 +110,7 @@ const LLSStorePage = () => {
         </section>
 
         {/* Store name + CTA */}
-        <section className="w-full px-6 py-8 text-center" style={{ marginTop: -50 }}>
+        <section className="w-full px-6 py-8 text-center" style={{ marginTop: -10 }}>
           <h1 className="text-white font-bold text-[24px] md:text-[28px]">Lokol Listening Stations</h1>
           <p className="mt-2 font-bold text-[20px] md:text-[24px]" style={{ color: "#FFD600" }}>
             at {storeName}
@@ -118,7 +118,7 @@ const LLSStorePage = () => {
           <p className="text-white font-normal leading-[1.8] text-[18px] md:text-[20px] max-w-2xl mx-auto mt-4">
             Listen and discover a curated selection of Atlanta local artists.
             <br /><br />
-            Earn points at {storeName}.
+            Earn points for {storeName} discounts.
           </p>
           <button
             onClick={scrollToGenres}
