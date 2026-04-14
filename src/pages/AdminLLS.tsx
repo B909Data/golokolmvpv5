@@ -65,6 +65,14 @@ const AdminLLS = () => {
   const [saving, setSaving] = useState(false);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addArtistName, setAddArtistName] = useState("");
+  const [addSongTitle, setAddSongTitle] = useState("");
+  const [addGenre, setAddGenre] = useState("");
+  const [addMp3File, setAddMp3File] = useState<File | null>(null);
+  const [addImageFile, setAddImageFile] = useState<File | null>(null);
+  const [addSubmitting, setAddSubmitting] = useState(false);
+  const [claimLink, setClaimLink] = useState<string | null>(null);
 
   const fetchSubmissions = async () => {
     if (!key) return;
