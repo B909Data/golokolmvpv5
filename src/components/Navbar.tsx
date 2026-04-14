@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
 
-const HIDDEN_PREFIXES = ["/lls/", "/lls/signup"];
-const HIDDEN_EXACT = ["/fan/scene", "/fan/info", "/lls/signup"];
+const HIDDEN_PREFIXES = ["/lls/"];
+const HIDDEN_EXACT = ["/fan/scene", "/fan/info"];
 
 const Navbar = () => {
   const location = useLocation();

@@ -311,7 +311,7 @@ const ArtistSubmit = () => {
         />
         <span className="text-sm text-primary-foreground/80 font-sans">
           I agree to the{" "}
-          <a href="/lls-music-release" target="_blank" style={{ color: '#FFD600', textDecoration: 'underline' }}>
+          <a href="/lls-music-release" target="_blank" style={{ color: '#000000', textDecoration: 'underline' }}>
             GoLokol Artist Terms &amp; Music Release
           </a>
         </span>
@@ -321,9 +321,7 @@ const ArtistSubmit = () => {
         type="button"
         onClick={handleSubmit}
         disabled={submitting || !mp3File || !imageFile || !termsConfirmed}
-        className={`w-full h-14 text-base font-display font-bold disabled:opacity-50 disabled:cursor-not-allowed mt-4 ${
-          termsConfirmed ? "bg-[#FFD600] text-black hover:bg-[#FFD600]/90" : "bg-gray-500 text-white"
-        }`}
+        className="w-full h-14 text-base font-display font-bold mt-4 bg-black text-[#FFD600] hover:bg-white hover:text-black disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed"
       >
         {submitting ? "Submitting..." : "Submit"}
       </Button>
