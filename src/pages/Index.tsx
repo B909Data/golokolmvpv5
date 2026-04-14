@@ -103,21 +103,21 @@ const Index = () => {
             image={llsCard}
             number={1}
             title="Lokol Listening Stations"
-            description="Place a Lokol Listening Station in your store or get your music placed in Stations city-wide."
+            description="Place a Lokol Listening Station in your store featuring local artists city-wide."
             to="/lls-us"
           />
           <HowItWorksCard
             image={connectCard}
             number={2}
             title="Your City Your Scene"
-            description="Local music lovers discover and support artists added to their Lokol Scene dashboard, earning points along the way."
+            description='Local music lovers scan, discover and add artists to their customized "Lokol Scene" dashboard. Local artists enjoy direct-to-fan engagement and show promotion.'
             to="/connect"
           />
           <HowItWorksCard
             image={img3Card}
             number={3}
             title="The Value of Local Music"
-            description="Engaging with your city's music now has added value. Redeem that value to sustain the city you know."
+            description="Local fans earn points for engaging and attending shows. Then redeem that value at local businesses."
             to="https://golokol.app/lls-us"
           />
         </div>
