@@ -183,6 +183,68 @@ const AdminLLS = () => {
     );
   };
 
+  const handleAddSong = async () => {
+    if (!addArtistName.trim() || !addSongTitle.trim() || !addGenre || !addMp3File || !addImageFile) {
+      toast.error("All fields are required");
+      return;
+    }
+    if (addMp3File.size > 20 * 1024 * 1024) {
+      toast.error("MP3 must be under 20MB");
+      return;
+    }
+    if (addImageFile.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    setAddSubmitting(true);
+    try {
+      const ts = Date.now();
+      const claimCode = 'GOLOKOL-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      const sanitizedMp3 = addMp3File.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const sanitizedImg = addImageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const mp3Path = `curated/${ts}-${sanitizedMp3}`;
+      const imgPath = `curated/${ts}-${sanitizedImg}`;
+
+      const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, addMp3File);
+      if (mp3Err) throw mp3Err;
+      const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, addImageFile);
+      if (imgErr) throw imgErr;
+
+      const { data: mp3UrlData } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
+      const { data: imgUrlData } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
+
+      const { error: insertErr } = await (supabase as any).from("lls_artist_submissions").insert({
+        artist_name: addArtistName.trim(),
+        song_title: addSongTitle.trim(),
+        genre_style: addGenre,
+        city_market: 'Atlanta',
+        mp3_url: mp3UrlData.publicUrl,
+        mp3_path: mp3Path,
+        original_filename: addMp3File.name,
+        song_image_url: imgUrlData.publicUrl,
+        admin_status: 'approved',
+        payment_status: 'curated',
+        claim_code: claimCode,
+        contact_email: 'pending@golokol.app',
+      });
+      if (insertErr) throw insertErr;
+
+      setClaimLink(`golokol.app/claim/${claimCode}`);
+      setAddArtistName("");
+      setAddSongTitle("");
+      setAddGenre("");
+      setAddMp3File(null);
+      setAddImageFile(null);
+      toast.success("Song added successfully");
+      fetchSubmissions();
+    } catch (err: any) {
+      console.error("Add song error:", err);
+      toast.error(err?.message || "Failed to add song");
+    } finally {
+      setAddSubmitting(false);
+    }
+  };
+
   if (!key) {
     return (
       <div className="min-h-screen bg-background">
