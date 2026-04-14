@@ -97,8 +97,8 @@ const FanScene = () => {
 
       if (savesData && savesData.length > 0) {
         const artistNames = savesData.map((s) => s.artist_choice);
-        const { data: subs } = await supabase
-          .from("submissions")
+        const { data: subs } = await (supabase as any)
+          .from("lls_artist_submissions")
           .select("artist_name, song_title, song_image_url, youtube_url, instagram_handle, artist_user_id")
           .in("artist_name", artistNames);
 
@@ -128,7 +128,7 @@ const FanScene = () => {
   }, [saves]);
 
   const points = profile?.lokol_points || 0;
-  const progressPct = Math.min((points / 100) * 100, 100);
+  const progressPct = Math.min((points / 40) * 100, 100);
 
   if (loading) {
     return (
@@ -341,7 +341,7 @@ function MarketTab({ points, progressPct }: { points: number; progressPct: numbe
           <div className="h-1.5 bg-[#333] rounded-full overflow-hidden">
             <div className="h-full bg-[#FFD600] rounded-full transition-all" style={{ width: `${progressPct}%` }} />
           </div>
-          <p className="text-white text-[11px] mt-1">100 pts unlocks rewards at local partners</p>
+          <p className="text-white text-[11px] mt-1">40 pts unlocks rewards at local partners</p>
         </div>
       </div>
 
@@ -354,11 +354,11 @@ function MarketTab({ points, progressPct }: { points: number; progressPct: numbe
             <p style={{ fontFamily: anton, fontSize: 14, color: "#fff", textTransform: "uppercase", marginTop: 12 }}>100 POINTS</p>
             <p className="text-white text-xs" style={{ opacity: 0.7 }}>10% off purchase</p>
             <button
-              disabled={points < 100}
+              disabled={points < 40}
               className="mt-3 w-full py-2 bg-[#FFD600] text-black font-bold text-sm rounded-full"
               style={{
-                opacity: points < 100 ? 0.4 : 1,
-                cursor: points < 100 ? "not-allowed" : "pointer",
+                opacity: points < 40 ? 0.4 : 1,
+                cursor: points < 40 ? "not-allowed" : "pointer",
               }}
             >
               Redeem

@@ -239,6 +239,8 @@ export type Database = {
         Row: {
           city: string | null
           created_at: string | null
+          daily_points_date: string | null
+          daily_points_earned: number | null
           email: string | null
           fan_user_id: string
           id: string
@@ -249,6 +251,8 @@ export type Database = {
         Insert: {
           city?: string | null
           created_at?: string | null
+          daily_points_date?: string | null
+          daily_points_earned?: number | null
           email?: string | null
           fan_user_id: string
           id?: string
@@ -259,6 +263,8 @@ export type Database = {
         Update: {
           city?: string | null
           created_at?: string | null
+          daily_points_date?: string | null
+          daily_points_earned?: number | null
           email?: string | null
           fan_user_id?: string
           id?: string
@@ -295,6 +301,33 @@ export type Database = {
           name?: string
           notify?: boolean
           session?: string
+        }
+        Relationships: []
+      }
+      fan_store_sessions: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          fan_user_id: string | null
+          id: string
+          points_earned: number | null
+          store_slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          fan_user_id?: string | null
+          id?: string
+          points_earned?: number | null
+          store_slug: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          fan_user_id?: string | null
+          id?: string
+          points_earned?: number | null
+          store_slug?: string
         }
         Relationships: []
       }
