@@ -111,7 +111,7 @@ const Index = () => {
             number={2}
             title="Your City Your Scene"
             description='Local music lovers scan, discover and add artists to their customized "Lokol Scene" dashboard. Local artists enjoy direct-to-fan engagement and show promotion.'
-            to="/connect"
+            to="https://golokol.app/lls-us"
           />
           <HowItWorksCard
             image={img3Card}
