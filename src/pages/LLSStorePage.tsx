@@ -2,7 +2,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import LLSOnboarding from "@/components/LLSOnboarding";
-import llsHero from "@/assets/lls-hero-crates.png";
+import cratesHero from "@/assets/crates-atl-hero.svg";
+import dbsHero from "@/assets/dbs-sounds-hero.svg";
+import moodsHero from "@/assets/moods-music-hero.svg";
+
+const HERO_MAP: Record<string, string> = {
+  "crates-atl": cratesHero,
+  "dbs-sounds": dbsHero,
+  "moods-music": moodsHero,
+};
 
 const SLUG_MAP: Record<string, string> = {
   "Hip-Hop": "hiphop", "R&B": "rnb", "Afrobeats": "afrobeats", "Alternative": "alternative",
@@ -98,7 +106,7 @@ const LLSStorePage = () => {
       <div className="min-h-screen flex flex-col bg-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
         {/* Hero Image */}
         <section className="w-full flex items-center justify-center px-4" style={{ height: "55vh", minHeight: 320 }}>
-          <img src={llsHero} alt="Lokol Listening Stations" className="w-full h-full object-contain" />
+          <img src={HERO_MAP[storeSlug || ""] || cratesHero} alt="Lokol Listening Stations" className="w-full h-full object-contain" />
         </section>
 
         {/* Store name + CTA */}

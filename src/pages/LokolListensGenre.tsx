@@ -1,374 +1,321 @@
-import { useParams, useSearchParams, Link } from "react-router-dom";
-import { ArrowLeft, Play, Pause, RotateCcw, Heart } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { ArrowLeft, Play, Pause, Heart, SkipForward, Plus } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
-import fenixFloImg from "@/assets/Hiphop-fenixandflo.jpeg";
-import jointdexterImg from "@/assets/Hiphop-Jointdexter.png";
-import sque3ezeImg from "@/assets/Hiphop-Sque3eze-Rock.png";
-import fenixFloAudio from "@/assets/audio/Hiphop-FenixandFlo-WhoSaidP2.mp3";
-import jointdexterAudio from "@/assets/audio/Hiphop-JointDexterandYoshi-Fye.mp3";
-import sque3ezeAudio from "@/assets/audio/Hiphop-Sque3eze-Rock.mp3";
+import { useToast } from "@/hooks/use-toast";
 
-interface Artist {
-  id: string;
-  name: string;
-  image: string;
-  song: string;
-  duration: number;
-  audio: string;
-}
-
-interface PlayerState {
-  artistId: string;
-  isPlaying: boolean;
-  currentTime: number;
-  duration: number;
-}
-
-function slugToGenre(slug: string) {
-  // Insert space before uppercase letters in camelCase slugs (e.g., "hiphop" → "hip hop")
-  const spaced = slug
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/-and-/g, " & ")
-    .replace(/-/g, " ");
-  // Special cases for known compound words
-  const specialCases: Record<string, string> = {
-    hiphop: "Hip Hop",
-    rnb: "RnB",
-    alternativesoul: "Alternative Soul",
-  };
-  if (specialCases[slug]) return specialCases[slug];
-  return spaced.replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
+const SLUG_TO_GENRE: Record<string, string> = {
+  hiphop: "Hip-Hop", rnb: "R&B", afrobeats: "Afrobeats",
+  alternative: "Alternative", beats: "Beats", blues: "Blues",
+  country: "Country", edm: "EDM", emo: "Emo", folk: "Folk",
+  funk: "Funk", gospel: "Gospel", hardcore: "Hardcore", house: "House",
+  indie: "Indie", jazz: "Jazz", latin: "Latin", metal: "Metal",
+  neosoul: "Neo-Soul", pop: "Pop", punk: "Punk", rave: "Rave",
+  reggae: "Reggae", rock: "Rock", ska: "Ska", spokenword: "Spoken-Word",
+  techno: "Techno",
 };
 
+interface Track {
+  id: string;
+  artist_name: string;
+  song_title: string;
+  song_image_url: string;
+  mp3_url: string;
+  artist_user_id: string | null;
+}
+
 const LokolListensGenre = () => {
-  const { genre } = useParams<{ genre: string }>();
-  const [searchParams] = useSearchParams();
-  const storeId = searchParams.get("store") || "";
-  const genreName = genre ? slugToGenre(genre) : "Unknown";
-
-  const artists: Record<string, Artist[]> = {
-    hiphop: [
-      {
-        id: "fenix-flo",
-        name: "Fenix&Flo",
-        image: fenixFloImg,
-        song: "Who Said? Pt.2",
-        duration: 164,
-        audio: fenixFloAudio,
-      },
-      {
-        id: "jointdexter",
-        name: "Jointdexter",
-        image: jointdexterImg,
-        song: "Fye",
-        duration: 129,
-        audio: jointdexterAudio,
-      },
-      {
-        id: "sque3eze",
-        name: "Sque3eze",
-        image: sque3ezeImg,
-        song: "Rock",
-        duration: 153,
-        audio: sque3ezeAudio,
-      },
-    ],
-    rnb: [],
-    alternativesoul: [],
-  };
-
-  const currentArtists = artists[genre || ""] || [];
+  const { genre, storeSlug } = useParams<{ genre: string; storeSlug: string }>();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [playerState, setPlayerState] = useState<PlayerState>({
-    artistId: "",
-    isPlaying: false,
-    currentTime: 0,
-    duration: 0,
-  });
 
-  const [cratePoints, setCratePoints] = useState(0);
-  const [votedArtists, setVotedArtists] = useState<Set<string>>(
-    new Set()
-  );
-  const [listeningProgress, setListeningProgress] = useState<
-    Record<string, number>
-  >({});
-  const [pointsAwarded, setPointsAwarded] = useState<Set<string>>(
-    new Set()
-  );
-  const [voteCount, setVoteCount] = useState(0);
-  const [showVoteLimitModal, setShowVoteLimitModal] = useState(false);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [tracksLoading, setTracksLoading] = useState(true);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [points, setPoints] = useState(0);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [showSaveOverlay, setShowSaveOverlay] = useState(false);
+  const [overlayTrack, setOverlayTrack] = useState<Track | null>(null);
+  const [pointsSplash, setPointsSplash] = useState<{ id: string; amount: number } | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [dailyPointsRemaining, setDailyPointsRemaining] = useState(40);
+  const [userId, setUserId] = useState<string | null>(null);
+  const halfAwarded = useRef<Set<string>>(new Set());
 
-  // Handle timeupdate event
+  useEffect(() => {
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setIsLoggedIn(true);
+        setUserId(session.user.id);
+        const { data: fp } = await supabase
+          .from("fan_profiles")
+          .select("daily_points_date, daily_points_earned")
+          .eq("fan_user_id", session.user.id)
+          .maybeSingle();
+        if (fp) {
+          const today = new Date().toLocaleDateString("en-US", { timeZone: "America/New_York" });
+          const dbDate = fp.daily_points_date
+            ? new Date(fp.daily_points_date + "T00:00:00").toLocaleDateString("en-US", { timeZone: "America/New_York" })
+            : null;
+          if (dbDate === today) {
+            setDailyPointsRemaining(40 - (fp.daily_points_earned || 0));
+          } else {
+            setDailyPointsRemaining(40);
+          }
+        }
+      }
+
+      const genreLabel = SLUG_TO_GENRE[genre || ""];
+      if (!genreLabel) { setTracksLoading(false); return; }
+
+      const { data } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .select("id, artist_name, song_title, song_image_url, mp3_url, artist_user_id, genre_style")
+        .eq("admin_status", "approved")
+        .not("mp3_url", "is", null);
+
+      if (data) {
+        const filtered = data.filter((row: any) => {
+          const genres = (row.genre_style as string).split(",").map((s: string) => s.trim().toLowerCase());
+          return genres.includes(genreLabel.toLowerCase());
+        });
+        setTracks(filtered.map((r: any) => ({
+          id: r.id,
+          artist_name: r.artist_name,
+          song_title: r.song_title || "Untitled",
+          song_image_url: r.song_image_url,
+          mp3_url: r.mp3_url,
+          artist_user_id: r.artist_user_id,
+        })));
+      }
+      setTracksLoading(false);
+    };
+    init();
+  }, [genre]);
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-
-    const handleTimeUpdate = () => {
-      setPlayerState((prev) => ({
-        ...prev,
-        currentTime: audio.currentTime,
-      }));
-
-      // Check if 50% of song has been listened to
-      const progress = audio.currentTime / audio.duration;
-      if (progress >= 0.5 && !pointsAwarded.has(playerState.artistId)) {
-        setCratePoints((prev) => prev + 5);
-        setPointsAwarded(
-          (prev) => new Set([...prev, playerState.artistId])
-        );
+    const onTime = () => {
+      setCurrentTime(audio.currentTime);
+      setDuration(audio.duration || 0);
+      if (playingId && audio.duration && audio.currentTime / audio.duration >= 0.5 && !halfAwarded.current.has(playingId)) {
+        halfAwarded.current.add(playingId);
+        setPoints(p => p + 5);
       }
     };
-
-    const handleLoadedMetadata = () => {
-      setPlayerState((prev) => ({
-        ...prev,
-        duration: audio.duration,
-      }));
-    };
-
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-
+    const onMeta = () => setDuration(audio.duration);
+    const onEnded = () => setIsPlaying(false);
+    audio.addEventListener("timeupdate", onTime);
+    audio.addEventListener("loadedmetadata", onMeta);
+    audio.addEventListener("ended", onEnded);
     return () => {
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("timeupdate", onTime);
+      audio.removeEventListener("loadedmetadata", onMeta);
+      audio.removeEventListener("ended", onEnded);
     };
-  }, [playerState.artistId, pointsAwarded]);
+  }, [playingId]);
 
-  const handlePlayPause = (artistId: string, audioUrl: string) => {
+  const handlePlay = useCallback((track: Track) => {
     const audio = audioRef.current;
     if (!audio) return;
-
-    // If switching to a different song, load it
-    if (playerState.artistId !== artistId) {
-      audio.src = audioUrl;
-      audio.currentTime = 0;
+    if (playingId !== track.id) {
+      audio.src = track.mp3_url;
       audio.play();
-      setPlayerState({
-        artistId,
-        isPlaying: true,
-        currentTime: 0,
-        duration: 0,
-      });
+      setPlayingId(track.id);
+      setIsPlaying(true);
     } else {
-      // Same song: toggle play/pause
-      if (playerState.isPlaying) {
-        audio.pause();
-        setPlayerState((prev) => ({ ...prev, isPlaying: false }));
-      } else {
-        audio.play();
-        setPlayerState((prev) => ({ ...prev, isPlaying: true }));
-      }
+      if (isPlaying) { audio.pause(); setIsPlaying(false); }
+      else { audio.play(); setIsPlaying(true); }
     }
-  };
+  }, [playingId, isPlaying]);
 
-  const handleRewind = () => {
+  const handleSkip = useCallback(() => {
+    if (!playingId || tracks.length === 0) return;
+    const idx = tracks.findIndex(t => t.id === playingId);
+    const next = tracks[(idx + 1) % tracks.length];
     const audio = audioRef.current;
     if (audio) {
-      audio.currentTime = 0;
-      setPlayerState((prev) => ({ ...prev, currentTime: 0 }));
+      audio.src = next.mp3_url;
+      audio.play();
+      setPlayingId(next.id);
+      setIsPlaying(true);
     }
-  };
+  }, [playingId, tracks]);
 
-  const handleVote = (artistId: string) => {
-    if (votedArtists.has(artistId)) return;
-
-    if (voteCount >= 3) {
-      setShowVoteLimitModal(true);
+  const handleSave = useCallback(async (track: Track) => {
+    if (!isLoggedIn) {
+      setOverlayTrack(track);
+      setShowSaveOverlay(true);
       return;
     }
+    if (savedIds.has(track.id)) return;
+    if (dailyPointsRemaining <= 0) {
+      toast({ title: "You've maxed out your Lokol Points for today. Come back tomorrow." });
+      return;
+    }
+    await (supabase as any).from("fan_saves").insert({
+      fan_user_id: userId,
+      artist_choice: track.artist_name,
+      email: "",
+      name: "",
+    });
+    const today = new Date().toISOString().split("T")[0];
+    await supabase.from("fan_profiles").update({
+      daily_points_earned: 40 - dailyPointsRemaining + 10,
+      daily_points_date: today,
+    } as any).eq("fan_user_id", userId!);
+    await supabase.from("fan_profiles").update({
+      lokol_points: (points + 10),
+    } as any).eq("fan_user_id", userId!);
 
-    setVotedArtists((prev) => new Set([...prev, artistId]));
-    setVoteCount((prev) => prev + 1);
-    setCratePoints((prev) => prev + 5);
-  };
+    setDailyPointsRemaining(r => r - 10);
+    setSavedIds(prev => new Set([...prev, track.id]));
+    setPoints(p => p + 10);
+    setPointsSplash({ id: track.id, amount: 10 });
+    setTimeout(() => setPointsSplash(null), 1200);
+  }, [isLoggedIn, savedIds, dailyPointsRemaining, userId, points, toast]);
 
-  if (!currentArtists || currentArtists.length === 0) {
+  const playingTrack = tracks.find(t => t.id === playingId);
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  if (tracksLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-black">
-        <header className="sticky top-0 z-50 px-6 py-4 flex items-center justify-between bg-black border-b border-gray-800">
-          <Link
-            to={`/lls${storeId ? `?store=${storeId}` : ""}`}
-            className="flex items-center gap-2 text-white hover:text-yellow-400 transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <img src={golokolLogo} alt="GoLokol" className="h-6 w-6" />
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-white">Crate Points: {cratePoints}</p>
-          </div>
-        </header>
-
-        <section className="flex-1 flex flex-col items-center justify-center px-6 py-16 text-center">
-          <h1 className="font-bold text-3xl text-white mb-4">{genreName}</h1>
-          <p className="text-lg text-gray-400 max-w-md">
-            Songs for this genre will appear here soon. Stay tuned.
-          </p>
-        </section>
-
-        <footer className="px-6 py-6 text-center border-t border-gray-800">
-          <p className="text-xs text-gray-400">
-            GoLokol — The future of music is local.
-          </p>
-        </footer>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <p className="text-white text-[16px]">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-black">
-      {/* Fixed Header */}
-      <header className="sticky top-0 z-50 px-4 py-3 flex items-center justify-between bg-black border-b border-gray-800">
-        <Link
-          to={`/lls${storeId ? `?store=${storeId}` : ""}`}
-          className="flex items-center gap-2 text-white hover:text-yellow-400 transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <p className="text-base font-bold text-[#FFD600]">
-          Crate Points: {cratePoints}
-        </p>
-        <Link
-          to={`/lls/signup?points=${cratePoints}`}
-          className="bg-[#FFD600] text-black font-bold text-sm px-4 py-2 rounded-lg hover:brightness-110 transition-all"
-        >
-          Save
-        </Link>
-      </header>
-
-      {/* Genre Title */}
-      <div className="px-6 py-6 text-center border-b border-gray-800">
-        <h1 className="font-bold text-3xl text-white">Lokol {genreName} Artists</h1>
-      </div>
-
-      {/* Artist Cards */}
-      <main className="flex-1 px-4 py-6 space-y-6">
-        {currentArtists.map((artist) => (
-          <div
-            key={artist.id}
-            className="rounded-lg overflow-hidden bg-black border border-gray-800"
-          >
-            {/* Image Section */}
-            <div className="relative w-full aspect-square rounded-t-lg overflow-hidden">
-              <img
-                src={artist.image}
-                alt={artist.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Artist Info */}
-            <div className="bg-[#2A2A2A] px-4 pt-3 pb-1">
-              <h3 className="text-lg font-bold text-white">{artist.name}</h3>
-              <p className="text-sm text-gray-400">{artist.song}</p>
-            </div>
-
-            {/* Controls Section */}
-            <div className="bg-[#2A2A2A] px-4 pb-4 pt-2 flex items-center justify-between">
-              {/* Left: Heart */}
-              <button
-                onClick={() => handleVote(artist.id)}
-                disabled={votedArtists.has(artist.id)}
-                className={`transition-all ${
-                  votedArtists.has(artist.id)
-                    ? "text-yellow-400"
-                    : "text-gray-400 hover:text-yellow-400"
-                }`}
-              >
-                <Heart
-                  className={`h-6 w-6 ${
-                    votedArtists.has(artist.id) ? "fill-yellow-400" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Center: Play/Pause + Rewind */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handlePlayPause(artist.id, artist.audio)}
-                  className="h-10 w-10 rounded-full bg-yellow-400 text-black flex items-center justify-center hover:bg-yellow-300 transition-all"
-                >
-                  {playerState.artistId === artist.id &&
-                  playerState.isPlaying ? (
-                    <Pause className="h-5 w-5 fill-black" />
-                  ) : (
-                    <Play className="h-5 w-5 ml-0.5 fill-black" />
-                  )}
-                </button>
-
-                <button
-                  onClick={handleRewind}
-                  disabled={playerState.artistId !== artist.id}
-                  className={`h-8 w-8 rounded border border-yellow-400 flex items-center justify-center transition-all ${
-                    playerState.artistId === artist.id
-                      ? "text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                      : "text-gray-400 border-gray-400"
-                  }`}
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Right: Duration */}
-              <div className="text-right">
-                <p className="text-sm font-bold text-white">
-                  {playerState.artistId === artist.id
-                    ? formatTime(playerState.currentTime)
-                    : "0:00"}{" "}
-                  / {formatTime(artist.duration)}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </main>
-
-      {/* Hidden Audio Element */}
+    <div className="min-h-screen flex flex-col bg-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <style>{`
+        @keyframes floatUp {
+          0% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-40px); }
+        }
+      `}</style>
       <audio ref={audioRef} />
 
-      {/* Vote Limit Modal */}
-      {showVoteLimitModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-lg p-6 max-w-sm w-full border border-gray-700">
-            <h2 className="text-xl font-bold text-white mb-3">
-              Vote Limit Reached
-            </h2>
-            <p className="text-gray-300 mb-6">
-              You've used all 3 votes this session. Sign up to save your points
-              and unlock more votes!
-            </p>
-            <Link
-              to="/lls/signup"
-              className="w-full bg-yellow-400 text-black font-bold py-3 rounded text-center hover:bg-yellow-300 transition-all block"
-            >
-              Sign Up
-            </Link>
-            <button
-              onClick={() => setShowVoteLimitModal(false)}
-              className="w-full mt-2 border border-gray-600 text-white py-3 rounded hover:bg-gray-800 transition-all"
-            >
-              Close
+      {/* Header */}
+      <header className="sticky top-0 z-50 px-4 py-3 flex items-center justify-between bg-black border-b border-[#333]">
+        <Link to={`/lls/${storeSlug || ""}`} className="text-white">
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+        <img src={golokolLogo} alt="GoLokol" className="h-6 w-6" />
+        <p className="text-[#FFD600] font-bold text-sm">Lokol Points: {points}</p>
+      </header>
+
+      {tracks.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-white text-[16px]">No songs here yet. Check back soon.</p>
+        </div>
+      ) : (
+        <main className="flex-1 px-4 py-4 grid grid-cols-2 gap-3" style={{ paddingBottom: playingId ? 100 : 16 }}>
+          {tracks.map(track => {
+            const isCurrent = playingId === track.id && isPlaying;
+            const alreadySaved = savedIds.has(track.id);
+            return (
+              <div
+                key={track.id}
+                className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer"
+                onClick={() => handlePlay(track)}
+              >
+                <img src={track.song_image_url} alt={track.artist_name} className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent" />
+
+                {/* Center icon */}
+                {isCurrent ? (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleSave(track); }}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    {alreadySaved ? (
+                      <Heart className="w-12 h-12 fill-[#FFD600] text-[#FFD600]" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center">
+                        <Plus className="w-6 h-6 text-white" />
+                      </div>
+                    )}
+                  </button>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Play className="w-12 h-12 text-white/60" />
+                  </div>
+                )}
+
+                {/* Points splash */}
+                {pointsSplash?.id === track.id && (
+                  <div
+                    className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                    style={{ animation: "floatUp 1.2s ease-out forwards" }}
+                  >
+                    <span className="text-[#FFD600] font-bold text-[24px]">+{pointsSplash.amount} pts</span>
+                  </div>
+                )}
+
+                {/* Bottom text */}
+                <div className="absolute bottom-3 left-3 right-3">
+                  <p className="text-white font-bold text-[13px] truncate">{track.artist_name}</p>
+                  <p className="text-white/70 text-[11px] truncate">{track.song_title}</p>
+                </div>
+              </div>
+            );
+          })}
+        </main>
+      )}
+
+      {/* Bottom Player Bar */}
+      {playingId && playingTrack && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#1a1a1a] border-t border-[#333]">
+          <div className="h-[2px] bg-[#333]">
+            <div className="h-full bg-[#FFD600] transition-all" style={{ width: `${progress}%` }} />
+          </div>
+          <div className="px-4 py-3 flex items-center gap-3">
+            <img src={playingTrack.song_image_url} alt="" className="w-12 h-12 rounded-lg object-cover" />
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-bold text-[13px] truncate">{playingTrack.artist_name}</p>
+              <p className="text-white/60 text-[11px] truncate">{playingTrack.song_title}</p>
+            </div>
+            <button onClick={() => handlePlay(playingTrack)} className="text-white">
+              {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
+            </button>
+            <button onClick={handleSkip} className="text-white">
+              <SkipForward className="w-8 h-8" />
             </button>
           </div>
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="px-6 py-6 text-center border-t border-gray-800">
-        <p className="text-xs text-gray-400">
-          GoLokol — The future of music is local.
-        </p>
-      </footer>
+      {/* Save Overlay */}
+      {showSaveOverlay && overlayTrack && (
+        <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center px-6">
+          <div className="bg-[#1a1a1a] rounded-2xl p-6 max-w-sm w-full text-center">
+            <img src={overlayTrack.song_image_url} alt="" className="w-20 h-20 rounded-xl object-cover mx-auto mb-4" />
+            <p className="text-white font-bold text-[18px]">{overlayTrack.artist_name}</p>
+            <p className="text-white text-[14px] mt-2">Save {overlayTrack.artist_name} to your Atlanta Lokol Scene</p>
+            <p className="text-[#FFD600] font-bold text-[16px] mt-2">+10 Lokol Points</p>
+            <button
+              onClick={() => navigate(`/lls/signup?points=${points}&store=${storeSlug || ""}`)}
+              className="mt-6 w-full py-3 bg-[#FFD600] text-black font-bold rounded-xl text-[16px]"
+            >
+              Create Account
+            </button>
+            <button
+              onClick={() => setShowSaveOverlay(false)}
+              className="mt-3 text-white/50 text-sm"
+            >
+              Not now
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

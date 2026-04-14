@@ -35,18 +35,18 @@ const SoundWave = () => (
 const SLIDES = [
   {
     emoji: "🎧",
-    heading: "Find Your Sound",
-    body: "Browse up to 3 songs that move you. Atlanta artists. Real music. Right here.",
+    heading: "Discover Local Music",
+    body: "Browse Atlanta artists you won't find on any algorithm. Real music. Right here.",
   },
   {
     emoji: "⭐",
     heading: "Earn Lokol Points",
-    body: "Get points for listening, saving artists to your Lokol Scene, and showing up to local shows.",
+    body: "Save artists to your Lokol Scene and show up to local shows to earn points.",
   },
   {
     emoji: "🎁",
     heading: "Redeem at Local Spots",
-    body: "Use your points for discounts at Crate ATL and other local partners in Atlanta.",
+    body: "Use your points for discounts at Crates ATL and other Atlanta partners.",
   },
 ];
 
@@ -74,7 +74,7 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
           <img src={golokolLogo} alt="GoLokol" className="w-16 h-16" />
           <SoundWave />
           <p className="text-white font-bold text-[18px] leading-relaxed">
-            You just earned 5 Lokol Points for being curious about the sounds floating around your city.
+            Good music lives here. Start exploring.
           </p>
           <p className="font-bold text-[14px]" style={{ color: "#FFD600" }}>
             Your city. Your scene. Be a part of it.
