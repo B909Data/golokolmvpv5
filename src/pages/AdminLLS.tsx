@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Music, RefreshCw, ExternalLink, CheckCircle, XCircle, Plus, Copy, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
