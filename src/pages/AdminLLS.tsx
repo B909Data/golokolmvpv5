@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Music, RefreshCw, ExternalLink, CheckCircle, XCircle } from "lucide-react";
+import { Music, RefreshCw, ExternalLink, CheckCircle, XCircle, Plus, Copy, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const GENRE_OPTIONS = [
+  "Afrobeats", "Alternative", "Beats", "Blues", "Country", "EDM", "Emo", "Folk",
+  "Funk", "Gospel", "Hardcore", "Hip-Hop", "House", "Indie", "Jazz", "Latin",
+  "Metal", "Neo-Soul", "Pop", "Punk", "R&B", "Rave", "Reggae", "Rock", "Ska",
+  "Spoken-Word", "Techno",
+];
 
 interface Submission {
   id: string;
@@ -57,6 +65,14 @@ const AdminLLS = () => {
   const [saving, setSaving] = useState(false);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addArtistName, setAddArtistName] = useState("");
+  const [addSongTitle, setAddSongTitle] = useState("");
+  const [addGenre, setAddGenre] = useState("");
+  const [addMp3File, setAddMp3File] = useState<File | null>(null);
+  const [addImageFile, setAddImageFile] = useState<File | null>(null);
+  const [addSubmitting, setAddSubmitting] = useState(false);
+  const [claimLink, setClaimLink] = useState<string | null>(null);
 
   const fetchSubmissions = async () => {
     if (!key) return;
@@ -167,6 +183,68 @@ const AdminLLS = () => {
     );
   };
 
+  const handleAddSong = async () => {
+    if (!addArtistName.trim() || !addSongTitle.trim() || !addGenre || !addMp3File || !addImageFile) {
+      toast.error("All fields are required");
+      return;
+    }
+    if (addMp3File.size > 20 * 1024 * 1024) {
+      toast.error("MP3 must be under 20MB");
+      return;
+    }
+    if (addImageFile.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    setAddSubmitting(true);
+    try {
+      const ts = Date.now();
+      const claimCode = 'GOLOKOL-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      const sanitizedMp3 = addMp3File.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const sanitizedImg = addImageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const mp3Path = `curated/${ts}-${sanitizedMp3}`;
+      const imgPath = `curated/${ts}-${sanitizedImg}`;
+
+      const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, addMp3File);
+      if (mp3Err) throw mp3Err;
+      const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, addImageFile);
+      if (imgErr) throw imgErr;
+
+      const { data: mp3UrlData } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
+      const { data: imgUrlData } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
+
+      const { error: insertErr } = await (supabase as any).from("lls_artist_submissions").insert({
+        artist_name: addArtistName.trim(),
+        song_title: addSongTitle.trim(),
+        genre_style: addGenre,
+        city_market: 'Atlanta',
+        mp3_url: mp3UrlData.publicUrl,
+        mp3_path: mp3Path,
+        original_filename: addMp3File.name,
+        song_image_url: imgUrlData.publicUrl,
+        admin_status: 'approved',
+        payment_status: 'curated',
+        claim_code: claimCode,
+        contact_email: 'pending@golokol.app',
+      });
+      if (insertErr) throw insertErr;
+
+      setClaimLink(`golokol.app/claim/${claimCode}`);
+      setAddArtistName("");
+      setAddSongTitle("");
+      setAddGenre("");
+      setAddMp3File(null);
+      setAddImageFile(null);
+      toast.success("Song added successfully");
+      fetchSubmissions();
+    } catch (err: any) {
+      console.error("Add song error:", err);
+      toast.error(err?.message || "Failed to add song");
+    } finally {
+      setAddSubmitting(false);
+    }
+  };
+
   if (!key) {
     return (
       <div className="min-h-screen bg-background">
@@ -201,6 +279,15 @@ const AdminLLS = () => {
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                 Refresh
               </Button>
+              <Button
+                size="sm"
+                className="font-bold"
+                style={{ backgroundColor: '#FFD600', color: '#000' }}
+                onClick={() => setShowAddForm(!showAddForm)}
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Song
+              </Button>
             </div>
           </div>
         </div>
@@ -208,6 +295,90 @@ const AdminLLS = () => {
 
       <section className="px-4 pb-24">
         <div className="max-w-7xl mx-auto">
+          {/* Add Song Form */}
+          {showAddForm && (
+            <div className="border border-border/50 rounded-lg p-6 mb-6 bg-card/30 space-y-4">
+              <h2 className="text-foreground font-bold text-lg">Add Song for Artist</h2>
+
+              {claimLink && (
+                <div className="rounded-lg p-4 space-y-2" style={{ backgroundColor: '#FFD600' }}>
+                  <p className="text-sm font-bold" style={{ color: '#000' }}>Claim Link:</p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-sm font-mono" style={{ color: '#000' }}>{claimLink}</code>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(`https://${claimLink}`); toast.success("Link copied!"); }}
+                      className="p-1 rounded hover:bg-black/10 transition-colors"
+                    >
+                      <Copy className="w-4 h-4" style={{ color: '#000' }} />
+                    </button>
+                    <button
+                      onClick={() => setClaimLink(null)}
+                      className="p-1 rounded hover:bg-black/10 transition-colors ml-auto"
+                    >
+                      <X className="w-4 h-4" style={{ color: '#000' }} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Artist Name *</label>
+                  <Input value={addArtistName} onChange={e => setAddArtistName(e.target.value)} placeholder="Artist name" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Song Title *</label>
+                  <Input value={addSongTitle} onChange={e => setAddSongTitle(e.target.value)} placeholder="Song title" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Genre *</label>
+                  <Select value={addGenre} onValueChange={setAddGenre}>
+                    <SelectTrigger className="bg-card/50 border-border/50">
+                      <SelectValue placeholder="Select genre" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GENRE_OPTIONS.map(g => (
+                        <SelectItem key={g} value={g}>{g}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Upload MP3 * (max 20MB)</label>
+                  <input
+                    type="file"
+                    accept=".mp3"
+                    onChange={e => setAddMp3File(e.target.files?.[0] || null)}
+                    className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Upload Song Image * (max 5MB)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setAddImageFile(e.target.files?.[0] || null)}
+                    className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  className="font-bold"
+                  style={{ backgroundColor: '#FFD600', color: '#000' }}
+                  onClick={handleAddSong}
+                  disabled={addSubmitting}
+                >
+                  {addSubmitting ? "Adding..." : "Add Song"}
+                </Button>
+                <Button variant="outline" onClick={() => { setShowAddForm(false); setClaimLink(null); }}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Submissions List */}
             <div className="lg:col-span-2 space-y-2">
