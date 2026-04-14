@@ -279,6 +279,15 @@ const AdminLLS = () => {
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                 Refresh
               </Button>
+              <Button
+                size="sm"
+                className="font-bold"
+                style={{ backgroundColor: '#FFD600', color: '#000' }}
+                onClick={() => setShowAddForm(!showAddForm)}
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Song
+              </Button>
             </div>
           </div>
         </div>
@@ -286,6 +295,90 @@ const AdminLLS = () => {
 
       <section className="px-4 pb-24">
         <div className="max-w-7xl mx-auto">
+          {/* Add Song Form */}
+          {showAddForm && (
+            <div className="border border-border/50 rounded-lg p-6 mb-6 bg-card/30 space-y-4">
+              <h2 className="text-foreground font-bold text-lg">Add Song for Artist</h2>
+
+              {claimLink && (
+                <div className="rounded-lg p-4 space-y-2" style={{ backgroundColor: '#FFD600' }}>
+                  <p className="text-sm font-bold" style={{ color: '#000' }}>Claim Link:</p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-sm font-mono" style={{ color: '#000' }}>{claimLink}</code>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(`https://${claimLink}`); toast.success("Link copied!"); }}
+                      className="p-1 rounded hover:bg-black/10 transition-colors"
+                    >
+                      <Copy className="w-4 h-4" style={{ color: '#000' }} />
+                    </button>
+                    <button
+                      onClick={() => setClaimLink(null)}
+                      className="p-1 rounded hover:bg-black/10 transition-colors ml-auto"
+                    >
+                      <X className="w-4 h-4" style={{ color: '#000' }} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Artist Name *</label>
+                  <Input value={addArtistName} onChange={e => setAddArtistName(e.target.value)} placeholder="Artist name" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Song Title *</label>
+                  <Input value={addSongTitle} onChange={e => setAddSongTitle(e.target.value)} placeholder="Song title" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Genre *</label>
+                  <Select value={addGenre} onValueChange={setAddGenre}>
+                    <SelectTrigger className="bg-card/50 border-border/50">
+                      <SelectValue placeholder="Select genre" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GENRE_OPTIONS.map(g => (
+                        <SelectItem key={g} value={g}>{g}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Upload MP3 * (max 20MB)</label>
+                  <input
+                    type="file"
+                    accept=".mp3"
+                    onChange={e => setAddMp3File(e.target.files?.[0] || null)}
+                    className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Upload Song Image * (max 5MB)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setAddImageFile(e.target.files?.[0] || null)}
+                    className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  className="font-bold"
+                  style={{ backgroundColor: '#FFD600', color: '#000' }}
+                  onClick={handleAddSong}
+                  disabled={addSubmitting}
+                >
+                  {addSubmitting ? "Adding..." : "Add Song"}
+                </Button>
+                <Button variant="outline" onClick={() => { setShowAddForm(false); setClaimLink(null); }}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Submissions List */}
             <div className="lg:col-span-2 space-y-2">
