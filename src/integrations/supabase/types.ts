@@ -307,6 +307,7 @@ export type Database = {
           artist_slug: string | null
           artist_user_id: string | null
           city_market: string
+          claim_code: string | null
           contact_email: string
           created_at: string
           genre_style: string
@@ -337,6 +338,7 @@ export type Database = {
           artist_slug?: string | null
           artist_user_id?: string | null
           city_market?: string
+          claim_code?: string | null
           contact_email: string
           created_at?: string
           genre_style: string
@@ -367,6 +369,7 @@ export type Database = {
           artist_slug?: string | null
           artist_user_id?: string | null
           city_market?: string
+          claim_code?: string | null
           contact_email?: string
           created_at?: string
           genre_style?: string
