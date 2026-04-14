@@ -111,7 +111,7 @@ const LLSStorePage = () => {
 
         {/* Store name + CTA */}
         <section className="w-full px-6 py-8 text-center" style={{ marginTop: -10 }}>
-          <h1 className="text-white font-bold text-[24px] md:text-[28px]">Lokol Listening Stations</h1>
+          <h1 className="text-white font-bold text-[24px] md:text-[28px]">You're at a Lokol Listening Station</h1>
           <p className="mt-2 font-bold text-[20px] md:text-[24px]" style={{ color: "#FFD600" }}>
             at {storeName}
           </p>
