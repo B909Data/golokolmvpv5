@@ -97,8 +97,8 @@ const FanScene = () => {
 
       if (savesData && savesData.length > 0) {
         const artistNames = savesData.map((s) => s.artist_choice);
-        const { data: subs } = await supabase
-          .from("submissions")
+        const { data: subs } = await (supabase as any)
+          .from("lls_artist_submissions")
           .select("artist_name, song_title, song_image_url, youtube_url, instagram_handle, artist_user_id")
           .in("artist_name", artistNames);
 
