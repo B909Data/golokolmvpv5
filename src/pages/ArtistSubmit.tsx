@@ -33,16 +33,14 @@ const ArtistSubmit = () => {
 
   const [form, setForm] = useState({
     artist_name: "",
-    genre_style: [] as string[],
     song_title: "",
+    genre_style: [] as string[],
   });
   const [termsConfirmed, setTermsConfirmed] = useState(false);
 
   const [mp3File, setMp3File] = useState<File | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-  const [artistNameReadOnly, setArtistNameReadOnly] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -52,7 +50,6 @@ const ArtistSubmit = () => {
       const metaArtistName = session.user.user_metadata?.artist_name;
       if (metaArtistName) {
         setForm(f => ({ ...f, artist_name: metaArtistName }));
-        setArtistNameReadOnly(true);
       }
       setLoading(false);
     };
@@ -77,7 +74,12 @@ const ArtistSubmit = () => {
     setImagePreview(URL.createObjectURL(file));
   };
 
-  const clearImage = () => { setImageFile(null); if (imagePreview) URL.revokeObjectURL(imagePreview); setImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = ""; };
+  const clearImage = () => {
+    setImageFile(null);
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleMp3Select = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -89,7 +91,10 @@ const ArtistSubmit = () => {
     setMp3File(file);
   };
 
-  const clearMp3 = () => { setMp3File(null); if (mp3InputRef.current) mp3InputRef.current.value = ""; };
+  const clearMp3 = () => {
+    setMp3File(null);
+    if (mp3InputRef.current) mp3InputRef.current.value = "";
+  };
 
   const validateStep = (s: number): boolean => {
     if (s === 1) {
@@ -113,6 +118,7 @@ const ArtistSubmit = () => {
   const handleSubmit = async () => {
     if (!mp3File) { toast({ title: "Please upload your MP3.", variant: "destructive" }); return; }
     if (!imageFile) { toast({ title: "Please upload a song image.", variant: "destructive" }); return; }
+    if (!termsConfirmed) { toast({ title: "Please agree to the terms before submitting.", variant: "destructive" }); return; }
     if (!user) return;
 
     setSubmitting(true);
@@ -125,17 +131,20 @@ const ArtistSubmit = () => {
         .eq("artist_user_id", user.id)
         .gte("created_at", firstOfMonth);
       if (countErr) throw countErr;
-      if ((count ?? 0) >= 2) { toast({ title: "You've reached your 2 submissions this month. Try again next month.", variant: "destructive" }); return; }
+      if ((count ?? 0) >= 2) {
+        toast({ title: "You've reached your 2 submissions this month. Try again next month.", variant: "destructive" });
+        return;
+      }
 
       const ts = Date.now();
-      const sanitizedMp3Name = mp3File.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-      const mp3Path = `submissions/${user.id}/${ts}-${sanitizedMp3Name}`;
+      const sanitizedMp3 = mp3File.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const mp3Path = `submissions/${user.id}/${ts}-${sanitizedMp3}`;
       const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
       if (mp3Err) throw mp3Err;
       const { data: mp3Url } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
 
-      const sanitizedImgName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-      const imgPath = `${user.id}/${ts}-${sanitizedImgName}`;
+      const sanitizedImg = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const imgPath = `${user.id}/${ts}-${sanitizedImg}`;
       const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, imageFile, { contentType: imageFile.type });
       if (imgErr) throw imgErr;
       const { data: imgUrl } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
@@ -158,11 +167,9 @@ const ArtistSubmit = () => {
       if (error) throw error;
 
       try {
-        const { data: mlData, error: mlError } = await supabase.functions.invoke(
-          "send-mailerlite-artist-welcome",
-          { body: { email: user.email, artist_name: form.artist_name.trim() } }
-        );
-        console.log("MailerLite response:", mlData, mlError);
+        await supabase.functions.invoke("send-mailerlite-artist-welcome", {
+          body: { email: user.email, artist_name: form.artist_name.trim() },
+        });
       } catch (mlErr) {
         console.error("MailerLite error:", mlErr);
       }
@@ -188,7 +195,7 @@ const ArtistSubmit = () => {
       <div className="text-center mb-4">
         <h2 className="font-display text-2xl text-primary-foreground">Song Info</h2>
         <p className="text-primary-foreground/70 text-sm font-sans mt-1">
-          This song will replace any song featured on ATL Lokol Listening Stations and distributed to fans who follow you already.
+          This song will replace any song currently featured on ATL Lokol Listening Stations.
         </p>
       </div>
 
@@ -196,28 +203,41 @@ const ArtistSubmit = () => {
         <Label className="text-primary-foreground text-base font-sans">Artist Name *</Label>
         <Input
           value={form.artist_name}
-          onChange={e => { if (!artistNameReadOnly) setForm(f => ({ ...f, artist_name: e.target.value })); }}
-          readOnly={artistNameReadOnly}
-          className={`h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground ${artistNameReadOnly ? "opacity-70 cursor-not-allowed" : ""}`}
+          readOnly
+          className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground opacity-70 cursor-not-allowed"
           maxLength={200}
           placeholder="Your artist or band name"
         />
-        {artistNameReadOnly && (
-          <p className="text-white/40 text-xs font-sans mt-1">This is your registered artist name.</p>
-        )}
+        <p className="text-white/40 text-xs font-sans mt-1">This is your registered artist name.</p>
       </div>
 
       <div className="space-y-2">
         <Label className="text-primary-foreground text-base font-sans">Song Title *</Label>
-        <Input value={form.song_title} onChange={e => setForm(f => ({ ...f, song_title: e.target.value }))} className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground" maxLength={300} placeholder="Your song title" />
+        <Input
+          value={form.song_title}
+          onChange={e => setForm(f => ({ ...f, song_title: e.target.value }))}
+          className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground"
+          maxLength={300}
+          placeholder="Your song title"
+        />
       </div>
 
       <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Genre / Style * <span className="text-primary-foreground/60">(up to 3)</span></Label>
+        <Label className="text-primary-foreground text-base font-sans">
+          Genre / Style * <span className="text-primary-foreground/60">(up to 3)</span>
+        </Label>
         <div className="flex flex-wrap gap-2 mt-1">
           {GENRE_OPTIONS.map(genre => (
-            <button key={genre} type="button" onClick={() => toggleGenre(genre)}
-              className={`px-3 py-2 rounded-full text-sm font-sans font-medium transition-colors ${form.genre_style.includes(genre) ? "bg-primary-foreground text-primary ring-2 ring-primary-foreground" : "bg-primary-foreground/10 text-primary-foreground/70 hover:bg-primary-foreground/20"}`}>
+            <button
+              key={genre}
+              type="button"
+              onClick={() => toggleGenre(genre)}
+              className={`px-3 py-2 rounded-full text-sm font-sans font-medium transition-colors ${
+                form.genre_style.includes(genre)
+                  ? "bg-primary-foreground text-primary ring-2 ring-primary-foreground"
+                  : "bg-primary-foreground/10 text-primary-foreground/70 hover:bg-primary-foreground/20"
+              }`}
+            >
               {genre}
             </button>
           ))}
@@ -230,19 +250,28 @@ const ArtistSubmit = () => {
     <div className="space-y-5">
       <div className="text-center mb-4">
         <h2 className="font-display text-2xl text-primary-foreground">Upload Files</h2>
-        <p className="text-primary-foreground/70 text-sm font-sans mt-1">Almost there — upload your song and artwork.</p>
+        <p className="text-primary-foreground/70 text-sm font-sans mt-1">
+          Almost there — add your song and artwork.
+        </p>
       </div>
 
       <div className="space-y-2">
-        <Label className="text-primary-foreground text-base font-sans">Upload MP3 * <span className="text-primary-foreground/60">(MP3 only, max 20MB)</span></Label>
+        <Label className="text-primary-foreground text-base font-sans">
+          Upload MP3 * <span className="text-primary-foreground/60">(MP3 only, max 20MB)</span>
+        </Label>
         {mp3File ? (
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-primary-foreground/30 bg-background">
             <span className="text-foreground text-sm font-sans truncate flex-1">{mp3File.name}</span>
-            <button type="button" onClick={clearMp3} className="bg-destructive text-destructive-foreground rounded-full p-1 shrink-0"><X className="h-4 w-4" /></button>
+            <button type="button" onClick={clearMp3} className="bg-destructive text-destructive-foreground rounded-full p-1 shrink-0">
+              <X className="h-4 w-4" />
+            </button>
           </div>
         ) : (
-          <button type="button" onClick={() => mp3InputRef.current?.click()}
-            className="flex items-center gap-3 px-6 py-4 rounded-lg border-2 border-dashed border-primary-foreground/30 bg-primary-foreground/5 text-primary-foreground/70 hover:border-primary-foreground hover:text-primary-foreground transition-colors w-full">
+          <button
+            type="button"
+            onClick={() => mp3InputRef.current?.click()}
+            className="flex items-center gap-3 px-6 py-4 rounded-lg border-2 border-dashed border-primary-foreground/30 bg-primary-foreground/5 text-primary-foreground/70 hover:border-primary-foreground hover:text-primary-foreground transition-colors w-full"
+          >
             <Upload className="h-5 w-5" /><span className="text-base font-sans">Choose MP3 File</span>
           </button>
         )}
@@ -251,21 +280,26 @@ const ArtistSubmit = () => {
 
       <div className="space-y-2">
         <Label className="text-primary-foreground text-base font-sans">Upload Song Image *</Label>
-        <p className="text-sm text-primary-foreground/60 font-sans">Any image, max 5MB (will be cropped to square)</p>
+        <p className="text-sm text-primary-foreground/60 font-sans">Any size or shape — we'll display it as a square.</p>
         {imagePreview ? (
           <div className="relative inline-block">
             <div className="w-32 h-32 rounded-lg overflow-hidden border border-primary-foreground/30">
               <img src={imagePreview} alt="Song preview" className="w-full h-full object-cover" />
             </div>
-            <button type="button" onClick={clearImage} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"><X className="h-4 w-4" /></button>
+            <button type="button" onClick={clearImage} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1">
+              <X className="h-4 w-4" />
+            </button>
           </div>
         ) : (
-          <button type="button" onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-3 px-6 py-4 rounded-lg border-2 border-dashed border-primary-foreground/30 bg-primary-foreground/5 text-primary-foreground/70 hover:border-primary-foreground hover:text-primary-foreground transition-colors w-full">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-3 px-6 py-4 rounded-lg border-2 border-dashed border-primary-foreground/30 bg-primary-foreground/5 text-primary-foreground/70 hover:border-primary-foreground hover:text-primary-foreground transition-colors w-full"
+          >
             <Upload className="h-5 w-5" /><span className="text-base font-sans">Choose Image</span>
           </button>
         )}
-      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
       </div>
 
       <label className="flex items-start gap-3 mt-4 cursor-pointer">
@@ -276,9 +310,9 @@ const ArtistSubmit = () => {
           className="mt-1 h-4 w-4 accent-[#FFD600]"
         />
         <span className="text-sm text-primary-foreground/80 font-sans">
-          I agree to the GoLokol{" "}
-          <a href="/lls-music-release" target="_blank" style={{ color: '#000000', textDecoration: 'underline' }}>
-            Artist Terms &amp; Music Release
+          I agree to the{" "}
+          <a href="/lls-music-release" target="_blank" style={{ color: '#FFD600', textDecoration: 'underline' }}>
+            GoLokol Artist Terms &amp; Music Release
           </a>
         </span>
       </label>
@@ -287,7 +321,9 @@ const ArtistSubmit = () => {
         type="button"
         onClick={handleSubmit}
         disabled={submitting || !mp3File || !imageFile || !termsConfirmed}
-        className={`w-full h-14 text-base font-display font-bold disabled:opacity-50 disabled:cursor-not-allowed mt-4 ${termsConfirmed ? "bg-[#FFD600] text-black hover:bg-[#FFD600]/90" : "bg-gray-500 text-white"}`}
+        className={`w-full h-14 text-base font-display font-bold disabled:opacity-50 disabled:cursor-not-allowed mt-4 ${
+          termsConfirmed ? "bg-[#FFD600] text-black hover:bg-[#FFD600]/90" : "bg-gray-500 text-white"
+        }`}
       >
         {submitting ? "Submitting..." : "Submit"}
       </Button>
