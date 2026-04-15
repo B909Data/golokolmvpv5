@@ -566,6 +566,26 @@ const ArtistDashboard = () => {
           </Button>
         </div>
       </div>
+      {/* Tianah Robinson Rule Overlay */}
+      {showTianahRule && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur z-50 flex items-center justify-center px-4"
+          onClick={() => setShowTianahRule(false)}>
+          <div className="bg-[#1a1a1a] rounded-2xl p-8 max-w-sm w-full mx-auto"
+            onClick={e => e.stopPropagation()}>
+            <h2 className="text-white text-center text-[24px] font-bold tracking-widest" style={{ fontFamily: "'Anton', sans-serif" }}>
+              THE TIANAH ROBINSON RULE
+            </h2>
+            <p className="text-white text-[15px] leading-relaxed text-center mt-6">
+              GoLokol does not support absurdly violent lyrics that support a neglect for human life. There are plenty of other platforms that dgaf about our communities. This isn't one.
+            </p>
+            <div className="w-full h-px bg-[#FFD600] mt-6" />
+            <button onClick={() => setShowTianahRule(false)}
+              className="w-full mt-4 py-3 rounded-xl bg-[#FFD600] text-black font-bold text-base">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );
