@@ -437,7 +437,7 @@ const ArtistDashboard = () => {
           </Button>
           <ul className="space-y-2 text-white text-[13px] font-sans list-disc list-inside">
             <li>Up to 2 submissions per month. Only ONE song is discoverable in stores at a time.</li>
-            <li>Once fans add you to their Lokol Scene you can send one new song and up to 4 show notifications per month.</li>
+            <li>Once fans add you to their Lokol Scene you can send up to 3 new songs and 4 show promotions per month.</li>
             <li>MP3 files only, max 20MB</li>
             <li>
               Submissions are only denied for two reasons: a poor mix, or a violation of{" "}
