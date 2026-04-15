@@ -41,6 +41,7 @@ interface ArtistProfile {
 }
 
 const ArtistDashboard = () => {
+  const [showTianahRule, setShowTianahRule] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const setupPhotoRef = useRef<HTMLInputElement>(null);
@@ -434,10 +435,17 @@ const ArtistDashboard = () => {
           >
             Submit New Music
           </Button>
-          <ul className="space-y-1 text-white text-[13px] font-sans list-disc list-inside">
-            <li>Up to 2 submissions per month</li>
+          <ul className="space-y-2 text-white text-[13px] font-sans list-disc list-inside">
+            <li>Up to 2 submissions per month. Only ONE song is discoverable in stores at a time.</li>
+            <li>Once fans add you to their Lokol Scene you can send one new song and up to 4 show notifications per month.</li>
             <li>MP3 files only, max 20MB</li>
-            <li>Free to submit</li>
+            <li>
+              Submissions are only denied for two reasons: a poor mix, or a violation of{" "}
+              <button type="button" onClick={() => setShowTianahRule(true)}
+                className="text-[#FFD600] underline hover:text-[#FFD600]/80 font-bold inline">
+                The Tianah Robinson Rule
+              </button>.
+            </li>
           </ul>
         </section>
 
@@ -558,6 +566,26 @@ const ArtistDashboard = () => {
           </Button>
         </div>
       </div>
+      {/* Tianah Robinson Rule Overlay */}
+      {showTianahRule && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur z-50 flex items-center justify-center px-4"
+          onClick={() => setShowTianahRule(false)}>
+          <div className="bg-[#1a1a1a] rounded-2xl p-8 max-w-sm w-full mx-auto"
+            onClick={e => e.stopPropagation()}>
+            <h2 className="text-white text-center text-[24px] font-bold tracking-widest" style={{ fontFamily: "'Anton', sans-serif" }}>
+              THE TIANAH ROBINSON RULE
+            </h2>
+            <p className="text-white text-[15px] leading-relaxed text-center mt-6">
+              GoLokol does not support absurdly violent lyrics that support a neglect for human life. There are plenty of other platforms that dgaf about our communities. This isn't one.
+            </p>
+            <div className="w-full h-px bg-[#FFD600] mt-6" />
+            <button onClick={() => setShowTianahRule(false)}
+              className="w-full mt-4 py-3 rounded-xl bg-[#FFD600] text-black font-bold text-base">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );
