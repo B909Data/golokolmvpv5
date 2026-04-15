@@ -435,10 +435,17 @@ const ArtistDashboard = () => {
           >
             Submit New Music
           </Button>
-          <ul className="space-y-1 text-white text-[13px] font-sans list-disc list-inside">
-            <li>Up to 2 submissions per month</li>
+          <ul className="space-y-2 text-white text-[13px] font-sans list-disc list-inside">
+            <li>Up to 2 submissions per month. Only ONE song is discoverable in stores at a time.</li>
+            <li>Once fans add you to their Lokol Scene you can send one new song and up to 4 show notifications per month.</li>
             <li>MP3 files only, max 20MB</li>
-            <li>Free to submit</li>
+            <li>
+              Submissions are only denied for two reasons: a poor mix, or a violation of{" "}
+              <button type="button" onClick={() => setShowTianahRule(true)}
+                className="text-[#FFD600] underline hover:text-[#FFD600]/80 font-bold inline">
+                The Tianah Robinson Rule
+              </button>.
+            </li>
           </ul>
         </section>
 
