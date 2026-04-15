@@ -25,6 +25,34 @@ interface Track {
   artist_user_id: string | null;
 }
 
+const playRewardSound = () => {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const now = ctx.currentTime;
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.frequency.setValueAtTime(523.25, now);
+    osc1.frequency.setValueAtTime(659.25, now + 0.15);
+    gain1.gain.setValueAtTime(0.3, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+    osc1.start(now);
+    osc1.stop(now + 0.6);
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.frequency.setValueAtTime(783.99, now + 0.15);
+    gain2.gain.setValueAtTime(0.2, now + 0.15);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    osc2.start(now + 0.15);
+    osc2.stop(now + 0.7);
+  } catch (e) {
+    // Silent fail
+  }
+};
+
 const LokolListensGenre = () => {
   const { genre, storeSlug } = useParams<{ genre: string; storeSlug: string }>();
   const navigate = useNavigate();
@@ -41,8 +69,9 @@ const LokolListensGenre = () => {
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [showSaveOverlay, setShowSaveOverlay] = useState(false);
   const [overlayTrack, setOverlayTrack] = useState<Track | null>(null);
-  const [pointsSplash, setPointsSplash] = useState<{ id: string; amount: number } | null>(null);
+  const [flashingId, setFlashingId] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isFan, setIsFan] = useState(false);
   const [dailyPointsRemaining, setDailyPointsRemaining] = useState(40);
   const [userId, setUserId] = useState<string | null>(null);
   const halfAwarded = useRef<Set<string>>(new Set());
@@ -51,14 +80,15 @@ const LokolListensGenre = () => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        setIsLoggedIn(true);
         setUserId(session.user.id);
-        const { data: fp } = await supabase
+        const { data: fp } = await (supabase as any)
           .from("fan_profiles")
-          .select("daily_points_date, daily_points_earned")
+          .select("daily_points_date, daily_points_earned, lokol_points")
           .eq("fan_user_id", session.user.id)
           .maybeSingle();
         if (fp) {
+          setIsLoggedIn(true);
+          setIsFan(true);
           const today = new Date().toLocaleDateString("en-US", { timeZone: "America/New_York" });
           const dbDate = fp.daily_points_date
             ? new Date(fp.daily_points_date + "T00:00:00").toLocaleDateString("en-US", { timeZone: "America/New_York" })
@@ -68,6 +98,11 @@ const LokolListensGenre = () => {
           } else {
             setDailyPointsRemaining(40);
           }
+          setPoints(fp.lokol_points || 0);
+        } else {
+          // Logged in but no fan profile (e.g. artist account)
+          setIsLoggedIn(true);
+          setIsFan(false);
         }
       }
 
@@ -150,7 +185,7 @@ const LokolListensGenre = () => {
   }, [playingId, tracks]);
 
   const handleSave = useCallback(async (track: Track) => {
-    if (!isLoggedIn) {
+    if (!isFan) {
       setOverlayTrack(track);
       setShowSaveOverlay(true);
       return;
@@ -160,6 +195,11 @@ const LokolListensGenre = () => {
       toast({ title: "You've maxed out your Lokol Points for today. Come back tomorrow." });
       return;
     }
+
+    // Phase 1: flash
+    setFlashingId(track.id);
+    playRewardSound();
+
     await (supabase as any).from("fan_saves").insert({
       fan_user_id: userId,
       artist_choice: track.artist_name,
@@ -176,11 +216,24 @@ const LokolListensGenre = () => {
     } as any).eq("fan_user_id", userId!);
 
     setDailyPointsRemaining(r => r - 10);
-    setSavedIds(prev => new Set([...prev, track.id]));
     setPoints(p => p + 10);
-    setPointsSplash({ id: track.id, amount: 10 });
-    setTimeout(() => setPointsSplash(null), 1200);
-  }, [isLoggedIn, savedIds, dailyPointsRemaining, userId, points, toast]);
+
+    // After 1.5s transition to Phase 2 (permanent saved)
+    setTimeout(() => {
+      setFlashingId(null);
+      setSavedIds(prev => new Set([...prev, track.id]));
+    }, 1500);
+  }, [isFan, savedIds, dailyPointsRemaining, userId, points, toast]);
+
+  const handleHeaderSave = useCallback(() => {
+    if (isFan) {
+      navigate("/fan/scene");
+    } else {
+      // Show overlay with first track or generic
+      setOverlayTrack(tracks[0] || null);
+      setShowSaveOverlay(true);
+    }
+  }, [isFan, navigate, tracks]);
 
   const playingTrack = tracks.find(t => t.id === playingId);
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -196,20 +249,30 @@ const LokolListensGenre = () => {
   return (
     <div className="min-h-screen flex flex-col bg-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
       <style>{`
-        @keyframes floatUp {
-          0% { opacity: 1; transform: translateY(0); }
-          100% { opacity: 0; transform: translateY(-40px); }
+        @keyframes pointsFlash {
+          0% { transform: scale(0.5); opacity: 0; }
+          20% { transform: scale(1.2); opacity: 1; }
+          80% { transform: scale(1.0); opacity: 1; }
+          100% { transform: scale(1.0); opacity: 0; }
         }
       `}</style>
       <audio ref={audioRef} />
 
       {/* Header */}
       <header className="sticky top-0 z-50 px-4 py-3 flex items-center justify-between bg-black border-b border-[#333]">
-        <Link to={`/lls/${storeSlug || ""}`} className="text-white">
+        <Link to={storeSlug ? `/lls/${storeSlug}` : "/lls"} className="text-white">
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <img src={golokolLogo} alt="GoLokol" className="h-6 w-6" />
-        <p className="text-[#FFD600] font-bold text-sm">Lokol Points: {points}</p>
+        <div className="flex items-center gap-2">
+          <img src={golokolLogo} alt="GoLokol" className="h-6 w-6" />
+          <p className="text-[#FFD600] font-bold text-sm">{points} pts</p>
+        </div>
+        <button
+          onClick={handleHeaderSave}
+          className="bg-[#FFD600] text-black font-bold text-xs px-3 py-1 rounded-full"
+        >
+          Save
+        </button>
       </header>
 
       {tracks.length === 0 ? (
@@ -221,47 +284,66 @@ const LokolListensGenre = () => {
           {tracks.map(track => {
             const isCurrent = playingId === track.id && isPlaying;
             const alreadySaved = savedIds.has(track.id);
+            const isFlashing = flashingId === track.id;
             return (
               <div
                 key={track.id}
-                className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer"
+                className={`relative aspect-square rounded-2xl overflow-hidden cursor-pointer ${isFlashing ? "ring-4 ring-[#FFD600]" : ""}`}
                 onClick={() => handlePlay(track)}
               >
                 <img src={track.song_image_url} alt={track.artist_name} className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent" />
 
-                {/* Center icon */}
-                {isCurrent ? (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleSave(track); }}
-                    className="absolute inset-0 flex items-center justify-center"
+                {/* Phase 1: Points flash overlay */}
+                {isFlashing && (
+                  <div
+                    className="absolute inset-0 flex items-center justify-center bg-black/60 z-10"
+                    style={{ animation: "pointsFlash 1.5s ease-out forwards" }}
                   >
-                    {alreadySaved ? (
-                      <Heart className="w-12 h-12 fill-[#FFD600] text-[#FFD600]" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center">
-                        <Plus className="w-6 h-6 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Play className="w-12 h-12 text-white/60" />
+                    <span
+                      className="text-white font-bold text-[32px]"
+                      style={{ fontFamily: "'Anton', sans-serif" }}
+                    >
+                      +10 POINTS
+                    </span>
                   </div>
                 )}
 
-                {/* Points splash */}
-                {pointsSplash?.id === track.id && (
-                  <div
-                    className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                    style={{ animation: "floatUp 1.2s ease-out forwards" }}
-                  >
-                    <span className="text-[#FFD600] font-bold text-[24px]">+{pointsSplash.amount} pts</span>
+                {/* Phase 2: Permanent saved state */}
+                {alreadySaved && !isFlashing && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 z-10">
+                    <Heart className="w-6 h-6 fill-[#FFD600] text-[#FFD600] mb-1" />
+                    <p className="text-[#FFD600] text-[18px] leading-tight text-center" style={{ fontFamily: "'Anton', sans-serif" }}>
+                      ADDED TO YOUR
+                    </p>
+                    <p className="text-[#FFD600] text-[18px] leading-tight text-center" style={{ fontFamily: "'Anton', sans-serif" }}>
+                      LOKOL SCENE
+                    </p>
                   </div>
+                )}
+
+                {/* Unsaved: show play or + button */}
+                {!alreadySaved && !isFlashing && (
+                  <>
+                    {isCurrent ? (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleSave(track); }}
+                        className="absolute inset-0 flex items-center justify-center z-10"
+                      >
+                        <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center">
+                          <Plus className="w-6 h-6 text-white" />
+                        </div>
+                      </button>
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Play className="w-12 h-12 text-white/60" />
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {/* Bottom text */}
-                <div className="absolute bottom-3 left-3 right-3">
+                <div className="absolute bottom-3 left-3 right-3 z-20">
                   <p className="text-white font-bold text-[13px] truncate">{track.artist_name}</p>
                   <p className="text-white/70 text-[11px] truncate">{track.song_title}</p>
                 </div>
@@ -294,12 +376,19 @@ const LokolListensGenre = () => {
       )}
 
       {/* Save Overlay */}
-      {showSaveOverlay && overlayTrack && (
+      {showSaveOverlay && (
         <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center px-6">
           <div className="bg-[#1a1a1a] rounded-2xl p-6 max-w-sm w-full text-center">
-            <img src={overlayTrack.song_image_url} alt="" className="w-20 h-20 rounded-xl object-cover mx-auto mb-4" />
-            <p className="text-white font-bold text-[18px]">{overlayTrack.artist_name}</p>
-            <p className="text-white text-[14px] mt-2">Save {overlayTrack.artist_name} to your Atlanta Lokol Scene</p>
+            {overlayTrack && (
+              <>
+                <img src={overlayTrack.song_image_url} alt="" className="w-20 h-20 rounded-xl object-cover mx-auto mb-4" />
+                <p className="text-white font-bold text-[18px]">{overlayTrack.artist_name}</p>
+                <p className="text-white text-[14px] mt-2">Save {overlayTrack.artist_name} to your Atlanta Lokol Scene</p>
+              </>
+            )}
+            {!overlayTrack && (
+              <p className="text-white font-bold text-[18px] mb-2">Save artists to your Lokol Scene</p>
+            )}
             <p className="text-[#FFD600] font-bold text-[16px] mt-2">+10 Lokol Points</p>
             <button
               onClick={() => navigate(`/lls/signup?points=${points}&store=${storeSlug || ""}`)}
