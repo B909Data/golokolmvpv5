@@ -41,6 +41,7 @@ interface ArtistProfile {
 }
 
 const ArtistDashboard = () => {
+  const [showTianahRule, setShowTianahRule] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const setupPhotoRef = useRef<HTMLInputElement>(null);
