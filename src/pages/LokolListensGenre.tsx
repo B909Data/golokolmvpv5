@@ -133,7 +133,9 @@ const LokolListensGenre = () => {
         }
       }
 
-      const genreLabel = SLUG_TO_GENRE[genre || ""];
+      // Read session token
+      setHasValidToken(!!readToken());
+
       if (!genreLabel) { setTracksLoading(false); return; }
 
       const { data } = await (supabase as any)
