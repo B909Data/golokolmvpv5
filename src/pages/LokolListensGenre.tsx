@@ -136,6 +136,7 @@ const LokolListensGenre = () => {
       // Read session token
       setHasValidToken(!!readToken());
 
+      const genreLabel = SLUG_TO_GENRE[genre || ""];
       if (!genreLabel) { setTracksLoading(false); return; }
 
       const { data } = await (supabase as any)
