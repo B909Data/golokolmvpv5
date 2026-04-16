@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useRef, ReactNode } from "react";
 import atlantaBg from "@/assets/atlanta-bg.svg";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import fanmenuShows from "@/assets/fanmenu-shows.svg";
+import fanmenuMarket from "@/assets/fanmenu-market.svg";
 
 interface LLSOnboardingProps {
   storeSlug: string;
@@ -23,32 +25,44 @@ const SoundWave = () => (
         }}
       />
     ))}
-    <style>{`
-      @keyframes soundWave {
-        0%, 100% { transform: scaleY(0.4); }
-        50% { transform: scaleY(1); }
-      }
-    `}</style>
   </div>
 );
 
 const SLIDES = [
   {
-    emoji: "🎧",
-    heading: "Discover Local Music",
-    body: "Browse Atlanta artists you won't find on any algorithm. Real music. Right here.",
+    icon: golokolLogo,
+    animation: "float",
+    heading: "All Genres. All Atlanta.",
+    body: "Discover and connect with emerging local artists and shows.",
   },
   {
-    emoji: "⭐",
-    heading: "Earn Lokol Points",
-    body: "Save artists to your Lokol Scene and show up to local shows to earn points.",
+    icon: fanmenuShows,
+    animation: "pulse",
+    heading: "Your Scene.",
+    body: "Create an Atlanta scene that matters to you.",
   },
   {
-    emoji: "🎁",
-    heading: "Redeem at Local Spots",
-    body: "Use your points for discounts at Crates ATL and other Atlanta partners.",
+    icon: fanmenuMarket,
+    animation: "float",
+    heading: "Earn and Redeem Points City-wide",
+    body: "Unlock the value of music in Atlanta.",
   },
 ];
+
+const KEYFRAMES = `
+  @keyframes soundWave {
+    0%, 100% { transform: scaleY(0.4); }
+    50% { transform: scaleY(1); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+`;
 
 const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
   const storageKey = `${STORAGE_KEY_PREFIX}${storeSlug}`;
@@ -57,28 +71,38 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const touchStartX = useRef(0);
 
-  useEffect(() => {
-    if (onboarded) return;
-    const timer = setTimeout(() => setPhase("swipe"), 3000);
-    return () => clearTimeout(timer);
-  }, [onboarded]);
-
   if (onboarded) return <>{children}</>;
 
   if (phase === "splash") {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <div
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+        style={{ fontFamily: "'Montserrat', sans-serif" }}
+      >
+        <style>{KEYFRAMES}</style>
         <img src={atlantaBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 flex flex-col items-center gap-6 px-8 text-center max-w-md">
           <img src={golokolLogo} alt="GoLokol" className="w-16 h-16" />
           <SoundWave />
-          <p className="text-white font-bold text-[18px] leading-relaxed">
-            Good music lives here. Start exploring.
-          </p>
-          <p className="font-bold text-[14px]" style={{ color: "#FFD600" }}>
-            Your city. Your scene. Be a part of it.
-          </p>
+          <h1
+            style={{
+              fontFamily: "'Anton', sans-serif",
+              color: "#FFD600",
+              fontSize: 32,
+              lineHeight: 1.1,
+            }}
+          >
+            Good music lives here.
+          </h1>
+          <p className="text-white text-[18px] leading-relaxed">Start exploring.</p>
+          <button
+            onClick={() => setPhase("swipe")}
+            className="font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] mt-4"
+            style={{ backgroundColor: "#FFD600", color: "#000", width: 200, height: 56 }}
+          >
+            Next
+          </button>
         </div>
       </div>
     );
@@ -115,13 +139,17 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center"
       style={{ fontFamily: "'Montserrat', sans-serif" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      <style>{KEYFRAMES}</style>
+      <img src={atlantaBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
+      <div className="absolute inset-0 bg-black/70" />
+
       {/* Progress dots */}
-      <div className="absolute top-12 flex gap-2">
+      <div className="absolute top-12 flex gap-2 z-10">
         {SLIDES.map((_, i) => (
           <div
             key={i}
@@ -131,15 +159,31 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
         ))}
       </div>
 
-      <div className="flex flex-col items-center gap-6 px-8 text-center max-w-md">
-        <span className="text-[64px]">{slide.emoji}</span>
-        <h2 className="text-white font-bold text-[28px]">{slide.heading}</h2>
-        <p className="text-white text-[16px] leading-relaxed">{slide.body}</p>
+      <div className="relative z-10 flex flex-col items-center gap-6 px-8 text-center max-w-md">
+        <img
+          src={slide.icon}
+          alt=""
+          className="w-20 h-20"
+          style={{
+            animation: `${slide.animation} 2.4s ease-in-out infinite`,
+          }}
+        />
+        <h2
+          style={{
+            fontFamily: "'Anton', sans-serif",
+            color: "#FFD600",
+            fontSize: 36,
+            lineHeight: 1.1,
+          }}
+        >
+          {slide.heading}
+        </h2>
+        <p className="text-white text-[16px] leading-relaxed max-w-xs">{slide.body}</p>
       </div>
 
       <button
         onClick={next}
-        className="absolute bottom-16 font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
+        className="absolute bottom-16 z-10 font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
         style={{ backgroundColor: "#FFD600", color: "#000", width: 200, height: 56 }}
       >
         {isLast ? "Let's Go" : "Next"}
