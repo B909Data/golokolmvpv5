@@ -36,6 +36,7 @@ import ArtistAfterParties from "./pages/ArtistAfterParties";
 import ArtistDashboard from "./pages/ArtistDashboard";
 import ArtistSignup from "./pages/ArtistSignup";
 import ArtistSubmit from "./pages/ArtistSubmit";
+import ArtistSubmitShow from "./pages/ArtistSubmitShow";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
@@ -123,6 +124,7 @@ const App = () => (
           <Route path="/artist/after-parties" element={<ArtistAfterParties />} />
           <Route path="/artist/dashboard" element={<ArtistDashboard />} />
           <Route path="/artist/submit" element={<ArtistSubmit />} />
+          <Route path="/artist/submit-show" element={<ArtistSubmitShow />} />
           <Route path="/artist/event/:eventId" element={<ArtistEvent />} />
           
           {/* Song Detail */}

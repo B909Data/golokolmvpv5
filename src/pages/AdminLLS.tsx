@@ -69,6 +69,7 @@ const AdminLLS = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [addArtistName, setAddArtistName] = useState("");
   const [addSongTitle, setAddSongTitle] = useState("");
+  const [addYoutubeUrl, setAddYoutubeUrl] = useState("");
   const [addGenre, setAddGenre] = useState("");
   const [addMp3File, setAddMp3File] = useState<File | null>(null);
   const [addImageFile, setAddImageFile] = useState<File | null>(null);
@@ -217,6 +218,7 @@ const AdminLLS = () => {
       const { error: insertErr } = await (supabase as any).from("lls_artist_submissions").insert({
         artist_name: addArtistName.trim(),
         song_title: addSongTitle.trim(),
+        youtube_url: addYoutubeUrl.trim() || null,
         genre_style: addGenre,
         city_market: 'Atlanta',
         mp3_url: mp3UrlData.publicUrl,
@@ -233,6 +235,7 @@ const AdminLLS = () => {
       setClaimLink(`golokol.app/claim/${claimCode}`);
       setAddArtistName("");
       setAddSongTitle("");
+      setAddYoutubeUrl("");
       setAddGenre("");
       setAddMp3File(null);
       setAddImageFile(null);
@@ -330,6 +333,10 @@ const AdminLLS = () => {
                 <div className="space-y-1">
                   <label className="text-sm text-muted-foreground">Song Title *</label>
                   <Input value={addSongTitle} onChange={e => setAddSongTitle(e.target.value)} placeholder="Song title" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">YouTube Link (optional)</label>
+                  <Input value={addYoutubeUrl} onChange={e => setAddYoutubeUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm text-muted-foreground">Genre *</label>
