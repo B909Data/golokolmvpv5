@@ -41,7 +41,29 @@ const LLSStorePage = () => {
         .eq("store_slug", storeSlug)
         .limit(1)
         .maybeSingle();
-      if (error || !data) { setNotFound(true); } else { setStoreName(data.store_name); }
+      if (error || !data) { setNotFound(true); } else {
+        setStoreName(data.store_name);
+        // Generate or refresh session token
+        try {
+          const existingRaw = localStorage.getItem("golokol_store_session");
+          const existing = existingRaw ? JSON.parse(existingRaw) : null;
+          const isValid = existing && existing.store_slug === storeSlug && existing.expires_at > Date.now();
+          if (!isValid) {
+            const token = {
+              store_slug: storeSlug,
+              store_name: data.store_name,
+              created_at: Date.now(),
+              expires_at: Date.now() + (2 * 60 * 60 * 1000),
+              genres_explored: [] as string[],
+              listened_under_50: [] as string[],
+              points_earned: 0,
+            };
+            localStorage.setItem("golokol_store_session", JSON.stringify(token));
+          }
+        } catch (e) {
+          // ignore localStorage errors
+        }
+      }
       setLoading(false);
     };
     fetchStore();

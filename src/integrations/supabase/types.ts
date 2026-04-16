@@ -244,6 +244,8 @@ export type Database = {
           email: string | null
           fan_user_id: string
           id: string
+          last_store_slug: string | null
+          last_store_visit: string | null
           lokol_points: number | null
           name: string | null
           qr_code_id: string | null
@@ -256,6 +258,8 @@ export type Database = {
           email?: string | null
           fan_user_id: string
           id?: string
+          last_store_slug?: string | null
+          last_store_visit?: string | null
           lokol_points?: number | null
           name?: string | null
           qr_code_id?: string | null
@@ -268,6 +272,8 @@ export type Database = {
           email?: string | null
           fan_user_id?: string
           id?: string
+          last_store_slug?: string | null
+          last_store_visit?: string | null
           lokol_points?: number | null
           name?: string | null
           qr_code_id?: string | null
@@ -301,6 +307,42 @@ export type Database = {
           name?: string
           notify?: boolean
           session?: string
+        }
+        Relationships: []
+      }
+      fan_session_tracks: {
+        Row: {
+          created_at: string | null
+          fan_user_id: string | null
+          genre: string | null
+          id: string
+          listen_pct: number | null
+          saved: boolean | null
+          session_date: string | null
+          store_slug: string | null
+          submission_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          fan_user_id?: string | null
+          genre?: string | null
+          id?: string
+          listen_pct?: number | null
+          saved?: boolean | null
+          session_date?: string | null
+          store_slug?: string | null
+          submission_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          fan_user_id?: string | null
+          genre?: string | null
+          id?: string
+          listen_pct?: number | null
+          saved?: boolean | null
+          session_date?: string | null
+          store_slug?: string | null
+          submission_id?: string | null
         }
         Relationships: []
       }

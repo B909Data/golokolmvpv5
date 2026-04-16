@@ -74,7 +74,34 @@ const LokolListensGenre = () => {
   const [isFan, setIsFan] = useState(false);
   const [dailyPointsRemaining, setDailyPointsRemaining] = useState(40);
   const [userId, setUserId] = useState<string | null>(null);
+  const [hasValidToken, setHasValidToken] = useState(false);
   const halfAwarded = useRef<Set<string>>(new Set());
+  const sessionTrackWritten = useRef<Set<string>>(new Set());
+
+  const readToken = useCallback(() => {
+    try {
+      const raw = localStorage.getItem("golokol_store_session");
+      const t = raw ? JSON.parse(raw) : null;
+      if (t && t.expires_at > Date.now()) return t;
+    } catch {}
+    return null;
+  }, []);
+
+  const writeToken = useCallback((updater: (t: any) => any) => {
+    try {
+      const raw = localStorage.getItem("golokol_store_session");
+      const t = raw ? JSON.parse(raw) : null;
+      if (!t) return;
+      const next = updater(t);
+      localStorage.setItem("golokol_store_session", JSON.stringify(next));
+    } catch {}
+  }, []);
+
+  const todayAtlanta = useCallback(() => {
+    const d = new Date().toLocaleDateString("en-US", { timeZone: "America/New_York" });
+    const [m, day, y] = d.split("/");
+    return `${y}-${m.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  }, []);
 
   useEffect(() => {
     const init = async () => {
@@ -105,6 +132,9 @@ const LokolListensGenre = () => {
           setIsFan(false);
         }
       }
+
+      // Read session token
+      setHasValidToken(!!readToken());
 
       const genreLabel = SLUG_TO_GENRE[genre || ""];
       if (!genreLabel) { setTracksLoading(false); return; }
@@ -140,9 +170,53 @@ const LokolListensGenre = () => {
     const onTime = () => {
       setCurrentTime(audio.currentTime);
       setDuration(audio.duration || 0);
-      if (playingId && audio.duration && audio.currentTime / audio.duration >= 0.5 && !halfAwarded.current.has(playingId)) {
-        halfAwarded.current.add(playingId);
-        setPoints(p => p + 5);
+      if (playingId && audio.duration) {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        // Update token under_50 list
+        if (pct < 50) {
+          writeToken((t) => {
+            if (!t.listened_under_50.includes(playingId)) {
+              t.listened_under_50 = [...t.listened_under_50, playingId];
+            }
+            return t;
+          });
+        } else {
+          writeToken((t) => {
+            t.listened_under_50 = t.listened_under_50.filter((id: string) => id !== playingId);
+            return t;
+          });
+        }
+        // 50%+ awards & DB write
+        if (pct >= 50 && !halfAwarded.current.has(playingId)) {
+          halfAwarded.current.add(playingId);
+          const token = readToken();
+          if (hasValidToken && isFan && userId && dailyPointsRemaining > 0) {
+            const today = todayAtlanta();
+            (supabase as any).from("fan_profiles").update({
+              lokol_points: points + 5,
+              daily_points_earned: (40 - dailyPointsRemaining) + 5,
+              daily_points_date: today,
+              last_store_slug: token?.store_slug || null,
+              last_store_visit: new Date().toISOString(),
+            }).eq("fan_user_id", userId).then(() => {});
+            setPoints(p => p + 5);
+            setDailyPointsRemaining(r => r - 5);
+            writeToken((t) => { t.points_earned = (t.points_earned || 0) + 5; return t; });
+          }
+          // Write fan_session_tracks (50% complete)
+          if (userId && token && !sessionTrackWritten.current.has(playingId + ":listen")) {
+            sessionTrackWritten.current.add(playingId + ":listen");
+            (supabase as any).from("fan_session_tracks").insert({
+              fan_user_id: userId,
+              submission_id: playingId,
+              store_slug: token.store_slug,
+              genre: SLUG_TO_GENRE[genre || ""] || null,
+              listen_pct: 50,
+              saved: false,
+              session_date: todayAtlanta(),
+            }).then(() => {});
+          }
+        }
       }
     };
     const onMeta = () => setDuration(audio.duration);
@@ -155,7 +229,7 @@ const LokolListensGenre = () => {
       audio.removeEventListener("loadedmetadata", onMeta);
       audio.removeEventListener("ended", onEnded);
     };
-  }, [playingId]);
+  }, [playingId, hasValidToken, isFan, userId, dailyPointsRemaining, points, genre, readToken, writeToken, todayAtlanta]);
 
   const handlePlay = useCallback((track: Track) => {
     const audio = audioRef.current;
@@ -165,11 +239,19 @@ const LokolListensGenre = () => {
       audio.play();
       setPlayingId(track.id);
       setIsPlaying(true);
+      // Track genre explored in token
+      writeToken((t) => {
+        const g = SLUG_TO_GENRE[genre || ""];
+        if (g && !t.genres_explored.includes(g)) {
+          t.genres_explored = [...t.genres_explored, g];
+        }
+        return t;
+      });
     } else {
       if (isPlaying) { audio.pause(); setIsPlaying(false); }
       else { audio.play(); setIsPlaying(true); }
     }
-  }, [playingId, isPlaying]);
+  }, [playingId, isPlaying, genre, writeToken]);
 
   const handleSkip = useCallback(() => {
     if (!playingId || tracks.length === 0) return;
@@ -191,7 +273,9 @@ const LokolListensGenre = () => {
       return;
     }
     if (savedIds.has(track.id)) return;
-    if (dailyPointsRemaining <= 0) {
+
+    const awardPoints = hasValidToken && dailyPointsRemaining > 0;
+    if (hasValidToken && dailyPointsRemaining <= 0) {
       toast({ title: "You've maxed out your Lokol Points for today. Come back tomorrow." });
       return;
     }
@@ -200,30 +284,60 @@ const LokolListensGenre = () => {
     setFlashingId(track.id);
     playRewardSound();
 
+    const token = readToken();
+
     await (supabase as any).from("fan_saves").insert({
       fan_user_id: userId,
       artist_choice: track.artist_name,
       email: "",
       name: "",
     });
-    const today = new Date().toISOString().split("T")[0];
-    await supabase.from("fan_profiles").update({
-      daily_points_earned: 40 - dailyPointsRemaining + 10,
-      daily_points_date: today,
-    } as any).eq("fan_user_id", userId!);
-    await supabase.from("fan_profiles").update({
-      lokol_points: (points + 10),
-    } as any).eq("fan_user_id", userId!);
 
-    setDailyPointsRemaining(r => r - 10);
-    setPoints(p => p + 10);
+    if (awardPoints) {
+      const today = todayAtlanta();
+      await (supabase as any).from("fan_profiles").update({
+        lokol_points: points + 10,
+        daily_points_earned: (40 - dailyPointsRemaining) + 10,
+        daily_points_date: today,
+        last_store_slug: token?.store_slug || null,
+        last_store_visit: new Date().toISOString(),
+      }).eq("fan_user_id", userId!);
+      setDailyPointsRemaining(r => r - 10);
+      setPoints(p => p + 10);
+      writeToken((t) => {
+        t.points_earned = (t.points_earned || 0) + 10;
+        t.listened_under_50 = t.listened_under_50.filter((id: string) => id !== track.id);
+        return t;
+      });
+    } else {
+      writeToken((t) => {
+        t.listened_under_50 = t.listened_under_50.filter((id: string) => id !== track.id);
+        return t;
+      });
+    }
+
+    // Write fan_session_tracks for save
+    if (token && userId) {
+      const currentListenPct = duration > 0 && playingId === track.id
+        ? Math.round((currentTime / duration) * 100)
+        : 0;
+      (supabase as any).from("fan_session_tracks").insert({
+        fan_user_id: userId,
+        submission_id: track.id,
+        store_slug: token.store_slug,
+        genre: SLUG_TO_GENRE[genre || ""] || null,
+        listen_pct: currentListenPct,
+        saved: true,
+        session_date: todayAtlanta(),
+      }).then(() => {});
+    }
 
     // After 1.5s transition to Phase 2 (permanent saved)
     setTimeout(() => {
       setFlashingId(null);
       setSavedIds(prev => new Set([...prev, track.id]));
     }, 1500);
-  }, [isFan, savedIds, dailyPointsRemaining, userId, points, toast]);
+  }, [isFan, savedIds, dailyPointsRemaining, userId, points, toast, hasValidToken, readToken, writeToken, todayAtlanta, currentTime, duration, playingId, genre]);
 
   const handleHeaderSave = useCallback(() => {
     if (isFan) {
