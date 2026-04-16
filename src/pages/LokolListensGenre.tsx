@@ -273,7 +273,9 @@ const LokolListensGenre = () => {
       return;
     }
     if (savedIds.has(track.id)) return;
-    if (dailyPointsRemaining <= 0) {
+
+    const awardPoints = hasValidToken && dailyPointsRemaining > 0;
+    if (hasValidToken && dailyPointsRemaining <= 0) {
       toast({ title: "You've maxed out your Lokol Points for today. Come back tomorrow." });
       return;
     }
@@ -282,30 +284,60 @@ const LokolListensGenre = () => {
     setFlashingId(track.id);
     playRewardSound();
 
+    const token = readToken();
+
     await (supabase as any).from("fan_saves").insert({
       fan_user_id: userId,
       artist_choice: track.artist_name,
       email: "",
       name: "",
     });
-    const today = new Date().toISOString().split("T")[0];
-    await supabase.from("fan_profiles").update({
-      daily_points_earned: 40 - dailyPointsRemaining + 10,
-      daily_points_date: today,
-    } as any).eq("fan_user_id", userId!);
-    await supabase.from("fan_profiles").update({
-      lokol_points: (points + 10),
-    } as any).eq("fan_user_id", userId!);
 
-    setDailyPointsRemaining(r => r - 10);
-    setPoints(p => p + 10);
+    if (awardPoints) {
+      const today = todayAtlanta();
+      await (supabase as any).from("fan_profiles").update({
+        lokol_points: points + 10,
+        daily_points_earned: (40 - dailyPointsRemaining) + 10,
+        daily_points_date: today,
+        last_store_slug: token?.store_slug || null,
+        last_store_visit: new Date().toISOString(),
+      }).eq("fan_user_id", userId!);
+      setDailyPointsRemaining(r => r - 10);
+      setPoints(p => p + 10);
+      writeToken((t) => {
+        t.points_earned = (t.points_earned || 0) + 10;
+        t.listened_under_50 = t.listened_under_50.filter((id: string) => id !== track.id);
+        return t;
+      });
+    } else {
+      writeToken((t) => {
+        t.listened_under_50 = t.listened_under_50.filter((id: string) => id !== track.id);
+        return t;
+      });
+    }
+
+    // Write fan_session_tracks for save
+    if (token && userId) {
+      const currentListenPct = duration > 0 && playingId === track.id
+        ? Math.round((currentTime / duration) * 100)
+        : 0;
+      (supabase as any).from("fan_session_tracks").insert({
+        fan_user_id: userId,
+        submission_id: track.id,
+        store_slug: token.store_slug,
+        genre: SLUG_TO_GENRE[genre || ""] || null,
+        listen_pct: currentListenPct,
+        saved: true,
+        session_date: todayAtlanta(),
+      }).then(() => {});
+    }
 
     // After 1.5s transition to Phase 2 (permanent saved)
     setTimeout(() => {
       setFlashingId(null);
       setSavedIds(prev => new Set([...prev, track.id]));
     }, 1500);
-  }, [isFan, savedIds, dailyPointsRemaining, userId, points, toast]);
+  }, [isFan, savedIds, dailyPointsRemaining, userId, points, toast, hasValidToken, readToken, writeToken, todayAtlanta, currentTime, duration, playingId, genre]);
 
   const handleHeaderSave = useCallback(() => {
     if (isFan) {
