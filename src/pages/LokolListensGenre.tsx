@@ -74,7 +74,34 @@ const LokolListensGenre = () => {
   const [isFan, setIsFan] = useState(false);
   const [dailyPointsRemaining, setDailyPointsRemaining] = useState(40);
   const [userId, setUserId] = useState<string | null>(null);
+  const [hasValidToken, setHasValidToken] = useState(false);
   const halfAwarded = useRef<Set<string>>(new Set());
+  const sessionTrackWritten = useRef<Set<string>>(new Set());
+
+  const readToken = useCallback(() => {
+    try {
+      const raw = localStorage.getItem("golokol_store_session");
+      const t = raw ? JSON.parse(raw) : null;
+      if (t && t.expires_at > Date.now()) return t;
+    } catch {}
+    return null;
+  }, []);
+
+  const writeToken = useCallback((updater: (t: any) => any) => {
+    try {
+      const raw = localStorage.getItem("golokol_store_session");
+      const t = raw ? JSON.parse(raw) : null;
+      if (!t) return;
+      const next = updater(t);
+      localStorage.setItem("golokol_store_session", JSON.stringify(next));
+    } catch {}
+  }, []);
+
+  const todayAtlanta = useCallback(() => {
+    const d = new Date().toLocaleDateString("en-US", { timeZone: "America/New_York" });
+    const [m, day, y] = d.split("/");
+    return `${y}-${m.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  }, []);
 
   useEffect(() => {
     const init = async () => {
