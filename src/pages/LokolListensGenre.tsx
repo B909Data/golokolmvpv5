@@ -170,9 +170,53 @@ const LokolListensGenre = () => {
     const onTime = () => {
       setCurrentTime(audio.currentTime);
       setDuration(audio.duration || 0);
-      if (playingId && audio.duration && audio.currentTime / audio.duration >= 0.5 && !halfAwarded.current.has(playingId)) {
-        halfAwarded.current.add(playingId);
-        setPoints(p => p + 5);
+      if (playingId && audio.duration) {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        // Update token under_50 list
+        if (pct < 50) {
+          writeToken((t) => {
+            if (!t.listened_under_50.includes(playingId)) {
+              t.listened_under_50 = [...t.listened_under_50, playingId];
+            }
+            return t;
+          });
+        } else {
+          writeToken((t) => {
+            t.listened_under_50 = t.listened_under_50.filter((id: string) => id !== playingId);
+            return t;
+          });
+        }
+        // 50%+ awards & DB write
+        if (pct >= 50 && !halfAwarded.current.has(playingId)) {
+          halfAwarded.current.add(playingId);
+          const token = readToken();
+          if (hasValidToken && isFan && userId && dailyPointsRemaining > 0) {
+            const today = todayAtlanta();
+            (supabase as any).from("fan_profiles").update({
+              lokol_points: points + 5,
+              daily_points_earned: (40 - dailyPointsRemaining) + 5,
+              daily_points_date: today,
+              last_store_slug: token?.store_slug || null,
+              last_store_visit: new Date().toISOString(),
+            }).eq("fan_user_id", userId).then(() => {});
+            setPoints(p => p + 5);
+            setDailyPointsRemaining(r => r - 5);
+            writeToken((t) => { t.points_earned = (t.points_earned || 0) + 5; return t; });
+          }
+          // Write fan_session_tracks (50% complete)
+          if (userId && token && !sessionTrackWritten.current.has(playingId + ":listen")) {
+            sessionTrackWritten.current.add(playingId + ":listen");
+            (supabase as any).from("fan_session_tracks").insert({
+              fan_user_id: userId,
+              submission_id: playingId,
+              store_slug: token.store_slug,
+              genre: SLUG_TO_GENRE[genre || ""] || null,
+              listen_pct: 50,
+              saved: false,
+              session_date: todayAtlanta(),
+            }).then(() => {});
+          }
+        }
       }
     };
     const onMeta = () => setDuration(audio.duration);
@@ -185,7 +229,7 @@ const LokolListensGenre = () => {
       audio.removeEventListener("loadedmetadata", onMeta);
       audio.removeEventListener("ended", onEnded);
     };
-  }, [playingId]);
+  }, [playingId, hasValidToken, isFan, userId, dailyPointsRemaining, points, genre, readToken, writeToken, todayAtlanta]);
 
   const handlePlay = useCallback((track: Track) => {
     const audio = audioRef.current;
