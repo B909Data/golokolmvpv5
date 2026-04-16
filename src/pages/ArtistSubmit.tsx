@@ -226,6 +226,7 @@ const ArtistSubmit = () => {
 
       <div className="space-y-2">
         <Label className="text-primary-foreground text-base font-sans">YouTube Link (optional)</Label>
+        <p className="text-primary-foreground/60 text-sm font-sans">Shown to your followers on their Lokol Scene homepage.</p>
         <Input
           value={form.youtube_url}
           onChange={e => setForm(f => ({ ...f, youtube_url: e.target.value }))}
