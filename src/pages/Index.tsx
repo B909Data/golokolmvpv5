@@ -1,10 +1,14 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import heroImage from "@/assets/golokol-hero.svg";
 import llsCard from "@/assets/lls-us-hero.jpg";
 import connectCard from "@/assets/connect-card.jpg";
 import img3Card from "@/assets/img3.svg";
+import golokolLogo from "@/assets/golokol-logo.svg";
+import { supabase } from "@/integrations/supabase/client";
 
 
 const HowItWorksCard = ({
@@ -38,6 +42,62 @@ const HowItWorksCard = ({
 );
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [showFanSignIn, setShowFanSignIn] = useState(false);
+  const [fanEmail, setFanEmail] = useState("");
+  const [fanPassword, setFanPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [fanSignInLoading, setFanSignInLoading] = useState(false);
+  const [fanSignInError, setFanSignInError] = useState<string | null>(null);
+
+  const closeFanSignIn = () => {
+    setShowFanSignIn(false);
+    setFanSignInError(null);
+    setFanPassword("");
+    setShowPassword(false);
+  };
+
+  const handleFanSignIn = async () => {
+    setFanSignInError(null);
+    if (!fanEmail || !fanPassword) {
+      setFanSignInError("Email and password are required.");
+      return;
+    }
+    setFanSignInLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: fanEmail.trim(),
+        password: fanPassword,
+      });
+      if (error) {
+        setFanSignInError(error.message);
+        setFanSignInLoading(false);
+        return;
+      }
+      const userId = data.user?.id;
+      if (!userId) {
+        setFanSignInError("Sign in failed. Please try again.");
+        setFanSignInLoading(false);
+        return;
+      }
+      const { data: profile } = await supabase
+        .from("fan_profiles")
+        .select("id")
+        .eq("fan_user_id", userId)
+        .maybeSingle();
+      if (!profile) {
+        await supabase.auth.signOut();
+        setFanSignInError("No fan account found. Discover at a local store first.");
+        setFanSignInLoading(false);
+        return;
+      }
+      navigate("/fan/scene");
+    } catch (err: any) {
+      setFanSignInError(err?.message || "Something went wrong.");
+      setFanSignInLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-black">
       <Navbar />
@@ -56,10 +116,7 @@ const Index = () => {
             <span className="text-[#FFD600]">is local</span>
           </h1>
           <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
-            GoLokol supports local music discovery, fan engagement and music scenes.
-          </p>
-          <p className="text-white text-base md:text-lg mt-2 max-w-xl opacity-90">
-            We launch April 18 on Record Store Day in Atlanta.
+            Discover and build your Lokol Scene.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
@@ -74,6 +131,13 @@ const Index = () => {
             >
               I am an artist
             </Link>
+            <button
+              type="button"
+              onClick={() => setShowFanSignIn(true)}
+              className="inline-flex items-center justify-center bg-transparent text-white font-bold text-base rounded-2xl h-14 px-8 min-w-[200px] border-2 border-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              My Lokol Scene
+            </button>
           </div>
         </div>
       </section>
@@ -124,6 +188,81 @@ const Index = () => {
       </section>
 
       <Footer />
+
+      {/* FAN SIGN IN MODAL */}
+      {showFanSignIn && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center"
+          onClick={closeFanSignIn}
+        >
+          <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
+          <div
+            className="bg-[#1a1a1a] rounded-2xl p-8 max-w-sm w-full mx-4 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={closeFanSignIn}
+              className="absolute top-4 right-4 text-white/60 hover:text-white"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="flex flex-col items-center gap-4">
+              <img src={golokolLogo} alt="GoLokol" className="w-10 h-10" />
+              <h2
+                className="text-white text-center"
+                style={{ fontFamily: "'Anton', sans-serif", fontSize: 24, lineHeight: 1.1 }}
+              >
+                Welcome back to your Lokol Scene
+              </h2>
+              <input
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                placeholder="you@email.com"
+                value={fanEmail}
+                onChange={(e) => setFanEmail(e.target.value)}
+                className="w-full bg-[#0E0E0E] border border-[#333] text-white placeholder-white/40 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-[#FFD600]"
+              />
+              <div className="relative w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  placeholder="Password"
+                  value={fanPassword}
+                  onChange={(e) => setFanPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleFanSignIn();
+                  }}
+                  className="w-full bg-[#0E0E0E] border border-[#333] text-white placeholder-white/40 rounded-xl px-4 py-3 pr-12 text-base focus:outline-none focus:border-[#FFD600]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {fanSignInError && (
+                <p className="text-red-500 text-sm text-center w-full">{fanSignInError}</p>
+              )}
+              <button
+                onClick={handleFanSignIn}
+                disabled={fanSignInLoading}
+                className="w-full bg-[#FFD600] text-black font-bold rounded-xl py-3 text-base disabled:opacity-60"
+              >
+                {fanSignInLoading ? "Signing in..." : "Sign In"}
+              </button>
+              <div className="w-full h-px bg-[#333] my-1" />
+              <p className="text-white/50 text-sm text-center">
+                New to GoLokol? Discover at a local store.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
