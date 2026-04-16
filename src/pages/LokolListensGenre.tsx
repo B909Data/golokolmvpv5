@@ -239,11 +239,19 @@ const LokolListensGenre = () => {
       audio.play();
       setPlayingId(track.id);
       setIsPlaying(true);
+      // Track genre explored in token
+      writeToken((t) => {
+        const g = SLUG_TO_GENRE[genre || ""];
+        if (g && !t.genres_explored.includes(g)) {
+          t.genres_explored = [...t.genres_explored, g];
+        }
+        return t;
+      });
     } else {
       if (isPlaying) { audio.pause(); setIsPlaying(false); }
       else { audio.play(); setIsPlaying(true); }
     }
-  }, [playingId, isPlaying]);
+  }, [playingId, isPlaying, genre, writeToken]);
 
   const handleSkip = useCallback(() => {
     if (!playingId || tracks.length === 0) return;
