@@ -451,11 +451,14 @@ const ArtistDashboard = () => {
 
         {/* Submit a Show */}
         <section className="space-y-2">
-          <Button disabled className="w-full h-14 text-base font-display font-bold bg-[#333] text-white/40 cursor-not-allowed">
+          <Button
+            onClick={() => navigate("/artist/submit-show")}
+            className="w-full h-14 text-base font-display font-bold bg-[#FFD600] text-black hover:bg-white"
+          >
             Submit a Show
           </Button>
           <p className="text-white/50 text-sm font-sans">
-            Coming soon. Fans who add you to their Lokol Scene get notified and earn points for showing up.
+            Fans who add you to their Lokol Scene get notified and earn points for showing up.
           </p>
         </section>
 
