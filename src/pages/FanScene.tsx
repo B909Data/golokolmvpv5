@@ -266,7 +266,7 @@ const FanScene = () => {
           />
         )}
         {activeView === "artists" && <ArtistsTab saves={saves} />}
-        {activeView === "shows" && <ShowsTab shows={shows} />}
+        {activeView === "shows" && <ShowsTab shows={shows} saves={saves} />}
         {activeView === "market" && <MarketTab points={points} progressPct={progressPct} />}
       </div>
 
@@ -590,7 +590,19 @@ function ArtistsTab({ saves }: { saves: SavedArtist[] }) {
 }
 
 /* ========== SHOWS TAB ========== */
-function ShowsTab({ shows }: { shows: ShowListing[] }) {
+function ShowsTab({ shows, saves }: { shows: ShowListing[]; saves: SavedArtist[] }) {
+  const savedArtistIds = new Set(
+    saves.map((s) => s.submission?.artist_user_id).filter(Boolean) as string[]
+  );
+
+  const sortedShows = [...shows].sort((a, b) => {
+    const aSaved = savedArtistIds.has(a.artist_user_id);
+    const bSaved = savedArtistIds.has(b.artist_user_id);
+    if (aSaved && !bSaved) return -1;
+    if (!aSaved && bSaved) return 1;
+    return a.show_date.localeCompare(b.show_date);
+  });
+
   return (
     <div>
       <div className="pl-5 pt-5 pb-4">
@@ -601,32 +613,44 @@ function ShowsTab({ shows }: { shows: ShowListing[] }) {
       </div>
 
       <div className="px-5">
-        {shows.length === 0 ? (
+        {sortedShows.length === 0 ? (
           <p className="text-white text-sm">No upcoming shows yet. Check back soon.</p>
         ) : (
           <div className="flex flex-col gap-3">
-            {shows.map((s) => (
-              <div key={s.id} className="bg-[#1a1a1a] rounded-xl p-4">
-                <p style={{ fontFamily: anton, fontSize: 16, color: "#fff", textTransform: "uppercase" }}>
-                  {s.event_name}
-                </p>
-                <p className="text-white text-sm">{s.venue_name}</p>
-                <p className="text-[#FFD600] text-sm mt-1">
-                  {new Date(s.show_date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                  {s.show_time ? ` · ${s.show_time}` : ""}
-                </p>
-                {s.ticket_url && (
-                  <a
-                    href={s.ticket_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-3 px-5 py-2 bg-[#FFD600] text-black font-bold text-sm rounded-full"
-                  >
-                    Buy Tickets
-                  </a>
-                )}
-              </div>
-            ))}
+            {sortedShows.map((s) => {
+              const isSaved = savedArtistIds.has(s.artist_user_id);
+              return (
+                <div
+                  key={s.id}
+                  className="bg-[#1a1a1a] rounded-xl p-4"
+                  style={isSaved ? { border: "2px solid #FFD600" } : undefined}
+                >
+                  {isSaved && (
+                    <p className="text-[#FFD600] text-[11px] font-bold uppercase tracking-wide mb-1">
+                      From your scene
+                    </p>
+                  )}
+                  <p style={{ fontFamily: anton, fontSize: 16, color: "#fff", textTransform: "uppercase" }}>
+                    {s.event_name}
+                  </p>
+                  <p className="text-white text-sm">{s.venue_name}</p>
+                  <p className="text-[#FFD600] text-sm mt-1">
+                    {new Date(s.show_date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    {s.show_time ? ` · ${s.show_time}` : ""}
+                  </p>
+                  {s.ticket_url && (
+                    <a
+                      href={s.ticket_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-3 px-5 py-2 bg-[#FFD600] text-black font-bold text-sm rounded-full"
+                    >
+                      Buy Tickets
+                    </a>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

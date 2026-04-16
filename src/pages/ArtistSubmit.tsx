@@ -34,6 +34,7 @@ const ArtistSubmit = () => {
   const [form, setForm] = useState({
     artist_name: "",
     song_title: "",
+    youtube_url: "",
     genre_style: [] as string[],
   });
   const [termsConfirmed, setTermsConfirmed] = useState(false);
@@ -159,6 +160,7 @@ const ArtistSubmit = () => {
         mp3_url: mp3Url.publicUrl,
         mp3_path: mp3Path,
         original_filename: mp3File.name,
+        youtube_url: form.youtube_url.trim() || null,
         artist_user_id: user.id,
         payment_status: "free",
         admin_status: "pending",
@@ -219,6 +221,17 @@ const ArtistSubmit = () => {
           className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground"
           maxLength={300}
           placeholder="Your song title"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-primary-foreground text-base font-sans">YouTube Link (optional)</Label>
+        <Input
+          value={form.youtube_url}
+          onChange={e => setForm(f => ({ ...f, youtube_url: e.target.value }))}
+          className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground"
+          maxLength={500}
+          placeholder="https://youtube.com/watch?v=..."
         />
       </div>
 
