@@ -1,0 +1,1 @@
+DELETE FROM public.fan_profiles WHERE fan_user_id = '5af2a67d-24b3-455d-9d26-0a71c906f15f';
