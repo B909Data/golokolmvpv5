@@ -1,7 +1,7 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Info } from "lucide-react";
+import { Info, Plus, Play, Pause } from "lucide-react";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import fanmenuArtists from "@/assets/fanmenu-artists.svg";
 import fanmenuShows from "@/assets/fanmenu-shows.svg";
@@ -10,8 +10,13 @@ import fanmenuHome from "@/assets/fanmenu-home.svg";
 import CratesATL from "@/assets/CratesATL.svg";
 import DBSlogo from "@/assets/DBSlogo.svg";
 import MoodsMusic from "@/assets/MoodsMusic.svg";
+import lokolHome1 from "@/assets/lokolhome-1.jpg";
+import lokolHome2 from "@/assets/lokolhome-2.jpg";
+import lokolHome3 from "@/assets/lokolhome-3.jpg";
 
 type View = "home" | "artists" | "shows" | "market";
+
+const HOME_IMAGES = [lokolHome1, lokolHome2, lokolHome3];
 
 interface FanProfile {
   id: string;
@@ -25,7 +30,9 @@ interface FanProfile {
 interface SavedArtist {
   id: string;
   artist_choice: string;
+  submission_id?: string | null;
   submission?: {
+    id?: string;
     artist_name: string;
     song_title: string;
     song_image_url: string | null;
@@ -45,6 +52,25 @@ interface ShowListing {
   artist_user_id: string;
 }
 
+interface MissedTrack {
+  id: string;
+  artist_name: string;
+  song_title: string;
+  song_image_url: string | null;
+  mp3_url: string | null;
+  genre_style: string | null;
+}
+
+interface StoreSession {
+  store_slug: string;
+  store_name?: string;
+  created_at: number;
+  expires_at: number;
+  genres_explored: string[];
+  listened_under_50: string[];
+  points_earned: number;
+}
+
 const anton = "'Anton', sans-serif";
 
 const FanScene = () => {
@@ -55,6 +81,28 @@ const FanScene = () => {
   const [saves, setSaves] = useState<SavedArtist[]>([]);
   const [shows, setShows] = useState<ShowListing[]>([]);
   const [activeView, setActiveView] = useState<View>("home");
+  const [homeImage, setHomeImage] = useState<string | null>(null);
+  const [storeSession, setStoreSession] = useState<StoreSession | null>(null);
+  const [tokenValid, setTokenValid] = useState(false);
+  const [tokenExpired, setTokenExpired] = useState(false);
+  const [expiredBannerDismissed, setExpiredBannerDismissed] = useState(false);
+  const [missedTracks, setMissedTracks] = useState<MissedTrack[]>([]);
+
+  useEffect(() => {
+    setHomeImage(HOME_IMAGES[Math.floor(Math.random() * HOME_IMAGES.length)]);
+
+    try {
+      const session = JSON.parse(localStorage.getItem("golokol_store_session") || "null") as StoreSession | null;
+      if (session) {
+        setStoreSession(session);
+        const valid = session.expires_at > Date.now();
+        setTokenValid(valid);
+        setTokenExpired(!valid);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -90,21 +138,33 @@ const FanScene = () => {
       }
       setProfile(prof);
 
-      const { data: savesData } = await supabase
+      const { data: savesData } = await (supabase as any)
         .from("fan_saves")
-        .select("id, artist_choice")
-        .eq("email", prof?.email || "");
+        .select("id, artist_choice, submission_id")
+        .eq("fan_user_id", userId);
 
       if (savesData && savesData.length > 0) {
-        const artistNames = savesData.map((s) => s.artist_choice);
-        const { data: subs } = await (supabase as any)
-          .from("lls_artist_submissions")
-          .select("artist_name, song_title, song_image_url, youtube_url, instagram_handle, artist_user_id")
-          .in("artist_name", artistNames);
+        const ids: string[] = savesData.filter((s: any) => s.submission_id).map((s: any) => s.submission_id);
+        const names: string[] = savesData.filter((s: any) => !s.submission_id).map((s: any) => s.artist_choice);
 
-        const enriched = savesData.map((s) => ({
+        const orParts: string[] = [];
+        if (ids.length > 0) orParts.push(`id.in.(${ids.join(",")})`);
+        if (names.length > 0) orParts.push(`artist_name.in.(${names.map((n) => `"${n}"`).join(",")})`);
+
+        let subs: any[] = [];
+        if (orParts.length > 0) {
+          const { data: subsData } = await (supabase as any)
+            .from("lls_artist_submissions")
+            .select("id, artist_name, song_title, song_image_url, youtube_url, instagram_handle, artist_user_id")
+            .or(orParts.join(","));
+          subs = subsData || [];
+        }
+
+        const enriched = savesData.map((s: any) => ({
           ...s,
-          submission: subs?.find((sub: any) => sub.artist_name === s.artist_choice),
+          submission:
+            subs.find((sub: any) => sub.id === s.submission_id) ||
+            subs.find((sub: any) => sub.artist_name === s.artist_choice),
         }));
         setSaves(enriched as SavedArtist[]);
       }
@@ -121,14 +181,44 @@ const FanScene = () => {
     load();
   }, [userId]);
 
-  const heroImage = useMemo(() => {
-    const withImages = saves.filter((s) => s.submission?.song_image_url);
-    if (withImages.length === 0) return null;
-    return withImages[Math.floor(Math.random() * withImages.length)].submission!.song_image_url;
-  }, [saves]);
+  // Load "Music You Might've Missed" when token expired
+  useEffect(() => {
+    if (!tokenExpired || !storeSession || !userId) return;
+    const loadMissed = async () => {
+      const genres = storeSession.genres_explored || [];
+      const underIds = storeSession.listened_under_50 || [];
+      if (genres.length === 0 && underIds.length === 0) return;
+
+      const savedSubmissionIds = new Set(
+        saves.map((s) => s.submission_id || s.submission?.id).filter(Boolean) as string[]
+      );
+
+      let query = (supabase as any)
+        .from("lls_artist_submissions")
+        .select("id, artist_name, song_title, song_image_url, mp3_url, genre_style")
+        .eq("admin_status", "approved");
+
+      if (genres.length > 0) {
+        query = query.in("genre_style", genres);
+      }
+
+      const { data } = await query;
+      if (!data) return;
+
+      const filtered = (data as MissedTrack[]).filter(
+        (t) => t.mp3_url && !savedSubmissionIds.has(t.id)
+      );
+
+      // listened_under_50 first, then others
+      const priority = filtered.filter((t) => underIds.includes(t.id));
+      const rest = filtered.filter((t) => !underIds.includes(t.id));
+      setMissedTracks([...priority, ...rest].slice(0, 12));
+    };
+    loadMissed();
+  }, [tokenExpired, storeSession, userId, saves]);
 
   const points = profile?.lokol_points || 0;
-  const progressPct = Math.min((points / 40) * 100, 100);
+  const progressPct = Math.min((points / 100) * 100, 100);
 
   if (loading) {
     return (
@@ -159,7 +249,22 @@ const FanScene = () => {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto pt-14 pb-24">
-        {activeView === "home" && <HomeView heroImage={heroImage} />}
+        {activeView === "home" && (
+          <HomeView
+            homeImage={homeImage}
+            tokenValid={tokenValid}
+            tokenExpired={tokenExpired}
+            storeSession={storeSession}
+            expiredBannerDismissed={expiredBannerDismissed}
+            onDismissExpired={() => setExpiredBannerDismissed(true)}
+            onKeepDiscovering={() => storeSession && navigate(`/lls/${storeSession.store_slug}`)}
+            onGoToMarket={() => setActiveView("market")}
+            missedTracks={missedTracks}
+            saves={saves}
+            setSaves={setSaves}
+            userId={userId}
+          />
+        )}
         {activeView === "artists" && <ArtistsTab saves={saves} />}
         {activeView === "shows" && <ShowsTab shows={shows} />}
         {activeView === "market" && <MarketTab points={points} progressPct={progressPct} />}
@@ -208,25 +313,233 @@ const FanScene = () => {
 };
 
 /* ========== HOME VIEW ========== */
-function HomeView({ heroImage }: { heroImage: string | null }) {
+function HomeView({
+  homeImage,
+  tokenValid,
+  tokenExpired,
+  storeSession,
+  expiredBannerDismissed,
+  onDismissExpired,
+  onKeepDiscovering,
+  onGoToMarket,
+  missedTracks,
+  saves,
+  setSaves,
+  userId,
+}: {
+  homeImage: string | null;
+  tokenValid: boolean;
+  tokenExpired: boolean;
+  storeSession: StoreSession | null;
+  expiredBannerDismissed: boolean;
+  onDismissExpired: () => void;
+  onKeepDiscovering: () => void;
+  onGoToMarket: () => void;
+  missedTracks: MissedTrack[];
+  saves: SavedArtist[];
+  setSaves: (s: SavedArtist[]) => void;
+  userId: string | null;
+}) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [savedMissedIds, setSavedMissedIds] = useState<Set<string>>(new Set());
+
+  const handlePlay = useCallback((track: MissedTrack) => {
+    const audio = audioRef.current;
+    if (!audio || !track.mp3_url) return;
+    if (playingId !== track.id) {
+      audio.src = track.mp3_url;
+      audio.play();
+      setPlayingId(track.id);
+      setIsPlaying(true);
+    } else {
+      if (isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
+      } else {
+        audio.play();
+        setIsPlaying(true);
+      }
+    }
+  }, [playingId, isPlaying]);
+
+  const handleSaveMissed = useCallback(async (track: MissedTrack) => {
+    if (!userId || savedMissedIds.has(track.id)) return;
+    setSavedMissedIds((prev) => new Set([...prev, track.id]));
+    await (supabase as any).from("fan_saves").insert({
+      fan_user_id: userId,
+      artist_choice: track.artist_name,
+      submission_id: track.id,
+      email: "",
+      name: "",
+    });
+    setSaves([
+      ...saves,
+      {
+        id: crypto.randomUUID(),
+        artist_choice: track.artist_name,
+        submission_id: track.id,
+        submission: {
+          id: track.id,
+          artist_name: track.artist_name,
+          song_title: track.song_title,
+          song_image_url: track.song_image_url,
+          youtube_url: null,
+          instagram_handle: null,
+          artist_user_id: null,
+        },
+      },
+    ]);
+  }, [userId, savedMissedIds, saves, setSaves]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onEnded = () => setIsPlaying(false);
+    audio.addEventListener("ended", onEnded);
+    return () => audio.removeEventListener("ended", onEnded);
+  }, []);
+
   return (
     <div className="relative min-h-[calc(100vh-56px-96px)]">
-      {heroImage && (
-        <img
-          src={heroImage}
-          alt=""
-          className="absolute right-0 top-0 h-[70vh] w-[65%] object-cover object-top"
-          style={{
-            filter: "sepia(0.5) saturate(2) hue-rotate(10deg) brightness(0.75) contrast(1.1)",
-          }}
-        />
+      <audio ref={audioRef} />
+
+      {/* Return-to-store banner */}
+      {tokenValid && storeSession && (
+        <div className="bg-[#FFD600] text-black px-4 py-3 flex items-center justify-between gap-3 relative z-20">
+          <p className="text-sm font-bold flex-1">
+            You're still earning points at {storeSession.store_name || storeSession.store_slug}
+          </p>
+          <button
+            onClick={onKeepDiscovering}
+            className="bg-black text-[#FFD600] px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap"
+          >
+            Keep Discovering
+          </button>
+        </div>
       )}
-      <div className="relative z-10 pl-5 pt-5">
-        <p style={{ fontFamily: anton, fontSize: 72, lineHeight: 0.9, color: "#FFD600" }}>MY</p>
-        <p style={{ fontFamily: anton, fontSize: 72, lineHeight: 0.9, color: "#FFD600" }}>LOKOL</p>
-        <p style={{ fontFamily: anton, fontSize: 72, lineHeight: 0.9, color: "#FFD600" }}>SCENE</p>
-        <p style={{ fontFamily: anton, fontSize: 56, lineHeight: 0.9, color: "#FFFFFF", marginTop: 4 }}>ATLANTA</p>
+      {tokenExpired && storeSession && !expiredBannerDismissed && (
+        <div className="bg-[#1a1a1a] text-white px-4 py-3 flex items-center justify-between gap-3 relative z-20">
+          <p className="text-sm flex-1">
+            Earn more points —{" "}
+            <button
+              onClick={() => {
+                onDismissExpired();
+                onGoToMarket();
+              }}
+              className="text-[#FFD600] underline font-bold"
+            >
+              visit
+            </button>{" "}
+            a Lokol Listening Station
+          </p>
+          <button
+            onClick={onDismissExpired}
+            className="text-white/60 text-xl leading-none"
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      <div className="relative">
+        {homeImage && (
+          <img
+            src={homeImage}
+            alt=""
+            className="absolute right-0 top-0 h-[70vh] w-[65%] object-cover object-top"
+            style={{
+              filter: "sepia(0.5) saturate(2) hue-rotate(10deg) brightness(0.75) contrast(1.1)",
+            }}
+          />
+        )}
+        <div className="relative z-10 pl-5 pt-5">
+          <p style={{ fontFamily: anton, fontSize: 72, lineHeight: 0.9, color: "#FFD600" }}>MY</p>
+          <p style={{ fontFamily: anton, fontSize: 72, lineHeight: 0.9, color: "#FFD600" }}>LOKOL</p>
+          <p style={{ fontFamily: anton, fontSize: 72, lineHeight: 0.9, color: "#FFD600" }}>SCENE</p>
+          <p style={{ fontFamily: anton, fontSize: 56, lineHeight: 0.9, color: "#FFFFFF", marginTop: 4 }}>ATLANTA</p>
+        </div>
       </div>
+
+      {/* Music You Might've Missed */}
+      {tokenExpired && storeSession && missedTracks.length > 0 && (
+        <div className="relative z-10 mt-[60vh] px-5 pt-8 pb-4">
+          <h2
+            style={{ fontFamily: anton, fontSize: 20, color: "#fff", textTransform: "uppercase" }}
+            className="mb-4"
+          >
+            Music you might've missed at {storeSession.store_name || storeSession.store_slug}
+          </h2>
+          <div className="grid grid-cols-2 gap-3">
+            {missedTracks.map((track) => {
+              const isCurrent = playingId === track.id;
+              const isSaved = savedMissedIds.has(track.id);
+              return (
+                <div key={track.id}>
+                  <div className="relative">
+                    <button
+                      onClick={() => handlePlay(track)}
+                      className="w-full aspect-square rounded-xl overflow-hidden bg-[#1a1a1a] flex items-center justify-center"
+                    >
+                      {track.song_image_url ? (
+                        <img
+                          src={track.song_image_url}
+                          alt={track.artist_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-gray-600 text-3xl">♪</span>
+                      )}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        {isCurrent && isPlaying ? (
+                          <Pause className="w-10 h-10 text-white" />
+                        ) : (
+                          <Play className="w-10 h-10 text-white" />
+                        )}
+                      </div>
+                    </button>
+                    {!isSaved && (
+                      <button
+                        onClick={() => handleSaveMissed(track)}
+                        className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[#FFD600] flex items-center justify-center"
+                        aria-label="Save"
+                      >
+                        <Plus className="w-5 h-5 text-black" strokeWidth={3} />
+                      </button>
+                    )}
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: anton,
+                      fontSize: 14,
+                      color: "#fff",
+                      textTransform: "uppercase",
+                      marginTop: 8,
+                    }}
+                  >
+                    {track.artist_name}
+                  </p>
+                  <p className="text-white text-xs" style={{ opacity: 0.7 }}>
+                    {track.song_title}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-white text-sm mt-6 text-center">
+            Visit a{" "}
+            <span
+              style={{ color: "#FFD600", textDecoration: "underline", cursor: "pointer" }}
+              onClick={onGoToMarket}
+            >
+              Lokol Listening Station
+            </span>{" "}
+            to earn points.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -341,7 +654,7 @@ function MarketTab({ points, progressPct }: { points: number; progressPct: numbe
           <div className="h-1.5 bg-[#333] rounded-full overflow-hidden">
             <div className="h-full bg-[#FFD600] rounded-full transition-all" style={{ width: `${progressPct}%` }} />
           </div>
-          <p className="text-white text-[11px] mt-1">40 pts unlocks rewards at local partners</p>
+          <p className="text-white text-[11px] mt-1">100 pts unlocks rewards at local partners</p>
         </div>
       </div>
 
@@ -354,11 +667,11 @@ function MarketTab({ points, progressPct }: { points: number; progressPct: numbe
             <p style={{ fontFamily: anton, fontSize: 14, color: "#fff", textTransform: "uppercase", marginTop: 12 }}>100 POINTS</p>
             <p className="text-white text-xs" style={{ opacity: 0.7 }}>10% off purchase</p>
             <button
-              disabled={points < 40}
+              disabled={points < 100}
               className="mt-3 w-full py-2 bg-[#FFD600] text-black font-bold text-sm rounded-full"
               style={{
-                opacity: points < 40 ? 0.4 : 1,
-                cursor: points < 40 ? "not-allowed" : "pointer",
+                opacity: points < 100 ? 0.4 : 1,
+                cursor: points < 100 ? "not-allowed" : "pointer",
               }}
             >
               Redeem
