@@ -245,53 +245,15 @@ const LokolListensGenre = () => {
     const audio = audioRef.current;
     if (!audio || !playingId) return;
     setCurrentTime(audio.currentTime);
-    const token = getValidToken();
     if (
-      token &&
+      hasValidTokenState &&
       audio.duration > 0 &&
       audio.currentTime / audio.duration >= 0.5 &&
       !pointsAwardedIds.has(playingId)
     ) {
       const awardedTrackId = playingId;
       setPointsAwardedIds((prev) => new Set(prev).add(awardedTrackId));
-
-      if (isLoggedIn && isFan && userId) {
-        try {
-          const { data: fp } = await (supabase as any)
-            .from("fan_profiles")
-            .select("lokol_points, daily_points_earned, daily_points_date")
-            .eq("fan_user_id", userId)
-            .single();
-          const todayAtlanta = getTodayAtlanta();
-          const isToday = fp?.daily_points_date === todayAtlanta;
-          const currentDaily = isToday ? (fp?.daily_points_earned || 0) : 0;
-
-          if (currentDaily >= DAILY_CAP) {
-            showCapToast();
-            return;
-          }
-
-          const pointsToAward = Math.min(5, DAILY_CAP - currentDaily);
-          const newPoints = points + pointsToAward;
-          setPoints(newPoints);
-          localStorage.setItem("golokol_session_points", newPoints.toString());
-
-          await (supabase as any)
-            .from("fan_profiles")
-            .update({
-              lokol_points: (fp?.lokol_points || 0) + pointsToAward,
-              daily_points_earned: currentDaily + pointsToAward,
-              daily_points_date: todayAtlanta,
-            })
-            .eq("fan_user_id", userId);
-
-          if (currentDaily + pointsToAward >= DAILY_CAP) showCapToast();
-        } catch {}
-      } else {
-        const newPoints = points + 5;
-        setPoints(newPoints);
-        localStorage.setItem("golokol_session_points", newPoints.toString());
-      }
+      await awardPoints(5);
     }
   };
 
@@ -310,41 +272,8 @@ const LokolListensGenre = () => {
     }
     if (savedIds.has(track.id) || splashIds.has(track.id)) return;
 
-    const token = getValidToken();
-    let pointsToAward = 0;
-
-    if (token && userId) {
-      try {
-        const { data: fp } = await (supabase as any)
-          .from("fan_profiles")
-          .select("lokol_points, daily_points_earned, daily_points_date")
-          .eq("fan_user_id", userId)
-          .single();
-        const todayAtlanta = getTodayAtlanta();
-        const isToday = fp?.daily_points_date === todayAtlanta;
-        const currentDaily = isToday ? (fp?.daily_points_earned || 0) : 0;
-
-        if (currentDaily >= DAILY_CAP) {
-          pointsToAward = 0;
-          showCapToast();
-        } else {
-          pointsToAward = Math.min(10, DAILY_CAP - currentDaily);
-        }
-
-        if (pointsToAward > 0) {
-          setPoints((p) => p + pointsToAward);
-          await (supabase as any)
-            .from("fan_profiles")
-            .update({
-              lokol_points: (fp?.lokol_points || 0) + pointsToAward,
-              daily_points_earned: currentDaily + pointsToAward,
-              daily_points_date: todayAtlanta,
-            })
-            .eq("fan_user_id", userId);
-
-          if (currentDaily + pointsToAward >= DAILY_CAP) showCapToast();
-        }
-      } catch {}
+    if (hasValidTokenState && userId) {
+      await awardPoints(10);
     }
 
     setSplashIds((prev) => new Set(prev).add(track.id));
@@ -352,12 +281,11 @@ const LokolListensGenre = () => {
 
     if (userId) {
       try {
-        await (supabase as any).from("fan_saves").insert({
+        await (supabase as any).from("lokol_scene_saves").insert({
           fan_user_id: userId,
-          artist_choice: track.artist_name,
           submission_id: track.id,
+          artist_name: track.artist_name,
           store_slug: storeSlug || null,
-          session: storeSlug || "lls1",
         });
       } catch {}
     }
