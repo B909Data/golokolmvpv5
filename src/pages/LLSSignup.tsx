@@ -61,28 +61,67 @@ const LLSSignup = () => {
         return;
       }
 
-      const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+      // Check if profile already exists
+      const { data: existingProfile } = await (supabase as any)
+        .from("fan_profiles")
+        .select("lokol_points, daily_points_earned, daily_points_date")
+        .eq("fan_user_id", userId)
+        .maybeSingle();
+
+      const todayAtlanta = new Date().toLocaleDateString("en-US", { timeZone: "America/New_York" });
+      const existingIsToday = existingProfile?.daily_points_date === todayAtlanta;
+      const existingDaily = existingIsToday ? (existingProfile?.daily_points_earned || 0) : 0;
+      const existingTotal = existingProfile?.lokol_points || 0;
+
+      // Use whichever is higher — DB or URL param
+      const finalPoints = Math.max(points, existingTotal);
+      const finalDaily = Math.max(points, existingDaily);
+
       await (supabase as any).from("fan_profiles").upsert(
         {
           fan_user_id: userId,
           name: name.trim() || null,
           email: email.trim(),
           city: "Atlanta",
-          lokol_points: points,
-          daily_points_earned: points,
-          daily_points_date: today,
+          lokol_points: finalPoints,
+          daily_points_earned: finalDaily,
+          daily_points_date: todayAtlanta,
           last_store_slug: storeSlug || null,
           last_store_visit: storeSlug ? new Date().toISOString() : null,
         },
         { onConflict: "fan_user_id" }
       );
 
-      if (artistName) {
-        await (supabase as any).from("fan_saves").insert({
-          fan_user_id: userId,
-          artist_choice: artistName,
-          store_slug: storeSlug || null,
-        });
+      // Save all pre-signup saves from localStorage
+      try {
+        const savedIdsRaw = localStorage.getItem("golokol_saved_ids");
+        const savedIds: string[] = savedIdsRaw ? JSON.parse(savedIdsRaw) : [];
+
+        // Also include the artist from URL param if not already in savedIds
+        // We need submission data for URL artist
+        if (savedIds.length > 0) {
+          const saves = savedIds.map((submissionId: string) => ({
+            fan_user_id: userId,
+            submission_id: submissionId,
+            store_slug: storeSlug || null,
+            artist_name: submissionId === "url_artist" ? artistName : null,
+          }));
+
+          // Upsert to avoid duplicates
+          await (supabase as any).from("lokol_scene_saves").upsert(saves, {
+            onConflict: "fan_user_id,submission_id",
+            ignoreDuplicates: true,
+          });
+        } else if (artistName) {
+          // Fallback: just save the URL artist by name if no localStorage
+          await (supabase as any).from("lokol_scene_saves").insert({
+            fan_user_id: userId,
+            artist_name: artistName,
+            store_slug: storeSlug || null,
+          });
+        }
+      } catch (saveErr) {
+        console.error("Error saving pre-signup artists:", saveErr);
       }
 
       navigate("/fan/scene");
