@@ -6,13 +6,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -45,11 +39,7 @@ interface Submission {
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
-
-const REJECTION_REASONS = [
-  "Violates our community standards",
-  "Poor mix/master quality",
-];
+const REJECTION_REASONS = ["Violates our community standards", "Poor mix/master quality"];
 
 const AdminLLS = () => {
   const [searchParams] = useSearchParams();
@@ -70,6 +60,7 @@ const AdminLLS = () => {
   const [addImageFile, setAddImageFile] = useState<File | null>(null);
   const [addSubmitting, setAddSubmitting] = useState(false);
   const [claimLink, setClaimLink] = useState<string | null>(null);
+  const [editingYoutube, setEditingYoutube] = useState<string>("");
 
   const fetchSubmissions = async () => {
     if (!key) return;
@@ -93,21 +84,21 @@ const AdminLLS = () => {
     if (key) fetchSubmissions();
   }, [key]);
 
+  // When selected submission changes, sync youtube edit field
   const selectedSubmission = submissions.find((s) => s.id === selectedId);
+  useEffect(() => {
+    setEditingYoutube(selectedSubmission?.youtube_url || "");
+  }, [selectedId]);
 
   const handleStatusChange = async (status: string) => {
-    if (!selectedId || !key) return;
+    if (!selectedId) return;
     setSaving(true);
     try {
-      const submission = submissions.find(s => s.id === selectedId);
-      const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
-        body: { id: selectedId, status, submission_type: submission?.submission_type || "general" },
-      });
+      const { error } = await (supabase as any).from("lls_artist_submissions").update({ status }).eq("id", selectedId);
       if (error) throw error;
       setSubmissions((prev) => prev.map((s) => (s.id === selectedId ? { ...s, status } : s)));
       toast.success("Status updated");
-    } catch (err) {
-      console.error("Update error:", err);
+    } catch {
       toast.error("Failed to update status");
     } finally {
       setSaving(false);
@@ -115,18 +106,17 @@ const AdminLLS = () => {
   };
 
   const handleNotesChange = async (admin_notes: string) => {
-    if (!selectedId || !key) return;
+    if (!selectedId) return;
     setSaving(true);
     try {
-      const submission = submissions.find(s => s.id === selectedId);
-      const { error } = await supabase.functions.invoke(`admin-update-submission?key=${key}`, {
-        body: { id: selectedId, admin_notes, submission_type: submission?.submission_type || "general" },
-      });
+      const { error } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .update({ admin_notes })
+        .eq("id", selectedId);
       if (error) throw error;
       setSubmissions((prev) => prev.map((s) => (s.id === selectedId ? { ...s, admin_notes } : s)));
       toast.success("Notes saved");
-    } catch (err) {
-      console.error("Update error:", err);
+    } catch {
       toast.error("Failed to save notes");
     } finally {
       setSaving(false);
@@ -134,7 +124,6 @@ const AdminLLS = () => {
   };
 
   const handleApprove = async (id: string) => {
-    if (!key) return;
     setSaving(true);
     try {
       const { error } = await (supabase as any)
@@ -145,7 +134,6 @@ const AdminLLS = () => {
       setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, admin_status: "approved" } : s)));
       toast.success("Submission approved");
     } catch (err: any) {
-      console.error("Approve error:", err);
       toast.error(err?.message || "Failed to approve");
     } finally {
       setSaving(false);
@@ -153,7 +141,7 @@ const AdminLLS = () => {
   };
 
   const handleReject = async (id: string) => {
-    if (!key || selectedReasons.length === 0) return;
+    if (selectedReasons.length === 0) return;
     setSaving(true);
     try {
       const reason = selectedReasons.join(", ");
@@ -162,22 +150,33 @@ const AdminLLS = () => {
         .update({ admin_status: "rejected", rejection_reason: reason })
         .eq("id", id);
       if (error) throw error;
-      setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, admin_status: "rejected", rejection_reason: reason } : s)));
+      setSubmissions((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, admin_status: "rejected", rejection_reason: reason } : s)),
+      );
       setRejectingId(null);
       setSelectedReasons([]);
       toast.success("Submission rejected");
     } catch (err: any) {
-      console.error("Reject error:", err);
       toast.error(err?.message || "Failed to reject");
     } finally {
       setSaving(false);
     }
   };
 
+  const handleSaveYoutube = async () => {
+    if (!selectedId) return;
+    const val = editingYoutube.trim() || null;
+    try {
+      await (supabase as any).from("lls_artist_submissions").update({ youtube_url: val }).eq("id", selectedId);
+      setSubmissions((prev) => prev.map((s) => (s.id === selectedId ? { ...s, youtube_url: val } : s)));
+      toast.success("YouTube URL saved");
+    } catch {
+      toast.error("Failed to save YouTube URL");
+    }
+  };
+
   const toggleReason = (reason: string) => {
-    setSelectedReasons(prev =>
-      prev.includes(reason) ? prev.filter(r => r !== reason) : [...prev, reason]
-    );
+    setSelectedReasons((prev) => (prev.includes(reason) ? prev.filter((r) => r !== reason) : [...prev, reason]));
   };
 
   const handleAddSong = async () => {
@@ -196,9 +195,9 @@ const AdminLLS = () => {
     setAddSubmitting(true);
     try {
       const ts = Date.now();
-      const claimCode = 'GOLOKOL-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-      const sanitizedMp3 = addMp3File.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-      const sanitizedImg = addImageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const claimCode = "GOLOKOL-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      const sanitizedMp3 = addMp3File.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const sanitizedImg = addImageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_");
       const mp3Path = `curated/${ts}-${sanitizedMp3}`;
       const imgPath = `curated/${ts}-${sanitizedImg}`;
 
@@ -215,15 +214,15 @@ const AdminLLS = () => {
         song_title: addSongTitle.trim(),
         youtube_url: addYoutubeUrl.trim() || null,
         genre_style: addGenre,
-        city_market: 'Atlanta',
+        city_market: "Atlanta",
         mp3_url: mp3UrlData.publicUrl,
         mp3_path: mp3Path,
         original_filename: addMp3File.name,
         song_image_url: imgUrlData.publicUrl,
-        admin_status: 'approved',
-        payment_status: 'curated',
+        admin_status: "approved",
+        payment_status: "curated",
         claim_code: claimCode,
-        contact_email: 'pending@golokol.app',
+        contact_email: "pending@golokol.app",
       });
       if (insertErr) throw insertErr;
 
@@ -237,7 +236,6 @@ const AdminLLS = () => {
       toast.success("Song added successfully");
       fetchSubmissions();
     } catch (err: any) {
-      console.error("Add song error:", err);
       toast.error(err?.message || "Failed to add song");
     } finally {
       setAddSubmitting(false);
@@ -272,7 +270,9 @@ const AdminLLS = () => {
             </div>
             <div className="flex items-center gap-2">
               <Link to={`/admin?key=${key}`}>
-                <Button variant="ghost" size="sm">← Back</Button>
+                <Button variant="ghost" size="sm">
+                  ← Back
+                </Button>
               </Link>
               <Button variant="outline" size="sm" onClick={fetchSubmissions} disabled={loading}>
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
@@ -281,11 +281,10 @@ const AdminLLS = () => {
               <Button
                 size="sm"
                 className="font-bold"
-                style={{ backgroundColor: '#FFD600', color: '#000' }}
+                style={{ backgroundColor: "#FFD600", color: "#000" }}
                 onClick={() => setShowAddForm(!showAddForm)}
               >
-                <Plus className="w-4 h-4 mr-1" />
-                Add Song
+                <Plus className="w-4 h-4 mr-1" /> Add Song
               </Button>
             </div>
           </div>
@@ -298,40 +297,50 @@ const AdminLLS = () => {
           {showAddForm && (
             <div className="border border-border/50 rounded-lg p-6 mb-6 bg-card/30 space-y-4">
               <h2 className="text-foreground font-bold text-lg">Add Song for Artist</h2>
-
               {claimLink && (
-                <div className="rounded-lg p-4 space-y-2" style={{ backgroundColor: '#FFD600' }}>
-                  <p className="text-sm font-bold" style={{ color: '#000' }}>Claim Link:</p>
+                <div className="rounded-lg p-4 space-y-2" style={{ backgroundColor: "#FFD600" }}>
+                  <p className="text-sm font-bold text-black">Claim Link:</p>
                   <div className="flex items-center gap-2">
-                    <code className="text-sm font-mono" style={{ color: '#000' }}>{claimLink}</code>
+                    <code className="text-sm font-mono text-black">{claimLink}</code>
                     <button
-                      onClick={() => { navigator.clipboard.writeText(`https://${claimLink}`); toast.success("Link copied!"); }}
-                      className="p-1 rounded hover:bg-black/10 transition-colors"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`https://${claimLink}`);
+                        toast.success("Link copied!");
+                      }}
+                      className="p-1 rounded hover:bg-black/10"
                     >
-                      <Copy className="w-4 h-4" style={{ color: '#000' }} />
+                      <Copy className="w-4 h-4 text-black" />
                     </button>
-                    <button
-                      onClick={() => setClaimLink(null)}
-                      className="p-1 rounded hover:bg-black/10 transition-colors ml-auto"
-                    >
-                      <X className="w-4 h-4" style={{ color: '#000' }} />
+                    <button onClick={() => setClaimLink(null)} className="p-1 rounded hover:bg-black/10 ml-auto">
+                      <X className="w-4 h-4 text-black" />
                     </button>
                   </div>
                 </div>
               )}
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-sm text-muted-foreground">Artist Name *</label>
-                  <Input value={addArtistName} onChange={e => setAddArtistName(e.target.value)} placeholder="Artist name" />
+                  <Input
+                    value={addArtistName}
+                    onChange={(e) => setAddArtistName(e.target.value)}
+                    placeholder="Artist name"
+                  />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm text-muted-foreground">Song Title *</label>
-                  <Input value={addSongTitle} onChange={e => setAddSongTitle(e.target.value)} placeholder="Song title" />
+                  <Input
+                    value={addSongTitle}
+                    onChange={(e) => setAddSongTitle(e.target.value)}
+                    placeholder="Song title"
+                  />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm text-muted-foreground">YouTube Link (optional)</label>
-                  <Input value={addYoutubeUrl} onChange={e => setAddYoutubeUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." />
+                  <Input
+                    value={addYoutubeUrl}
+                    onChange={(e) => setAddYoutubeUrl(e.target.value)}
+                    placeholder="https://youtube.com/watch?v=..."
+                  />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm text-muted-foreground">Genre *</label>
@@ -340,8 +349,10 @@ const AdminLLS = () => {
                       <SelectValue placeholder="Select genre" />
                     </SelectTrigger>
                     <SelectContent>
-                      {GENRE_OPTIONS.map(g => (
-                        <SelectItem key={g} value={g}>{g}</SelectItem>
+                      {GENRE_OPTIONS.map((g) => (
+                        <SelectItem key={g} value={g}>
+                          {g}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -351,7 +362,7 @@ const AdminLLS = () => {
                   <input
                     type="file"
                     accept=".mp3"
-                    onChange={e => setAddMp3File(e.target.files?.[0] || null)}
+                    onChange={(e) => setAddMp3File(e.target.files?.[0] || null)}
                     className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80"
                   />
                 </div>
@@ -360,22 +371,27 @@ const AdminLLS = () => {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={e => setAddImageFile(e.target.files?.[0] || null)}
+                    onChange={(e) => setAddImageFile(e.target.files?.[0] || null)}
                     className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80"
                   />
                 </div>
               </div>
-
               <div className="flex gap-2 pt-2">
                 <Button
                   className="font-bold"
-                  style={{ backgroundColor: '#FFD600', color: '#000' }}
+                  style={{ backgroundColor: "#FFD600", color: "#000" }}
                   onClick={handleAddSong}
                   disabled={addSubmitting}
                 >
                   {addSubmitting ? "Adding..." : "Add Song"}
                 </Button>
-                <Button variant="outline" onClick={() => { setShowAddForm(false); setClaimLink(null); }}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setClaimLink(null);
+                  }}
+                >
                   Cancel
                 </Button>
               </div>
@@ -408,13 +424,9 @@ const AdminLLS = () => {
                         <tr
                           key={sub.id}
                           onClick={() => setSelectedId(sub.id)}
-                          className={`border-b border-border/30 cursor-pointer hover:bg-card/30 transition-colors ${
-                            selectedId === sub.id ? "bg-card/50" : ""
-                          }`}
+                          className={`border-b border-border/30 cursor-pointer hover:bg-card/30 transition-colors ${selectedId === sub.id ? "bg-card/50" : ""}`}
                         >
-                          <td className="px-4 py-3 text-foreground">
-                            {new Date(sub.created_at).toLocaleDateString()}
-                          </td>
+                          <td className="px-4 py-3 text-foreground">{new Date(sub.created_at).toLocaleDateString()}</td>
                           <td className="px-4 py-3 text-foreground">{sub.artist_name}</td>
                           <td className="px-4 py-3 text-foreground">{sub.song_title}</td>
                           <td className="px-4 py-3 text-foreground text-xs">
@@ -422,7 +434,12 @@ const AdminLLS = () => {
                           </td>
                           <td className="px-4 py-3">
                             {sub.mp3_url ? (
-                              <a href={sub.mp3_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">
+                              <a
+                                href={sub.mp3_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline text-xs"
+                              >
                                 {sub.original_filename || "Download"}
                               </a>
                             ) : (
@@ -435,21 +452,25 @@ const AdminLLS = () => {
                                 sub.admin_status === "approved"
                                   ? "bg-green-500/20 text-green-500"
                                   : sub.admin_status === "rejected"
-                                  ? "bg-red-500/20 text-red-500"
-                                  : sub.status === "Selected"
-                                  ? "bg-primary/20 text-primary"
-                                  : sub.status === "Shortlisted"
-                                  ? "bg-yellow-500/20 text-yellow-500"
-                                  : sub.status === "Reviewed"
-                                  ? "bg-blue-500/20 text-blue-500"
-                                  : "bg-muted text-muted-foreground"
+                                    ? "bg-red-500/20 text-red-500"
+                                    : sub.status === "Selected"
+                                      ? "bg-primary/20 text-primary"
+                                      : sub.status === "Shortlisted"
+                                        ? "bg-yellow-500/20 text-yellow-500"
+                                        : sub.status === "Reviewed"
+                                          ? "bg-blue-500/20 text-blue-500"
+                                          : "bg-muted text-muted-foreground"
                               }`}
                             >
-                              {sub.admin_status === "approved" ? "Approved" : sub.admin_status === "rejected" ? "Rejected" : sub.status}
+                              {sub.admin_status === "approved"
+                                ? "Approved"
+                                : sub.admin_status === "rejected"
+                                  ? "Rejected"
+                                  : sub.status}
                             </span>
                           </td>
                           <td className="px-4 py-3">
-                            <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                               {sub.admin_status !== "approved" && (
                                 <button
                                   onClick={() => handleApprove(sub.id)}
@@ -462,7 +483,10 @@ const AdminLLS = () => {
                               )}
                               {sub.admin_status !== "rejected" && (
                                 <button
-                                  onClick={() => { setRejectingId(sub.id); setSelectedReasons([]); }}
+                                  onClick={() => {
+                                    setRejectingId(sub.id);
+                                    setSelectedReasons([]);
+                                  }}
                                   disabled={saving}
                                   className="p-1 rounded hover:bg-red-500/20 text-red-500 transition-colors"
                                   title="Reject"
@@ -479,13 +503,12 @@ const AdminLLS = () => {
                 </div>
               )}
 
-              {/* Inline reject form */}
               {rejectingId && (
                 <div className="border border-red-500/30 rounded-lg p-4 bg-red-500/5 space-y-3">
                   <p className="text-foreground text-sm font-medium">
-                    Reject: {submissions.find(s => s.id === rejectingId)?.song_title}
+                    Reject: {submissions.find((s) => s.id === rejectingId)?.song_title}
                   </p>
-                  {REJECTION_REASONS.map(reason => (
+                  {REJECTION_REASONS.map((reason) => (
                     <label key={reason} className="flex items-center gap-2 cursor-pointer">
                       <Checkbox
                         checked={selectedReasons.includes(reason)}
@@ -506,7 +529,10 @@ const AdminLLS = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => { setRejectingId(null); setSelectedReasons([]); }}
+                      onClick={() => {
+                        setRejectingId(null);
+                        setSelectedReasons([]);
+                      }}
                     >
                       Cancel
                     </Button>
@@ -518,14 +544,16 @@ const AdminLLS = () => {
             {/* Details Panel */}
             <div className="lg:col-span-1">
               {selectedSubmission ? (
-                <div className="border border-border/50 rounded-lg p-6 space-y-6 bg-card/30">
+                <div className="border border-border/50 rounded-lg p-6 space-y-4 bg-card/30">
                   {selectedSubmission.song_image_url && (
-                    <img src={selectedSubmission.song_image_url} className="w-full rounded-lg object-cover aspect-square mb-4" />
+                    <img
+                      src={selectedSubmission.song_image_url}
+                      className="w-full rounded-lg object-cover aspect-square"
+                      alt=""
+                    />
                   )}
                   <div>
-                    <h3 className="font-display text-xl text-foreground mb-1">
-                      {selectedSubmission.song_title}
-                    </h3>
+                    <h3 className="font-display text-xl text-foreground mb-1">{selectedSubmission.song_title}</h3>
                     <p className="text-muted-foreground">{selectedSubmission.artist_name}</p>
                   </div>
 
@@ -559,39 +587,58 @@ const AdminLLS = () => {
                     <p className="text-muted-foreground">
                       <span className="text-foreground">Release Agreement:</span>{" "}
                       {selectedSubmission.music_release_agreed ? (
-                        <span className="text-green-600 font-medium">
-                          ✅ Signed{selectedSubmission.music_release_agreed_at
-                            ? ` on ${new Date(selectedSubmission.music_release_agreed_at).toLocaleString()}`
-                            : ""}
-                        </span>
+                        <span className="text-green-600 font-medium">✅ Signed</span>
                       ) : (
                         <span className="text-red-500 font-medium">❌ Not signed</span>
                       )}
                     </p>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    {selectedSubmission.mp3_url && (
-                      <a href={selectedSubmission.mp3_url} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
-                        <ExternalLink className="w-4 h-4" />
-                        🎵 {selectedSubmission.original_filename || "MP3 Download"}
-                      </a>
-                    )}
-                    {selectedSubmission.spotify_url && selectedSubmission.spotify_url !== "curated-submission" && (
-                      <a href={selectedSubmission.spotify_url} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
-                        <ExternalLink className="w-4 h-4" />Spotify
-                      </a>
-                    )}
-                    {selectedSubmission.youtube_url && (
-                      <a href={selectedSubmission.youtube_url} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
-                        <ExternalLink className="w-4 h-4" />YouTube
+                  {/* MP3 link */}
+                  {selectedSubmission.mp3_url && (
+                    <a
+                      href={selectedSubmission.mp3_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      🎵 {selectedSubmission.original_filename || "MP3 Download"}
+                    </a>
+                  )}
+
+                  {/* YouTube URL — editable */}
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">YouTube URL</p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={editingYoutube}
+                        onChange={(e) => setEditingYoutube(e.target.value)}
+                        placeholder="https://youtube.com/watch?v=..."
+                        className="flex-1 text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                      />
+                      <button
+                        onClick={handleSaveYoutube}
+                        className="px-2 py-1.5 rounded text-xs font-bold"
+                        style={{ backgroundColor: "#FFD600", color: "#000" }}
+                      >
+                        Save
+                      </button>
+                    </div>
+                    {editingYoutube && (
+                      <a
+                        href={editingYoutube}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+                      >
+                        <ExternalLink className="w-3 h-3" /> Preview
                       </a>
                     )}
                   </div>
 
+                  {/* Short bio */}
                   {selectedSubmission.short_bio && (
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Artist Bio</p>
@@ -599,13 +646,7 @@ const AdminLLS = () => {
                     </div>
                   )}
 
-                  {selectedSubmission.notes && (
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Artist Notes</p>
-                      <p className="text-sm text-foreground">{selectedSubmission.notes}</p>
-                    </div>
-                  )}
-
+                  {/* Status */}
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground">Status</p>
                     <Select value={selectedSubmission.status} onValueChange={handleStatusChange} disabled={saving}>
@@ -614,12 +655,15 @@ const AdminLLS = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {STATUS_OPTIONS.map((opt) => (
-                          <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                          <SelectItem key={opt} value={opt}>
+                            {opt}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
 
+                  {/* Admin Notes */}
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground">Admin Notes</p>
                     <Textarea
@@ -627,7 +671,7 @@ const AdminLLS = () => {
                       onChange={(e) => {
                         const newNotes = e.target.value;
                         setSubmissions((prev) =>
-                          prev.map((s) => s.id === selectedId ? { ...s, admin_notes: newNotes } : s)
+                          prev.map((s) => (s.id === selectedId ? { ...s, admin_notes: newNotes } : s)),
                         );
                       }}
                       onBlur={(e) => handleNotesChange(e.target.value)}
