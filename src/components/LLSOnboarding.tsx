@@ -38,20 +38,37 @@ const SLIDES = [
   {
     icon: golokolLogo,
     animation: "float 2.5s ease-in-out infinite",
-    heading: "All Genres. All Atlanta.",
-    body: "Discover and connect with emerging local artists and shows.",
+    heading: (
+      <>
+        1<br />
+        Discover and Support
+      </>
+    ),
+    body: "emerging local artists and shows",
   },
   {
     icon: fanmenuShows,
     animation: "pulse 2s ease-in-out infinite",
-    heading: "Your Scene.",
-    body: "Create an Atlanta scene that matters to you.",
+    heading: (
+      <>
+        2<br />
+        Your City. Your Scene.
+      </>
+    ),
+    body: "Create an ATL scene that matters to you.",
   },
   {
     icon: fanmenuMarket,
     animation: "float 2.5s ease-in-out infinite",
-    heading: "Earn and Redeem Points City-wide",
-    body: "Unlock the value of music in Atlanta.",
+    heading: (
+      <>
+        3<br />
+        Earn and Redeem
+        <br />
+        Points City-wide
+      </>
+    ),
+    body: "Unlock the value of music IRL.",
   },
 ];
 
