@@ -285,28 +285,37 @@ export type Database = {
           artist_choice: string
           created_at: string
           email: string
+          fan_user_id: string | null
           id: string
           name: string
           notify: boolean
           session: string
+          store_slug: string | null
+          submission_id: string | null
         }
         Insert: {
           artist_choice: string
           created_at?: string
           email: string
+          fan_user_id?: string | null
           id?: string
           name: string
           notify?: boolean
           session?: string
+          store_slug?: string | null
+          submission_id?: string | null
         }
         Update: {
           artist_choice?: string
           created_at?: string
           email?: string
+          fan_user_id?: string | null
           id?: string
           name?: string
           notify?: boolean
           session?: string
+          store_slug?: string | null
+          submission_id?: string | null
         }
         Relationships: []
       }
