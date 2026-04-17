@@ -436,18 +436,18 @@ const LokolListensGenre = () => {
                   alt=""
                   className="w-20 h-20 rounded-xl object-cover"
                 />
-                <p className="text-white font-bold text-lg text-center">
+                <p className="text-white font-bold text-[18px] text-center">
                   {overlayTrack.artist_name}
                 </p>
-                <p className="text-white text-sm text-center">
-                  Save {overlayTrack.artist_name} to your Atlanta Lokol Scene
+                <p className="text-white text-[14px] text-center">
+                  Save to your Atlanta Lokol Scene.
                 </p>
                 {hasValidToken && (
                   <p
-                    className="font-bold text-base text-center"
+                    className="font-bold text-[14px] text-center"
                     style={{ color: "#FFD600" }}
                   >
-                    +10 Lokol Points
+                    +10 pts after signing up.
                   </p>
                 )}
               </>
