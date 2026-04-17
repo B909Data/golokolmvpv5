@@ -249,7 +249,7 @@ const FanScene = () => {
               localStorage.removeItem("golokol_saved_ids");
               localStorage.removeItem("golokol_session_points");
               localStorage.removeItem("golokol_store_session");
-              navigate("/lls/signup");
+              navigate("/");
             }}
             className="text-[11px] text-white/40"
           >

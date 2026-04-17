@@ -342,16 +342,40 @@ const LokolListensGenre = () => {
           <ArrowLeft size={24} />
         </button>
         <img src={golokolLogo} alt="GoLokol" className="w-8 h-8" />
-        <div className="flex items-center gap-3">
-          <span className="text-[#FFD600] font-bold text-sm">Points: {points}</span>
-          <button
-            onClick={handleHeaderSave}
-            className="px-3 py-1.5 rounded-full text-xs font-bold"
-            style={{ backgroundColor: "#FFD600", color: "#000" }}
-          >
-            Save
-          </button>
-        </div>
+        {isFan ? (
+          <div className="flex items-center gap-2">
+            <span className="text-[#FFD600] font-bold text-sm">🎵 {points} pts</span>
+            <button
+              onClick={() => navigate("/fan/scene")}
+              className="px-3 py-1 rounded-full text-xs font-bold bg-[#FFD600] text-black"
+            >
+              My Scene
+            </button>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                localStorage.removeItem("golokol_saved_ids");
+                localStorage.removeItem("golokol_session_points");
+                localStorage.removeItem("golokol_store_session");
+                navigate("/");
+              }}
+              className="px-3 py-1 rounded-full text-xs border border-white text-white"
+            >
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <span className="text-[#FFD600] font-bold text-sm">Points: {points}</span>
+            <button
+              onClick={handleHeaderSave}
+              className="px-3 py-1.5 rounded-full text-xs font-bold"
+              style={{ backgroundColor: "#FFD600", color: "#000" }}
+            >
+              Save
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Genre title */}
