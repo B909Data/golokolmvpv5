@@ -621,7 +621,7 @@ const LokolListensGenre = () => {
       )}
 
       {/* Daily cap toast */}
-      {capToastVisible && (
+      {(capToastVisible || capMessage) && (
         <div
           className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-xl shadow-2xl max-w-[90%]"
           style={{
@@ -632,7 +632,8 @@ const LokolListensGenre = () => {
           }}
         >
           <p className="text-sm font-bold text-center">
-            You've maxed out today's points. Keep listening — the music is still free. 🎧
+            {capMessage ||
+              "You've maxed out today's points. Keep listening — the music is still free. 🎧"}
           </p>
         </div>
       )}
