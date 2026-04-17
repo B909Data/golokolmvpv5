@@ -96,6 +96,7 @@ const LokolListensGenre = () => {
   const [capToastVisible, setCapToastVisible] = useState(false);
   const [capMessage, setCapMessage] = useState("");
   const [dailyPointsEarned, setDailyPointsEarned] = useState(0);
+  const hasValidTokenRef = useRef(false);
   const [hasValidTokenState, setHasValidTokenState] = useState(false);
 
   const genreLabel = SLUG_TO_GENRE[genre || ""] || genre || "";
