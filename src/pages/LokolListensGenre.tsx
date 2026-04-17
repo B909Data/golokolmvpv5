@@ -310,7 +310,7 @@ const LokolListensGenre = () => {
   };
 
   const currentTrack = tracks.find((t) => t.id === playingId);
-  const hasValidToken = !!getValidToken();
+  const hasValidToken = hasValidTokenState;
 
   return (
     <div
