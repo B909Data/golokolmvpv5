@@ -89,7 +89,12 @@ const FanScene = () => {
   const [missedTracks, setMissedTracks] = useState<MissedTrack[]>([]);
 
   useEffect(() => {
-    setHomeImage(HOME_IMAGES[Math.floor(Math.random() * HOME_IMAGES.length)]);
+    let idx = Math.floor(Math.random() * HOME_IMAGES.length);
+    setHomeImage(HOME_IMAGES[idx]);
+    const rotateInterval = setInterval(() => {
+      idx = (idx + 1) % HOME_IMAGES.length;
+      setHomeImage(HOME_IMAGES[idx]);
+    }, 6000);
 
     try {
       const session = JSON.parse(localStorage.getItem("golokol_store_session") || "null") as StoreSession | null;
@@ -102,6 +107,8 @@ const FanScene = () => {
     } catch {
       // ignore
     }
+
+    return () => clearInterval(rotateInterval);
   }, []);
 
   useEffect(() => {

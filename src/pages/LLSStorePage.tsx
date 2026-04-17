@@ -128,19 +128,13 @@ const LLSStorePage = () => {
       <div className="min-h-screen flex flex-col bg-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
         {/* Hero Image */}
         <section className="w-full flex items-center justify-center px-4" style={{ height: "55vh", minHeight: 320 }}>
-          <img src={HERO_MAP[storeSlug || ""] || cratesHero} alt="Lokol Listening Stations" className="w-full h-full object-contain" />
+          <img src={HERO_MAP[storeSlug || ""] || cratesHero} alt="Lokol Listening Stations" className="w-full h-full object-contain" loading="eager" decoding="async" fetchPriority="high" />
         </section>
 
         {/* Store name + CTA */}
         <section className="w-full px-6 py-8 text-center" style={{ marginTop: -10 }}>
-          <h1 className="text-white font-bold text-[24px] md:text-[28px]">You're at a Lokol Listening Station</h1>
-          <p className="mt-2 font-bold text-[20px] md:text-[24px]" style={{ color: "#FFD600" }}>
-            at {storeName}
-          </p>
-          <p className="text-white font-normal leading-[1.8] text-[18px] md:text-[20px] max-w-2xl mx-auto mt-4">
-            Listen and discover a curated selection of Atlanta local artists.
-            <br /><br />
-            Earn points for {storeName} discounts.
+          <p className="text-white font-normal leading-[1.6] text-[18px] md:text-[20px] max-w-2xl mx-auto">
+            Listen, earn points and build your local music scene on GoLokol.
           </p>
           <button
             onClick={scrollToGenres}
