@@ -94,6 +94,7 @@ const LokolListensGenre = () => {
   const [isFan, setIsFan] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [capToastVisible, setCapToastVisible] = useState(false);
+  const [capMessage, setCapMessage] = useState("");
   const [dailyPointsEarned, setDailyPointsEarned] = useState(0);
   const [hasValidTokenState, setHasValidTokenState] = useState(false);
 
@@ -125,15 +126,18 @@ const LokolListensGenre = () => {
   // Token validity check (mount + interval)
   useEffect(() => {
     const checkToken = () => {
-      try {
-        const token = JSON.parse(localStorage.getItem("golokol_store_session") || "null");
-        setHasValidTokenState(!!(token && token.expires_at && token.expires_at > Date.now()));
-      } catch {
-        setHasValidTokenState(false);
+      const token = JSON.parse(
+        localStorage.getItem("golokol_store_session") || "null"
+      );
+      const valid = !!(token && token.expires_at > Date.now());
+      setHasValidTokenState(valid);
+      if (!valid && token) {
+        // Token just expired — clear it so it doesn't keep checking
+        // But keep it for "missed music" feature on FanScene
       }
     };
     checkToken();
-    const interval = setInterval(checkToken, 30000);
+    const interval = setInterval(checkToken, 10000); // check every 10 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -190,37 +194,56 @@ const LokolListensGenre = () => {
 
   // Centralized point award logic with daily cap
   const awardPoints = async (amount: number): Promise<number> => {
-    const todayAtlanta = getTodayAtlanta();
+    if (!isFan || !userId) return 0;
+    if (!hasValidTokenState) return 0;
 
-    if (dailyPointsEarned >= DAILY_CAP) {
-      showCapToast();
+    // Always read fresh from DB — never trust local state for cap
+    const { data: fp, error } = await (supabase as any)
+      .from("fan_profiles")
+      .select("lokol_points, daily_points_earned, daily_points_date")
+      .eq("fan_user_id", userId)
+      .single();
+    if (error || !fp) return 0;
+
+    const todayAtlanta = new Date().toLocaleDateString("en-US", {
+      timeZone: "America/New_York",
+    });
+    const isToday = fp.daily_points_date === todayAtlanta;
+    const currentDaily = isToday ? (fp.daily_points_earned || 0) : 0;
+
+    // Hard cap check
+    if (currentDaily >= 40) {
+      if (!capToastShownRef.current) {
+        capToastShownRef.current = true;
+        setCapMessage(
+          "You've maxed out today's points. Keep listening — the music is still free. 🎧"
+        );
+        setTimeout(() => setCapMessage(""), 5000);
+      }
       return 0;
     }
 
-    const pointsToAward = Math.min(amount, DAILY_CAP - dailyPointsEarned);
-    const newPoints = points + pointsToAward;
-    const newDaily = dailyPointsEarned + pointsToAward;
+    const pointsToAward = Math.min(amount, 40 - currentDaily);
 
-    setPoints(newPoints);
-    setDailyPointsEarned(newDaily);
-    localStorage.setItem("golokol_session_points", newPoints.toString());
+    // Update DB first, then local state
+    const { error: updateError } = await (supabase as any)
+      .from("fan_profiles")
+      .update({
+        lokol_points: fp.lokol_points + pointsToAward,
+        daily_points_earned: currentDaily + pointsToAward,
+        daily_points_date: todayAtlanta,
+      })
+      .eq("fan_user_id", userId);
+    if (updateError) return 0;
 
-    if (isFan && userId) {
-      try {
-        const { data: fp } = await (supabase as any)
-          .from("fan_profiles")
-          .select("lokol_points, daily_points_earned")
-          .eq("fan_user_id", userId)
-          .single();
-        await (supabase as any).from("fan_profiles").update({
-          lokol_points: (fp?.lokol_points || 0) + pointsToAward,
-          daily_points_earned: (fp?.daily_points_earned || 0) + pointsToAward,
-          daily_points_date: todayAtlanta,
-        }).eq("fan_user_id", userId);
-      } catch {}
-    }
+    // Update local state after DB confirms
+    setPoints(fp.lokol_points + pointsToAward);
+    setDailyPointsEarned(currentDaily + pointsToAward);
+    localStorage.setItem(
+      "golokol_session_points",
+      (fp.lokol_points + pointsToAward).toString()
+    );
 
-    if (newDaily >= DAILY_CAP) showCapToast();
     return pointsToAward;
   };
 
@@ -598,7 +621,7 @@ const LokolListensGenre = () => {
       )}
 
       {/* Daily cap toast */}
-      {capToastVisible && (
+      {(capToastVisible || capMessage) && (
         <div
           className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-xl shadow-2xl max-w-[90%]"
           style={{
@@ -609,7 +632,8 @@ const LokolListensGenre = () => {
           }}
         >
           <p className="text-sm font-bold text-center">
-            You've maxed out today's points. Keep listening — the music is still free. 🎧
+            {capMessage ||
+              "You've maxed out today's points. Keep listening — the music is still free. 🎧"}
           </p>
         </div>
       )}
