@@ -668,6 +668,33 @@ export type Database = {
           },
         ]
       }
+      lokol_scene_saves: {
+        Row: {
+          artist_name: string | null
+          created_at: string | null
+          fan_user_id: string
+          id: string
+          store_slug: string | null
+          submission_id: string
+        }
+        Insert: {
+          artist_name?: string | null
+          created_at?: string | null
+          fan_user_id: string
+          id?: string
+          store_slug?: string | null
+          submission_id: string
+        }
+        Update: {
+          artist_name?: string | null
+          created_at?: string | null
+          fan_user_id?: string
+          id?: string
+          store_slug?: string | null
+          submission_id?: string
+        }
+        Relationships: []
+      }
       show_listings: {
         Row: {
           artist_user_id: string
