@@ -5,14 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
 
 const SLUG_TO_GENRE: Record<string, string> = {
-  hiphop: "Hip-Hop", rnb: "R&B", afrobeats: "Afrobeats",
-  alternative: "Alternative", beats: "Beats", blues: "Blues",
-  country: "Country", edm: "EDM", emo: "Emo", folk: "Folk",
-  funk: "Funk", gospel: "Gospel", hardcore: "Hardcore", house: "House",
-  indie: "Indie", jazz: "Jazz", latin: "Latin", metal: "Metal",
-  neosoul: "Neo-Soul", pop: "Pop", punk: "Punk", rave: "Rave",
-  reggae: "Reggae", rock: "Rock", ska: "Ska", spokenword: "Spoken-Word",
-  techno: "Techno",
+  hiphop: "Hip Hop",
+  rnb: "RnB",
+  alternative: "Alternative",
+  "hardcore-punk": "Hardcore + Punk",
 };
 
 const DAILY_CAP = 40;

@@ -13,12 +13,10 @@ const HERO_MAP: Record<string, string> = {
 };
 
 const SLUG_MAP: Record<string, string> = {
-  "Hip-Hop": "hiphop", "R&B": "rnb", "Afrobeats": "afrobeats", "Alternative": "alternative",
-  "Beats": "beats", "Blues": "blues", "Country": "country", "EDM": "edm", "Emo": "emo",
-  "Folk": "folk", "Funk": "funk", "Gospel": "gospel", "Hardcore": "hardcore", "House": "house",
-  "Indie": "indie", "Jazz": "jazz", "Latin": "latin", "Metal": "metal", "Neo-Soul": "neosoul",
-  "Pop": "pop", "Punk": "punk", "Rave": "rave", "Reggae": "reggae", "Rock": "rock",
-  "Ska": "ska", "Spoken-Word": "spokenword", "Techno": "techno",
+  "Hip Hop": "hiphop",
+  "RnB": "rnb",
+  "Alternative": "alternative",
+  "Hardcore + Punk": "hardcore-punk",
 };
 
 interface GenreCard { label: string; slug: string; image: string }
