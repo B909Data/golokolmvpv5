@@ -96,6 +96,7 @@ const LokolListensGenre = () => {
   const [capToastVisible, setCapToastVisible] = useState(false);
   const [capMessage, setCapMessage] = useState("");
   const [dailyPointsEarned, setDailyPointsEarned] = useState(0);
+  const hasValidTokenRef = useRef(false);
   const [hasValidTokenState, setHasValidTokenState] = useState(false);
 
   const genreLabel = SLUG_TO_GENRE[genre || ""] || genre || "";
@@ -131,6 +132,7 @@ const LokolListensGenre = () => {
       );
       const valid = !!(token && token.expires_at > Date.now());
       setHasValidTokenState(valid);
+      hasValidTokenRef.current = valid;
       if (!valid && token) {
         // Token just expired — clear it so it doesn't keep checking
         // But keep it for "missed music" feature on FanScene
@@ -195,7 +197,7 @@ const LokolListensGenre = () => {
   // Centralized point award logic with daily cap
   const awardPoints = async (amount: number): Promise<number> => {
     if (!isFan || !userId) return 0;
-    if (!hasValidTokenState) return 0;
+    if (!hasValidTokenRef.current) return 0;
 
     // Always read fresh from DB — never trust local state for cap
     const { data: fp, error } = await (supabase as any)
@@ -269,7 +271,7 @@ const LokolListensGenre = () => {
     if (!audio || !playingId) return;
     setCurrentTime(audio.currentTime);
     if (
-      hasValidTokenState &&
+      hasValidTokenRef.current &&
       audio.duration > 0 &&
       audio.currentTime / audio.duration >= 0.5 &&
       !pointsAwardedIds.has(playingId)
@@ -295,7 +297,7 @@ const LokolListensGenre = () => {
     }
     if (savedIds.has(track.id) || splashIds.has(track.id)) return;
 
-    if (hasValidTokenState && userId) {
+    if (hasValidTokenRef.current && userId) {
       await awardPoints(10);
     }
 
