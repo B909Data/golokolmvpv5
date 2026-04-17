@@ -101,9 +101,11 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
               lineHeight: 1.1,
             }}
           >
-            Good music lives here.
+            Good music lives
+            <br />
+            in Atlanta
           </h1>
-          <p className="text-white text-[18px] leading-relaxed">Start exploring.</p>
+          <p className="text-white text-[18px] leading-relaxed">Start Exploring in 3 steps.</p>
           <button
             onClick={() => setPhase("swipe")}
             className="mt-4 font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
