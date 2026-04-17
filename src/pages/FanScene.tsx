@@ -120,7 +120,7 @@ const FanScene = () => {
     if (!userId) return;
     const load = async () => {
       let prof: FanProfile | null = null;
-      const { data: profData } = await supabase
+      const { data: profData } = await (supabase as any)
         .from("fan_profiles")
         .select("*")
         .eq("fan_user_id", userId)
@@ -129,7 +129,7 @@ const FanScene = () => {
       if (profData) {
         prof = profData;
       } else {
-        const { data: newProf } = await supabase
+        const { data: newProf } = await (supabase as any)
           .from("fan_profiles")
           .insert({ fan_user_id: userId, city: "Atlanta", lokol_points: 0 })
           .select()
@@ -139,32 +139,28 @@ const FanScene = () => {
       setProfile(prof);
 
       const { data: savesData } = await (supabase as any)
-        .from("fan_saves")
-        .select("id, artist_choice, submission_id")
+        .from("lokol_scene_saves")
+        .select("id, submission_id, artist_name")
         .eq("fan_user_id", userId);
 
       if (savesData && savesData.length > 0) {
-        const ids: string[] = savesData.filter((s: any) => s.submission_id).map((s: any) => s.submission_id);
-        const names: string[] = savesData.filter((s: any) => !s.submission_id).map((s: any) => s.artist_choice);
-
-        const orParts: string[] = [];
-        if (ids.length > 0) orParts.push(`id.in.(${ids.join(",")})`);
-        if (names.length > 0) orParts.push(`artist_name.in.(${names.map((n) => `"${n}"`).join(",")})`);
+        const submissionIds = savesData
+          .map((s: any) => s.submission_id)
+          .filter(Boolean);
 
         let subs: any[] = [];
-        if (orParts.length > 0) {
-          const { data: subsData } = await (supabase as any)
+        if (submissionIds.length > 0) {
+          const { data: subData } = await (supabase as any)
             .from("lls_artist_submissions")
             .select("id, artist_name, song_title, song_image_url, youtube_url, instagram_handle, artist_user_id")
-            .or(orParts.join(","));
-          subs = subsData || [];
+            .in("id", submissionIds);
+          if (subData) subs = subData;
         }
 
         const enriched = savesData.map((s: any) => ({
           ...s,
-          submission:
-            subs.find((sub: any) => sub.id === s.submission_id) ||
-            subs.find((sub: any) => sub.artist_name === s.artist_choice),
+          artist_choice: s.artist_name,
+          submission: subs.find((sub: any) => sub.id === s.submission_id),
         }));
         setSaves(enriched as SavedArtist[]);
       }
