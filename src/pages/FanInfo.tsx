@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Info } from "lucide-react";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import { supabase } from "@/integrations/supabase/client";
 
 const anton = "'Anton', sans-serif";
 
