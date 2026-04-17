@@ -17,12 +17,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const GENRE_OPTIONS = [
-  "Afrobeats", "Alternative", "Beats", "Blues", "Country", "EDM", "Emo", "Folk",
-  "Funk", "Gospel", "Hardcore", "Hip-Hop", "House", "Indie", "Jazz", "Latin",
-  "Metal", "Neo-Soul", "Pop", "Punk", "R&B", "Rave", "Reggae", "Rock", "Ska",
-  "Spoken-Word", "Techno",
-];
+const GENRE_OPTIONS = ["Hip Hop", "RnB", "Alternative", "Hardcore + Punk"];
 
 interface Submission {
   id: string;

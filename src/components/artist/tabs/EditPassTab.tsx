@@ -34,12 +34,7 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   return { label, value };
 });
 
-const GENRE_OPTIONS = [
-  "Afrobeats", "Alternative", "Beats", "Blues", "Country", "EDM", "Emo",
-  "Folk", "Funk", "Gospel", "Hardcore", "Hip-Hop", "House", "Indie",
-  "Jazz", "Latin", "Metal", "Neo-Soul", "Pop", "Punk", "R&B", "Rave",
-  "Reggae", "Rock", "Ska", "Spoken-Word", "Techno",
-];
+const GENRE_OPTIONS = ["Hip Hop", "RnB", "Alternative", "Hardcore + Punk"];
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png"];
