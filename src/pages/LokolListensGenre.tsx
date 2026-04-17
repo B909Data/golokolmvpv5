@@ -126,15 +126,18 @@ const LokolListensGenre = () => {
   // Token validity check (mount + interval)
   useEffect(() => {
     const checkToken = () => {
-      try {
-        const token = JSON.parse(localStorage.getItem("golokol_store_session") || "null");
-        setHasValidTokenState(!!(token && token.expires_at && token.expires_at > Date.now()));
-      } catch {
-        setHasValidTokenState(false);
+      const token = JSON.parse(
+        localStorage.getItem("golokol_store_session") || "null"
+      );
+      const valid = !!(token && token.expires_at > Date.now());
+      setHasValidTokenState(valid);
+      if (!valid && token) {
+        // Token just expired — clear it so it doesn't keep checking
+        // But keep it for "missed music" feature on FanScene
       }
     };
     checkToken();
-    const interval = setInterval(checkToken, 30000);
+    const interval = setInterval(checkToken, 10000); // check every 10 seconds
     return () => clearInterval(interval);
   }, []);
 
