@@ -38,20 +38,37 @@ const SLIDES = [
   {
     icon: golokolLogo,
     animation: "float 2.5s ease-in-out infinite",
-    heading: "All Genres. All Atlanta.",
-    body: "Discover and connect with emerging local artists and shows.",
+    heading: (
+      <>
+        1<br />
+        Discover and Support
+      </>
+    ),
+    body: "emerging local artists and shows",
   },
   {
     icon: fanmenuShows,
     animation: "pulse 2s ease-in-out infinite",
-    heading: "Your Scene.",
-    body: "Create an Atlanta scene that matters to you.",
+    heading: (
+      <>
+        2<br />
+        Your City. Your Scene.
+      </>
+    ),
+    body: "Create an ATL scene that matters to you.",
   },
   {
     icon: fanmenuMarket,
     animation: "float 2.5s ease-in-out infinite",
-    heading: "Earn and Redeem Points City-wide",
-    body: "Unlock the value of music in Atlanta.",
+    heading: (
+      <>
+        3<br />
+        Earn and Redeem
+        <br />
+        Points City-wide
+      </>
+    ),
+    body: "Unlock the value of music IRL.",
   },
 ];
 
@@ -84,9 +101,11 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
               lineHeight: 1.1,
             }}
           >
-            Good music lives here.
+            Good music lives
+            <br />
+            in Atlanta
           </h1>
-          <p className="text-white text-[18px] leading-relaxed">Start exploring.</p>
+          <p className="text-white text-[18px] leading-relaxed">Start Exploring in 3 steps.</p>
           <button
             onClick={() => setPhase("swipe")}
             className="mt-4 font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
