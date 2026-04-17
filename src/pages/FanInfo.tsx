@@ -19,7 +19,21 @@ const FanInfo = () => {
           </button>
           <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
         </div>
-        <Info className="w-6 h-6 text-[#FFD600]" />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              localStorage.removeItem("golokol_saved_ids");
+              localStorage.removeItem("golokol_session_points");
+              localStorage.removeItem("golokol_store_session");
+              navigate("/lls/signup");
+            }}
+            className="text-[11px] text-white/40"
+          >
+            Sign Out
+          </button>
+          <Info className="w-6 h-6 text-[#FFD600]" />
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto pt-14 pb-8">
