@@ -65,8 +65,17 @@ const LokolListensGenre = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [points, setPoints] = useState(0);
-  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [points, setPoints] = useState(() => {
+    try {
+      return parseInt(localStorage.getItem("golokol_session_points") || "0");
+    } catch { return 0; }
+  });
+  const [savedIds, setSavedIds] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem("golokol_saved_ids");
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  });
   const [splashIds, setSplashIds] = useState<Set<string>>(new Set());
   const [pointsAwardedIds, setPointsAwardedIds] = useState<Set<string>>(new Set());
   const [showOverlay, setShowOverlay] = useState(false);
@@ -86,6 +95,14 @@ const LokolListensGenre = () => {
   };
 
   useEffect(() => {
+    localStorage.setItem("golokol_saved_ids", JSON.stringify([...savedIds]));
+  }, [savedIds]);
+
+  useEffect(() => {
+    localStorage.setItem("golokol_session_points", points.toString());
+  }, [points]);
+
+  useEffect(() => {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -97,6 +114,18 @@ const LokolListensGenre = () => {
           .eq("fan_user_id", session.user.id)
           .maybeSingle();
         setIsFan(!!fanProfile);
+
+        if (fanProfile) {
+          const { data: fp } = await (supabase as any)
+            .from("fan_profiles")
+            .select("lokol_points")
+            .eq("fan_user_id", session.user.id)
+            .single();
+          if (fp?.lokol_points) {
+            setPoints(fp.lokol_points);
+            localStorage.setItem("golokol_session_points", fp.lokol_points.toString());
+          }
+        }
       }
 
       const { data } = await (supabase as any)
