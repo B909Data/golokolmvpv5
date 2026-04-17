@@ -15,6 +15,8 @@ const SLUG_TO_GENRE: Record<string, string> = {
   techno: "Techno",
 };
 
+const DAILY_CAP = 40;
+
 const playRewardSound = () => {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -44,6 +46,10 @@ const KEYFRAMES = `
     70% { transform: scale(1.0); opacity: 1; }
     100% { transform: scale(1.0); opacity: 0; }
   }
+  @keyframes capToastIn {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
 `;
 
 interface Track {
@@ -54,10 +60,14 @@ interface Track {
   mp3_url: string;
 }
 
+const getTodayAtlanta = () =>
+  new Date().toLocaleDateString("en-US", { timeZone: "America/New_York" });
+
 const LokolListensGenre = () => {
   const { genre, storeSlug } = useParams<{ genre: string; storeSlug: string }>();
   const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const capToastShownRef = useRef(false);
 
   const [tracks, setTracks] = useState<Track[]>([]);
   const [tracksLoading, setTracksLoading] = useState(true);
@@ -83,6 +93,7 @@ const LokolListensGenre = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isFan, setIsFan] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [capToastVisible, setCapToastVisible] = useState(false);
 
   const genreLabel = SLUG_TO_GENRE[genre || ""] || genre || "";
 
@@ -92,6 +103,13 @@ const LokolListensGenre = () => {
       if (token && token.expires_at && token.expires_at > Date.now()) return token;
     } catch {}
     return null;
+  };
+
+  const showCapToast = () => {
+    if (capToastShownRef.current) return;
+    capToastShownRef.current = true;
+    setCapToastVisible(true);
+    setTimeout(() => setCapToastVisible(false), 3000);
   };
 
   useEffect(() => {
@@ -158,7 +176,7 @@ const LokolListensGenre = () => {
     }
   };
 
-  const handleTimeUpdate = () => {
+  const handleTimeUpdate = async () => {
     const audio = audioRef.current;
     if (!audio || !playingId) return;
     setCurrentTime(audio.currentTime);
@@ -169,8 +187,46 @@ const LokolListensGenre = () => {
       audio.currentTime / audio.duration >= 0.5 &&
       !pointsAwardedIds.has(playingId)
     ) {
-      setPoints((p) => p + 5);
-      setPointsAwardedIds((prev) => new Set(prev).add(playingId));
+      const awardedTrackId = playingId;
+      setPointsAwardedIds((prev) => new Set(prev).add(awardedTrackId));
+
+      if (isLoggedIn && isFan && userId) {
+        try {
+          const { data: fp } = await (supabase as any)
+            .from("fan_profiles")
+            .select("lokol_points, daily_points_earned, daily_points_date")
+            .eq("fan_user_id", userId)
+            .single();
+          const todayAtlanta = getTodayAtlanta();
+          const isToday = fp?.daily_points_date === todayAtlanta;
+          const currentDaily = isToday ? (fp?.daily_points_earned || 0) : 0;
+
+          if (currentDaily >= DAILY_CAP) {
+            showCapToast();
+            return;
+          }
+
+          const pointsToAward = Math.min(5, DAILY_CAP - currentDaily);
+          const newPoints = points + pointsToAward;
+          setPoints(newPoints);
+          localStorage.setItem("golokol_session_points", newPoints.toString());
+
+          await (supabase as any)
+            .from("fan_profiles")
+            .update({
+              lokol_points: (fp?.lokol_points || 0) + pointsToAward,
+              daily_points_earned: currentDaily + pointsToAward,
+              daily_points_date: todayAtlanta,
+            })
+            .eq("fan_user_id", userId);
+
+          if (currentDaily + pointsToAward >= DAILY_CAP) showCapToast();
+        } catch {}
+      } else {
+        const newPoints = points + 5;
+        setPoints(newPoints);
+        localStorage.setItem("golokol_session_points", newPoints.toString());
+      }
     }
   };
 
@@ -190,21 +246,39 @@ const LokolListensGenre = () => {
     if (savedIds.has(track.id) || splashIds.has(track.id)) return;
 
     const token = getValidToken();
+    let pointsToAward = 0;
+
     if (token && userId) {
-      setPoints((p) => p + 10);
       try {
-        const { data: profile } = await (supabase as any)
+        const { data: fp } = await (supabase as any)
           .from("fan_profiles")
-          .select("lokol_points, daily_points_earned")
+          .select("lokol_points, daily_points_earned, daily_points_date")
           .eq("fan_user_id", userId)
-          .maybeSingle();
-        await (supabase as any)
-          .from("fan_profiles")
-          .update({
-            lokol_points: (profile?.lokol_points || 0) + 10,
-            daily_points_earned: (profile?.daily_points_earned || 0) + 10,
-          })
-          .eq("fan_user_id", userId);
+          .single();
+        const todayAtlanta = getTodayAtlanta();
+        const isToday = fp?.daily_points_date === todayAtlanta;
+        const currentDaily = isToday ? (fp?.daily_points_earned || 0) : 0;
+
+        if (currentDaily >= DAILY_CAP) {
+          pointsToAward = 0;
+          showCapToast();
+        } else {
+          pointsToAward = Math.min(10, DAILY_CAP - currentDaily);
+        }
+
+        if (pointsToAward > 0) {
+          setPoints((p) => p + pointsToAward);
+          await (supabase as any)
+            .from("fan_profiles")
+            .update({
+              lokol_points: (fp?.lokol_points || 0) + pointsToAward,
+              daily_points_earned: currentDaily + pointsToAward,
+              daily_points_date: todayAtlanta,
+            })
+            .eq("fan_user_id", userId);
+
+          if (currentDaily + pointsToAward >= DAILY_CAP) showCapToast();
+        }
       } catch {}
     }
 
@@ -217,6 +291,8 @@ const LokolListensGenre = () => {
           fan_user_id: userId,
           artist_choice: track.artist_name,
           submission_id: track.id,
+          store_slug: storeSlug || null,
+          session: storeSlug || "lls1",
         });
       } catch {}
     }
@@ -501,6 +577,23 @@ const LokolListensGenre = () => {
               Not now
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Daily cap toast */}
+      {capToastVisible && (
+        <div
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-xl shadow-2xl max-w-[90%]"
+          style={{
+            backgroundColor: "#1a1a1a",
+            color: "#FFD600",
+            animation: "capToastIn 0.3s ease-out",
+            border: "1px solid #FFD600",
+          }}
+        >
+          <p className="text-sm font-bold text-center">
+            You've maxed out today's points. Keep listening — the music is still free. 🎧
+          </p>
         </div>
       )}
     </div>
