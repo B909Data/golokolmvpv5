@@ -194,37 +194,56 @@ const LokolListensGenre = () => {
 
   // Centralized point award logic with daily cap
   const awardPoints = async (amount: number): Promise<number> => {
-    const todayAtlanta = getTodayAtlanta();
+    if (!isFan || !userId) return 0;
+    if (!hasValidTokenState) return 0;
 
-    if (dailyPointsEarned >= DAILY_CAP) {
-      showCapToast();
+    // Always read fresh from DB — never trust local state for cap
+    const { data: fp, error } = await (supabase as any)
+      .from("fan_profiles")
+      .select("lokol_points, daily_points_earned, daily_points_date")
+      .eq("fan_user_id", userId)
+      .single();
+    if (error || !fp) return 0;
+
+    const todayAtlanta = new Date().toLocaleDateString("en-US", {
+      timeZone: "America/New_York",
+    });
+    const isToday = fp.daily_points_date === todayAtlanta;
+    const currentDaily = isToday ? (fp.daily_points_earned || 0) : 0;
+
+    // Hard cap check
+    if (currentDaily >= 40) {
+      if (!capToastShownRef.current) {
+        capToastShownRef.current = true;
+        setCapMessage(
+          "You've maxed out today's points. Keep listening — the music is still free. 🎧"
+        );
+        setTimeout(() => setCapMessage(""), 5000);
+      }
       return 0;
     }
 
-    const pointsToAward = Math.min(amount, DAILY_CAP - dailyPointsEarned);
-    const newPoints = points + pointsToAward;
-    const newDaily = dailyPointsEarned + pointsToAward;
+    const pointsToAward = Math.min(amount, 40 - currentDaily);
 
-    setPoints(newPoints);
-    setDailyPointsEarned(newDaily);
-    localStorage.setItem("golokol_session_points", newPoints.toString());
+    // Update DB first, then local state
+    const { error: updateError } = await (supabase as any)
+      .from("fan_profiles")
+      .update({
+        lokol_points: fp.lokol_points + pointsToAward,
+        daily_points_earned: currentDaily + pointsToAward,
+        daily_points_date: todayAtlanta,
+      })
+      .eq("fan_user_id", userId);
+    if (updateError) return 0;
 
-    if (isFan && userId) {
-      try {
-        const { data: fp } = await (supabase as any)
-          .from("fan_profiles")
-          .select("lokol_points, daily_points_earned")
-          .eq("fan_user_id", userId)
-          .single();
-        await (supabase as any).from("fan_profiles").update({
-          lokol_points: (fp?.lokol_points || 0) + pointsToAward,
-          daily_points_earned: (fp?.daily_points_earned || 0) + pointsToAward,
-          daily_points_date: todayAtlanta,
-        }).eq("fan_user_id", userId);
-      } catch {}
-    }
+    // Update local state after DB confirms
+    setPoints(fp.lokol_points + pointsToAward);
+    setDailyPointsEarned(currentDaily + pointsToAward);
+    localStorage.setItem(
+      "golokol_session_points",
+      (fp.lokol_points + pointsToAward).toString()
+    );
 
-    if (newDaily >= DAILY_CAP) showCapToast();
     return pointsToAward;
   };
 
