@@ -13,13 +13,43 @@ const HERO_MAP: Record<string, string> = {
 };
 
 const SLUG_MAP: Record<string, string> = {
+  "Hip-Hop": "hiphop",
   "Hip Hop": "hiphop",
-  "RnB": "rnb",
-  "Alternative": "alternative",
-  "Hardcore + Punk": "hardcore-punk",
+  "R&B": "rnb",
+  RnB: "rnb",
+  Alternative: "alternative",
+  "Hardcore + Punk": "hardcore",
+  Afrobeats: "afrobeats",
+  Beats: "beats",
+  Blues: "blues",
+  Country: "country",
+  EDM: "edm",
+  Emo: "emo",
+  Folk: "folk",
+  Funk: "funk",
+  Gospel: "gospel",
+  Hardcore: "hardcore",
+  House: "house",
+  Indie: "indie",
+  Jazz: "jazz",
+  Latin: "latin",
+  Metal: "metal",
+  "Neo-Soul": "neosoul",
+  Pop: "pop",
+  Punk: "punk",
+  Rave: "rave",
+  Reggae: "reggae",
+  Rock: "rock",
+  Ska: "ska",
+  "Spoken-Word": "spokenword",
+  Techno: "techno",
 };
 
-interface GenreCard { label: string; slug: string; image: string }
+interface GenreCard {
+  label: string;
+  slug: string;
+  image: string;
+}
 
 const LLSStorePage = () => {
   const { storeSlug } = useParams<{ storeSlug: string }>();
@@ -32,16 +62,22 @@ const LLSStorePage = () => {
 
   useEffect(() => {
     const fetchStore = async () => {
-      if (!storeSlug) { setNotFound(true); setLoading(false); return; }
+      if (!storeSlug) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase
         .from("lls_retail_signups")
         .select("store_name")
         .eq("store_slug", storeSlug)
         .limit(1)
         .maybeSingle();
-      if (error || !data) { setNotFound(true); } else {
+      if (error || !data) {
+        setNotFound(true);
+      } else {
         setStoreName(data.store_name);
-        // Generate or refresh session token
+        // Generate or refresh session token — 1 HOUR window
         try {
           const existingRaw = localStorage.getItem("golokol_store_session");
           const existing = existingRaw ? JSON.parse(existingRaw) : null;
@@ -51,16 +87,14 @@ const LLSStorePage = () => {
               store_slug: storeSlug,
               store_name: data.store_name,
               created_at: Date.now(),
-              expires_at: Date.now() + (2 * 60 * 60 * 1000),
+              expires_at: Date.now() + 1 * 60 * 60 * 1000, // 1 HOUR
               genres_explored: [] as string[],
               listened_under_50: [] as string[],
               points_earned: 0,
             };
             localStorage.setItem("golokol_store_session", JSON.stringify(token));
           }
-        } catch (e) {
-          // ignore localStorage errors
-        }
+        } catch {}
       }
       setLoading(false);
     };
@@ -75,7 +109,10 @@ const LLSStorePage = () => {
         .eq("admin_status", "approved")
         .not("song_image_url", "is", null);
 
-      if (!data || data.length === 0) { setGenresLoading(false); return; }
+      if (!data || data.length === 0) {
+        setGenresLoading(false);
+        return;
+      }
 
       const usedImages = new Set<string>();
       const genreMap = new Map<string, string>();
@@ -126,7 +163,12 @@ const LLSStorePage = () => {
       <div className="min-h-screen flex flex-col bg-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
         {/* Hero Image */}
         <section className="w-full flex items-center justify-center px-4" style={{ height: "55vh", minHeight: 320 }}>
-          <img src={HERO_MAP[storeSlug || ""] || cratesHero} alt="Lokol Listening Stations" className="w-full h-full object-contain" loading="eager" decoding="async" fetchPriority="high" />
+          <img
+            src={HERO_MAP[storeSlug || ""] || cratesHero}
+            alt="Lokol Listening Stations"
+            className="w-full h-full object-contain"
+            loading="eager"
+          />
         </section>
 
         {/* Store name + CTA */}
@@ -143,11 +185,10 @@ const LLSStorePage = () => {
           </button>
         </section>
 
-        {/* Genre Selection Section */}
+        {/* Genre Selection */}
         <section id="genre-section" className="w-full py-12 md:py-16 px-4" style={{ backgroundColor: "#000000" }}>
           <div className="max-w-[1000px] mx-auto">
             <h2 className="text-center font-bold text-[28px] md:text-[32px] mb-10 md:mb-12 text-white">Pick a genre</h2>
-
             {genresLoading ? (
               <p className="text-white text-center text-[20px] font-bold">Loading...</p>
             ) : genres.length === 0 ? (
@@ -160,7 +201,12 @@ const LLSStorePage = () => {
                     onClick={() => navigate(`/lls/${storeSlug}/genre/${genre.slug}`)}
                     className="group relative aspect-square rounded-[24px] overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFD600]"
                   >
-                    <img src={genre.image} alt={genre.label} className="absolute inset-0 w-full h-full object-cover" loading="lazy" width={768} height={768} />
+                    <img
+                      src={genre.image}
+                      alt={genre.label}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy"
+                    />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-[#FFD600]/15 transition-colors duration-200" />
                     <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent" />
                     <span className="absolute bottom-5 left-0 right-0 text-center text-white font-bold text-[24px] md:text-[28px] drop-shadow-lg">
