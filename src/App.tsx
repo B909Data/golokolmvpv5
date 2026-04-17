@@ -69,6 +69,7 @@ import FanInfo from "./pages/FanInfo";
 import Connect from "./pages/Connect";
 import Unsubscribe from "./pages/Unsubscribe";
 import ClaimAccount from "./pages/ClaimAccount";
+import LokolStations from "./pages/LokolStations";
 
 const queryClient = new QueryClient();
 
@@ -163,6 +164,7 @@ const App = () => (
            <Route path="/for-artists" element={<ArtistRecognition />} />
            <Route path="/q/:code" element={<ShortLinkRedirect />} />
            <Route path="/claim/:code" element={<ClaimAccount />} />
+           <Route path="/lokol-stations" element={<LokolStations />} />
            
            {/* 404 */}
            <Route path="*" element={<NotFound />} />
