@@ -242,9 +242,23 @@ const FanScene = () => {
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between bg-black">
         <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
-        <button onClick={() => navigate("/fan/info")} className="text-[#FFD600]">
-          <Info className="w-6 h-6" />
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              localStorage.removeItem("golokol_saved_ids");
+              localStorage.removeItem("golokol_session_points");
+              localStorage.removeItem("golokol_store_session");
+              navigate("/lls/signup");
+            }}
+            className="text-[11px] text-white/40"
+          >
+            Sign Out
+          </button>
+          <button onClick={() => navigate("/fan/info")} className="text-[#FFD600]">
+            <Info className="w-6 h-6" />
+          </button>
+        </div>
       </header>
 
       {/* Scrollable content */}
