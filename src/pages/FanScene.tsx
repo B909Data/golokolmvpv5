@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Info, Plus, Play, Pause } from "lucide-react";
+import { Info, Plus, Play, Pause, X } from "lucide-react";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import fanmenuArtists from "@/assets/fanmenu-artists.svg";
 import fanmenuShows from "@/assets/fanmenu-shows.svg";
@@ -15,7 +15,6 @@ import lokolHome2 from "@/assets/lokolhome-2.jpg";
 import lokolHome3 from "@/assets/lokolhome-3.jpg";
 
 type View = "home" | "artists" | "shows" | "market";
-
 const HOME_IMAGES = [lokolHome1, lokolHome2, lokolHome3];
 
 interface FanProfile {
@@ -73,7 +72,6 @@ interface StoreSession {
 
 const anton = "'Anton', sans-serif";
 
-// Format ms remaining as "Xh Xm" or "Xm Xs"
 const formatCountdown = (ms: number): string => {
   if (ms <= 0) return "0m";
   const totalSeconds = Math.floor(ms / 1000);
@@ -83,6 +81,20 @@ const formatCountdown = (ms: number): string => {
   if (hours > 0) return `${hours}h ${minutes}m`;
   if (minutes > 0) return `${minutes}m ${seconds}s`;
   return `${seconds}s`;
+};
+
+const getYouTubeId = (url: string): string | null => {
+  try {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/\s]{11})/,
+      /youtube\.com\/shorts\/([^&?/\s]{11})/,
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m) return m[1];
+    }
+  } catch {}
+  return null;
 };
 
 const FanScene = () => {
@@ -101,7 +113,9 @@ const FanScene = () => {
   const [expiredBannerDismissed, setExpiredBannerDismissed] = useState(false);
   const [missedTracks, setMissedTracks] = useState<MissedTrack[]>([]);
 
-  // Rotating home image
+  // YouTube modal state
+  const [youtubeModal, setYoutubeModal] = useState<{ artist: SavedArtist } | null>(null);
+
   useEffect(() => {
     let idx = Math.floor(Math.random() * HOME_IMAGES.length);
     setHomeImage(HOME_IMAGES[idx]);
@@ -112,7 +126,6 @@ const FanScene = () => {
     return () => clearInterval(rotateInterval);
   }, []);
 
-  // Load store session and start countdown
   useEffect(() => {
     try {
       const session = JSON.parse(localStorage.getItem("golokol_store_session") || "null") as StoreSession | null;
@@ -122,7 +135,6 @@ const FanScene = () => {
         setTokenValid(valid);
         setTokenExpired(!valid);
         if (valid) {
-          // Start countdown ticker
           const tick = () => {
             const remaining = session.expires_at - Date.now();
             if (remaining <= 0) {
@@ -164,7 +176,6 @@ const FanScene = () => {
         .select("*")
         .eq("fan_user_id", userId)
         .maybeSingle();
-
       if (profData) {
         prof = profData;
       } else {
@@ -177,7 +188,6 @@ const FanScene = () => {
       }
       setProfile(prof);
 
-      // Load saves from lokol_scene_saves
       const { data: savesData } = await (supabase as any)
         .from("lokol_scene_saves")
         .select("id, submission_id, artist_name")
@@ -207,13 +217,11 @@ const FanScene = () => {
         .eq("city", "Atlanta")
         .order("show_date", { ascending: true });
       if (showsData) setShows(showsData);
-
       setLoading(false);
     };
     load();
   }, [userId]);
 
-  // Load "Music You Might've Missed" when token expired
   useEffect(() => {
     if (!tokenExpired || !storeSession || !userId) return;
     const loadMissed = async () => {
@@ -229,16 +237,12 @@ const FanScene = () => {
         .from("lls_artist_submissions")
         .select("id, artist_name, song_title, song_image_url, mp3_url, genre_style")
         .eq("admin_status", "approved");
-
-      if (genres.length > 0) {
-        query = query.in("genre_style", genres);
-      }
+      if (genres.length > 0) query = query.in("genre_style", genres);
 
       const { data } = await query;
       if (!data) return;
 
       const filtered = (data as MissedTrack[]).filter((t) => t.mp3_url && !savedSubmissionIds.has(t.id));
-
       const priority = filtered.filter((t) => underIds.includes(t.id));
       const rest = filtered.filter((t) => !underIds.includes(t.id));
       setMissedTracks([...priority, ...rest]);
@@ -309,7 +313,7 @@ const FanScene = () => {
             userId={userId}
           />
         )}
-        {activeView === "artists" && <ArtistsTab saves={saves} />}
+        {activeView === "artists" && <ArtistsTab saves={saves} onArtistTap={(s) => setYoutubeModal({ artist: s })} />}
         {activeView === "shows" && <ShowsTab shows={shows} saves={saves} />}
         {activeView === "market" && <MarketTab points={points} progressPct={progressPct} />}
       </div>
@@ -332,10 +336,7 @@ const FanScene = () => {
                   src={t.icon}
                   alt={t.label}
                   className="w-8 h-8"
-                  style={{
-                    opacity: isActive ? 1 : 0.4,
-                    filter: isActive ? "none" : "brightness(0) invert(1)",
-                  }}
+                  style={{ opacity: isActive ? 1 : 0.4, filter: isActive ? "none" : "brightness(0) invert(1)" }}
                 />
               </div>
               <span
@@ -348,9 +349,83 @@ const FanScene = () => {
           );
         })}
       </nav>
+
+      {/* YouTube Modal */}
+      {youtubeModal && <YouTubeModal artist={youtubeModal.artist} onClose={() => setYoutubeModal(null)} />}
     </div>
   );
 };
+
+/* ========== YOUTUBE MODAL ========== */
+function YouTubeModal({ artist, onClose }: { artist: SavedArtist; onClose: () => void }) {
+  const sub = artist.submission;
+  const youtubeId = sub?.youtube_url ? getYouTubeId(sub.youtube_url) : null;
+
+  return (
+    <div className="fixed inset-0 bg-black/90 z-[100] flex flex-col" onClick={onClose}>
+      <div className="flex items-center justify-between px-4 py-3">
+        <div>
+          <p style={{ fontFamily: "'Anton', sans-serif", fontSize: 18, color: "#FFD600" }}>
+            {sub?.artist_name || artist.artist_choice}
+          </p>
+          <p className="text-white/60 text-sm">{sub?.song_title}</p>
+        </div>
+        <button onClick={onClose} className="text-white/60 hover:text-white p-2">
+          <X size={24} />
+        </button>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center px-4" onClick={(e) => e.stopPropagation()}>
+        {youtubeId ? (
+          <div className="w-full" style={{ maxWidth: 600 }}>
+            <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+              <iframe
+                className="absolute inset-0 w-full h-full rounded-xl"
+                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+                title={sub?.song_title || ""}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4 text-center px-8">
+            {sub?.song_image_url && (
+              <img src={sub.song_image_url} alt="" className="w-48 h-48 rounded-xl object-cover" />
+            )}
+            <p style={{ fontFamily: "'Anton', sans-serif", fontSize: 20, color: "#fff" }}>
+              {sub?.artist_name || artist.artist_choice}
+            </p>
+            <p className="text-white/50 text-sm">Video coming soon.</p>
+            {sub?.instagram_handle && (
+              <a
+                href={`https://instagram.com/${sub.instagram_handle.replace("@", "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#FFD600] text-sm underline"
+              >
+                {sub.instagram_handle} on Instagram
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+
+      {sub?.instagram_handle && youtubeId && (
+        <div className="px-4 pb-8 text-center">
+          <a
+            href={`https://instagram.com/${sub.instagram_handle.replace("@", "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#FFD600] text-sm underline"
+          >
+            {sub.instagram_handle}
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ========== HOME VIEW ========== */
 function HomeView({
@@ -451,7 +526,6 @@ function HomeView({
     <div className="relative min-h-[calc(100vh-56px-96px)]">
       <audio ref={audioRef} />
 
-      {/* Active token banner — countdown */}
       {tokenValid && storeSession && countdown && (
         <div className="bg-[#FFD600] text-black px-4 py-3 flex items-center justify-between gap-3 relative z-20">
           <p className="text-sm font-bold flex-1">
@@ -467,7 +541,6 @@ function HomeView({
         </div>
       )}
 
-      {/* Expired token banner */}
       {tokenExpired && storeSession && !expiredBannerDismissed && (
         <div className="bg-[#1a1a1a] text-white px-4 py-3 flex items-center justify-between gap-3 relative z-20">
           <p className="text-sm flex-1">
@@ -489,7 +562,6 @@ function HomeView({
         </div>
       )}
 
-      {/* Hero */}
       <div className="relative">
         {homeImage && (
           <img
@@ -507,7 +579,6 @@ function HomeView({
         </div>
       </div>
 
-      {/* Music You Might've Missed */}
       {tokenExpired && storeSession && missedTracks.length > 0 && (
         <div className="relative z-10 mt-[60vh] px-5 pt-8 pb-4">
           <h2 style={{ fontFamily: anton, fontSize: 20, color: "#fff", textTransform: "uppercase" }} className="mb-1">
@@ -583,7 +654,7 @@ function HomeView({
 }
 
 /* ========== ARTISTS TAB ========== */
-function ArtistsTab({ saves }: { saves: SavedArtist[] }) {
+function ArtistsTab({ saves, onArtistTap }: { saves: SavedArtist[]; onArtistTap: (s: SavedArtist) => void }) {
   return (
     <div>
       <div className="pl-5 pt-5 pb-4">
@@ -600,18 +671,22 @@ function ArtistsTab({ saves }: { saves: SavedArtist[] }) {
           {saves.map((s) => {
             const sub = s.submission;
             return (
-              <div key={s.id}>
-                {sub?.song_image_url ? (
-                  <img
-                    src={sub.song_image_url}
-                    alt={sub.artist_name}
-                    className="w-full aspect-square object-cover rounded-xl"
-                  />
-                ) : (
-                  <div className="w-full aspect-square bg-[#1a1a1a] rounded-xl flex items-center justify-center text-gray-600 text-3xl">
-                    ♪
+              <div key={s.id} onClick={() => onArtistTap(s)} className="cursor-pointer">
+                <div className="relative w-full aspect-square rounded-xl overflow-hidden">
+                  {sub?.song_image_url ? (
+                    <img src={sub.song_image_url} alt={sub.artist_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center text-gray-600 text-3xl">
+                      ♪
+                    </div>
+                  )}
+                  {/* Play icon overlay */}
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <div className="w-12 h-12 rounded-full bg-[#FFD600] flex items-center justify-center">
+                      <Play size={20} className="text-black ml-1" />
+                    </div>
                   </div>
-                )}
+                </div>
                 <p style={{ fontFamily: anton, fontSize: 14, color: "#fff", textTransform: "uppercase", marginTop: 8 }}>
                   {sub?.artist_name || s.artist_choice}
                 </p>
@@ -631,7 +706,6 @@ function ArtistsTab({ saves }: { saves: SavedArtist[] }) {
 /* ========== SHOWS TAB ========== */
 function ShowsTab({ shows, saves }: { shows: ShowListing[]; saves: SavedArtist[] }) {
   const savedArtistIds = new Set(saves.map((s) => s.submission?.artist_user_id).filter(Boolean) as string[]);
-
   const sortedShows = [...shows].sort((a, b) => {
     const aSaved = savedArtistIds.has(a.artist_user_id);
     const bSaved = savedArtistIds.has(b.artist_user_id);
@@ -648,7 +722,6 @@ function ShowsTab({ shows, saves }: { shows: ShowListing[]; saves: SavedArtist[]
         <p style={{ fontFamily: anton, fontSize: 64, lineHeight: 0.9, color: "#FFD600" }}>SHOWS</p>
         <p style={{ fontFamily: anton, fontSize: 48, lineHeight: 0.9, color: "#FFFFFF", marginTop: 4 }}>ATLANTA</p>
       </div>
-
       <div className="px-5">
         {sortedShows.length === 0 ? (
           <p className="text-white text-sm">No upcoming shows yet. Check back soon.</p>
@@ -718,13 +791,11 @@ function MarketTab({ points, progressPct }: { points: number; progressPct: numbe
             <div className="h-full bg-[#FFD600] rounded-full transition-all" style={{ width: `${progressPct}%` }} />
           </div>
         </div>
-        {/* Updated copy */}
         <p className="text-white text-[13px] mt-1">
           Collect points. Redeem locally. <span style={{ color: "#FFD600" }}>(Coming soon)</span>
         </p>
       </div>
 
-      {/* World Cup section */}
       <div className="px-5 pt-6 pb-2">
         <p style={{ fontFamily: anton, fontSize: 18, color: "#FFD600", textTransform: "uppercase", lineHeight: 1.2 }}>
           Lokol Points Coming Soon for the World Cup 2026
@@ -732,8 +803,6 @@ function MarketTab({ points, progressPct }: { points: number; progressPct: numbe
         <p className="text-white text-[13px] mt-2 mb-5" style={{ opacity: 0.7 }}>
           Meanwhile, Discover, Engage and Collect Points. New music added daily.
         </p>
-
-        {/* Partner store logos */}
         <div className="flex flex-col gap-3">
           {partners.map((p) => (
             <div key={p.name} className="bg-[#1a1a1a] rounded-xl p-4 flex items-center gap-4">
