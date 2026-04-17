@@ -11,6 +11,12 @@ interface LLSOnboardingProps {
 
 const STORAGE_KEY_PREFIX = "golokol_onboarded_";
 
+const KEYFRAMES = `
+  @keyframes soundWave { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+  @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+`;
+
 const SoundWave = () => (
   <div className="flex items-end justify-center gap-[5px] h-10">
     {[0, 1, 2, 3, 4].map((i) => (
@@ -31,38 +37,23 @@ const SoundWave = () => (
 const SLIDES = [
   {
     icon: golokolLogo,
-    animation: "float",
+    animation: "float 2.5s ease-in-out infinite",
     heading: "All Genres. All Atlanta.",
     body: "Discover and connect with emerging local artists and shows.",
   },
   {
     icon: fanmenuShows,
-    animation: "pulse",
+    animation: "pulse 2s ease-in-out infinite",
     heading: "Your Scene.",
     body: "Create an Atlanta scene that matters to you.",
   },
   {
     icon: fanmenuMarket,
-    animation: "float",
+    animation: "float 2.5s ease-in-out infinite",
     heading: "Earn and Redeem Points City-wide",
     body: "Unlock the value of music in Atlanta.",
   },
 ];
-
-const KEYFRAMES = `
-  @keyframes soundWave {
-    0%, 100% { transform: scaleY(0.4); }
-    50% { transform: scaleY(1); }
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-  }
-`;
 
 const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
   const storageKey = `${STORAGE_KEY_PREFIX}${storeSlug}`;
@@ -98,7 +89,7 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
           <p className="text-white text-[18px] leading-relaxed">Start exploring.</p>
           <button
             onClick={() => setPhase("swipe")}
-            className="font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] mt-4"
+            className="mt-4 font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
             style={{ backgroundColor: "#FFD600", color: "#000", width: 200, height: 56 }}
           >
             Next
@@ -109,6 +100,7 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
   }
 
   const isLast = currentSlide === SLIDES.length - 1;
+  const slide = SLIDES[currentSlide];
 
   const next = () => {
     if (isLast) {
@@ -135,8 +127,6 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
     }
   };
 
-  const slide = SLIDES[currentSlide];
-
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center"
@@ -148,7 +138,6 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
       <img src={atlantaBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 bg-black/70" />
 
-      {/* Progress dots */}
       <div className="absolute top-12 flex gap-2 z-10">
         {SLIDES.map((_, i) => (
           <div
@@ -164,9 +153,7 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
           src={slide.icon}
           alt=""
           className="w-20 h-20"
-          style={{
-            animation: `${slide.animation} 2.4s ease-in-out infinite`,
-          }}
+          style={{ animation: slide.animation }}
         />
         <h2
           style={{
