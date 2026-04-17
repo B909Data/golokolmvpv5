@@ -122,6 +122,21 @@ const LokolListensGenre = () => {
     localStorage.setItem("golokol_session_points", points.toString());
   }, [points]);
 
+  // Token validity check (mount + interval)
+  useEffect(() => {
+    const checkToken = () => {
+      try {
+        const token = JSON.parse(localStorage.getItem("golokol_store_session") || "null");
+        setHasValidTokenState(!!(token && token.expires_at && token.expires_at > Date.now()));
+      } catch {
+        setHasValidTokenState(false);
+      }
+    };
+    checkToken();
+    const interval = setInterval(checkToken, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -130,20 +145,31 @@ const LokolListensGenre = () => {
         setUserId(session.user.id);
         const { data: fanProfile } = await (supabase as any)
           .from("fan_profiles")
-          .select("id")
+          .select("id, lokol_points, daily_points_earned, daily_points_date")
           .eq("fan_user_id", session.user.id)
           .maybeSingle();
         setIsFan(!!fanProfile);
 
         if (fanProfile) {
-          const { data: fp } = await (supabase as any)
-            .from("fan_profiles")
-            .select("lokol_points")
-            .eq("fan_user_id", session.user.id)
-            .single();
-          if (fp?.lokol_points) {
-            setPoints(fp.lokol_points);
-            localStorage.setItem("golokol_session_points", fp.lokol_points.toString());
+          const todayAtlanta = getTodayAtlanta();
+          const isToday = fanProfile?.daily_points_date === todayAtlanta;
+          const currentDailyPoints = isToday ? (fanProfile?.daily_points_earned || 0) : 0;
+          setPoints(fanProfile?.lokol_points || 0);
+          setDailyPointsEarned(currentDailyPoints);
+          localStorage.setItem(
+            "golokol_session_points",
+            String(fanProfile?.lokol_points || 0)
+          );
+
+          // Load existing saves from lokol_scene_saves
+          const { data: existingSaves } = await (supabase as any)
+            .from("lokol_scene_saves")
+            .select("submission_id")
+            .eq("fan_user_id", session.user.id);
+          if (existingSaves) {
+            setSavedIds(
+              new Set(existingSaves.map((s: any) => s.submission_id).filter(Boolean))
+            );
           }
         }
       }
@@ -161,6 +187,43 @@ const LokolListensGenre = () => {
       setTracksLoading(false);
     })();
   }, [genreLabel]);
+
+  // Centralized point award logic with daily cap
+  const awardPoints = async (amount: number): Promise<number> => {
+    const todayAtlanta = getTodayAtlanta();
+
+    if (dailyPointsEarned >= DAILY_CAP) {
+      showCapToast();
+      return 0;
+    }
+
+    const pointsToAward = Math.min(amount, DAILY_CAP - dailyPointsEarned);
+    const newPoints = points + pointsToAward;
+    const newDaily = dailyPointsEarned + pointsToAward;
+
+    setPoints(newPoints);
+    setDailyPointsEarned(newDaily);
+    localStorage.setItem("golokol_session_points", newPoints.toString());
+
+    if (isFan && userId) {
+      try {
+        const { data: fp } = await (supabase as any)
+          .from("fan_profiles")
+          .select("lokol_points, daily_points_earned")
+          .eq("fan_user_id", userId)
+          .single();
+        await (supabase as any).from("fan_profiles").update({
+          lokol_points: (fp?.lokol_points || 0) + pointsToAward,
+          daily_points_earned: (fp?.daily_points_earned || 0) + pointsToAward,
+          daily_points_date: todayAtlanta,
+        }).eq("fan_user_id", userId);
+      } catch {}
+    }
+
+    if (newDaily >= DAILY_CAP) showCapToast();
+    return pointsToAward;
+  };
+
 
   const handlePlayToggle = (track: Track) => {
     const audio = audioRef.current;
