@@ -311,7 +311,7 @@ const LokolListensGenre = () => {
   };
 
   const handleSave = async (track: Track) => {
-    if (!isLoggedIn || !isFanRef.current) {
+    if (!isFanRef.current) {
       setOverlayTrack(track);
       setShowOverlay(true);
       return;
