@@ -40,12 +40,17 @@ const ArtistSubmit = () => {
 
   useEffect(() => {
     const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { navigate("/artist/signup", { replace: true }); return; }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/artist/signup", { replace: true });
+        return;
+      }
       setUser(session.user);
       const metaArtistName = session.user.user_metadata?.artist_name;
       if (metaArtistName) {
-        setForm(f => ({ ...f, artist_name: metaArtistName }));
+        setForm((f) => ({ ...f, artist_name: metaArtistName }));
       }
       setLoading(false);
     };
@@ -53,9 +58,9 @@ const ArtistSubmit = () => {
   }, [navigate]);
 
   const toggleGenre = (genre: string) => {
-    setForm(f => {
+    setForm((f) => {
       const current = f.genre_style;
-      if (current.includes(genre)) return { ...f, genre_style: current.filter(g => g !== genre) };
+      if (current.includes(genre)) return { ...f, genre_style: current.filter((g) => g !== genre) };
       if (current.length >= 3) return f;
       return { ...f, genre_style: [...current, genre] };
     });
@@ -64,8 +69,14 @@ const ArtistSubmit = () => {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) { toast({ title: "Please select an image file.", variant: "destructive" }); return; }
-    if (file.size > MAX_IMAGE_SIZE) { toast({ title: "Image must be under 5MB.", variant: "destructive" }); return; }
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please select an image file.", variant: "destructive" });
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast({ title: "Image must be under 5MB.", variant: "destructive" });
+      return;
+    }
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
   };
@@ -81,9 +92,13 @@ const ArtistSubmit = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.type !== "audio/mpeg" && !file.name.toLowerCase().endsWith(".mp3")) {
-      toast({ title: "MP3 files only, max 20MB", variant: "destructive" }); return;
+      toast({ title: "MP3 files only, max 20MB", variant: "destructive" });
+      return;
     }
-    if (file.size > MAX_MP3_SIZE) { toast({ title: "MP3 files only, max 20MB", variant: "destructive" }); return; }
+    if (file.size > MAX_MP3_SIZE) {
+      toast({ title: "MP3 files only, max 20MB", variant: "destructive" });
+      return;
+    }
     setMp3File(file);
   };
 
@@ -94,27 +109,58 @@ const ArtistSubmit = () => {
 
   const validateStep = (s: number): boolean => {
     if (s === 1) {
-      if (!form.artist_name.trim()) { toast({ title: "Artist Name is required.", variant: "destructive" }); return false; }
-      if (!form.song_title.trim()) { toast({ title: "Song Title is required.", variant: "destructive" }); return false; }
-      if (form.genre_style.length === 0) { toast({ title: "Please select at least one genre.", variant: "destructive" }); return false; }
+      if (!form.artist_name.trim()) {
+        toast({ title: "Artist Name is required.", variant: "destructive" });
+        return false;
+      }
+      if (!form.song_title.trim()) {
+        toast({ title: "Song Title is required.", variant: "destructive" });
+        return false;
+      }
+      if (form.genre_style.length === 0) {
+        toast({ title: "Please select at least one genre.", variant: "destructive" });
+        return false;
+      }
       return true;
     }
     if (s === 2) {
-      if (!mp3File) { toast({ title: "Please upload your MP3.", variant: "destructive" }); return false; }
-      if (!imageFile) { toast({ title: "Please upload a song image.", variant: "destructive" }); return false; }
-      if (!termsConfirmed) { toast({ title: "Please agree to the terms before submitting.", variant: "destructive" }); return false; }
+      if (!mp3File) {
+        toast({ title: "Please upload your MP3.", variant: "destructive" });
+        return false;
+      }
+      if (!imageFile) {
+        toast({ title: "Please upload a song image.", variant: "destructive" });
+        return false;
+      }
+      if (!termsConfirmed) {
+        toast({ title: "Please agree to the terms before submitting.", variant: "destructive" });
+        return false;
+      }
       return true;
     }
     return true;
   };
 
-  const handleNext = () => { if (validateStep(step)) setStep(prev => Math.min(prev + 1, TOTAL_STEPS)); };
-  const handleBack = () => { setStep(prev => Math.max(prev - 1, 1)); };
+  const handleNext = () => {
+    if (validateStep(step)) setStep((prev) => Math.min(prev + 1, TOTAL_STEPS));
+  };
+  const handleBack = () => {
+    setStep((prev) => Math.max(prev - 1, 1));
+  };
 
   const handleSubmit = async () => {
-    if (!mp3File) { toast({ title: "Please upload your MP3.", variant: "destructive" }); return; }
-    if (!imageFile) { toast({ title: "Please upload a song image.", variant: "destructive" }); return; }
-    if (!termsConfirmed) { toast({ title: "Please agree to the terms before submitting.", variant: "destructive" }); return; }
+    if (!mp3File) {
+      toast({ title: "Please upload your MP3.", variant: "destructive" });
+      return;
+    }
+    if (!imageFile) {
+      toast({ title: "Please upload a song image.", variant: "destructive" });
+      return;
+    }
+    if (!termsConfirmed) {
+      toast({ title: "Please agree to the terms before submitting.", variant: "destructive" });
+      return;
+    }
     if (!user) return;
 
     setSubmitting(true);
@@ -133,15 +179,19 @@ const ArtistSubmit = () => {
       }
 
       const ts = Date.now();
-      const sanitizedMp3 = mp3File.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const sanitizedMp3 = mp3File.name.replace(/[^a-zA-Z0-9.-]/g, "_");
       const mp3Path = `submissions/${user.id}/${ts}-${sanitizedMp3}`;
-      const { error: mp3Err } = await supabase.storage.from("station_submission_audio").upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
+      const { error: mp3Err } = await supabase.storage
+        .from("station_submission_audio")
+        .upload(mp3Path, mp3File, { contentType: "audio/mpeg" });
       if (mp3Err) throw mp3Err;
       const { data: mp3Url } = supabase.storage.from("station_submission_audio").getPublicUrl(mp3Path);
 
-      const sanitizedImg = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const sanitizedImg = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_");
       const imgPath = `${user.id}/${ts}-${sanitizedImg}`;
-      const { error: imgErr } = await supabase.storage.from("station_submission_images").upload(imgPath, imageFile, { contentType: imageFile.type });
+      const { error: imgErr } = await supabase.storage
+        .from("station_submission_images")
+        .upload(imgPath, imageFile, { contentType: imageFile.type });
       if (imgErr) throw imgErr;
       const { data: imgUrl } = supabase.storage.from("station_submission_images").getPublicUrl(imgPath);
 
@@ -212,7 +262,7 @@ const ArtistSubmit = () => {
         <Label className="text-primary-foreground text-base font-sans">Song Title *</Label>
         <Input
           value={form.song_title}
-          onChange={e => setForm(f => ({ ...f, song_title: e.target.value }))}
+          onChange={(e) => setForm((f) => ({ ...f, song_title: e.target.value }))}
           className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground"
           maxLength={300}
           placeholder="Your song title"
@@ -221,10 +271,13 @@ const ArtistSubmit = () => {
 
       <div className="space-y-2">
         <Label className="text-primary-foreground text-base font-sans">YouTube Link (optional)</Label>
-        <p className="text-primary-foreground/60 text-sm font-sans">Shown to your followers on their Lokol Scene homepage.</p>
+        <p className="text-primary-foreground/60 text-sm font-sans">
+          Strongly suggested. Something new to share with fans who save you to their Lokol Scene. (ie music video or
+          live performance)
+        </p>
         <Input
           value={form.youtube_url}
-          onChange={e => setForm(f => ({ ...f, youtube_url: e.target.value }))}
+          onChange={(e) => setForm((f) => ({ ...f, youtube_url: e.target.value }))}
           className="h-14 text-base font-sans bg-background text-foreground border-primary-foreground/50 placeholder:text-muted-foreground"
           maxLength={500}
           placeholder="https://youtube.com/watch?v=..."
@@ -236,7 +289,7 @@ const ArtistSubmit = () => {
           Genre / Style * <span className="text-primary-foreground/60">(up to 3)</span>
         </Label>
         <div className="flex flex-wrap gap-2 mt-1">
-          {GENRE_OPTIONS.map(genre => (
+          {GENRE_OPTIONS.map((genre) => (
             <button
               key={genre}
               type="button"
@@ -259,9 +312,7 @@ const ArtistSubmit = () => {
     <div className="space-y-5">
       <div className="text-center mb-4">
         <h2 className="font-display text-2xl text-primary-foreground">Upload Files</h2>
-        <p className="text-primary-foreground/70 text-sm font-sans mt-1">
-          Almost there — add your song and artwork.
-        </p>
+        <p className="text-primary-foreground/70 text-sm font-sans mt-1">Almost there — add your song and artwork.</p>
       </div>
 
       <div className="space-y-2">
@@ -271,7 +322,11 @@ const ArtistSubmit = () => {
         {mp3File ? (
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-primary-foreground/30 bg-background">
             <span className="text-foreground text-sm font-sans truncate flex-1">{mp3File.name}</span>
-            <button type="button" onClick={clearMp3} className="bg-destructive text-destructive-foreground rounded-full p-1 shrink-0">
+            <button
+              type="button"
+              onClick={clearMp3}
+              className="bg-destructive text-destructive-foreground rounded-full p-1 shrink-0"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -281,7 +336,8 @@ const ArtistSubmit = () => {
             onClick={() => mp3InputRef.current?.click()}
             className="flex items-center gap-3 px-6 py-4 rounded-lg border-2 border-dashed border-primary-foreground/30 bg-primary-foreground/5 text-primary-foreground/70 hover:border-primary-foreground hover:text-primary-foreground transition-colors w-full"
           >
-            <Upload className="h-5 w-5" /><span className="text-base font-sans">Choose MP3 File</span>
+            <Upload className="h-5 w-5" />
+            <span className="text-base font-sans">Choose MP3 File</span>
           </button>
         )}
         <input ref={mp3InputRef} type="file" accept=".mp3,audio/mpeg" onChange={handleMp3Select} className="hidden" />
@@ -289,13 +345,19 @@ const ArtistSubmit = () => {
 
       <div className="space-y-2">
         <Label className="text-primary-foreground text-base font-sans">Upload Song Image *</Label>
-        <p className="text-sm text-primary-foreground/60 font-sans">Any size or shape — we'll display it as a square.</p>
+        <p className="text-sm text-primary-foreground/60 font-sans">
+          Any size or shape — we'll display it as a square.
+        </p>
         {imagePreview ? (
           <div className="relative inline-block">
             <div className="w-32 h-32 rounded-lg overflow-hidden border border-primary-foreground/30">
               <img src={imagePreview} alt="Song preview" className="w-full h-full object-cover" />
             </div>
-            <button type="button" onClick={clearImage} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1">
+            <button
+              type="button"
+              onClick={clearImage}
+              className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -305,7 +367,8 @@ const ArtistSubmit = () => {
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center gap-3 px-6 py-4 rounded-lg border-2 border-dashed border-primary-foreground/30 bg-primary-foreground/5 text-primary-foreground/70 hover:border-primary-foreground hover:text-primary-foreground transition-colors w-full"
           >
-            <Upload className="h-5 w-5" /><span className="text-base font-sans">Choose Image</span>
+            <Upload className="h-5 w-5" />
+            <span className="text-base font-sans">Choose Image</span>
           </button>
         )}
         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
@@ -315,12 +378,12 @@ const ArtistSubmit = () => {
         <input
           type="checkbox"
           checked={termsConfirmed}
-          onChange={e => setTermsConfirmed(e.target.checked)}
+          onChange={(e) => setTermsConfirmed(e.target.checked)}
           className="mt-1 h-4 w-4 accent-[#FFD600]"
         />
         <span className="text-sm text-primary-foreground/80 font-sans">
           I agree to the{" "}
-          <a href="/lls-music-release" target="_blank" style={{ color: '#000000', textDecoration: 'underline' }}>
+          <a href="/lls-music-release" target="_blank" style={{ color: "#000000", textDecoration: "underline" }}>
             GoLokol Artist Terms &amp; Music Release
           </a>
         </span>
@@ -351,20 +414,29 @@ const ArtistSubmit = () => {
         </div>
 
         <div className="bg-primary rounded-2xl p-6 md:p-8">
-          <form onSubmit={e => e.preventDefault()}>
+          <form onSubmit={(e) => e.preventDefault()}>
             {step === 1 && renderStep1()}
             {step === 2 && renderStep2()}
 
             {step < TOTAL_STEPS && (
               <div className="flex justify-between gap-3 mt-8">
                 {step > 1 ? (
-                  <Button type="button" variant="outline" onClick={handleBack}
-                    className="h-11 px-6 font-display font-bold text-base bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBack}
+                    className="h-11 px-6 font-display font-bold text-base bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
+                  >
                     <ArrowLeft className="mr-1 h-4 w-4" /> Back
                   </Button>
-                ) : <div />}
-                <Button type="button" onClick={handleNext}
-                  className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                ) : (
+                  <div />
+                )}
+                <Button
+                  type="button"
+                  onClick={handleNext}
+                  className="h-11 px-8 font-display font-bold text-base bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                >
                   Next
                 </Button>
               </div>
@@ -372,8 +444,12 @@ const ArtistSubmit = () => {
 
             {step === TOTAL_STEPS && step > 1 && (
               <div className="mt-6">
-                <Button type="button" variant="outline" onClick={handleBack}
-                  className="h-11 px-6 font-display font-bold text-base bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleBack}
+                  className="h-11 px-6 font-display font-bold text-base bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
+                >
                   <ArrowLeft className="mr-1 h-4 w-4" /> Back
                 </Button>
               </div>
