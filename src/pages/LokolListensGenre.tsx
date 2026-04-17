@@ -97,6 +97,8 @@ const LokolListensGenre = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+
+  // Points — local only for April 18th launch
   const [points, setPoints] = useState(() => {
     try {
       return parseInt(localStorage.getItem("golokol_session_points") || "0");
@@ -104,6 +106,7 @@ const LokolListensGenre = () => {
       return 0;
     }
   });
+
   const [savedIds, setSavedIds] = useState<Set<string>>(() => {
     try {
       const stored = localStorage.getItem("golokol_saved_ids");
@@ -112,27 +115,27 @@ const LokolListensGenre = () => {
       return new Set();
     }
   });
+
   const [splashIds, setSplashIds] = useState<Set<string>>(new Set());
   const [pointsAwardedIds, setPointsAwardedIds] = useState<Set<string>>(new Set());
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayTrack, setOverlayTrack] = useState<Track | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isFan, setIsFan] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
   const [capToast, setCapToast] = useState("");
+
   const hasValidTokenRef = useRef(false);
   const isFanRef = useRef(false);
   const userIdRef = useRef<string | null>(null);
+  const dailyPointsRef = useRef(0);
 
   const genreLabel = SLUG_TO_GENRE[genre || ""] || genre || "";
 
+  // Sync refs with state
   useEffect(() => {
     isFanRef.current = isFan;
   }, [isFan]);
-  useEffect(() => {
-    userIdRef.current = userId;
-  }, [userId]);
 
+  // Persist to localStorage
   useEffect(() => {
     localStorage.setItem("golokol_saved_ids", JSON.stringify([...savedIds]));
   }, [savedIds]);
@@ -141,6 +144,7 @@ const LokolListensGenre = () => {
     localStorage.setItem("golokol_session_points", points.toString());
   }, [points]);
 
+  // Token check
   useEffect(() => {
     const checkToken = () => {
       try {
@@ -155,14 +159,14 @@ const LokolListensGenre = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Auth + data load
   useEffect(() => {
     (async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
+
       if (session) {
-        setIsLoggedIn(true);
-        setUserId(session.user.id);
         userIdRef.current = session.user.id;
 
         const { data: fanProfile } = await (supabase as any)
@@ -174,18 +178,28 @@ const LokolListensGenre = () => {
         if (fanProfile) {
           setIsFan(true);
           isFanRef.current = true;
+
+          // Load daily points count into ref for cap checking
           const todayAtlanta = getTodayAtlanta();
           const isToday = fanProfile.daily_points_date === todayAtlanta;
-          const currentDailyPoints = isToday ? fanProfile.daily_points_earned || 0 : 0;
-          setPoints(fanProfile.lokol_points || 0);
-          localStorage.setItem("golokol_session_points", String(fanProfile.lokol_points || 0));
+          dailyPointsRef.current = isToday ? fanProfile.daily_points_earned || 0 : 0;
 
-          if (currentDailyPoints >= DAILY_CAP && !capToastShownRef.current) {
+          // Sync points from DB
+          const dbPoints = fanProfile.lokol_points || 0;
+          const localPoints = parseInt(localStorage.getItem("golokol_session_points") || "0");
+          // Use whichever is higher
+          const finalPoints = Math.max(dbPoints, localPoints);
+          setPoints(finalPoints);
+          localStorage.setItem("golokol_session_points", finalPoints.toString());
+
+          // Show cap toast if already at limit
+          if (dailyPointsRef.current >= DAILY_CAP && !capToastShownRef.current) {
             capToastShownRef.current = true;
             setCapToast("You've maxed out today's points. Keep listening — the music is still free. 🎧");
             setTimeout(() => setCapToast(""), 5000);
           }
 
+          // Load existing saves
           const { data: existingSaves } = await (supabase as any)
             .from("lokol_scene_saves")
             .select("submission_id")
@@ -193,9 +207,35 @@ const LokolListensGenre = () => {
           if (existingSaves) {
             setSavedIds(new Set(existingSaves.map((s: any) => s.submission_id).filter(Boolean)));
           }
+
+          // *** HANDLE PENDING SAVE FROM PRE-SIGNUP ***
+          const pendingSaveRaw = localStorage.getItem("golokol_pending_save");
+          if (pendingSaveRaw) {
+            try {
+              const pendingTrack = JSON.parse(pendingSaveRaw);
+              // Insert save to DB
+              await (supabase as any).from("lokol_scene_saves").insert({
+                fan_user_id: session.user.id,
+                submission_id: pendingTrack.id,
+                artist_name: pendingTrack.artist_name,
+                store_slug: pendingTrack.store_slug || null,
+              });
+              // Add to local saved state
+              setSavedIds((prev) => new Set(prev).add(pendingTrack.id));
+              // Award 10 points locally
+              const pendingPts = parseInt(localStorage.getItem("golokol_pending_points") || "0");
+              const newPoints = Math.max(finalPoints, pendingPts) + 10;
+              setPoints(newPoints);
+              localStorage.setItem("golokol_session_points", newPoints.toString());
+              // Clear pending
+              localStorage.removeItem("golokol_pending_save");
+              localStorage.removeItem("golokol_pending_points");
+            } catch {}
+          }
         }
       }
 
+      // Load tracks
       const { data } = await (supabase as any)
         .from("lls_artist_submissions")
         .select("id, artist_name, song_title, song_image_url, mp3_url, genre_style")
@@ -210,60 +250,65 @@ const LokolListensGenre = () => {
     })();
   }, [genreLabel]);
 
-  const showCapToastMsg = useCallback(() => {
-    if (capToastShownRef.current) return;
-    capToastShownRef.current = true;
-    setCapToast("You've hit today's 40pt limit. Keep listening — the music is still free. 🎧");
-    setTimeout(() => setCapToast(""), 5000);
+  // Award points — local + DB
+  const awardPoints = useCallback(async (amount: number): Promise<number> => {
+    if (!hasValidTokenRef.current) return 0;
+
+    // Check daily cap using ref
+    if (dailyPointsRef.current >= DAILY_CAP) {
+      if (!capToastShownRef.current) {
+        capToastShownRef.current = true;
+        setCapToast("You've hit today's 40pt limit. Keep listening — the music is still free. 🎧");
+        setTimeout(() => setCapToast(""), 5000);
+      }
+      return 0;
+    }
+
+    const pointsToAward = Math.min(amount, DAILY_CAP - dailyPointsRef.current);
+
+    // Update local immediately
+    setPoints((prev) => {
+      const newVal = prev + pointsToAward;
+      localStorage.setItem("golokol_session_points", newVal.toString());
+      return newVal;
+    });
+    dailyPointsRef.current += pointsToAward;
+
+    // Check if we just hit the cap
+    if (dailyPointsRef.current >= DAILY_CAP && !capToastShownRef.current) {
+      capToastShownRef.current = true;
+      setCapToast("You've hit today's 40pt limit. Keep listening — the music is still free. 🎧");
+      setTimeout(() => setCapToast(""), 5000);
+    }
+
+    // Write to DB if fan
+    if (isFanRef.current && userIdRef.current) {
+      try {
+        const { data: fp } = await (supabase as any)
+          .from("fan_profiles")
+          .select("lokol_points, daily_points_earned, daily_points_date")
+          .eq("fan_user_id", userIdRef.current)
+          .single();
+
+        if (fp) {
+          const todayAtlanta = getTodayAtlanta();
+          const isToday = fp.daily_points_date === todayAtlanta;
+          const dbDaily = isToday ? fp.daily_points_earned || 0 : 0;
+
+          await (supabase as any)
+            .from("fan_profiles")
+            .update({
+              lokol_points: fp.lokol_points + pointsToAward,
+              daily_points_earned: dbDaily + pointsToAward,
+              daily_points_date: todayAtlanta,
+            })
+            .eq("fan_user_id", userIdRef.current);
+        }
+      } catch {}
+    }
+
+    return pointsToAward;
   }, []);
-
-  const awardPoints = useCallback(
-    async (amount: number): Promise<number> => {
-      if (!isFanRef.current || !userIdRef.current) return 0;
-      if (!hasValidTokenRef.current) return 0;
-
-      const { data: fp, error } = await (supabase as any)
-        .from("fan_profiles")
-        .select("lokol_points, daily_points_earned, daily_points_date")
-        .eq("fan_user_id", userIdRef.current)
-        .single();
-
-      if (error || !fp) return 0;
-
-      const todayAtlanta = getTodayAtlanta();
-      const isToday = fp.daily_points_date === todayAtlanta;
-      const currentDaily = isToday ? fp.daily_points_earned || 0 : 0;
-
-      if (currentDaily >= DAILY_CAP) {
-        showCapToastMsg();
-        return 0;
-      }
-
-      const pointsToAward = Math.min(amount, DAILY_CAP - currentDaily);
-
-      const { error: updateError } = await (supabase as any)
-        .from("fan_profiles")
-        .update({
-          lokol_points: fp.lokol_points + pointsToAward,
-          daily_points_earned: currentDaily + pointsToAward,
-          daily_points_date: todayAtlanta,
-        })
-        .eq("fan_user_id", userIdRef.current);
-
-      if (updateError) return 0;
-
-      const newTotal = fp.lokol_points + pointsToAward;
-      setPoints(newTotal);
-      localStorage.setItem("golokol_session_points", newTotal.toString());
-
-      if (currentDaily + pointsToAward >= DAILY_CAP) {
-        showCapToastMsg();
-      }
-
-      return pointsToAward;
-    },
-    [showCapToastMsg],
-  );
 
   const handlePlayToggle = (track: Track) => {
     const audio = audioRef.current;
@@ -292,13 +337,11 @@ const LokolListensGenre = () => {
     setCurrentTime(audio.currentTime);
     if (
       hasValidTokenRef.current &&
-      isFanRef.current &&
       audio.duration > 0 &&
       audio.currentTime / audio.duration >= 0.5 &&
       !pointsAwardedIds.has(playingId)
     ) {
-      const awardedTrackId = playingId;
-      setPointsAwardedIds((prev) => new Set(prev).add(awardedTrackId));
+      setPointsAwardedIds((prev) => new Set(prev).add(playingId));
       await awardPoints(5);
     }
   };
@@ -311,6 +354,7 @@ const LokolListensGenre = () => {
   };
 
   const handleSave = async (track: Track) => {
+    // Not a fan yet — show signup overlay
     if (!isFanRef.current) {
       setOverlayTrack(track);
       setShowOverlay(true);
@@ -318,11 +362,13 @@ const LokolListensGenre = () => {
     }
     if (savedIds.has(track.id) || splashIds.has(track.id)) return;
 
+    // Show splash immediately
     setSplashIds((prev) => new Set(prev).add(track.id));
     playRewardSound();
 
+    // Award points + save to DB concurrently
     await Promise.all([
-      hasValidTokenRef.current ? awardPoints(10) : Promise.resolve(0),
+      awardPoints(10),
       (async () => {
         try {
           await (supabase as any).from("lokol_scene_saves").insert({
@@ -346,7 +392,7 @@ const LokolListensGenre = () => {
   };
 
   const handleHeaderSave = () => {
-    if (!isLoggedIn || !isFanRef.current) {
+    if (!isFanRef.current) {
       setOverlayTrack(null);
       setShowOverlay(true);
     } else {
@@ -443,12 +489,14 @@ const LokolListensGenre = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
+                {/* Default: show play icon */}
                 {!isCurrent && !isSaved && !isSplash && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Play size={56} className="text-white drop-shadow-lg" strokeWidth={1.5} />
                   </div>
                 )}
 
+                {/* Playing: show + save button */}
                 {isCurrent && !isSaved && !isSplash && (
                   <>
                     <div className="absolute inset-0 bg-black/50" />
@@ -482,6 +530,7 @@ const LokolListensGenre = () => {
                   </>
                 )}
 
+                {/* Splash: +10 POINTS animation */}
                 {isSplash && (
                   <>
                     <div className="absolute inset-0 bg-[#FFD600]/20 ring-4 ring-[#FFD600] rounded-2xl" />
@@ -494,6 +543,7 @@ const LokolListensGenre = () => {
                   </>
                 )}
 
+                {/* Saved: permanent state */}
                 {isSaved && !isSplash && (
                   <>
                     <div className="absolute inset-0 bg-black/60" />
@@ -513,6 +563,7 @@ const LokolListensGenre = () => {
                   </>
                 )}
 
+                {/* Artist info */}
                 {!isSaved && !isSplash && (
                   <div className="absolute bottom-2 left-2 right-2 z-10">
                     <p className="text-white font-bold text-[13px] truncate">{track.artist_name}</p>
@@ -525,6 +576,7 @@ const LokolListensGenre = () => {
         </div>
       )}
 
+      {/* Bottom player bar */}
       {playingId && currentTrack && (
         <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#333] z-40">
           <div
@@ -555,6 +607,7 @@ const LokolListensGenre = () => {
         </div>
       )}
 
+      {/* Save overlay — shown when not a fan yet */}
       {showOverlay && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#1a1a1a] rounded-2xl p-6 max-w-sm w-full flex flex-col items-center gap-4">
@@ -575,11 +628,26 @@ const LokolListensGenre = () => {
               </>
             )}
             <button
-              onClick={() =>
+              onClick={() => {
+                // Store pending save so it executes after signup
+                if (overlayTrack) {
+                  localStorage.setItem(
+                    "golokol_pending_save",
+                    JSON.stringify({
+                      id: overlayTrack.id,
+                      artist_name: overlayTrack.artist_name,
+                      song_title: overlayTrack.song_title,
+                      song_image_url: overlayTrack.song_image_url,
+                      mp3_url: overlayTrack.mp3_url,
+                      store_slug: storeSlug || "",
+                    }),
+                  );
+                  localStorage.setItem("golokol_pending_points", points.toString());
+                }
                 navigate(
                   `/lls/signup?points=${points}&store=${storeSlug || ""}&artist=${encodeURIComponent(overlayTrack?.artist_name || "")}`,
-                )
-              }
+                );
+              }}
               className="w-full h-12 font-bold rounded-xl"
               style={{ backgroundColor: "#FFD600", color: "#000" }}
             >
@@ -592,6 +660,7 @@ const LokolListensGenre = () => {
         </div>
       )}
 
+      {/* Daily cap toast */}
       {capToast && (
         <div
           className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-xl shadow-2xl max-w-[90%] text-center"
