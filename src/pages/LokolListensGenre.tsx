@@ -385,6 +385,7 @@ const LokolListensGenre = () => {
 
     // *** TRACK GENRE ON SAVE too ***
     trackGenreInSession(genreLabel);
+    localStorage.setItem("golokol_last_genre_url", `/lls/${storeSlug}/genre/${genre}`);
     // Remove from under-50 since they're saving it
     trackUnder50InSession(track.id, false);
 
