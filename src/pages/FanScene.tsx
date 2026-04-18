@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Info, Plus, Play, Pause, X } from "lucide-react";
+import { Info, Plus, Play, Pause, X, ArrowLeft } from "lucide-react";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import fanmenuArtists from "@/assets/fanmenu-artists.svg";
 import fanmenuShows from "@/assets/fanmenu-shows.svg";
@@ -112,11 +112,14 @@ const FanScene = () => {
   const [countdown, setCountdown] = useState("");
   const [expiredBannerDismissed, setExpiredBannerDismissed] = useState(false);
   const [missedTracks, setMissedTracks] = useState<MissedTrack[]>([]);
+  const [lastGenreUrl, setLastGenreUrl] = useState<string | null>(null);
 
   // YouTube modal state
   const [youtubeModal, setYoutubeModal] = useState<{ artist: SavedArtist } | null>(null);
 
   useEffect(() => {
+    const stored = localStorage.getItem("golokol_last_genre_url");
+    if (stored) setLastGenreUrl(stored);
     let idx = Math.floor(Math.random() * HOME_IMAGES.length);
     setHomeImage(HOME_IMAGES[idx]);
     const rotateInterval = setInterval(() => {
@@ -274,7 +277,18 @@ const FanScene = () => {
 
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between bg-black">
-        <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
+        <div className="flex items-center gap-3">
+          <img src={golokolLogo} alt="GoLokol" className="h-8 w-8" />
+          {lastGenreUrl && (
+            <button
+              onClick={() => navigate(lastGenreUrl)}
+              className="flex items-center gap-1 text-[#FFD600] text-xs font-bold"
+            >
+              <ArrowLeft size={14} />
+              Back to music
+            </button>
+          )}
+        </div>
         <div className="flex items-center gap-3">
           <button
             onClick={async () => {
@@ -282,6 +296,7 @@ const FanScene = () => {
               localStorage.removeItem("golokol_saved_ids");
               localStorage.removeItem("golokol_session_points");
               localStorage.removeItem("golokol_store_session");
+              localStorage.removeItem("golokol_last_genre_url");
               navigate("/");
             }}
             className="text-[11px] text-white/40"
