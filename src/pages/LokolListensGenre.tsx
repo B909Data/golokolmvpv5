@@ -654,6 +654,7 @@ const LokolListensGenre = () => {
                   );
                   localStorage.setItem("golokol_pending_points", points.toString());
                 }
+                localStorage.setItem("golokol_last_genre_url", `/lls/${storeSlug}/genre/${genre}`);
                 navigate(
                   `/lls/signup?points=${points}&store=${storeSlug || ""}&artist=${encodeURIComponent(overlayTrack?.artist_name || "")}`,
                 );
