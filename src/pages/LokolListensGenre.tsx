@@ -469,15 +469,8 @@ const LokolListensGenre = () => {
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <span className="text-[#FFD600] font-bold text-sm">Points: {points}</span>
-            <button
-              onClick={handleHeaderSave}
-              className="px-3 py-1.5 rounded-full text-xs font-bold"
-              style={{ backgroundColor: "#FFD600", color: "#000" }}
-            >
-              Save
-            </button>
           </div>
         )}
       </div>
