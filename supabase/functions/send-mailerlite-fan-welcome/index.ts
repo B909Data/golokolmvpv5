@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const MAILERLITE_API_KEY = Deno.env.get("MAILERLITE_ARTIST_SIGNUP");
-const FAN_GROUP_ID = "INSERT_YOUR_FAN_GROUP_ID_HERE";
+const FAN_GROUP_ID = "185276257652442702";
 
 serve(async (req) => {
   const corsHeaders = {
