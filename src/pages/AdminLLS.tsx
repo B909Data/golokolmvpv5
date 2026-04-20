@@ -809,16 +809,60 @@ const AdminLLS = () => {
 
           {activeTab === "analytics" && (
             <div className="space-y-6">
+              {/* Date range filter */}
+              <div className="border border-border/50 rounded-lg p-4 bg-card/30 flex flex-wrap items-end gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">From</label>
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={e => setDateFrom(e.target.value)}
+                    className="text-sm px-3 py-2 rounded bg-card/50 border border-border/50 text-foreground"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">To</label>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={e => setDateTo(e.target.value)}
+                    className="text-sm px-3 py-2 rounded bg-card/50 border border-border/50 text-foreground"
+                  />
+                </div>
+                <button
+                  onClick={fetchAnalytics}
+                  className="px-4 py-2 rounded-lg text-sm font-bold"
+                  style={{ backgroundColor: "#FFD600", color: "#000" }}
+                >
+                  Run
+                </button>
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    { label: "Today", from: new Date().toISOString().split("T")[0], to: new Date().toISOString().split("T")[0] },
+                    { label: "This Week", from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], to: new Date().toISOString().split("T")[0] },
+                    { label: "Launch Day", from: "2026-04-18", to: "2026-04-18" },
+                    { label: "All Time", from: "2026-04-18", to: new Date().toISOString().split("T")[0] },
+                  ].map(preset => (
+                    <button
+                      key={preset.label}
+                      onClick={() => { setDateFrom(preset.from); setDateTo(preset.to); }}
+                      className="px-3 py-1.5 rounded text-xs border border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {analyticsLoading ? (
-                <p className="text-muted-foreground text-center py-16">Loading analytics...</p>
+                <p className="text-muted-foreground text-center py-16">Loading...</p>
               ) : !analytics ? (
-                <p className="text-muted-foreground text-center py-16">No data yet.</p>
+                <p className="text-muted-foreground text-center py-8">Set a date range and tap Run.</p>
               ) : (
                 <>
                   {/* Top stat cards */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
-                      { label: "Total Fans", value: analytics.totalFans },
+                      { label: "New Fans", value: analytics.totalFans },
                       { label: "Total Saves", value: analytics.totalSaves },
                       { label: "Points Distributed", value: analytics.totalPoints },
                       { label: "Songs on Station", value: submissions.filter(s => s.admin_status === "approved").length },
