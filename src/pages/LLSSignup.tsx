@@ -124,6 +124,14 @@ const LLSSignup = () => {
         console.error("Error saving pre-signup artists:", saveErr);
       }
 
+      try {
+        await supabase.functions.invoke("send-mailerlite-fan-welcome", {
+          body: { email: email.trim(), name: name.trim() || "" },
+        });
+      } catch (mlErr) {
+        console.error("MailerLite fan welcome error:", mlErr);
+      }
+
       navigate("/fan/scene");
     } catch (err: any) {
       setError(err?.message || "Something went wrong.");
