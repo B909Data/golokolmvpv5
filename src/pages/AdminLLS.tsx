@@ -61,6 +61,69 @@ const AdminLLS = () => {
   const [addSubmitting, setAddSubmitting] = useState(false);
   const [claimLink, setClaimLink] = useState<string | null>(null);
   const [editingYoutube, setEditingYoutube] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"submissions" | "analytics">("submissions");
+  const [analytics, setAnalytics] = useState<{
+    totalFans: number;
+    fansPerStore: { store: string; count: number }[];
+    totalSaves: number;
+    topSongs: { artist_name: string; song_title: string; count: number }[];
+    savesPerGenre: { genre: string; count: number }[];
+    totalPoints: number;
+  } | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
+  const fetchAnalytics = async () => {
+    setAnalyticsLoading(true);
+    try {
+      const { data: fans } = await (supabase as any)
+        .from("fan_profiles")
+        .select("fan_user_id, city");
+
+      const { data: saves } = await (supabase as any)
+        .from("lokol_scene_saves")
+        .select("submission_id, artist_name, store_slug");
+      const { data: submissions } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .select("id, artist_name, song_title, genre_style")
+        .eq("admin_status", "approved");
+      const { data: points } = await (supabase as any)
+        .from("fan_profiles")
+        .select("lokol_points");
+      const totalFans = fans?.length || 0;
+      const totalSaves = saves?.length || 0;
+      const totalPoints = points?.reduce((sum: number, f: any) => sum + (f.lokol_points || 0), 0) || 0;
+      const storeMap: Record<string, number> = {};
+      saves?.forEach((s: any) => {
+        const store = s.store_slug || "unknown";
+        storeMap[store] = (storeMap[store] || 0) + 1;
+      });
+      const fansPerStore = Object.entries(storeMap).map(([store, count]) => ({ store, count })).sort((a, b) => b.count - a.count);
+      const songMap: Record<string, { artist_name: string; song_title: string; count: number }> = {};
+      saves?.forEach((s: any) => {
+        if (!s.submission_id) return;
+        const sub = submissions?.find((sub: any) => sub.id === s.submission_id);
+        if (!sub) return;
+        if (!songMap[s.submission_id]) {
+          songMap[s.submission_id] = { artist_name: sub.artist_name, song_title: sub.song_title, count: 0 };
+        }
+        songMap[s.submission_id].count++;
+      });
+      const topSongs = Object.values(songMap).sort((a, b) => b.count - a.count).slice(0, 10);
+      const genreMap: Record<string, number> = {};
+      saves?.forEach((s: any) => {
+        if (!s.submission_id) return;
+        const sub = submissions?.find((sub: any) => sub.id === s.submission_id);
+        if (!sub?.genre_style) return;
+        genreMap[sub.genre_style] = (genreMap[sub.genre_style] || 0) + 1;
+      });
+      const savesPerGenre = Object.entries(genreMap).map(([genre, count]) => ({ genre, count })).sort((a, b) => b.count - a.count);
+      setAnalytics({ totalFans, fansPerStore, totalSaves, topSongs, savesPerGenre, totalPoints });
+    } catch (err) {
+      console.error("Analytics error:", err);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
 
   const fetchSubmissions = async () => {
     if (!key) return;
@@ -285,26 +348,35 @@ const AdminLLS = () => {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <Music className="w-8 h-8 text-primary" />
-              <h1 className="font-display text-3xl text-foreground">LLS Submissions</h1>
+              <h1 className="font-display text-3xl text-foreground">LLS Admin</h1>
             </div>
             <div className="flex items-center gap-2">
               <Link to={`/admin?key=${key}`}>
-                <Button variant="ghost" size="sm">
-                  ← Back
-                </Button>
+                <Button variant="ghost" size="sm">← Back</Button>
               </Link>
-              <Button variant="outline" size="sm" onClick={fetchSubmissions} disabled={loading}>
-                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                Refresh
-              </Button>
-              <Button
-                size="sm"
-                className="font-bold"
-                style={{ backgroundColor: "#FFD600", color: "#000" }}
-                onClick={() => setShowAddForm(!showAddForm)}
+              <button
+                onClick={() => setActiveTab("submissions")}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${activeTab === "submissions" ? "bg-[#FFD600] text-black" : "bg-card/50 text-foreground border border-border/50"}`}
               >
-                <Plus className="w-4 h-4 mr-1" /> Add Song
-              </Button>
+                Submissions
+              </button>
+              <button
+                onClick={() => { setActiveTab("analytics"); fetchAnalytics(); }}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${activeTab === "analytics" ? "bg-[#FFD600] text-black" : "bg-card/50 text-foreground border border-border/50"}`}
+              >
+                Analytics
+              </button>
+              {activeTab === "submissions" && (
+                <>
+                  <Button variant="outline" size="sm" onClick={fetchSubmissions} disabled={loading}>
+                    <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                    Refresh
+                  </Button>
+                  <Button size="sm" className="font-bold" style={{ backgroundColor: "#FFD600", color: "#000" }} onClick={() => setShowAddForm(!showAddForm)}>
+                    <Plus className="w-4 h-4 mr-1" /> Add Song
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -312,6 +384,7 @@ const AdminLLS = () => {
 
       <section className="px-4 pb-24">
         <div className="max-w-7xl mx-auto">
+          {activeTab === "submissions" && (<>
           {/* Add Song Form */}
           {showAddForm && (
             <div className="border border-border/50 rounded-lg p-6 mb-6 bg-card/30 space-y-4">
@@ -719,6 +792,88 @@ const AdminLLS = () => {
               )}
             </div>
           </div>
+          </>)}
+
+          {activeTab === "analytics" && (
+            <div className="space-y-6">
+              {analyticsLoading ? (
+                <p className="text-muted-foreground text-center py-16">Loading analytics...</p>
+              ) : !analytics ? (
+                <p className="text-muted-foreground text-center py-16">No data yet.</p>
+              ) : (
+                <>
+                  {/* Top stat cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { label: "Total Fans", value: analytics.totalFans },
+                      { label: "Total Saves", value: analytics.totalSaves },
+                      { label: "Points Distributed", value: analytics.totalPoints },
+                      { label: "Songs on Station", value: submissions.filter(s => s.admin_status === "approved").length },
+                    ].map(stat => (
+                      <div key={stat.label} className="border border-border/50 rounded-lg p-4 bg-card/30 text-center">
+                        <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Saves per store */}
+                    <div className="border border-border/50 rounded-lg p-4 bg-card/30">
+                      <h3 className="font-bold text-foreground mb-3">Saves by Store</h3>
+                      {analytics.fansPerStore.length === 0 ? (
+                        <p className="text-muted-foreground text-sm">No data yet.</p>
+                      ) : analytics.fansPerStore.map(s => (
+                        <div key={s.store} className="flex items-center justify-between py-2 border-b border-border/20 last:border-0">
+                          <span className="text-sm text-foreground capitalize">{s.store.replace(/-/g, " ")}</span>
+                          <span className="text-sm font-bold" style={{ color: "#FFD600" }}>{s.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Saves per genre */}
+                    <div className="border border-border/50 rounded-lg p-4 bg-card/30">
+                      <h3 className="font-bold text-foreground mb-3">Saves by Genre</h3>
+                      {analytics.savesPerGenre.length === 0 ? (
+                        <p className="text-muted-foreground text-sm">No data yet.</p>
+                      ) : analytics.savesPerGenre.map(g => (
+                        <div key={g.genre} className="flex items-center justify-between py-2 border-b border-border/20 last:border-0">
+                          <span className="text-sm text-foreground">{g.genre}</span>
+                          <span className="text-sm font-bold" style={{ color: "#FFD600" }}>{g.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Top saved songs */}
+                  <div className="border border-border/50 rounded-lg p-4 bg-card/30">
+                    <h3 className="font-bold text-foreground mb-3">Top Saved Songs</h3>
+                    {analytics.topSongs.length === 0 ? (
+                      <p className="text-muted-foreground text-sm">No saves yet.</p>
+                    ) : (
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border/30">
+                            <th className="text-left py-2 text-muted-foreground font-medium">#</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Artist</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Song</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Saves</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {analytics.topSongs.map((song, i) => (
+                            <tr key={i} className="border-b border-border/20 last:border-0">
+                              <td className="py-2 text-muted-foreground">{i + 1}</td>
+                              <td className="py-2 text-foreground">{song.artist_name}</td>
+                              <td className="py-2 text-foreground">{song.song_title}</td>
+                              <td className="py-2 font-bold" style={{ color: "#FFD600" }}>{song.count}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
