@@ -22,17 +22,17 @@ serve(async (req) => {
       });
     }
 
-    const firstName = name ? name.trim().split(" ")[0] : "";
+    const firstName = name ? name.trim().split(" ")[0] : "music lover";
 
-    const payload: any = {
+    const payload = {
       email,
       groups: [FAN_GROUP_ID],
       status: "active",
+      fields: {
+        golokol_fan_name: firstName,
+        golokol_fan_scene: "https://golokol.app/fan/scene",
+      },
     };
-
-    if (firstName) {
-      payload.fields = { name: firstName };
-    }
 
     const response = await fetch("https://connect.mailerlite.com/api/subscribers", {
       method: "POST",
