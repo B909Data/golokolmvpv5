@@ -71,6 +71,8 @@ const AdminLLS = () => {
     totalPoints: number;
   } | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [dateFrom, setDateFrom] = useState("2026-04-18");
+  const [dateTo, setDateTo] = useState(() => new Date().toISOString().split("T")[0]);
 
   const fetchAnalytics = async () => {
     setAnalyticsLoading(true);
