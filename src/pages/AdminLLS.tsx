@@ -792,6 +792,88 @@ const AdminLLS = () => {
               )}
             </div>
           </div>
+          </>)}
+
+          {activeTab === "analytics" && (
+            <div className="space-y-6">
+              {analyticsLoading ? (
+                <p className="text-muted-foreground text-center py-16">Loading analytics...</p>
+              ) : !analytics ? (
+                <p className="text-muted-foreground text-center py-16">No data yet.</p>
+              ) : (
+                <>
+                  {/* Top stat cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { label: "Total Fans", value: analytics.totalFans },
+                      { label: "Total Saves", value: analytics.totalSaves },
+                      { label: "Points Distributed", value: analytics.totalPoints },
+                      { label: "Songs on Station", value: submissions.filter(s => s.admin_status === "approved").length },
+                    ].map(stat => (
+                      <div key={stat.label} className="border border-border/50 rounded-lg p-4 bg-card/30 text-center">
+                        <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Saves per store */}
+                    <div className="border border-border/50 rounded-lg p-4 bg-card/30">
+                      <h3 className="font-bold text-foreground mb-3">Saves by Store</h3>
+                      {analytics.fansPerStore.length === 0 ? (
+                        <p className="text-muted-foreground text-sm">No data yet.</p>
+                      ) : analytics.fansPerStore.map(s => (
+                        <div key={s.store} className="flex items-center justify-between py-2 border-b border-border/20 last:border-0">
+                          <span className="text-sm text-foreground capitalize">{s.store.replace(/-/g, " ")}</span>
+                          <span className="text-sm font-bold" style={{ color: "#FFD600" }}>{s.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Saves per genre */}
+                    <div className="border border-border/50 rounded-lg p-4 bg-card/30">
+                      <h3 className="font-bold text-foreground mb-3">Saves by Genre</h3>
+                      {analytics.savesPerGenre.length === 0 ? (
+                        <p className="text-muted-foreground text-sm">No data yet.</p>
+                      ) : analytics.savesPerGenre.map(g => (
+                        <div key={g.genre} className="flex items-center justify-between py-2 border-b border-border/20 last:border-0">
+                          <span className="text-sm text-foreground">{g.genre}</span>
+                          <span className="text-sm font-bold" style={{ color: "#FFD600" }}>{g.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Top saved songs */}
+                  <div className="border border-border/50 rounded-lg p-4 bg-card/30">
+                    <h3 className="font-bold text-foreground mb-3">Top Saved Songs</h3>
+                    {analytics.topSongs.length === 0 ? (
+                      <p className="text-muted-foreground text-sm">No saves yet.</p>
+                    ) : (
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border/30">
+                            <th className="text-left py-2 text-muted-foreground font-medium">#</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Artist</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Song</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Saves</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {analytics.topSongs.map((song, i) => (
+                            <tr key={i} className="border-b border-border/20 last:border-0">
+                              <td className="py-2 text-muted-foreground">{i + 1}</td>
+                              <td className="py-2 text-foreground">{song.artist_name}</td>
+                              <td className="py-2 text-foreground">{song.song_title}</td>
+                              <td className="py-2 font-bold" style={{ color: "#FFD600" }}>{song.count}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
