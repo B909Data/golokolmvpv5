@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Music, RefreshCw, ExternalLink, CheckCircle, XCircle, Plus, Copy, X } from "lucide-react";
+import { Music, RefreshCw, ExternalLink, CheckCircle, XCircle, Plus, Copy, X, Trash2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -242,6 +242,25 @@ const AdminLLS = () => {
     }
   };
 
+  const handleDeleteSong = async (id: string) => {
+    if (!window.confirm("Remove this song from the station? This cannot be undone.")) return;
+    setSaving(true);
+    try {
+      const { error } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+      setSubmissions(prev => prev.filter(s => s.id !== id));
+      if (selectedId === id) setSelectedId(null);
+      toast.success("Song removed");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to remove song");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (!key) {
     return (
       <div className="min-h-screen bg-background">
@@ -417,6 +436,7 @@ const AdminLLS = () => {
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">MP3</th>
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">Status</th>
                         <th className="px-4 py-3 text-left text-muted-foreground font-medium">Actions</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-medium">Remove</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -494,8 +514,18 @@ const AdminLLS = () => {
                                   <XCircle className="w-4 h-4" />
                                 </button>
                               )}
-                            </div>
-                          </td>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                          <button
+                            onClick={() => handleDeleteSong(sub.id)}
+                            disabled={saving}
+                            className="p-1 rounded hover:bg-red-500/20 text-red-500/50 hover:text-red-500 transition-colors"
+                            title="Remove song"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
                         </tr>
                       ))}
                     </tbody>
