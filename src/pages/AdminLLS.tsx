@@ -348,26 +348,35 @@ const AdminLLS = () => {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <Music className="w-8 h-8 text-primary" />
-              <h1 className="font-display text-3xl text-foreground">LLS Submissions</h1>
+              <h1 className="font-display text-3xl text-foreground">LLS Admin</h1>
             </div>
             <div className="flex items-center gap-2">
               <Link to={`/admin?key=${key}`}>
-                <Button variant="ghost" size="sm">
-                  ← Back
-                </Button>
+                <Button variant="ghost" size="sm">← Back</Button>
               </Link>
-              <Button variant="outline" size="sm" onClick={fetchSubmissions} disabled={loading}>
-                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                Refresh
-              </Button>
-              <Button
-                size="sm"
-                className="font-bold"
-                style={{ backgroundColor: "#FFD600", color: "#000" }}
-                onClick={() => setShowAddForm(!showAddForm)}
+              <button
+                onClick={() => setActiveTab("submissions")}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${activeTab === "submissions" ? "bg-[#FFD600] text-black" : "bg-card/50 text-foreground border border-border/50"}`}
               >
-                <Plus className="w-4 h-4 mr-1" /> Add Song
-              </Button>
+                Submissions
+              </button>
+              <button
+                onClick={() => { setActiveTab("analytics"); fetchAnalytics(); }}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${activeTab === "analytics" ? "bg-[#FFD600] text-black" : "bg-card/50 text-foreground border border-border/50"}`}
+              >
+                Analytics
+              </button>
+              {activeTab === "submissions" && (
+                <>
+                  <Button variant="outline" size="sm" onClick={fetchSubmissions} disabled={loading}>
+                    <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                    Refresh
+                  </Button>
+                  <Button size="sm" className="font-bold" style={{ backgroundColor: "#FFD600", color: "#000" }} onClick={() => setShowAddForm(!showAddForm)}>
+                    <Plus className="w-4 h-4 mr-1" /> Add Song
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
