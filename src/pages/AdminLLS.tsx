@@ -384,6 +384,7 @@ const AdminLLS = () => {
 
       <section className="px-4 pb-24">
         <div className="max-w-7xl mx-auto">
+          {activeTab === "submissions" && (<>
           {/* Add Song Form */}
           {showAddForm && (
             <div className="border border-border/50 rounded-lg p-6 mb-6 bg-card/30 space-y-4">
