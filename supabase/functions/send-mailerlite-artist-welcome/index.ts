@@ -26,6 +26,7 @@ serve(async (req) => {
         fields: {
           name: artist_name,
           golokol_artist_name: artist_name,
+          golokol_artist_profile: "https://golokol.app/artist/dashboard",
         },
         groups: GROUP_ID ? [GROUP_ID] : [],
         status: "active",
