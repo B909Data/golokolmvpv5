@@ -77,29 +77,36 @@ const AdminLLS = () => {
   const fetchAnalytics = async () => {
     setAnalyticsLoading(true);
     try {
+      const fromISO = new Date(dateFrom + "T00:00:00.000Z").toISOString();
+      const toISO = new Date(dateTo + "T23:59:59.999Z").toISOString();
       const { data: fans } = await (supabase as any)
         .from("fan_profiles")
-        .select("fan_user_id, city");
-
+        .select("fan_user_id, lokol_points")
+        .gte("created_at", fromISO)
+        .lte("created_at", toISO);
       const { data: saves } = await (supabase as any)
         .from("lokol_scene_saves")
-        .select("submission_id, artist_name, store_slug");
+        .select("submission_id, artist_name, store_slug, created_at")
+        .gte("created_at", fromISO)
+        .lte("created_at", toISO);
       const { data: submissions } = await (supabase as any)
         .from("lls_artist_submissions")
         .select("id, artist_name, song_title, genre_style")
         .eq("admin_status", "approved");
-      const { data: points } = await (supabase as any)
+      const { data: allPoints } = await (supabase as any)
         .from("fan_profiles")
         .select("lokol_points");
       const totalFans = fans?.length || 0;
       const totalSaves = saves?.length || 0;
-      const totalPoints = points?.reduce((sum: number, f: any) => sum + (f.lokol_points || 0), 0) || 0;
+      const totalPoints = allPoints?.reduce((sum: number, f: any) => sum + (f.lokol_points || 0), 0) || 0;
       const storeMap: Record<string, number> = {};
       saves?.forEach((s: any) => {
         const store = s.store_slug || "unknown";
         storeMap[store] = (storeMap[store] || 0) + 1;
       });
-      const fansPerStore = Object.entries(storeMap).map(([store, count]) => ({ store, count })).sort((a, b) => b.count - a.count);
+      const fansPerStore = Object.entries(storeMap)
+        .map(([store, count]) => ({ store, count }))
+        .sort((a, b) => b.count - a.count);
       const songMap: Record<string, { artist_name: string; song_title: string; count: number }> = {};
       saves?.forEach((s: any) => {
         if (!s.submission_id) return;
@@ -110,7 +117,9 @@ const AdminLLS = () => {
         }
         songMap[s.submission_id].count++;
       });
-      const topSongs = Object.values(songMap).sort((a, b) => b.count - a.count).slice(0, 10);
+      const topSongs = Object.values(songMap)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
       const genreMap: Record<string, number> = {};
       saves?.forEach((s: any) => {
         if (!s.submission_id) return;
@@ -118,7 +127,9 @@ const AdminLLS = () => {
         if (!sub?.genre_style) return;
         genreMap[sub.genre_style] = (genreMap[sub.genre_style] || 0) + 1;
       });
-      const savesPerGenre = Object.entries(genreMap).map(([genre, count]) => ({ genre, count })).sort((a, b) => b.count - a.count);
+      const savesPerGenre = Object.entries(genreMap)
+        .map(([genre, count]) => ({ genre, count }))
+        .sort((a, b) => b.count - a.count);
       setAnalytics({ totalFans, fansPerStore, totalSaves, topSongs, savesPerGenre, totalPoints });
     } catch (err) {
       console.error("Analytics error:", err);
