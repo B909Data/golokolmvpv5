@@ -71,33 +71,42 @@ const AdminLLS = () => {
     totalPoints: number;
   } | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [dateFrom, setDateFrom] = useState("2026-04-18");
+  const [dateTo, setDateTo] = useState(() => new Date().toISOString().split("T")[0]);
 
   const fetchAnalytics = async () => {
     setAnalyticsLoading(true);
     try {
+      const fromISO = new Date(dateFrom + "T00:00:00.000Z").toISOString();
+      const toISO = new Date(dateTo + "T23:59:59.999Z").toISOString();
       const { data: fans } = await (supabase as any)
         .from("fan_profiles")
-        .select("fan_user_id, city");
-
+        .select("fan_user_id, lokol_points")
+        .gte("created_at", fromISO)
+        .lte("created_at", toISO);
       const { data: saves } = await (supabase as any)
         .from("lokol_scene_saves")
-        .select("submission_id, artist_name, store_slug");
+        .select("submission_id, artist_name, store_slug, created_at")
+        .gte("created_at", fromISO)
+        .lte("created_at", toISO);
       const { data: submissions } = await (supabase as any)
         .from("lls_artist_submissions")
         .select("id, artist_name, song_title, genre_style")
         .eq("admin_status", "approved");
-      const { data: points } = await (supabase as any)
+      const { data: allPoints } = await (supabase as any)
         .from("fan_profiles")
         .select("lokol_points");
       const totalFans = fans?.length || 0;
       const totalSaves = saves?.length || 0;
-      const totalPoints = points?.reduce((sum: number, f: any) => sum + (f.lokol_points || 0), 0) || 0;
+      const totalPoints = allPoints?.reduce((sum: number, f: any) => sum + (f.lokol_points || 0), 0) || 0;
       const storeMap: Record<string, number> = {};
       saves?.forEach((s: any) => {
         const store = s.store_slug || "unknown";
         storeMap[store] = (storeMap[store] || 0) + 1;
       });
-      const fansPerStore = Object.entries(storeMap).map(([store, count]) => ({ store, count })).sort((a, b) => b.count - a.count);
+      const fansPerStore = Object.entries(storeMap)
+        .map(([store, count]) => ({ store, count }))
+        .sort((a, b) => b.count - a.count);
       const songMap: Record<string, { artist_name: string; song_title: string; count: number }> = {};
       saves?.forEach((s: any) => {
         if (!s.submission_id) return;
@@ -108,7 +117,9 @@ const AdminLLS = () => {
         }
         songMap[s.submission_id].count++;
       });
-      const topSongs = Object.values(songMap).sort((a, b) => b.count - a.count).slice(0, 10);
+      const topSongs = Object.values(songMap)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
       const genreMap: Record<string, number> = {};
       saves?.forEach((s: any) => {
         if (!s.submission_id) return;
@@ -116,7 +127,9 @@ const AdminLLS = () => {
         if (!sub?.genre_style) return;
         genreMap[sub.genre_style] = (genreMap[sub.genre_style] || 0) + 1;
       });
-      const savesPerGenre = Object.entries(genreMap).map(([genre, count]) => ({ genre, count })).sort((a, b) => b.count - a.count);
+      const savesPerGenre = Object.entries(genreMap)
+        .map(([genre, count]) => ({ genre, count }))
+        .sort((a, b) => b.count - a.count);
       setAnalytics({ totalFans, fansPerStore, totalSaves, topSongs, savesPerGenre, totalPoints });
     } catch (err) {
       console.error("Analytics error:", err);
@@ -796,16 +809,60 @@ const AdminLLS = () => {
 
           {activeTab === "analytics" && (
             <div className="space-y-6">
+              {/* Date range filter */}
+              <div className="border border-border/50 rounded-lg p-4 bg-card/30 flex flex-wrap items-end gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">From</label>
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={e => setDateFrom(e.target.value)}
+                    className="text-sm px-3 py-2 rounded bg-card/50 border border-border/50 text-foreground"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">To</label>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={e => setDateTo(e.target.value)}
+                    className="text-sm px-3 py-2 rounded bg-card/50 border border-border/50 text-foreground"
+                  />
+                </div>
+                <button
+                  onClick={fetchAnalytics}
+                  className="px-4 py-2 rounded-lg text-sm font-bold"
+                  style={{ backgroundColor: "#FFD600", color: "#000" }}
+                >
+                  Run
+                </button>
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    { label: "Today", from: new Date().toISOString().split("T")[0], to: new Date().toISOString().split("T")[0] },
+                    { label: "This Week", from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], to: new Date().toISOString().split("T")[0] },
+                    { label: "Launch Day", from: "2026-04-18", to: "2026-04-18" },
+                    { label: "All Time", from: "2026-04-18", to: new Date().toISOString().split("T")[0] },
+                  ].map(preset => (
+                    <button
+                      key={preset.label}
+                      onClick={() => { setDateFrom(preset.from); setDateTo(preset.to); }}
+                      className="px-3 py-1.5 rounded text-xs border border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {analyticsLoading ? (
-                <p className="text-muted-foreground text-center py-16">Loading analytics...</p>
+                <p className="text-muted-foreground text-center py-16">Loading...</p>
               ) : !analytics ? (
-                <p className="text-muted-foreground text-center py-16">No data yet.</p>
+                <p className="text-muted-foreground text-center py-8">Set a date range and tap Run.</p>
               ) : (
                 <>
                   {/* Top stat cards */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
-                      { label: "Total Fans", value: analytics.totalFans },
+                      { label: "New Fans", value: analytics.totalFans },
                       { label: "Total Saves", value: analytics.totalSaves },
                       { label: "Points Distributed", value: analytics.totalPoints },
                       { label: "Songs on Station", value: submissions.filter(s => s.admin_status === "approved").length },
