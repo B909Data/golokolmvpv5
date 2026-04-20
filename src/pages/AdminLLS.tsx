@@ -61,6 +61,69 @@ const AdminLLS = () => {
   const [addSubmitting, setAddSubmitting] = useState(false);
   const [claimLink, setClaimLink] = useState<string | null>(null);
   const [editingYoutube, setEditingYoutube] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"submissions" | "analytics">("submissions");
+  const [analytics, setAnalytics] = useState<{
+    totalFans: number;
+    fansPerStore: { store: string; count: number }[];
+    totalSaves: number;
+    topSongs: { artist_name: string; song_title: string; count: number }[];
+    savesPerGenre: { genre: string; count: number }[];
+    totalPoints: number;
+  } | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
+  const fetchAnalytics = async () => {
+    setAnalyticsLoading(true);
+    try {
+      const { data: fans } = await (supabase as any)
+        .from("fan_profiles")
+        .select("fan_user_id, city");
+
+      const { data: saves } = await (supabase as any)
+        .from("lokol_scene_saves")
+        .select("submission_id, artist_name, store_slug");
+      const { data: submissions } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .select("id, artist_name, song_title, genre_style")
+        .eq("admin_status", "approved");
+      const { data: points } = await (supabase as any)
+        .from("fan_profiles")
+        .select("lokol_points");
+      const totalFans = fans?.length || 0;
+      const totalSaves = saves?.length || 0;
+      const totalPoints = points?.reduce((sum: number, f: any) => sum + (f.lokol_points || 0), 0) || 0;
+      const storeMap: Record<string, number> = {};
+      saves?.forEach((s: any) => {
+        const store = s.store_slug || "unknown";
+        storeMap[store] = (storeMap[store] || 0) + 1;
+      });
+      const fansPerStore = Object.entries(storeMap).map(([store, count]) => ({ store, count })).sort((a, b) => b.count - a.count);
+      const songMap: Record<string, { artist_name: string; song_title: string; count: number }> = {};
+      saves?.forEach((s: any) => {
+        if (!s.submission_id) return;
+        const sub = submissions?.find((sub: any) => sub.id === s.submission_id);
+        if (!sub) return;
+        if (!songMap[s.submission_id]) {
+          songMap[s.submission_id] = { artist_name: sub.artist_name, song_title: sub.song_title, count: 0 };
+        }
+        songMap[s.submission_id].count++;
+      });
+      const topSongs = Object.values(songMap).sort((a, b) => b.count - a.count).slice(0, 10);
+      const genreMap: Record<string, number> = {};
+      saves?.forEach((s: any) => {
+        if (!s.submission_id) return;
+        const sub = submissions?.find((sub: any) => sub.id === s.submission_id);
+        if (!sub?.genre_style) return;
+        genreMap[sub.genre_style] = (genreMap[sub.genre_style] || 0) + 1;
+      });
+      const savesPerGenre = Object.entries(genreMap).map(([genre, count]) => ({ genre, count })).sort((a, b) => b.count - a.count);
+      setAnalytics({ totalFans, fansPerStore, totalSaves, topSongs, savesPerGenre, totalPoints });
+    } catch (err) {
+      console.error("Analytics error:", err);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
 
   const fetchSubmissions = async () => {
     if (!key) return;
