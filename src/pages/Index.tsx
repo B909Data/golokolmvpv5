@@ -9,6 +9,7 @@ import connectCard from "@/assets/connect-card.jpg";
 import img3Card from "@/assets/img3.svg";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import { supabase } from "@/integrations/supabase/client";
+import LLSOnboarding from "@/components/LLSOnboarding";
 
 
 const HowItWorksCard = ({
