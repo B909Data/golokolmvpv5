@@ -41,10 +41,10 @@ const SLIDES = [
     heading: (
       <>
         1<br />
-        Discover and Support
+        Discover Local Music
       </>
     ),
-    body: "emerging local artists and shows",
+    body: "Browse Atlanta artists. Decide who moves you. It matters.",
   },
   {
     icon: fanmenuShows,
@@ -52,10 +52,10 @@ const SLIDES = [
     heading: (
       <>
         2<br />
-        Your City. Your Scene.
+        Build Your Scene
       </>
     ),
-    body: "Create an ATL scene that matters to you.",
+    body: "Save artists you love. Your Lokol Scene is your personal Atlanta music dashboard.",
   },
   {
     icon: fanmenuMarket,
@@ -63,12 +63,10 @@ const SLIDES = [
     heading: (
       <>
         3<br />
-        Earn and Redeem
-        <br />
-        Points City-wide
+        Show Up. Earn. Redeem.
       </>
     ),
-    body: "Unlock the value of music IRL.",
+    body: "Engage. Go to shows. Earn points and redeem value in your city.",
   },
 ];
 
