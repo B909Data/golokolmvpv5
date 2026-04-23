@@ -215,7 +215,7 @@ const LokolListensGenre = () => {
 
           if (dailyPointsRef.current >= DAILY_CAP && !capToastShownRef.current) {
             capToastShownRef.current = true;
-            setCapToast("You've maxed out today's points. Keep listening — the music is still free. 🎧");
+            setCapToast("You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧");
             setTimeout(() => setCapToast(""), 5000);
           }
 
@@ -270,7 +270,7 @@ const LokolListensGenre = () => {
     if (dailyPointsRef.current >= DAILY_CAP) {
       if (!capToastShownRef.current) {
         capToastShownRef.current = true;
-        setCapToast("You've hit today's 40pt limit. Keep listening — the music is still free. 🎧");
+        setCapToast("You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧");
         setTimeout(() => setCapToast(""), 5000);
       }
       return 0;
@@ -287,7 +287,7 @@ const LokolListensGenre = () => {
 
     if (dailyPointsRef.current >= DAILY_CAP && !capToastShownRef.current) {
       capToastShownRef.current = true;
-      setCapToast("You've hit today's 40pt limit. Keep listening — the music is still free. 🎧");
+      setCapToast("You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧");
       setTimeout(() => setCapToast(""), 5000);
     }
 
