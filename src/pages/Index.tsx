@@ -164,45 +164,17 @@ const Index = () => {
           <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
             Discover and build your Lokol Scene.
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4">
-            <Link
-              to="/lls-us/retail"
-              className="inline-flex items-center justify-center bg-white text-black font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              I am a record store
-            </Link>
-            <Link
-              to="/lls-us/artists"
-              className="inline-flex items-center justify-center bg-black text-[#FFD600] font-semibold text-base rounded-2xl h-14 px-8 min-w-[200px] border-2 border-[#FFD600] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              I am an artist
-            </Link>
+          <div className="mt-8 flex gap-4 items-center">
             <button
               type="button"
               onClick={() => setShowFanSignIn(true)}
-              className="inline-flex items-center justify-center bg-transparent text-white font-bold text-base rounded-2xl h-14 px-8 min-w-[200px] border-2 border-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+              className="inline-flex items-center justify-center bg-[#FFD600] text-black font-bold text-base rounded-2xl h-12 px-8 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
             >
-              My Lokol Scene
+              Sign In
             </button>
           </div>
         </div>
       </section>
-
-      {/* WHY LOCAL */}
-      <section className="bg-black px-6 md:px-12 lg:px-20 py-16 md:py-24">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-display font-bold text-3xl md:text-[40px] text-[#FFD600] mb-6 leading-tight">
-            Music isn't dead, it's local.
-          </h2>
-          <p className="text-[20px] text-white leading-relaxed mb-6">
-            Local music ecosystems have been disconnected by algorithms and ungrounded viral moments. Artists struggle alone. Music lovers are overwhelmed with choice. Local venues and music retail compete with monopolies that prioritize the intangible.
-          </p>
-          <p className="text-[20px] text-white leading-relaxed">
-            We help reconnect the collective strength of local artists, fans, venues, and retail with the city they all call home.
-          </p>
-        </div>
-      </section>
-
       {/* LOKOL ATLANTA MUSIC */}
       <section className="bg-black px-6 md:px-12 lg:px-20 py-16 md:py-24">
         <div className="max-w-5xl mx-auto">
