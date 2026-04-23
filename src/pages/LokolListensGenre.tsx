@@ -34,7 +34,7 @@ const SLUG_TO_GENRE: Record<string, string> = {
   techno: "Techno",
 };
 
-const DAILY_CAP = 40;
+const DAILY_CAP = 30;
 
 // Write genre to store session token
 const trackGenreInSession = (genreLabel: string) => {
@@ -146,7 +146,6 @@ const LokolListensGenre = () => {
   });
 
   const [splashIds, setSplashIds] = useState<Set<string>>(new Set());
-  const [pointsAwardedIds, setPointsAwardedIds] = useState<Set<string>>(new Set());
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayTrack, setOverlayTrack] = useState<Track | null>(null);
   const [isFan, setIsFan] = useState(false);
@@ -216,7 +215,7 @@ const LokolListensGenre = () => {
 
           if (dailyPointsRef.current >= DAILY_CAP && !capToastShownRef.current) {
             capToastShownRef.current = true;
-            setCapToast("You've maxed out today's points. Keep listening — the music is still free. 🎧");
+            setCapToast("You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧");
             setTimeout(() => setCapToast(""), 5000);
           }
 
@@ -271,7 +270,7 @@ const LokolListensGenre = () => {
     if (dailyPointsRef.current >= DAILY_CAP) {
       if (!capToastShownRef.current) {
         capToastShownRef.current = true;
-        setCapToast("You've hit today's 40pt limit. Keep listening — the music is still free. 🎧");
+        setCapToast("You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧");
         setTimeout(() => setCapToast(""), 5000);
       }
       return 0;
@@ -288,7 +287,7 @@ const LokolListensGenre = () => {
 
     if (dailyPointsRef.current >= DAILY_CAP && !capToastShownRef.current) {
       capToastShownRef.current = true;
-      setCapToast("You've hit today's 40pt limit. Keep listening — the music is still free. 🎧");
+      setCapToast("You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧");
       setTimeout(() => setCapToast(""), 5000);
     }
 
@@ -347,7 +346,7 @@ const LokolListensGenre = () => {
     }
   };
 
-  const handleTimeUpdate = async () => {
+  const handleTimeUpdate = () => {
     const audio = audioRef.current;
     if (!audio || !playingId) return;
     setCurrentTime(audio.currentTime);
@@ -355,16 +354,6 @@ const LokolListensGenre = () => {
     // Remove from under-50 once they hit 50%
     if (audio.duration > 0 && audio.currentTime / audio.duration >= 0.5) {
       trackUnder50InSession(playingId, false);
-    }
-
-    if (
-      hasValidTokenRef.current &&
-      audio.duration > 0 &&
-      audio.currentTime / audio.duration >= 0.5 &&
-      !pointsAwardedIds.has(playingId)
-    ) {
-      setPointsAwardedIds((prev) => new Set(prev).add(playingId));
-      await awardPoints(5);
     }
   };
 
