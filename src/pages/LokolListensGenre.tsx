@@ -146,7 +146,6 @@ const LokolListensGenre = () => {
   });
 
   const [splashIds, setSplashIds] = useState<Set<string>>(new Set());
-  const [pointsAwardedIds, setPointsAwardedIds] = useState<Set<string>>(new Set());
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayTrack, setOverlayTrack] = useState<Track | null>(null);
   const [isFan, setIsFan] = useState(false);
