@@ -346,7 +346,7 @@ const LokolListensGenre = () => {
     }
   };
 
-  const handleTimeUpdate = async () => {
+  const handleTimeUpdate = () => {
     const audio = audioRef.current;
     if (!audio || !playingId) return;
     setCurrentTime(audio.currentTime);
@@ -354,16 +354,6 @@ const LokolListensGenre = () => {
     // Remove from under-50 once they hit 50%
     if (audio.duration > 0 && audio.currentTime / audio.duration >= 0.5) {
       trackUnder50InSession(playingId, false);
-    }
-
-    if (
-      hasValidTokenRef.current &&
-      audio.duration > 0 &&
-      audio.currentTime / audio.duration >= 0.5 &&
-      !pointsAwardedIds.has(playingId)
-    ) {
-      setPointsAwardedIds((prev) => new Set(prev).add(playingId));
-      await awardPoints(5);
     }
   };
 
