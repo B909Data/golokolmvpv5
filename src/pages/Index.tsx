@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -49,6 +49,51 @@ const Index = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [fanSignInLoading, setFanSignInLoading] = useState(false);
   const [fanSignInError, setFanSignInError] = useState<string | null>(null);
+
+  const [genres, setGenres] = useState<{ label: string; slug: string; image: string }[]>([]);
+  const [genresLoading, setGenresLoading] = useState(true);
+
+  const SLUG_MAP: Record<string, string> = {
+    "Hip-Hop": "hiphop",
+    "Hip Hop": "hiphop",
+    "R&B": "rnb",
+    "RnB": "rnb",
+    "Alternative": "alternative",
+    "Hardcore + Punk": "hardcore",
+  };
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      const { data } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .select("genre_style, song_image_url")
+        .eq("admin_status", "approved")
+        .not("song_image_url", "is", null);
+
+      if (!data || data.length === 0) { setGenresLoading(false); return; }
+
+      const usedImages = new Set<string>();
+      const genreMap = new Map<string, string>();
+
+      for (const row of data) {
+        const genre = (row.genre_style as string).split(",")[0].trim();
+        if (!genre || genreMap.has(genre)) continue;
+        const img = row.song_image_url as string;
+        if (usedImages.has(img)) continue;
+        usedImages.add(img);
+        genreMap.set(genre, img);
+      }
+
+      const cards: { label: string; slug: string; image: string }[] = [];
+      for (const [label, img] of genreMap) {
+        const slug = SLUG_MAP[label] || label.toLowerCase().replace(/[^a-z0-9]/g, "");
+        cards.push({ label, slug, image: img });
+      }
+      setGenres(cards);
+      setGenresLoading(false);
+    };
+    fetchGenres();
+  }, []);
 
   const closeFanSignIn = () => {
     setShowFanSignIn(false);
