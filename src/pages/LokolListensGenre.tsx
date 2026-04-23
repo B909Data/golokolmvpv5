@@ -34,7 +34,7 @@ const SLUG_TO_GENRE: Record<string, string> = {
   techno: "Techno",
 };
 
-const DAILY_CAP = 40;
+const DAILY_CAP = 30;
 
 // Write genre to store session token
 const trackGenreInSession = (genreLabel: string) => {
