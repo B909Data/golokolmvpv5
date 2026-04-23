@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -49,6 +49,51 @@ const Index = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [fanSignInLoading, setFanSignInLoading] = useState(false);
   const [fanSignInError, setFanSignInError] = useState<string | null>(null);
+
+  const [genres, setGenres] = useState<{ label: string; slug: string; image: string }[]>([]);
+  const [genresLoading, setGenresLoading] = useState(true);
+
+  const SLUG_MAP: Record<string, string> = {
+    "Hip-Hop": "hiphop",
+    "Hip Hop": "hiphop",
+    "R&B": "rnb",
+    "RnB": "rnb",
+    "Alternative": "alternative",
+    "Hardcore + Punk": "hardcore",
+  };
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      const { data } = await (supabase as any)
+        .from("lls_artist_submissions")
+        .select("genre_style, song_image_url")
+        .eq("admin_status", "approved")
+        .not("song_image_url", "is", null);
+
+      if (!data || data.length === 0) { setGenresLoading(false); return; }
+
+      const usedImages = new Set<string>();
+      const genreMap = new Map<string, string>();
+
+      for (const row of data) {
+        const genre = (row.genre_style as string).split(",")[0].trim();
+        if (!genre || genreMap.has(genre)) continue;
+        const img = row.song_image_url as string;
+        if (usedImages.has(img)) continue;
+        usedImages.add(img);
+        genreMap.set(genre, img);
+      }
+
+      const cards: { label: string; slug: string; image: string }[] = [];
+      for (const [label, img] of genreMap) {
+        const slug = SLUG_MAP[label] || label.toLowerCase().replace(/[^a-z0-9]/g, "");
+        cards.push({ label, slug, image: img });
+      }
+      setGenres(cards);
+      setGenresLoading(false);
+    };
+    fetchGenres();
+  }, []);
 
   const closeFanSignIn = () => {
     setShowFanSignIn(false);
@@ -154,6 +199,58 @@ const Index = () => {
           </p>
           <p className="text-[20px] text-white leading-relaxed">
             We help reconnect the collective strength of local artists, fans, venues, and retail with the city they all call home.
+          </p>
+        </div>
+      </section>
+
+      {/* LOKOL ATLANTA MUSIC */}
+      <section className="bg-black px-6 md:px-12 lg:px-20 py-16 md:py-24">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2
+              className="text-white mb-3"
+              style={{ fontFamily: "'Anton', sans-serif", fontSize: 40, lineHeight: 1.0 }}
+            >
+              LOKOL ATLANTA MUSIC
+            </h2>
+            <p className="text-[#CCCCCC] text-base md:text-lg">
+              Pick a genre. Listen. Save artists to your Lokol Scene.
+            </p>
+          </div>
+
+          {genresLoading ? (
+            <div className="flex justify-center py-12">
+              <div className="w-10 h-10 border-2 border-[#FFD600] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : genres.length === 0 ? (
+            <p className="text-center text-[#CCCCCC]">Music loading soon. Check back.</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {genres.map((genre) => (
+                <div
+                  key={genre.slug}
+                  onClick={() => navigate(`/lls/crates-atl/genre/${genre.slug}`)}
+                  className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-[1.03]"
+                >
+                  <img
+                    src={genre.image}
+                    alt={genre.label}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div
+                    className="absolute bottom-3 left-3 right-3 text-white"
+                    style={{ fontFamily: "'Anton', sans-serif", fontSize: 22, lineHeight: 1.0 }}
+                  >
+                    {genre.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <p className="text-center text-[#888] text-sm mt-10">
+            Atlanta, GA — More cities coming soon.
           </p>
         </div>
       </section>
