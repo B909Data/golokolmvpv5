@@ -9,7 +9,7 @@ interface LLSOnboardingProps {
   children: ReactNode;
 }
 
-const STORAGE_KEY_PREFIX = "golokol_onboarded_";
+const STORAGE_KEY_PREFIX = "golokol_onboarded_v2_";
 
 const KEYFRAMES = `
   @keyframes soundWave { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
@@ -41,10 +41,10 @@ const SLIDES = [
     heading: (
       <>
         1<br />
-        Discover and Support
+        Discover Local Music
       </>
     ),
-    body: "emerging local artists and shows",
+    body: "Browse Atlanta artists. Decide who moves you. It matters.",
   },
   {
     icon: fanmenuShows,
@@ -52,10 +52,10 @@ const SLIDES = [
     heading: (
       <>
         2<br />
-        Your City. Your Scene.
+        Build Your Scene
       </>
     ),
-    body: "Create an ATL scene that matters to you.",
+    body: "Save artists you love. Your Lokol Scene is your personal Atlanta music dashboard.",
   },
   {
     icon: fanmenuMarket,
@@ -63,12 +63,10 @@ const SLIDES = [
     heading: (
       <>
         3<br />
-        Earn and Redeem
-        <br />
-        Points City-wide
+        Show Up. Earn. Redeem.
       </>
     ),
-    body: "Unlock the value of music IRL.",
+    body: "Engage. Go to shows. Earn points and redeem value in your city.",
   },
 ];
 
@@ -101,11 +99,9 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
               lineHeight: 1.1,
             }}
           >
-            Good music lives
-            <br />
-            in Atlanta
+            Good Music Lives Here
           </h1>
-          <p className="text-white text-[18px] leading-relaxed">Start Exploring in 3 steps.</p>
+          <p className="text-white text-[18px] leading-relaxed">Atlanta's local music scene. Discover it in 3 steps.</p>
           <button
             onClick={() => setPhase("swipe")}
             className="mt-4 font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"

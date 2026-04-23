@@ -9,6 +9,7 @@ import connectCard from "@/assets/connect-card.jpg";
 import img3Card from "@/assets/img3.svg";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import { supabase } from "@/integrations/supabase/client";
+import LLSOnboarding from "@/components/LLSOnboarding";
 
 
 const HowItWorksCard = ({
@@ -144,6 +145,7 @@ const Index = () => {
   };
 
   return (
+    <LLSOnboarding storeSlug="homepage">
     <div className="min-h-screen flex flex-col bg-black">
       <Navbar />
 
@@ -376,6 +378,7 @@ const Index = () => {
         </div>
       )}
     </div>
+    </LLSOnboarding>
   );
 };
 
