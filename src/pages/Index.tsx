@@ -112,8 +112,9 @@ const Index = () => {
         <div className="absolute inset-0 bg-black/45" />
         <div className="relative z-10 px-6 md:px-12 lg:px-20 pt-32 pb-16 max-w-3xl">
           <h1 className="font-display font-bold text-[32px] md:text-[48px] leading-[1.1] mb-4">
-            <span className="text-white">The Future of music </span>
-            <span className="text-[#FFD600]">is local</span>
+            <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 56, lineHeight: 1.0, color: "#FFD600" }}>
+              Good Music Lives<br />in Atlanta
+            </span>
           </h1>
           <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
             Discover and build your Lokol Scene.
@@ -280,11 +281,11 @@ const Index = () => {
               </button>
               <div className="w-full h-px bg-[#333] my-1" />
               <Link
-                to="/lokol-stations"
+                to="/lls/crates-atl"
                 onClick={closeFanSignIn}
                 className="text-[#FFD600] text-sm text-center hover:underline"
               >
-                New to GoLokol? Find a Lokol Listening Station near you.
+                New to GoLokol? Explore Atlanta music and build your scene.
               </Link>
             </div>
           </div>
