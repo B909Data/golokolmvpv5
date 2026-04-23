@@ -91,8 +91,37 @@ const LLSStorePage = () => {
               genres_explored: [] as string[],
               listened_under_50: [] as string[],
               points_earned: 0,
+              scan_bonus_awarded: false,
             };
             localStorage.setItem("golokol_store_session", JSON.stringify(token));
+            // Award 15pt scan bonus to signed-in fans
+            try {
+              const { data: sessionData } = await supabase.auth.getSession();
+              const userId = sessionData?.session?.user?.id;
+              if (userId) {
+                const { data: fanProfile } = await (supabase as any)
+                  .from("fan_profiles")
+                  .select("lokol_points, daily_scan_bonus_date")
+                  .eq("fan_user_id", userId)
+                  .maybeSingle();
+                if (fanProfile) {
+                  const todayAtlanta = new Date().toLocaleDateString("en-US", { timeZone: "America/New_York" });
+                  const alreadyBonusedToday = fanProfile.daily_scan_bonus_date === todayAtlanta;
+                  if (!alreadyBonusedToday) {
+                    await (supabase as any)
+                      .from("fan_profiles")
+                      .update({
+                        lokol_points: (fanProfile.lokol_points || 0) + 15,
+                        daily_scan_bonus_date: todayAtlanta,
+                      })
+                      .eq("fan_user_id", userId);
+                    // Update token to reflect bonus awarded
+                    const updatedToken = { ...token, scan_bonus_awarded: true };
+                    localStorage.setItem("golokol_store_session", JSON.stringify(updatedToken));
+                  }
+                }
+              }
+            } catch {}
           }
         } catch {}
       }
