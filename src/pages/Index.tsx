@@ -203,6 +203,58 @@ const Index = () => {
         </div>
       </section>
 
+      {/* LOKOL ATLANTA MUSIC */}
+      <section className="bg-black px-6 md:px-12 lg:px-20 py-16 md:py-24">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2
+              className="text-white mb-3"
+              style={{ fontFamily: "'Anton', sans-serif", fontSize: 40, lineHeight: 1.0 }}
+            >
+              LOKOL ATLANTA MUSIC
+            </h2>
+            <p className="text-[#CCCCCC] text-base md:text-lg">
+              Pick a genre. Listen. Save artists to your Lokol Scene.
+            </p>
+          </div>
+
+          {genresLoading ? (
+            <div className="flex justify-center py-12">
+              <div className="w-10 h-10 border-2 border-[#FFD600] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : genres.length === 0 ? (
+            <p className="text-center text-[#CCCCCC]">Music loading soon. Check back.</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {genres.map((genre) => (
+                <div
+                  key={genre.slug}
+                  onClick={() => navigate(`/lls/crates-atl/genre/${genre.slug}`)}
+                  className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-[1.03]"
+                >
+                  <img
+                    src={genre.image}
+                    alt={genre.label}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div
+                    className="absolute bottom-3 left-3 right-3 text-white"
+                    style={{ fontFamily: "'Anton', sans-serif", fontSize: 22, lineHeight: 1.0 }}
+                  >
+                    {genre.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <p className="text-center text-[#888] text-sm mt-10">
+            Atlanta, GA — More cities coming soon.
+          </p>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
       <section className="bg-[#0E0E0E] px-6 md:px-12 lg:px-20 py-16 md:py-24">
         <h2 className="text-center font-display font-bold text-3xl md:text-[40px] text-white mb-12">
