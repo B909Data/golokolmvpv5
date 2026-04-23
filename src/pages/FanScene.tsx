@@ -254,7 +254,7 @@ const FanScene = () => {
   }, [tokenExpired, storeSession, userId, saves]);
 
   const points = profile?.lokol_points || 0;
-  const progressPct = Math.min((points / 100) * 100, 100);
+  const progressPct = Math.min((points / 300) * 100, 100);
 
   if (loading) {
     return (
@@ -807,7 +807,8 @@ function MarketTab({ points, progressPct }: { points: number; progressPct: numbe
           </div>
         </div>
         <p className="text-white text-[13px] mt-1">
-          Collect points. Redeem locally. <span style={{ color: "#FFD600" }}>(Coming soon)</span>
+          Collect points. Redeem locally.{" "}
+          <span style={{ color: "#FFD600" }}>(Coming soon)</span>
         </p>
       </div>
 
@@ -818,6 +819,12 @@ function MarketTab({ points, progressPct }: { points: number; progressPct: numbe
         <p className="text-white text-[13px] mt-2 mb-5" style={{ opacity: 0.7 }}>
           Meanwhile, Discover, Engage and Collect Points. New music added daily.
         </p>
+        <div className="bg-[#1a1a1a] border border-[#FFD600]/30 rounded-xl p-4 mb-3">
+          <p className="text-white text-sm">
+            <span style={{ color: "#FFD600" }} className="font-bold">Earn more points</span> — visit a Lokol Listening Station. Scan in-store for a{" "}
+            <span style={{ color: "#FFD600" }} className="font-bold">15pt bonus</span> plus up to 5 saves per day.
+          </p>
+        </div>
         <div className="flex flex-col gap-3">
           {partners.map((p) => (
             <div key={p.name} className="bg-[#1a1a1a] rounded-xl p-4 flex items-center gap-4">
