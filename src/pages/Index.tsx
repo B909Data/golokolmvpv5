@@ -257,6 +257,21 @@ const Index = () => {
         </div>
       </section>
 
+      {/* WHY LOCAL */}
+      <section className="bg-black px-6 md:px-12 lg:px-20 py-16 md:py-24">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display font-bold text-3xl md:text-[40px] text-[#FFD600] mb-6 leading-tight">
+            Music isn't dead, it's local.
+          </h2>
+          <p className="text-[20px] text-white leading-relaxed mb-6">
+            Local music ecosystems have been disconnected by algorithms and ungrounded viral moments. Artists struggle alone. Music lovers are overwhelmed with choice. Local venues and music retail compete with monopolies that prioritize the intangible.
+          </p>
+          <p className="text-[20px] text-white leading-relaxed">
+            We help reconnect the collective strength of local artists, fans, venues, and retail with the city they all call home.
+          </p>
+        </div>
+      </section>
+
       <Footer />
 
       {/* FAN SIGN IN MODAL */}
