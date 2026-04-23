@@ -9,7 +9,7 @@ interface LLSOnboardingProps {
   children: ReactNode;
 }
 
-const STORAGE_KEY_PREFIX = "golokol_onboarded_";
+const STORAGE_KEY_PREFIX = "golokol_onboarded_v2_";
 
 const KEYFRAMES = `
   @keyframes soundWave { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
