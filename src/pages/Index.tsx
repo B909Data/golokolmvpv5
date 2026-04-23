@@ -378,6 +378,7 @@ const Index = () => {
         </div>
       )}
     </div>
+    </LLSOnboarding>
   );
 };
 
