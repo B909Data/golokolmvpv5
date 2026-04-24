@@ -96,6 +96,28 @@ const Index = () => {
     fetchGenres();
   }, []);
 
+  useEffect(() => {
+    try {
+      const existingRaw = localStorage.getItem("golokol_store_session");
+      const existing = existingRaw ? JSON.parse(existingRaw) : null;
+      const isValid = existing && existing.store_slug === "atlanta" && existing.expires_at > Date.now();
+      if (!isValid) {
+        const token = {
+          store_slug: "atlanta",
+          store_name: "Atlanta",
+          city_session: true,
+          created_at: Date.now(),
+          expires_at: Date.now() + (1 * 60 * 60 * 1000),
+          genres_explored: [] as string[],
+          listened_under_50: [] as string[],
+          points_earned: 0,
+          scan_bonus_awarded: false,
+        };
+        localStorage.setItem("golokol_store_session", JSON.stringify(token));
+      }
+    } catch {}
+  }, []);
+
   const closeFanSignIn = () => {
     setShowFanSignIn(false);
     setFanSignInError(null);
