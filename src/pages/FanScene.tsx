@@ -346,6 +346,7 @@ const FanScene = () => {
                 setSaves(prev => prev.filter(save => save.id !== s.id));
               } catch {}
             }}
+            userId={userId}
           />
         )}
         {activeView === "shows" && <ShowsTab shows={shows} saves={saves} />}
@@ -697,8 +698,32 @@ function HomeView({
 }
 
 /* ========== ARTISTS TAB ========== */
-function ArtistsTab({ saves, onArtistTap, onRemoveArtist }: { saves: SavedArtist[]; onArtistTap: (s: SavedArtist) => void; onRemoveArtist: (s: SavedArtist) => void }) {
+function ArtistsTab({ saves, onArtistTap, onRemoveArtist, userId }: { saves: SavedArtist[]; onArtistTap: (s: SavedArtist) => void; onRemoveArtist: (s: SavedArtist) => void; userId: string | null }) {
   const [editMode, setEditMode] = useState(false);
+  const [sharingId, setSharingId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleShare = async (s: SavedArtist) => {
+    if (!userId || !s.submission_id) return;
+    setSharingId(s.id);
+    try {
+      const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+      await (supabase as any).from("referrals").insert({
+        referrer_fan_id: userId,
+        submission_id: s.submission_id,
+        artist_name: s.submission?.artist_name || s.artist_choice,
+        referral_code: code,
+      });
+      const link = `https://golokol.app/lls/atlanta/genre/${
+        (s.submission?.artist_name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+      }?ref=${code}`;
+      await navigator.clipboard.writeText(link);
+      setCopiedId(s.id);
+      setTimeout(() => setCopiedId(null), 3000);
+    } catch {}
+    setSharingId(null);
+  };
+
   return (
     <div>
       <div className="pl-5 pt-5 pb-4">
@@ -759,7 +784,23 @@ function ArtistsTab({ saves, onArtistTap, onRemoveArtist }: { saves: SavedArtist
                 <p className="text-white text-xs" style={{ opacity: 0.7 }}>
                   {sub?.song_title || ""}
                 </p>
-                <img src={fanmenuArtists} alt="saved" className="w-5 h-5 mt-1" style={{ filter: "none" }} />
+                <div className="flex items-center justify-between mt-1">
+                  <img src={fanmenuArtists} alt="saved" className="w-5 h-5" style={{ filter: "none" }} />
+                  {!editMode && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleShare(s); }}
+                      className="text-[10px] font-bold px-2 py-1 rounded-full"
+                      style={{
+                        backgroundColor: copiedId === s.id ? "#FFD600" : "transparent",
+                        color: copiedId === s.id ? "#000" : "rgba(255,255,255,0.4)",
+                        border: copiedId === s.id ? "none" : "1px solid rgba(255,255,255,0.2)",
+                      }}
+                      disabled={sharingId === s.id}
+                    >
+                      {copiedId === s.id ? "Link Copied!" : sharingId === s.id ? "..." : "Share"}
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}

@@ -698,6 +698,42 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          artist_name: string | null
+          created_at: string | null
+          id: string
+          points_awarded: boolean | null
+          referral_code: string
+          referred_fan_id: string | null
+          referrer_fan_id: string
+          signed_up_at: string | null
+          submission_id: string
+        }
+        Insert: {
+          artist_name?: string | null
+          created_at?: string | null
+          id?: string
+          points_awarded?: boolean | null
+          referral_code: string
+          referred_fan_id?: string | null
+          referrer_fan_id: string
+          signed_up_at?: string | null
+          submission_id: string
+        }
+        Update: {
+          artist_name?: string | null
+          created_at?: string | null
+          id?: string
+          points_awarded?: boolean | null
+          referral_code?: string
+          referred_fan_id?: string | null
+          referrer_fan_id?: string
+          signed_up_at?: string | null
+          submission_id?: string
+        }
+        Relationships: []
+      }
       show_listings: {
         Row: {
           artist_user_id: string
