@@ -393,13 +393,17 @@ const Index = () => {
                 {fanSignInLoading ? "Signing in..." : "Sign In"}
               </button>
               <div className="w-full h-px bg-[#333] my-1" />
-              <Link
-                to="/lls/crates-atl"
-                onClick={closeFanSignIn}
+              <button
+                onClick={() => {
+                  closeFanSignIn();
+                  setTimeout(() => {
+                    document.getElementById("lokol-music-section")?.scrollIntoView({ behavior: "smooth" });
+                  }, 100);
+                }}
                 className="text-[#FFD600] text-sm text-center hover:underline"
               >
-                New to GoLokol? Explore Atlanta music and build your scene.
-              </Link>
+                New to GoLokol? Explore the music first.
+              </button>
             </div>
           </div>
         </div>
