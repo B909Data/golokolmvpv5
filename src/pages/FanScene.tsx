@@ -119,6 +119,7 @@ const FanScene = () => {
 
   // YouTube modal state
   const [youtubeModal, setYoutubeModal] = useState<{ artist: SavedArtist } | null>(null);
+  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("golokol_last_genre_url");
