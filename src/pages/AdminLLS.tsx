@@ -39,7 +39,11 @@ interface Submission {
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
-const REJECTION_REASONS = ["Violates our community standards", "Poor mix/master quality"];
+const REJECTION_REASONS = [
+  "Violates our community standards",
+  "Poor mix/master quality",
+  "ONLY_ONE_SONG",
+];
 
 const AdminLLS = () => {
   const [searchParams] = useSearchParams();
