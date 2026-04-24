@@ -71,6 +71,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import ClaimAccount from "./pages/ClaimAccount";
 import LokolStations from "./pages/LokolStations";
 import Discover from "@/pages/Discover";
+import ReferralLanding from "@/pages/ReferralLanding";
 
 const queryClient = new QueryClient();
 
