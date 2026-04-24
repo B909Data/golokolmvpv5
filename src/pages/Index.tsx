@@ -10,6 +10,11 @@ import img3Card from "@/assets/img3.svg";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import { supabase } from "@/integrations/supabase/client";
 import LLSOnboarding from "@/components/LLSOnboarding";
+import genreHiphop from "@/assets/Genre-hiphop.png";
+import genreRnb from "@/assets/Genre-rnb.png";
+import genreAlternative from "@/assets/Genre-alternative.png";
+import genreHardcore from "@/assets/Genre-hardcore.png";
+import genreIndie from "@/assets/Genre-indie.png";
 
 
 const HowItWorksCard = ({
