@@ -35,25 +35,31 @@ const LLSUs = () => {
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Discover Atlanta's local music scene from anywhere. No algorithm. No gatekeeping.
+              Discover Atlanta's local music. Step outside of the algorithm.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Save artists you love. Build your Lokol Scene — a personal dashboard of Atlanta music, shows, and moments.
+              Save artists you love. Build your own Lokol Scene. Earn points along the way.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Artists get direct placement in front of fans who buy records, go to shows, and bring their friends.
+              GoLokol music fans buy records, go to shows, and bring their friends.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Visit partner stores to earn bonus points. Redeem that value locally. The more you engage, the more your city gives back.
+              Earn bonus points — visit participating retail and gathering spots to discover new music IRL.
+            </span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
+            <span className="type-subcaption text-[#F0EDE8]">
+              Redeem that value locally.
             </span>
           </li>
         </ul>
