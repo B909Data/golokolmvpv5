@@ -734,6 +734,33 @@ export type Database = {
         }
         Relationships: []
       }
+      show_checkins: {
+        Row: {
+          artist_user_id: string
+          checked_in_at: string | null
+          checkin_date: string
+          fan_user_id: string
+          id: string
+          points_awarded: number | null
+        }
+        Insert: {
+          artist_user_id: string
+          checked_in_at?: string | null
+          checkin_date: string
+          fan_user_id: string
+          id?: string
+          points_awarded?: number | null
+        }
+        Update: {
+          artist_user_id?: string
+          checked_in_at?: string | null
+          checkin_date?: string
+          fan_user_id?: string
+          id?: string
+          points_awarded?: number | null
+        }
+        Relationships: []
+      }
       show_listings: {
         Row: {
           artist_user_id: string
