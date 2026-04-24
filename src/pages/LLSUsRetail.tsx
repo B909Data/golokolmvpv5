@@ -27,7 +27,7 @@ const [form, setForm] = useState({
     store_name: "",
     city_location: "",
     store_type: "",
-    has_listening_station: "",
+    has_listening_station: "N/A",
     signage_preference: [] as string[],
     contact_name: "",
     contact_email: "",
@@ -64,7 +64,7 @@ const [form, setForm] = useState({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.store_name || !form.city_location || !form.store_type || !form.has_listening_station || !form.contact_name || !form.contact_email) {
+    if (!form.store_name || !form.city_location || !form.store_type || !form.contact_name || !form.contact_email) {
       toast({ title: "Please fill in all required fields.", variant: "destructive" });
       return;
     }
@@ -125,19 +125,19 @@ const [form, setForm] = useState({
       <section className="px-6 md:px-12 lg:px-20 pt-24 md:pt-28 pb-12 md:pb-20">
         <div className="max-w-3xl">
           <h1 className="mb-4">
-            <span className="text-foreground">Is Your Store Where Atlanta </span>
-            <span className="text-primary">Discovers Its Sound?</span>
+            <span className="text-foreground">Your Business Is a Part of </span>
+            <span className="text-primary">Atlanta's Local Music Scene.</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
-            The record stores that win aren't just selling music, they're breaking it.
+            Atlanta fans are already discovering local music. Your store is where they come to earn more, redeem points, and go deeper.
           </p>
           <ol className="space-y-5 max-w-2xl list-none">
             {[
-              "Artists submitted to Lokol Listening Stations are crowdsourced and curated.",
-              "A simple QR code touchpoint turns your store into a local music discovery experience as music lovers browse your aisles.",
-              "Customers accrue points by engaging with music.",
-              "Those points, over time are redeemed at your store for discount on future purchase.",
-              "Engagement is locked to store location. So points = repeat patronage.",
+              "GoLokol fans discover local artists online and at partner stores city-wide.",
+              "Your store is a rewards destination — fans earn bonus points when they visit and redeem that value with you.",
+              "Post-purchase gifting turns every sale into a music discovery moment.",
+              "Redemption drives repeat visits. Points earned anywhere, spent at your store.",
+              "You set your own reward. GoLokol handles the infrastructure.",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-4">
                 <span className="mt-0.5 w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -193,55 +193,6 @@ const [form, setForm] = useState({
                 </Select>
               </div>
 
-              <div>
-                <Label className="text-foreground">Do you currently have a space dedicated to local music? *</Label>
-                <Select value={form.has_listening_station} onValueChange={v => setForm(f => ({ ...f, has_listening_station: v }))}>
-                  <SelectTrigger className="mt-1.5 bg-input border-border text-foreground">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Yes">Yes</SelectItem>
-                    <SelectItem value="No">No</SelectItem>
-                    <SelectItem value="Something Informal">Something Informal</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Signage Preference */}
-              <div className="rounded-lg bg-[#2a2a2a] p-6">
-                <Label className="text-foreground mb-4 block">Choose 1 or both store signage? (free)</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {[
-                    { value: "24x24_foam_board", img: signageSquare, caption: '24x24 foam board (Hang on the wall)' },
-                    { value: "7x9_foam_boards", img: signageTall, caption: 'Three (3) 7x9 foam boards (between racks)' },
-                  ].map((opt) => {
-                    const selected = form.signage_preference.includes(opt.value);
-                    return (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() =>
-                          setForm(f => ({
-                            ...f,
-                            signage_preference: selected
-                              ? f.signage_preference.filter(v => v !== opt.value)
-                              : [...f.signage_preference, opt.value],
-                          }))
-                        }
-                        className={`rounded-lg border-2 p-3 transition-all text-left ${
-                          selected
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border bg-input hover:border-foreground/30'
-                        }`}
-                      >
-                        <img src={opt.img} alt={opt.caption} className="w-full rounded-md mb-3 object-contain max-h-52" loading="lazy" />
-                        <p className="type-body-sm text-[#F0EDE8]">{opt.caption}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Store Logo Upload */}
               <div>
                 <Label className="text-foreground mb-2 block">Upload your high resolution store logo. (jpg, svg or png)</Label>
@@ -287,7 +238,7 @@ const [form, setForm] = useState({
               </div>
 
               <Button type="submit" size="lg" disabled={submitting} className="w-full md:w-auto">
-                {submitting ? "Submitting…" : "Partner Your Store"}
+                {submitting ? "Submitting…" : "Let's Talk"}
               </Button>
             </form>
           )}
