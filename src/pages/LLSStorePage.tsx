@@ -17,6 +17,14 @@ const HERO_MAP: Record<string, string> = {
   "moods-music": moodsHero,
 };
 
+const GENRE_IMAGES: Record<string, string> = {
+  "Hip-Hop": genreHiphop,
+  "R&B": genreRnb,
+  Alternative: genreAlternative,
+  Hardcore: genreHardcore,
+  Indie: genreIndie,
+};
+
 const SLUG_MAP: Record<string, string> = {
   "Hip-Hop": "hiphop",
   "Hip Hop": "hiphop",
@@ -24,6 +32,7 @@ const SLUG_MAP: Record<string, string> = {
   RnB: "rnb",
   Alternative: "alternative",
   "Hardcore + Punk": "hardcore",
+  Hardcore: "hardcore",
   Afrobeats: "afrobeats",
   Beats: "beats",
   Blues: "blues",
@@ -33,7 +42,6 @@ const SLUG_MAP: Record<string, string> = {
   Folk: "folk",
   Funk: "funk",
   Gospel: "gospel",
-  Hardcore: "hardcore",
   House: "house",
   Indie: "indie",
   Jazz: "jazz",
@@ -56,6 +64,40 @@ interface GenreCard {
   image: string;
 }
 
+// Scan bonus sound — bright fanfare, welcoming
+const playScanBonusSound = () => {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const now = ctx.currentTime;
+    // Rising arpeggio — C E G C
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now + i * 0.12);
+      gain.gain.setValueAtTime(0.25, now + i * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.5);
+      osc.start(now + i * 0.12);
+      osc.stop(now + i * 0.12 + 0.5);
+    });
+  } catch {}
+};
+
+const KEYFRAMES = `
+  @keyframes scanBonusIn {
+    0% { opacity: 0; transform: scale(0.7); }
+    20% { opacity: 1; transform: scale(1.05); }
+    80% { opacity: 1; transform: scale(1.0); }
+    100% { opacity: 0; transform: scale(1.0); }
+  }
+  @keyframes scanBonusPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+`;
+
 const LLSStorePage = () => {
   const { storeSlug } = useParams<{ storeSlug: string }>();
   const navigate = useNavigate();
@@ -65,14 +107,9 @@ const LLSStorePage = () => {
   const [genres, setGenres] = useState<GenreCard[]>([]);
   const [genresLoading, setGenresLoading] = useState(true);
   const [isCitySlug, setIsCitySlug] = useState(false);
-
-  const GENRE_IMAGES: Record<string, string> = {
-    "Hip-Hop": genreHiphop,
-    "R&B": genreRnb,
-    "Alternative": genreAlternative,
-    "Hardcore": genreHardcore,
-    "Indie": genreIndie,
-  };
+  // Scan bonus animation state
+  const [showScanBonus, setShowScanBonus] = useState(false);
+  const [scanBonusStoreName, setScanBonusStoreName] = useState("");
 
   useEffect(() => {
     const fetchStore = async () => {
@@ -81,12 +118,13 @@ const LLSStorePage = () => {
         setLoading(false);
         return;
       }
-      // City-level general session slugs — no DB lookup needed
+
       const CITY_SLUGS = ["atlanta"];
-      const isCitySlug = CITY_SLUGS.includes(storeSlug);
-      setIsCitySlug(CITY_SLUGS.includes(storeSlug));
+      const citySlug = CITY_SLUGS.includes(storeSlug);
+      setIsCitySlug(citySlug);
       let resolvedStoreName = "Atlanta";
-      if (!isCitySlug) {
+
+      if (!citySlug) {
         const { data, error } = await supabase
           .from("lls_retail_signups")
           .select("store_name")
@@ -100,27 +138,30 @@ const LLSStorePage = () => {
         }
         resolvedStoreName = data.store_name;
       }
+
       setStoreName(resolvedStoreName);
-      const storeNameForToken = resolvedStoreName;
+
       try {
         const existingRaw = localStorage.getItem("golokol_store_session");
         const existing = existingRaw ? JSON.parse(existingRaw) : null;
         const isValid = existing && existing.store_slug === storeSlug && existing.expires_at > Date.now();
+
         if (!isValid) {
           const token = {
             store_slug: storeSlug,
-            store_name: storeNameForToken,
-            city_session: isCitySlug,
+            store_name: resolvedStoreName,
+            city_session: citySlug,
             created_at: Date.now(),
-            expires_at: Date.now() + (1 * 60 * 60 * 1000),
+            expires_at: Date.now() + 1 * 60 * 60 * 1000,
             genres_explored: [] as string[],
             listened_under_50: [] as string[],
             points_earned: 0,
             scan_bonus_awarded: false,
           };
           localStorage.setItem("golokol_store_session", JSON.stringify(token));
-          // Only award scan bonus for real store visits, not city sessions
-          if (!isCitySlug) {
+
+          // Award 15pt scan bonus for real store visits only
+          if (!citySlug) {
             try {
               const { data: sessionData } = await supabase.auth.getSession();
               const userId = sessionData?.session?.user?.id;
@@ -130,9 +171,11 @@ const LLSStorePage = () => {
                   .select("lokol_points, daily_scan_bonus_date")
                   .eq("fan_user_id", userId)
                   .maybeSingle();
+
                 if (fanProfile) {
                   const todayAtlanta = new Date().toLocaleDateString("en-US", { timeZone: "America/New_York" });
                   const alreadyBonusedToday = fanProfile.daily_scan_bonus_date === todayAtlanta;
+
                   if (!alreadyBonusedToday) {
                     await (supabase as any)
                       .from("fan_profiles")
@@ -141,8 +184,15 @@ const LLSStorePage = () => {
                         daily_scan_bonus_date: todayAtlanta,
                       })
                       .eq("fan_user_id", userId);
+
                     const updatedToken = { ...token, scan_bonus_awarded: true };
                     localStorage.setItem("golokol_store_session", JSON.stringify(updatedToken));
+
+                    // Show bonus animation
+                    setScanBonusStoreName(resolvedStoreName);
+                    setShowScanBonus(true);
+                    playScanBonusSound();
+                    setTimeout(() => setShowScanBonus(false), 3500);
                   }
                 }
               }
@@ -150,6 +200,7 @@ const LLSStorePage = () => {
           }
         }
       } catch {}
+
       setLoading(false);
     };
     fetchStore();
@@ -178,13 +229,13 @@ const LLSStorePage = () => {
         const img = row.song_image_url as string;
         if (usedImages.has(img)) continue;
         usedImages.add(img);
-        genreMap.set(firstGenre, GENRE_IMAGES[firstGenre] || img);
+        genreMap.set(firstGenre, img);
       }
 
       const cards: GenreCard[] = [];
       for (const [label, img] of genreMap) {
         const slug = SLUG_MAP[label] || label.toLowerCase().replace(/[^a-z0-9]/g, "");
-        cards.push({ label, slug, image: img });
+        cards.push({ label, slug, image: GENRE_IMAGES[label] || img });
       }
       setGenres(cards);
       setGenresLoading(false);
@@ -214,7 +265,48 @@ const LLSStorePage = () => {
 
   return (
     <LLSOnboarding storeSlug={storeSlug || ""}>
+      <style>{KEYFRAMES}</style>
       <div className="min-h-screen flex flex-col bg-black" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+        {/* Scan Bonus Animation Overlay */}
+        {showScanBonus && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
+            <div
+              className="flex flex-col items-center justify-center gap-4 px-10 py-8 rounded-3xl"
+              style={{
+                backgroundColor: "#000",
+                border: "3px solid #FFD600",
+                animation: "scanBonusIn 3.5s ease-out forwards",
+                maxWidth: 320,
+              }}
+            >
+              <span style={{ fontSize: 48 }}>🎵</span>
+              <p
+                style={{
+                  fontFamily: "'Anton', sans-serif",
+                  fontSize: 42,
+                  color: "#FFD600",
+                  lineHeight: 1,
+                  textAlign: "center",
+                }}
+              >
+                +15 LOKOL POINTS
+              </p>
+              <p
+                style={{
+                  fontFamily: "'Anton', sans-serif",
+                  fontSize: 18,
+                  color: "#fff",
+                  textAlign: "center",
+                  lineHeight: 1.2,
+                }}
+              >
+                GoLokol at {scanBonusStoreName}
+              </p>
+              <p className="text-white/50 text-xs text-center">Bonus points for visiting the station</p>
+            </div>
+          </div>
+        )}
+
         {/* Hero Image */}
         <section className="w-full flex items-center justify-center px-4" style={{ height: "55vh", minHeight: 320 }}>
           <img
@@ -225,7 +317,7 @@ const LLSStorePage = () => {
           />
         </section>
 
-        {/* Store name + CTA */}
+        {/* CTA */}
         <section className="w-full px-6 py-8 text-center" style={{ marginTop: -10 }}>
           <p className="text-white font-normal leading-[1.6] text-[18px] md:text-[20px] max-w-2xl mx-auto">
             Listen, earn points and build your local music scene on GoLokol.
