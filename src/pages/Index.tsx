@@ -95,7 +95,7 @@ const Index = () => {
         const img = row.song_image_url as string;
         if (usedImages.has(img)) continue;
         usedImages.add(img);
-        genreMap.set(genre, img);
+        genreMap.set(genre, GENRE_IMAGES[genre] || img);
       }
 
       const cards: { label: string; slug: string; image: string }[] = [];
