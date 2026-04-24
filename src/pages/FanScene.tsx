@@ -184,12 +184,22 @@ const FanScene = () => {
       if (profData) {
         prof = profData;
       } else {
+        const { data: { user } } = await supabase.auth.getUser();
         const { data: newProf } = await (supabase as any)
           .from("fan_profiles")
           .insert({ fan_user_id: userId, city: "Atlanta", lokol_points: 0 })
           .select()
           .single();
         prof = newProf;
+        // Fire welcome email for new fans regardless of signup method
+        try {
+          await supabase.functions.invoke("send-mailerlite-fan-welcome", {
+            body: {
+              email: user?.email || "",
+              name: user?.user_metadata?.full_name || user?.user_metadata?.name || "",
+            },
+          });
+        } catch {}
       }
       setProfile(prof);
 
