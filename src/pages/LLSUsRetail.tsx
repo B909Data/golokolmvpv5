@@ -125,19 +125,19 @@ const [form, setForm] = useState({
       <section className="px-6 md:px-12 lg:px-20 pt-24 md:pt-28 pb-12 md:pb-20">
         <div className="max-w-3xl">
           <h1 className="mb-4">
-            <span className="text-foreground">Is Your Store Where Atlanta </span>
-            <span className="text-primary">Discovers Its Sound?</span>
+            <span className="text-foreground">Your Business Is a Part of </span>
+            <span className="text-primary">Atlanta's Local Music Scene.</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary mb-6 max-w-2xl">
-            The record stores that win aren't just selling music, they're breaking it.
+            Atlanta fans are already discovering local music. Your store is where they come to earn more, redeem points, and go deeper.
           </p>
           <ol className="space-y-5 max-w-2xl list-none">
             {[
-              "Artists submitted to Lokol Listening Stations are crowdsourced and curated.",
-              "A simple QR code touchpoint turns your store into a local music discovery experience as music lovers browse your aisles.",
-              "Customers accrue points by engaging with music.",
-              "Those points, over time are redeemed at your store for discount on future purchase.",
-              "Engagement is locked to store location. So points = repeat patronage.",
+              "GoLokol fans discover local artists online and at partner stores city-wide.",
+              "Your store is a rewards destination — fans earn bonus points when they visit and redeem that value with you.",
+              "Post-purchase gifting turns every sale into a music discovery moment.",
+              "Redemption drives repeat visits. Points earned anywhere, spent at your store.",
+              "You set your own reward. GoLokol handles the infrastructure.",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-4">
                 <span className="mt-0.5 w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
