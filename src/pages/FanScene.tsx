@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Info, Plus, Play, Pause, X, ArrowLeft } from "lucide-react";
+import { QrCode } from "lucide-react";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import fanmenuArtists from "@/assets/fanmenu-artists.svg";
 import fanmenuShows from "@/assets/fanmenu-shows.svg";
