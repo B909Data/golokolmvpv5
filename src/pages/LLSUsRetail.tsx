@@ -64,7 +64,7 @@ const [form, setForm] = useState({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.store_name || !form.city_location || !form.store_type || !form.has_listening_station || !form.contact_name || !form.contact_email) {
+    if (!form.store_name || !form.city_location || !form.store_type || !form.contact_name || !form.contact_email) {
       toast({ title: "Please fill in all required fields.", variant: "destructive" });
       return;
     }
