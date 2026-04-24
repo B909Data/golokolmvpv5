@@ -70,6 +70,7 @@ import Connect from "./pages/Connect";
 import Unsubscribe from "./pages/Unsubscribe";
 import ClaimAccount from "./pages/ClaimAccount";
 import LokolStations from "./pages/LokolStations";
+import Discover from "@/pages/Discover";
 
 const queryClient = new QueryClient();
 
@@ -165,6 +166,7 @@ const App = () => (
            <Route path="/q/:code" element={<ShortLinkRedirect />} />
            <Route path="/claim/:code" element={<ClaimAccount />} />
            <Route path="/lokol-stations" element={<LokolStations />} />
+           <Route path="/discover" element={<Discover />} />
            
            {/* 404 */}
            <Route path="*" element={<NotFound />} />
