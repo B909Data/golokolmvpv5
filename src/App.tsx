@@ -168,6 +168,7 @@ const App = () => (
            <Route path="/claim/:code" element={<ClaimAccount />} />
            <Route path="/lokol-stations" element={<LokolStations />} />
            <Route path="/discover" element={<Discover />} />
+           <Route path="/ref/:code" element={<ReferralLanding />} />
            
            {/* 404 */}
            <Route path="*" element={<NotFound />} />
