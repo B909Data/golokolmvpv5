@@ -203,7 +203,7 @@ const Index = () => {
               {genres.map((genre) => (
                 <div
                   key={genre.slug}
-                  onClick={() => navigate(`/lls/crates-atl/genre/${genre.slug}`)}
+                  onClick={() => navigate(`/lls/atlanta/genre/${genre.slug}`)}
                   className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-[1.03]"
                 >
                   <img
