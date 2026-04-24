@@ -185,6 +185,14 @@ const LokolListensGenre = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const capToastShownRef = useRef(false);
 
+  const GENRE_IMAGES: Record<string, string> = {
+    "Hip-Hop": genreHiphop,
+    "R&B": genreRnb,
+    "Alternative": genreAlternative,
+    "Hardcore": genreHardcore,
+    "Indie": genreIndie,
+  };
+
   const [tracks, setTracks] = useState<Track[]>([]);
   const [tracksLoading, setTracksLoading] = useState(true);
   const [playingId, setPlayingId] = useState<string | null>(null);
