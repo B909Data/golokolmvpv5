@@ -714,9 +714,7 @@ function ArtistsTab({ saves, onArtistTap, onRemoveArtist, userId }: { saves: Sav
         artist_name: s.submission?.artist_name || s.artist_choice,
         referral_code: code,
       });
-      const link = `https://golokol.app/lls/atlanta/genre/${
-        (s.submission?.artist_name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
-      }?ref=${code}`;
+      const link = `https://golokol.app/ref/${code}`;
       await navigator.clipboard.writeText(link);
       setCopiedId(s.id);
       setTimeout(() => setCopiedId(null), 3000);
