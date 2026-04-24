@@ -68,6 +68,14 @@ const Index = () => {
     "Hardcore + Punk": "hardcore",
   };
 
+  const GENRE_IMAGES: Record<string, string> = {
+    "Hip-Hop": genreHiphop,
+    "R&B": genreRnb,
+    "Alternative": genreAlternative,
+    "Hardcore": genreHardcore,
+    "Indie": genreIndie,
+  };
+
   useEffect(() => {
     const fetchGenres = async () => {
       const { data } = await (supabase as any)
