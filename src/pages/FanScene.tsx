@@ -326,6 +326,7 @@ const FanScene = () => {
             saves={saves}
             setSaves={setSaves}
             userId={userId}
+            navigate={navigate}
           />
         )}
         {activeView === "artists" && <ArtistsTab saves={saves} onArtistTap={(s) => setYoutubeModal({ artist: s })} />}
@@ -457,6 +458,7 @@ function HomeView({
   saves,
   setSaves,
   userId,
+  navigate,
 }: {
   homeImage: string | null;
   tokenValid: boolean;
@@ -471,6 +473,7 @@ function HomeView({
   saves: SavedArtist[];
   setSaves: (s: SavedArtist[]) => void;
   userId: string | null;
+  navigate: (path: string) => void;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
@@ -591,6 +594,13 @@ function HomeView({
           <p style={{ fontFamily: anton, fontSize: 72, lineHeight: 0.9, color: "#FFD600" }}>LOKOL</p>
           <p style={{ fontFamily: anton, fontSize: 72, lineHeight: 0.9, color: "#FFD600" }}>SCENE</p>
           <p style={{ fontFamily: anton, fontSize: 56, lineHeight: 0.9, color: "#FFFFFF", marginTop: 4 }}>ATLANTA</p>
+          <button
+            onClick={() => navigate("/discover")}
+            className="mt-4 px-6 py-3 rounded-full font-bold text-sm"
+            style={{ backgroundColor: "#FFD600", color: "#000" }}
+          >
+            Discover More Music
+          </button>
         </div>
       </div>
 
