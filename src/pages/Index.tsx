@@ -10,6 +10,11 @@ import img3Card from "@/assets/img3.svg";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import { supabase } from "@/integrations/supabase/client";
 import LLSOnboarding from "@/components/LLSOnboarding";
+import genreHiphop from "@/assets/Genre-hiphop.png";
+import genreRnb from "@/assets/Genre-rnb.png";
+import genreAlternative from "@/assets/Genre-alternative.png";
+import genreHardcore from "@/assets/Genre-hardcore.png";
+import genreIndie from "@/assets/Genre-indie.png";
 
 
 const HowItWorksCard = ({
@@ -63,6 +68,14 @@ const Index = () => {
     "Hardcore + Punk": "hardcore",
   };
 
+  const GENRE_IMAGES: Record<string, string> = {
+    "Hip-Hop": genreHiphop,
+    "R&B": genreRnb,
+    "Alternative": genreAlternative,
+    "Hardcore": genreHardcore,
+    "Indie": genreIndie,
+  };
+
   useEffect(() => {
     const fetchGenres = async () => {
       const { data } = await (supabase as any)
@@ -82,7 +95,7 @@ const Index = () => {
         const img = row.song_image_url as string;
         if (usedImages.has(img)) continue;
         usedImages.add(img);
-        genreMap.set(genre, img);
+        genreMap.set(genre, GENRE_IMAGES[genre] || img);
       }
 
       const cards: { label: string; slug: string; image: string }[] = [];

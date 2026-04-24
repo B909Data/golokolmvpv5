@@ -3,6 +3,11 @@ import { ArrowLeft, Play, Pause, SkipForward, Heart } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import genreHiphop from "@/assets/Genre-hiphop.png";
+import genreRnb from "@/assets/Genre-rnb.png";
+import genreAlternative from "@/assets/Genre-alternative.png";
+import genreHardcore from "@/assets/Genre-hardcore.png";
+import genreIndie from "@/assets/Genre-indie.png";
 
 const SLUG_TO_GENRE: Record<string, string> = {
   hiphop: "Hip-Hop",
@@ -179,6 +184,14 @@ const LokolListensGenre = () => {
   const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement>(null);
   const capToastShownRef = useRef(false);
+
+  const GENRE_IMAGES: Record<string, string> = {
+    "Hip-Hop": genreHiphop,
+    "R&B": genreRnb,
+    "Alternative": genreAlternative,
+    "Hardcore": genreHardcore,
+    "Indie": genreIndie,
+  };
 
   const [tracks, setTracks] = useState<Track[]>([]);
   const [tracksLoading, setTracksLoading] = useState(true);

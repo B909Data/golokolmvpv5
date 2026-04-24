@@ -5,6 +5,11 @@ import LLSOnboarding from "@/components/LLSOnboarding";
 import cratesHero from "@/assets/crates-atl-hero.svg";
 import dbsHero from "@/assets/dbs-sounds-hero.svg";
 import moodsHero from "@/assets/moods-music-hero.svg";
+import genreHiphop from "@/assets/Genre-hiphop.png";
+import genreRnb from "@/assets/Genre-rnb.png";
+import genreAlternative from "@/assets/Genre-alternative.png";
+import genreHardcore from "@/assets/Genre-hardcore.png";
+import genreIndie from "@/assets/Genre-indie.png";
 
 const HERO_MAP: Record<string, string> = {
   "crates-atl": cratesHero,
@@ -60,6 +65,14 @@ const LLSStorePage = () => {
   const [genres, setGenres] = useState<GenreCard[]>([]);
   const [genresLoading, setGenresLoading] = useState(true);
   const [isCitySlug, setIsCitySlug] = useState(false);
+
+  const GENRE_IMAGES: Record<string, string> = {
+    "Hip-Hop": genreHiphop,
+    "R&B": genreRnb,
+    "Alternative": genreAlternative,
+    "Hardcore": genreHardcore,
+    "Indie": genreIndie,
+  };
 
   useEffect(() => {
     const fetchStore = async () => {
@@ -165,7 +178,7 @@ const LLSStorePage = () => {
         const img = row.song_image_url as string;
         if (usedImages.has(img)) continue;
         usedImages.add(img);
-        genreMap.set(firstGenre, img);
+        genreMap.set(firstGenre, GENRE_IMAGES[firstGenre] || img);
       }
 
       const cards: GenreCard[] = [];
