@@ -18,11 +18,11 @@ const LLSUsArtists = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
         <div className="relative z-10 px-6 md:px-12 lg:px-20 pb-10 md:pb-14 max-w-3xl">
           <h1 className="mb-4">
-            <span className="text-foreground">Build Local </span>
-            <span className="text-primary">Momentum</span>
+            <span className="text-foreground">Your Music. Real Fans. </span>
+            <span className="text-primary">Great Shows.</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary mb-0 max-w-2xl">
-            GoLokol puts your music in front of music lovers in your city that buy records, show up to local events, and tell their friends.
+            GoLokol puts your music in front of Atlanta fans who already show up.
           </p>
         </div>
       </section>
