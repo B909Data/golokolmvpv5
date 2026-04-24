@@ -59,6 +59,7 @@ const LLSStorePage = () => {
   const [notFound, setNotFound] = useState(false);
   const [genres, setGenres] = useState<GenreCard[]>([]);
   const [genresLoading, setGenresLoading] = useState(true);
+  const [isCitySlug, setIsCitySlug] = useState(false);
 
   useEffect(() => {
     const fetchStore = async () => {
@@ -67,34 +68,46 @@ const LLSStorePage = () => {
         setLoading(false);
         return;
       }
-      const { data, error } = await supabase
-        .from("lls_retail_signups")
-        .select("store_name")
-        .eq("store_slug", storeSlug)
-        .limit(1)
-        .maybeSingle();
-      if (error || !data) {
-        setNotFound(true);
-      } else {
-        setStoreName(data.store_name);
-        // Generate or refresh session token — 1 HOUR window
-        try {
-          const existingRaw = localStorage.getItem("golokol_store_session");
-          const existing = existingRaw ? JSON.parse(existingRaw) : null;
-          const isValid = existing && existing.store_slug === storeSlug && existing.expires_at > Date.now();
-          if (!isValid) {
-            const token = {
-              store_slug: storeSlug,
-              store_name: data.store_name,
-              created_at: Date.now(),
-              expires_at: Date.now() + 1 * 60 * 60 * 1000, // 1 HOUR
-              genres_explored: [] as string[],
-              listened_under_50: [] as string[],
-              points_earned: 0,
-              scan_bonus_awarded: false,
-            };
-            localStorage.setItem("golokol_store_session", JSON.stringify(token));
-            // Award 15pt scan bonus to signed-in fans
+      // City-level general session slugs — no DB lookup needed
+      const CITY_SLUGS = ["atlanta"];
+      const isCitySlug = CITY_SLUGS.includes(storeSlug);
+      setIsCitySlug(CITY_SLUGS.includes(storeSlug));
+      let resolvedStoreName = "Atlanta";
+      if (!isCitySlug) {
+        const { data, error } = await supabase
+          .from("lls_retail_signups")
+          .select("store_name")
+          .eq("store_slug", storeSlug)
+          .limit(1)
+          .maybeSingle();
+        if (error || !data) {
+          setNotFound(true);
+          setLoading(false);
+          return;
+        }
+        resolvedStoreName = data.store_name;
+      }
+      setStoreName(resolvedStoreName);
+      const storeNameForToken = resolvedStoreName;
+      try {
+        const existingRaw = localStorage.getItem("golokol_store_session");
+        const existing = existingRaw ? JSON.parse(existingRaw) : null;
+        const isValid = existing && existing.store_slug === storeSlug && existing.expires_at > Date.now();
+        if (!isValid) {
+          const token = {
+            store_slug: storeSlug,
+            store_name: storeNameForToken,
+            city_session: isCitySlug,
+            created_at: Date.now(),
+            expires_at: Date.now() + (1 * 60 * 60 * 1000),
+            genres_explored: [] as string[],
+            listened_under_50: [] as string[],
+            points_earned: 0,
+            scan_bonus_awarded: false,
+          };
+          localStorage.setItem("golokol_store_session", JSON.stringify(token));
+          // Only award scan bonus for real store visits, not city sessions
+          if (!isCitySlug) {
             try {
               const { data: sessionData } = await supabase.auth.getSession();
               const userId = sessionData?.session?.user?.id;
@@ -115,7 +128,6 @@ const LLSStorePage = () => {
                         daily_scan_bonus_date: todayAtlanta,
                       })
                       .eq("fan_user_id", userId);
-                    // Update token to reflect bonus awarded
                     const updatedToken = { ...token, scan_bonus_awarded: true };
                     localStorage.setItem("golokol_store_session", JSON.stringify(updatedToken));
                   }
@@ -123,8 +135,8 @@ const LLSStorePage = () => {
               }
             } catch {}
           }
-        } catch {}
-      }
+        }
+      } catch {}
       setLoading(false);
     };
     fetchStore();
