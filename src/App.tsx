@@ -71,6 +71,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import ClaimAccount from "./pages/ClaimAccount";
 import LokolStations from "./pages/LokolStations";
 import Discover from "@/pages/Discover";
+import ReferralLanding from "@/pages/ReferralLanding";
 
 const queryClient = new QueryClient();
 
@@ -167,6 +168,7 @@ const App = () => (
            <Route path="/claim/:code" element={<ClaimAccount />} />
            <Route path="/lokol-stations" element={<LokolStations />} />
            <Route path="/discover" element={<Discover />} />
+           <Route path="/ref/:code" element={<ReferralLanding />} />
            
            {/* 404 */}
            <Route path="*" element={<NotFound />} />
