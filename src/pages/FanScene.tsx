@@ -331,7 +331,23 @@ const FanScene = () => {
             navigate={navigate}
           />
         )}
-        {activeView === "artists" && <ArtistsTab saves={saves} onArtistTap={(s) => setYoutubeModal({ artist: s })} />}
+        {activeView === "artists" && (
+          <ArtistsTab
+            saves={saves}
+            onArtistTap={(s) => setYoutubeModal({ artist: s })}
+            onRemoveArtist={async (s) => {
+              if (!userId || !s.submission_id) return;
+              try {
+                await (supabase as any)
+                  .from("lokol_scene_saves")
+                  .delete()
+                  .eq("fan_user_id", userId)
+                  .eq("submission_id", s.submission_id);
+                setSaves(prev => prev.filter(save => save.id !== s.id));
+              } catch {}
+            }}
+          />
+        )}
         {activeView === "shows" && <ShowsTab shows={shows} saves={saves} />}
         {activeView === "market" && <MarketTab points={points} progressPct={progressPct} />}
       </div>
@@ -681,7 +697,8 @@ function HomeView({
 }
 
 /* ========== ARTISTS TAB ========== */
-function ArtistsTab({ saves, onArtistTap }: { saves: SavedArtist[]; onArtistTap: (s: SavedArtist) => void }) {
+function ArtistsTab({ saves, onArtistTap, onRemoveArtist }: { saves: SavedArtist[]; onArtistTap: (s: SavedArtist) => void; onRemoveArtist: (s: SavedArtist) => void }) {
+  const [editMode, setEditMode] = useState(false);
   return (
     <div>
       <div className="pl-5 pt-5 pb-4">
@@ -689,6 +706,19 @@ function ArtistsTab({ saves, onArtistTap }: { saves: SavedArtist[]; onArtistTap:
         <p style={{ fontFamily: anton, fontSize: 64, lineHeight: 0.9, color: "#FFD600" }}>LOKOL</p>
         <p style={{ fontFamily: anton, fontSize: 64, lineHeight: 0.9, color: "#FFD600" }}>ARTISTS</p>
         <p style={{ fontFamily: anton, fontSize: 48, lineHeight: 0.9, color: "#FFFFFF", marginTop: 4 }}>ATLANTA</p>
+        {saves.length > 0 && (
+          <button
+            onClick={() => setEditMode(e => !e)}
+            className="mt-4 px-5 py-2 rounded-full text-sm font-bold border"
+            style={{
+              borderColor: editMode ? "#fff" : "#FFD600",
+              color: editMode ? "#fff" : "#FFD600",
+              backgroundColor: "transparent",
+            }}
+          >
+            {editMode ? "Done" : "Remove Artists"}
+          </button>
+        )}
       </div>
 
       {saves.length === 0 ? (
@@ -698,8 +728,17 @@ function ArtistsTab({ saves, onArtistTap }: { saves: SavedArtist[]; onArtistTap:
           {saves.map((s) => {
             const sub = s.submission;
             return (
-              <div key={s.id} onClick={() => onArtistTap(s)} className="cursor-pointer">
+              <div key={s.id} onClick={() => !editMode && onArtistTap(s)} className="cursor-pointer">
                 <div className="relative w-full aspect-square rounded-xl overflow-hidden">
+                  {editMode && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onRemoveArtist(s); }}
+                      className="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-red-500 flex items-center justify-center shadow-lg"
+                      aria-label="Remove artist"
+                    >
+                      <X size={14} className="text-white" strokeWidth={3} />
+                    </button>
+                  )}
                   {sub?.song_image_url ? (
                     <img src={sub.song_image_url} alt={sub.artist_name} className="w-full h-full object-cover" />
                   ) : (
