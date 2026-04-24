@@ -206,7 +206,7 @@ const LLSStorePage = () => {
         <section className="w-full flex items-center justify-center px-4" style={{ height: "55vh", minHeight: 320 }}>
           <img
             src={HERO_MAP[storeSlug || ""] || cratesHero}
-            alt="Lokol Listening Stations"
+            alt={isCitySlug ? "GoLokol Atlanta" : "Lokol Listening Stations"}
             className="w-full h-full object-contain"
             loading="eager"
           />
