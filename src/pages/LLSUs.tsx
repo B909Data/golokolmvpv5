@@ -35,25 +35,25 @@ const LLSUs = () => {
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Lokol Listening Stations turns record stores into local music discovery hubs.
+              Discover Atlanta's local music scene from anywhere. No algorithm. No gatekeeping.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Music lovers listen, add their favs to a customized Lokol Scene.
+              Save artists you love. Build your Lokol Scene — a personal dashboard of Atlanta music, shows, and moments.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Artists create local momentum with direct-to-fan promotion, sales, and communication. No algorithms. No barriers.
+              Artists get direct placement in front of fans who buy records, go to shows, and bring their friends.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Fans earn points engaging at stations, on GoLokol and at shows. Then redeem those points with local business.
+              Visit partner stores to earn bonus points. Redeem that value locally. The more you engage, the more your city gives back.
             </span>
           </li>
         </ul>
@@ -70,7 +70,7 @@ const LLSUs = () => {
             <Music className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm an Artist</h2>
             <p className="type-body-md text-[#F0EDE8]">
-              Submit your music and build real momentum with Atlanta record store and Lokol event features. Get a free 1-month trial of Golokol Connect.
+              Get your music in front of Atlanta fans who are already listening. Submit one song, build real local momentum. First month free.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
               Get Started →
@@ -84,7 +84,7 @@ const LLSUs = () => {
             <Disc3 className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm Music Retail</h2>
             <p className="type-body-md text-[#F0EDE8]">
-              Turn your store into a lokol music discovery hub. Generate more traffic, sales and cultural relevance.
+              Become a rewards destination for Atlanta music fans. Drive repeat visits, increase sales, and anchor your store in the local music community.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
               Get Started →
