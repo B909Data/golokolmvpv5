@@ -783,7 +783,23 @@ function ArtistsTab({ saves, onArtistTap, onRemoveArtist, userId }: { saves: Sav
                 <p className="text-white text-xs" style={{ opacity: 0.7 }}>
                   {sub?.song_title || ""}
                 </p>
-                <img src={fanmenuArtists} alt="saved" className="w-5 h-5 mt-1" style={{ filter: "none" }} />
+                <div className="flex items-center justify-between mt-1">
+                  <img src={fanmenuArtists} alt="saved" className="w-5 h-5" style={{ filter: "none" }} />
+                  {!editMode && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleShare(s); }}
+                      className="text-[10px] font-bold px-2 py-1 rounded-full"
+                      style={{
+                        backgroundColor: copiedId === s.id ? "#FFD600" : "transparent",
+                        color: copiedId === s.id ? "#000" : "rgba(255,255,255,0.4)",
+                        border: copiedId === s.id ? "none" : "1px solid rgba(255,255,255,0.2)",
+                      }}
+                      disabled={sharingId === s.id}
+                    >
+                      {copiedId === s.id ? "Link Copied!" : sharingId === s.id ? "..." : "Share"}
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}
