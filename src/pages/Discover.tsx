@@ -23,6 +23,14 @@ const Discover = () => {
   const [genres, setGenres] = useState<{ label: string; slug: string; image: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const GENRE_IMAGES: Record<string, string> = {
+    "Hip-Hop": genreHiphop,
+    "R&B": genreRnb,
+    "Alternative": genreAlternative,
+    "Hardcore": genreHardcore,
+    "Indie": genreIndie,
+  };
+
   useEffect(() => {
     // Ensure atlanta session token exists
     try {
