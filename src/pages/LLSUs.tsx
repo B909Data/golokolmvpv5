@@ -76,7 +76,7 @@ const LLSUs = () => {
             <Music className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm an Artist</h2>
             <p className="type-body-md text-[#F0EDE8]">
-              Get your music in front of Atlanta fans who are already listening. Submit one song, build real local momentum. First month free.
+              Get your music in front of Atlanta fans who already show up. Submit one song. Build real local momentum. First month free.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
               Get Started →
