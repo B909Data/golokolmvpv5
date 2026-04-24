@@ -68,6 +68,8 @@ interface StoreSession {
   genres_explored: string[];
   listened_under_50: string[];
   points_earned: number;
+  scan_bonus_awarded?: boolean;
+  city_session?: boolean;
 }
 
 const anton = "'Anton', sans-serif";
@@ -544,7 +546,7 @@ function HomeView({
     <div className="relative min-h-[calc(100vh-56px-96px)]">
       <audio ref={audioRef} />
 
-      {tokenValid && storeSession && countdown && (
+      {tokenValid && storeSession && countdown && !storeSession.city_session && (
         <div className="bg-[#FFD600] text-black px-4 py-3 flex items-center justify-between gap-3 relative z-20">
           <p className="text-sm font-bold flex-1">
             Your {storeSession.store_name || storeSession.store_slug} discovery access ends in{" "}
@@ -559,7 +561,7 @@ function HomeView({
         </div>
       )}
 
-      {tokenExpired && storeSession && !expiredBannerDismissed && (
+      {tokenExpired && storeSession && !expiredBannerDismissed && !storeSession.city_session && (
         <div className="bg-[#1a1a1a] text-white px-4 py-3 flex items-center justify-between gap-3 relative z-20">
           <p className="text-sm flex-1">
             Earn more points —{" "}
