@@ -346,6 +346,7 @@ const FanScene = () => {
                 setSaves(prev => prev.filter(save => save.id !== s.id));
               } catch {}
             }}
+            userId={userId}
           />
         )}
         {activeView === "shows" && <ShowsTab shows={shows} saves={saves} />}
