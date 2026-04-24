@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import genreHiphop from "@/assets/Genre-hiphop.png";
+import genreRnb from "@/assets/Genre-rnb.png";
+import genreAlternative from "@/assets/Genre-alternative.png";
+import genreHardcore from "@/assets/Genre-hardcore.png";
+import genreIndie from "@/assets/Genre-indie.png";
 
 const SLUG_MAP: Record<string, string> = {
   "Hip-Hop": "hiphop",
