@@ -317,6 +317,9 @@ const FanScene = () => {
           >
             Sign Out
           </button>
+          <button onClick={() => setShowQR(true)} className="text-[#FFD600]" aria-label="My QR">
+            <QrCode className="w-6 h-6" />
+          </button>
           <button onClick={() => navigate("/fan/info")} className="text-[#FFD600]">
             <Info className="w-6 h-6" />
           </button>
