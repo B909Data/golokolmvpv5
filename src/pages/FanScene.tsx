@@ -331,7 +331,23 @@ const FanScene = () => {
             navigate={navigate}
           />
         )}
-        {activeView === "artists" && <ArtistsTab saves={saves} onArtistTap={(s) => setYoutubeModal({ artist: s })} />}
+        {activeView === "artists" && (
+          <ArtistsTab
+            saves={saves}
+            onArtistTap={(s) => setYoutubeModal({ artist: s })}
+            onRemoveArtist={async (s) => {
+              if (!userId || !s.submission_id) return;
+              try {
+                await (supabase as any)
+                  .from("lokol_scene_saves")
+                  .delete()
+                  .eq("fan_user_id", userId)
+                  .eq("submission_id", s.submission_id);
+                setSaves(prev => prev.filter(save => save.id !== s.id));
+              } catch {}
+            }}
+          />
+        )}
         {activeView === "shows" && <ShowsTab shows={shows} saves={saves} />}
         {activeView === "market" && <MarketTab points={points} progressPct={progressPct} />}
       </div>
