@@ -66,6 +66,14 @@ const LLSStorePage = () => {
   const [genresLoading, setGenresLoading] = useState(true);
   const [isCitySlug, setIsCitySlug] = useState(false);
 
+  const GENRE_IMAGES: Record<string, string> = {
+    "Hip-Hop": genreHiphop,
+    "R&B": genreRnb,
+    "Alternative": genreAlternative,
+    "Hardcore": genreHardcore,
+    "Indie": genreIndie,
+  };
+
   useEffect(() => {
     const fetchStore = async () => {
       if (!storeSlug) {
