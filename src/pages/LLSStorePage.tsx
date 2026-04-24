@@ -178,7 +178,7 @@ const LLSStorePage = () => {
         const img = row.song_image_url as string;
         if (usedImages.has(img)) continue;
         usedImages.add(img);
-        genreMap.set(firstGenre, img);
+        genreMap.set(firstGenre, GENRE_IMAGES[firstGenre] || img);
       }
 
       const cards: GenreCard[] = [];
