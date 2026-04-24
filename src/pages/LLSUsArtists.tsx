@@ -18,11 +18,11 @@ const LLSUsArtists = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
         <div className="relative z-10 px-6 md:px-12 lg:px-20 pb-10 md:pb-14 max-w-3xl">
           <h1 className="mb-4">
-            <span className="text-foreground">Build Local </span>
-            <span className="text-primary">Momentum</span>
+            <span className="text-foreground">Your Music. Real Fans. </span>
+            <span className="text-primary">Great Shows.</span>
           </h1>
           <p className="type-subcaption text-foreground-secondary mb-0 max-w-2xl">
-            GoLokol puts your music in front of music lovers in your city that buy records, show up to local events, and tell their friends.
+            GoLokol puts your music in front of Atlanta fans who already show up.
           </p>
         </div>
       </section>
@@ -31,9 +31,10 @@ const LLSUsArtists = () => {
       <section className="px-6 md:px-12 lg:px-20 py-12 md:py-16">
         <ol className="space-y-5 mb-8 max-w-2xl list-none">
           {[
-            "ONE song lives on the platform at one time. Submit up to 2 per month.",
-            "Local fans discover and connect with you at Lokol Listening Stations distributed city-wide.",
-            "Promote directly to fans who include your music in the GOLOKOL SCENE.",
+            "Submit one song at a time. Up to 2 per month. Always free.",
+            "Your music is discoverable by anyone in Atlanta — online and at partner stores city-wide.",
+            "Introduce new music and shows to fans who add you to their Lokol Scene.",
+            "Make every new show count. GoLokol show notifications are more than a flyer.",
             "All Atlanta artists get a 1-month free trial.",
           ].map((text, i) => (
             <li key={i} className="flex items-start gap-4">
@@ -96,10 +97,10 @@ const LLSUsArtists = () => {
       <section className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24">
         <div className="max-w-md mx-auto text-center">
           <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
-            Ready to get your music heard?
+            Ready to build something real in Atlanta?
           </h2>
           <p className="text-foreground-secondary text-base font-sans mb-8">
-            Submit your music to Lokol Listening Stations in Atlanta record stores. Free to submit. No algorithm.
+            Your next fan is already listening.
           </p>
           <Link
             to="/artist/signup"
