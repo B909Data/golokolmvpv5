@@ -634,15 +634,21 @@ const AdminLLS = () => {
                   <p className="text-foreground text-sm font-medium">
                     Reject: {submissions.find((s) => s.id === rejectingId)?.song_title}
                   </p>
-                  {REJECTION_REASONS.map((reason) => (
-                    <label key={reason} className="flex items-center gap-2 cursor-pointer">
-                      <Checkbox
-                        checked={selectedReasons.includes(reason)}
-                        onCheckedChange={() => toggleReason(reason)}
-                      />
-                      <span className="text-foreground text-sm">{reason}</span>
-                    </label>
-                  ))}
+                  {REJECTION_REASONS.map((reason) => {
+                    const rejectingSubmission = submissions.find(s => s.id === rejectingId);
+                    const displayLabel = reason === "ONLY_ONE_SONG"
+                      ? `Only one song can be featured at a time. We loved ${rejectingSubmission?.song_title || "this song"} — it will be shared with your new fans as fresh music.`
+                      : reason;
+                    return (
+                      <label key={reason} className="flex items-center gap-2 cursor-pointer">
+                        <Checkbox
+                          checked={selectedReasons.includes(reason)}
+                          onCheckedChange={() => toggleReason(reason)}
+                        />
+                        <span className="text-foreground text-sm">{displayLabel}</span>
+                      </label>
+                    );
+                  })}
                   <div className="flex gap-2">
                     <Button
                       size="sm"
