@@ -35,25 +35,31 @@ const LLSUs = () => {
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Discover Atlanta's local music scene from anywhere. No algorithm. No gatekeeping.
+              Discover Atlanta's local music. Step outside of the algorithm.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Save artists you love. Build your Lokol Scene — a personal dashboard of Atlanta music, shows, and moments.
+              Save artists you love. Build your own Lokol Scene. Earn points along the way.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Artists get direct placement in front of fans who buy records, go to shows, and bring their friends.
+              GoLokol music fans buy records, go to shows, and bring their friends.
             </span>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
             <span className="type-subcaption text-[#F0EDE8]">
-              Visit partner stores to earn bonus points. Redeem that value locally. The more you engage, the more your city gives back.
+              Earn bonus points — visit participating retail and gathering spots to discover new music IRL.
+            </span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="mt-2 h-3 w-3 rounded-full bg-primary flex-shrink-0" />
+            <span className="type-subcaption text-[#F0EDE8]">
+              Redeem that value locally.
             </span>
           </li>
         </ul>
@@ -70,7 +76,7 @@ const LLSUs = () => {
             <Music className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm an Artist</h2>
             <p className="type-body-md text-[#F0EDE8]">
-              Get your music in front of Atlanta fans who are already listening. Submit one song, build real local momentum. First month free.
+              Get your music in front of Atlanta fans who already show up. Submit one song. Build real local momentum. First month free.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
               Get Started →
@@ -84,7 +90,7 @@ const LLSUs = () => {
             <Disc3 className="h-12 w-12 text-primary mb-6 transition-transform duration-300 group-hover:scale-110" />
             <h2 className="text-foreground mb-3 text-2xl md:text-3xl">I'm Music Retail</h2>
             <p className="type-body-md text-[#F0EDE8]">
-              Become a rewards destination for Atlanta music fans. Drive repeat visits, increase sales, and anchor your store in the local music community.
+              Become a rewards destination for Atlanta music fans. Drive repeat visits and anchor your store in the local music community.
             </p>
             <span className="mt-6 inline-block text-primary font-display text-sm tracking-wide uppercase transition-transform duration-300 group-hover:translate-x-1">
               Get Started →
