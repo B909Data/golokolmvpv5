@@ -193,55 +193,6 @@ const [form, setForm] = useState({
                 </Select>
               </div>
 
-              <div>
-                <Label className="text-foreground">Do you currently have a space dedicated to local music? *</Label>
-                <Select value={form.has_listening_station} onValueChange={v => setForm(f => ({ ...f, has_listening_station: v }))}>
-                  <SelectTrigger className="mt-1.5 bg-input border-border text-foreground">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Yes">Yes</SelectItem>
-                    <SelectItem value="No">No</SelectItem>
-                    <SelectItem value="Something Informal">Something Informal</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Signage Preference */}
-              <div className="rounded-lg bg-[#2a2a2a] p-6">
-                <Label className="text-foreground mb-4 block">Choose 1 or both store signage? (free)</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {[
-                    { value: "24x24_foam_board", img: signageSquare, caption: '24x24 foam board (Hang on the wall)' },
-                    { value: "7x9_foam_boards", img: signageTall, caption: 'Three (3) 7x9 foam boards (between racks)' },
-                  ].map((opt) => {
-                    const selected = form.signage_preference.includes(opt.value);
-                    return (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() =>
-                          setForm(f => ({
-                            ...f,
-                            signage_preference: selected
-                              ? f.signage_preference.filter(v => v !== opt.value)
-                              : [...f.signage_preference, opt.value],
-                          }))
-                        }
-                        className={`rounded-lg border-2 p-3 transition-all text-left ${
-                          selected
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border bg-input hover:border-foreground/30'
-                        }`}
-                      >
-                        <img src={opt.img} alt={opt.caption} className="w-full rounded-md mb-3 object-contain max-h-52" loading="lazy" />
-                        <p className="type-body-sm text-[#F0EDE8]">{opt.caption}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Store Logo Upload */}
               <div>
                 <Label className="text-foreground mb-2 block">Upload your high resolution store logo. (jpg, svg or png)</Label>
