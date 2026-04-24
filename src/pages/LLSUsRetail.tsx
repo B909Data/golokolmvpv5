@@ -238,7 +238,7 @@ const [form, setForm] = useState({
               </div>
 
               <Button type="submit" size="lg" disabled={submitting} className="w-full md:w-auto">
-                {submitting ? "Submitting…" : "Partner Your Store"}
+                {submitting ? "Submitting…" : "Let's Talk"}
               </Button>
             </form>
           )}
