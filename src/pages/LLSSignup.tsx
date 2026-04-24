@@ -10,6 +10,7 @@ const LLSSignup = () => {
   const points = parseInt(searchParams.get("points") || "0");
   const storeSlug = searchParams.get("store") || "";
   const artistName = searchParams.get("artist") || "";
+  const refCode = searchParams.get("ref") || localStorage.getItem("golokol_referral_code") || "";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -59,6 +60,41 @@ const LLSSignup = () => {
         setError("Something went wrong. Please try again.");
         setLoading(false);
         return;
+      }
+
+      // Process referral if present
+      if (refCode && userId) {
+        try {
+          const { data: referral } = await (supabase as any)
+            .from("referrals")
+            .select("id, referrer_fan_id, points_awarded")
+            .eq("referral_code", refCode)
+            .maybeSingle();
+          if (referral && !referral.points_awarded) {
+            await (supabase as any)
+              .from("referrals")
+              .update({
+                referred_fan_id: userId,
+                signed_up_at: new Date().toISOString(),
+                points_awarded: true,
+              })
+              .eq("id", referral.id);
+            const { data: referrerProfile } = await (supabase as any)
+              .from("fan_profiles")
+              .select("lokol_points")
+              .eq("fan_user_id", referral.referrer_fan_id)
+              .maybeSingle();
+            if (referrerProfile) {
+              await (supabase as any)
+                .from("fan_profiles")
+                .update({
+                  lokol_points: (referrerProfile.lokol_points || 0) + 5,
+                })
+                .eq("fan_user_id", referral.referrer_fan_id);
+            }
+          }
+        } catch {}
+        localStorage.removeItem("golokol_referral_code");
       }
 
       // Check if profile already exists
