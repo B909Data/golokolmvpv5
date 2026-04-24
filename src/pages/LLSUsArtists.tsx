@@ -31,9 +31,10 @@ const LLSUsArtists = () => {
       <section className="px-6 md:px-12 lg:px-20 py-12 md:py-16">
         <ol className="space-y-5 mb-8 max-w-2xl list-none">
           {[
-            "ONE song lives on the platform at one time. Submit up to 2 per month.",
-            "Local fans discover and connect with you at Lokol Listening Stations distributed city-wide.",
-            "Promote directly to fans who include your music in the GOLOKOL SCENE.",
+            "Submit one song at a time. Up to 2 per month. Always free.",
+            "Your music is discoverable by anyone in Atlanta — online and at partner stores city-wide.",
+            "Introduce new music and shows to fans who add you to their Lokol Scene.",
+            "Make every new show count. GoLokol show notifications are more than a flyer.",
             "All Atlanta artists get a 1-month free trial.",
           ].map((text, i) => (
             <li key={i} className="flex items-start gap-4">
