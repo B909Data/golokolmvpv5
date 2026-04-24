@@ -265,23 +265,23 @@ const Index = () => {
           <HowItWorksCard
             image={llsCard}
             number={1}
-            title="Lokol Listening Stations"
-            description="Place a Lokol Listening Station in your store featuring local artists city-wide."
+            title="Algorithms Have No Home"
+            description="We curate new music coming out of Atlanta. Discover and save the artists you want to watch."
             to="/lls-us"
           />
           <HowItWorksCard
             image={connectCard}
             number={2}
             title="Your City Your Scene"
-            description='Local music lovers scan, discover and add artists to their customized "Lokol Scene" dashboard. Local artists enjoy direct-to-fan engagement and show promotion.'
-            to="https://golokol.app/lls-us"
+            description="Customize your scene with new music and show notifications from the artists you said matter."
+            to="/lls-us"
           />
           <HowItWorksCard
             image={img3Card}
             number={3}
             title="The Value of Local Music"
             description="Local fans earn points for engaging and attending shows. Then redeem that value at local businesses."
-            to="https://golokol.app/lls-us"
+            to="/lls-us"
           />
         </div>
       </section>
