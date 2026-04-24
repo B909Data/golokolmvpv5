@@ -97,10 +97,10 @@ const LLSUsArtists = () => {
       <section className="bg-background-secondary px-6 md:px-12 lg:px-20 py-16 md:py-24">
         <div className="max-w-md mx-auto text-center">
           <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
-            Ready to get your music heard?
+            Ready to build something real in Atlanta?
           </h2>
           <p className="text-foreground-secondary text-base font-sans mb-8">
-            Submit your music to Lokol Listening Stations in Atlanta record stores. Free to submit. No algorithm.
+            Your next fan is already listening.
           </p>
           <Link
             to="/artist/signup"
