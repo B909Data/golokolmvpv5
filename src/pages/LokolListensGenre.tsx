@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Play, Pause, SkipForward, Heart } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -182,6 +182,9 @@ const getTodayAtlanta = () => new Date().toLocaleDateString("en-US", { timeZone:
 const LokolListensGenre = () => {
   const { genre, storeSlug } = useParams<{ genre: string; storeSlug: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const autoplayId = searchParams.get("autoplay") || "";
+  const refCode = searchParams.get("ref") || localStorage.getItem("golokol_referral_code") || "";
   const audioRef = useRef<HTMLAudioElement>(null);
   const capToastShownRef = useRef(false);
 
@@ -329,6 +332,21 @@ const LokolListensGenre = () => {
       );
       setTracks(filtered);
       setTracksLoading(false);
+      // Auto-play specific song if autoplay param present
+      if (autoplayId) {
+        const autoTrack = filtered.find((t: Track) => t.id === autoplayId);
+        if (autoTrack) {
+          setTimeout(() => {
+            const audio = document.querySelector("audio") as HTMLAudioElement;
+            if (audio) {
+              audio.src = autoTrack.mp3_url;
+              audio.play();
+            }
+            setPlayingId(autoTrack.id);
+            setIsPlaying(true);
+          }, 500);
+        }
+      }
     })();
   }, [genreLabel]);
 
@@ -855,8 +873,9 @@ const LokolListensGenre = () => {
                   localStorage.setItem("golokol_pending_points", points.toString());
                 }
                 localStorage.setItem("golokol_last_genre_url", `/lls/${storeSlug}/genre/${genre}`);
+                const refParam = refCode ? `&ref=${refCode}` : "";
                 navigate(
-                  `/lls/signup?points=${points}&store=${storeSlug || ""}&artist=${encodeURIComponent(overlayTrack?.artist_name || "")}`,
+                  `/lls/signup?points=${points}&store=${storeSlug || ""}&artist=${encodeURIComponent(overlayTrack?.artist_name || "")}${refParam}`,
                 );
               }}
               className="w-full h-12 font-bold rounded-xl"
