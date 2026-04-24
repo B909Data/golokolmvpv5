@@ -402,6 +402,41 @@ const FanScene = () => {
 
       {/* YouTube Modal */}
       {youtubeModal && <YouTubeModal artist={youtubeModal.artist} onClose={() => setYoutubeModal(null)} />}
+      {showQR && userId && (
+        <div
+          className="fixed inset-0 bg-black/95 z-[100] flex flex-col items-center justify-center gap-6 px-6"
+          onClick={() => setShowQR(false)}
+        >
+          <p style={{ fontFamily: "'Anton', sans-serif", fontSize: 24, color: "#FFD600" }}>
+            MY SHOW QR
+          </p>
+          <p className="text-white/60 text-sm text-center">
+            Have the artist scan this at the show to earn 25 points.
+          </p>
+          <div
+            className="bg-white p-4 rounded-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+                `https://golokol.app/checkin?fan=${userId}&token=${Math.floor(Date.now() / 600000)}`
+              )}`}
+              alt="Fan QR Code"
+              className="w-[220px] h-[220px]"
+            />
+          </div>
+          <p className="text-white/30 text-xs text-center">
+            QR refreshes every 10 minutes. Tap anywhere to close.
+          </p>
+          <button
+            onClick={() => setShowQR(false)}
+            className="px-6 py-3 rounded-full text-sm font-bold"
+            style={{ backgroundColor: "#FFD600", color: "#000" }}
+          >
+            Close
+          </button>
+        </div>
+      )}
     </div>
   );
 };
