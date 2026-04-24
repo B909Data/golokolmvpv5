@@ -548,7 +548,14 @@ const LokolListensGenre = () => {
       {/* Header */}
       <div className="sticky top-0 z-40 px-4 py-3 bg-black border-b border-gray-800 flex items-center justify-between">
         <button
-          onClick={() => navigate(storeSlug ? `/lls/${storeSlug}` : "/lls")}
+          onClick={() => {
+            const citySlugs = ["atlanta"];
+            if (!storeSlug || citySlugs.includes(storeSlug)) {
+              navigate("/discover");
+            } else {
+              navigate(`/lls/${storeSlug}`);
+            }
+          }}
           className="text-white"
           aria-label="Back"
         >
