@@ -121,6 +121,9 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
     if (isLast) {
       localStorage.setItem(storageKey, "true");
       setOnboarded(true);
+      setTimeout(() => {
+        document.getElementById("lokol-music-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     } else {
       setCurrentSlide((s) => s + 1);
     }

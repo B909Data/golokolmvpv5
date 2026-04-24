@@ -200,7 +200,7 @@ const Index = () => {
         </div>
       </section>
       {/* LOKOL ATLANTA MUSIC */}
-      <section className="bg-black px-6 md:px-12 lg:px-20 py-16 md:py-24">
+      <section id="lokol-music-section" className="bg-black px-6 md:px-12 lg:px-20 py-16 md:py-24">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <h2
