@@ -5,6 +5,11 @@ import LLSOnboarding from "@/components/LLSOnboarding";
 import cratesHero from "@/assets/crates-atl-hero.svg";
 import dbsHero from "@/assets/dbs-sounds-hero.svg";
 import moodsHero from "@/assets/moods-music-hero.svg";
+import genreHiphop from "@/assets/Genre-hiphop.png";
+import genreRnb from "@/assets/Genre-rnb.png";
+import genreAlternative from "@/assets/Genre-alternative.png";
+import genreHardcore from "@/assets/Genre-hardcore.png";
+import genreIndie from "@/assets/Genre-indie.png";
 
 const HERO_MAP: Record<string, string> = {
   "crates-atl": cratesHero,
