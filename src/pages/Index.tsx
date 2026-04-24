@@ -154,10 +154,15 @@ const Index = () => {
         .eq("fan_user_id", userId)
         .maybeSingle();
       if (!profile) {
-        await supabase.auth.signOut();
-        setFanSignInError("No fan account found. Discover at a local store first.");
-        setFanSignInLoading(false);
-        return;
+        // Create fan profile automatically for new users
+        await (supabase as any)
+          .from("fan_profiles")
+          .insert({
+            fan_user_id: userId,
+            email: fanEmail.trim(),
+            city: "Atlanta",
+            lokol_points: 0,
+          });
       }
       navigate("/fan/scene");
     } catch (err: any) {
