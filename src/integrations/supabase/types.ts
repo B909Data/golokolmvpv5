@@ -241,6 +241,7 @@ export type Database = {
           created_at: string | null
           daily_points_date: string | null
           daily_points_earned: number | null
+          daily_scan_bonus_date: string | null
           email: string | null
           fan_user_id: string
           id: string
@@ -255,6 +256,7 @@ export type Database = {
           created_at?: string | null
           daily_points_date?: string | null
           daily_points_earned?: number | null
+          daily_scan_bonus_date?: string | null
           email?: string | null
           fan_user_id: string
           id?: string
@@ -269,6 +271,7 @@ export type Database = {
           created_at?: string | null
           daily_points_date?: string | null
           daily_points_earned?: number | null
+          daily_scan_bonus_date?: string | null
           email?: string | null
           fan_user_id?: string
           id?: string

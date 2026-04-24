@@ -34,7 +34,9 @@ const SLUG_TO_GENRE: Record<string, string> = {
   techno: "Techno",
 };
 
-const DAILY_CAP = 30;
+const DAILY_CAP = 50;
+const GENERAL_SAVE_CAP = 3;
+const STORE_SAVE_CAP = 5;
 
 // Write genre to store session token
 const trackGenreInSession = (genreLabel: string) => {
@@ -267,10 +269,18 @@ const LokolListensGenre = () => {
   const awardPoints = useCallback(async (amount: number): Promise<number> => {
     if (!hasValidTokenRef.current) return 0;
 
-    if (dailyPointsRef.current >= DAILY_CAP) {
+    // Check correct save cap based on session type
+    const isInStore = hasValidTokenRef.current;
+    const saveCapForSession = isInStore ? STORE_SAVE_CAP : GENERAL_SAVE_CAP;
+    const pointsCapForSession = saveCapForSession * 10;
+
+    if (dailyPointsRef.current >= pointsCapForSession) {
       if (!capToastShownRef.current) {
         capToastShownRef.current = true;
-        setCapToast("You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧");
+        const msg = isInStore
+          ? "You've saved 5 artists today at this store. Come back tomorrow for more points. 🎧"
+          : "You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧";
+        setCapToast(msg);
         setTimeout(() => setCapToast(""), 5000);
       }
       return 0;
@@ -285,9 +295,12 @@ const LokolListensGenre = () => {
     });
     dailyPointsRef.current += pointsToAward;
 
-    if (dailyPointsRef.current >= DAILY_CAP && !capToastShownRef.current) {
+    if (dailyPointsRef.current >= pointsCapForSession && !capToastShownRef.current) {
       capToastShownRef.current = true;
-      setCapToast("You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧");
+      const msg = isInStore
+        ? "You've saved 5 artists today at this store. Come back tomorrow for more points. 🎧"
+        : "You've saved 3 artists today. Visit a Lokol Listening Station to save more and earn bonus points. 🎧";
+      setCapToast(msg);
       setTimeout(() => setCapToast(""), 5000);
     }
 
