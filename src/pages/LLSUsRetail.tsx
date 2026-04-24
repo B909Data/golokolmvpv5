@@ -27,7 +27,7 @@ const [form, setForm] = useState({
     store_name: "",
     city_location: "",
     store_type: "",
-    has_listening_station: "",
+    has_listening_station: "N/A",
     signage_preference: [] as string[],
     contact_name: "",
     contact_email: "",
