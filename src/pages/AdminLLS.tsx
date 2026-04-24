@@ -224,7 +224,13 @@ const AdminLLS = () => {
     if (selectedReasons.length === 0) return;
     setSaving(true);
     try {
-      const reason = selectedReasons.join(", ");
+      const rejectingSubmission = submissions.find(s => s.id === id);
+      const reason = selectedReasons
+        .map(r => r === "ONLY_ONE_SONG"
+          ? `Only one song can be featured at a time. We loved ${rejectingSubmission?.song_title || "this song"} — it will be shared with your new fans as fresh music.`
+          : r
+        )
+        .join(", ");
       const { error } = await (supabase as any)
         .from("lls_artist_submissions")
         .update({ admin_status: "rejected", rejection_reason: reason })
