@@ -44,7 +44,11 @@ const SLIDES = [
         Discover Local Music
       </>
     ),
-    body: "Browse Atlanta artists. Decide who moves you. It matters.",
+    body: (
+      <>
+        Save artists who move you. <br /> It matters.
+      </>
+    ),
   },
   {
     icon: fanmenuShows,
@@ -52,10 +56,16 @@ const SLIDES = [
     heading: (
       <>
         2<br />
-        Build Your Scene
+        Build Your Lokol Scene
       </>
     ),
-    body: "Save artists you love. Your Lokol Scene is your personal Atlanta music dashboard.",
+    body: (
+      <>
+        New music and shows
+        <br />
+        from those you said mattered.
+      </>
+    ),
   },
   {
     icon: fanmenuMarket,
@@ -66,7 +76,12 @@ const SLIDES = [
         Show Up. Earn. Redeem.
       </>
     ),
-    body: "Engage. Go to shows. Earn points and redeem value in your city.",
+    body: (
+      <>
+        Engage + Go to shows = Earn Points. <br />
+        Redeem points around town.
+      </>
+    ),
   },
 ];
 
@@ -101,7 +116,9 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
           >
             Good Music Lives Here
           </h1>
-          <p className="text-white text-[18px] leading-relaxed">Atlanta's local music scene. Discover it in 3 steps.</p>
+          <p className="text-white text-[18px] leading-relaxed">
+            Discover and build your own <br /> Atlanta music scene in 3 steps
+          </p>
           <button
             onClick={() => setPhase("swipe")}
             className="mt-4 font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
