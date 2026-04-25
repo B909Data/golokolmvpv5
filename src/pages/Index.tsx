@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import heroImage from "@/assets/golokol-hero.svg";
+import heroImage from "@/assets/golokol-hero-cityinforest.png";
 import llsCard from "@/assets/lls-us-hero.jpg";
 import connectCard from "@/assets/connect-card.jpg";
 import img3Card from "@/assets/img3.svg";
