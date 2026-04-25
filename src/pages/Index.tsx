@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import heroImage from "@/assets/golokol-hero-cityinforest.png";
+import heroImage from "@/assets/golokol-hero-cityinforest.jpg";
 import llsCard from "@/assets/lls-us-hero.jpg";
 import connectCard from "@/assets/connect-card.jpg";
 import img3Card from "@/assets/img3.svg";
@@ -198,8 +198,8 @@ const Index = () => {
         />
         <div className="absolute inset-0 bg-black/45" />
         <div className="relative z-10 px-6 md:px-12 lg:px-20 pt-32 pb-16 max-w-3xl">
-          <h1 className="font-display font-bold text-[32px] md:text-[48px] leading-[1.1] mb-4">
-            <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 56, lineHeight: 1.0, color: "#FFD600" }}>
+          <h1 className="mb-4">
+            <span style={{ fontFamily: "'Anton', sans-serif", fontWeight: 700, fontSize: 56, lineHeight: 1.0, color: "#FFD600" }}>
               Good Music Lives<br />in Atlanta
             </span>
           </h1>
