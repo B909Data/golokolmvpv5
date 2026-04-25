@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import heroImage from "@/assets/golokol-hero-musicmind.jpg";
 import llsCard from "@/assets/lls-us-hero.jpg";
 import connectCard from "@/assets/connect-card.jpg";
-import img3Card from "@/assets/img3.svg";
+import img3Card from "@/assets/homepage-card3.jpg";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import { supabase } from "@/integrations/supabase/client";
 import LLSOnboarding from "@/components/LLSOnboarding";
