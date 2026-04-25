@@ -266,7 +266,7 @@ const ArtistDashboard = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate("/artist/signup", { replace: true });
+    navigate("/", { replace: true });
   };
 
   const getInitials = () => {
@@ -346,6 +346,53 @@ const ArtistDashboard = () => {
     <div className="min-h-screen bg-black flex flex-col">
       <Navbar />
       <div className="flex-1 w-full max-w-[480px] mx-auto px-6 py-6 space-y-6">
+        {/* Artist Overview Video */}
+        <section className="rounded-2xl overflow-hidden bg-[#1a1a1a]">
+          <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+            <iframe
+              className="absolute inset-0 w-full h-full"
+              src="https://www.youtube.com/embed/Jja45Z5GRzg?rel=0"
+              title="GoLokol Artist Overview"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+          <div className="px-4 py-3">
+            <p style={{ fontFamily: "'Anton', sans-serif", fontSize: 16, color: "#FFD600" }}>
+              WELCOME TO GOLOKOL
+            </p>
+            <p className="text-white/60 text-xs mt-1">
+              Watch this first — everything you need to know as a GoLokol artist.
+            </p>
+          </div>
+        </section>
+
+        {/* Coming Soon */}
+        <section className="rounded-2xl bg-[#1a1a1a] p-5 space-y-3">
+          <p style={{ fontFamily: "'Anton', sans-serif", fontSize: 18, color: "#FFD600" }}>
+            COMING SOON TO YOUR DASHBOARD
+          </p>
+          <p className="text-white/50 text-xs">
+            We are building the tools artists actually need. Here is what is on the way.
+          </p>
+          {[
+            { title: "Fan, Song & Show Engagement Data", desc: "See how many fans saved your song, which stores and cities are generating saves, and how your shows are performing." },
+            { title: "Direct Fan Messaging", desc: "Message fans who added you to their Lokol Scene directly. Up to 3 new music drops and 4 show promotions per month." },
+            { title: "Subscription Management", desc: "Manage your GoLokol Connect subscription, billing, and artist tier from one place." },
+            { title: "City-Wide Music Charts", desc: "See where your song ranks among Atlanta artists and track your momentum over time." },
+          ].map((item) => (
+            <div key={item.title} className="border border-white/10 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-white font-bold text-sm">{item.title}</p>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FFD600]/10 text-[#FFD600] whitespace-nowrap">
+                  Coming Soon
+                </span>
+              </div>
+              <p className="text-white/40 text-xs leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </section>
+
         {/* Header */}
         <div className="flex items-center gap-4">
           {profile?.profile_image_url ? (
@@ -381,7 +428,7 @@ const ArtistDashboard = () => {
                 badge = <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-black whitespace-nowrap">Live on GoLokol</span>;
               } else if (admin_status === "approved") {
                 badge = <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-black whitespace-nowrap">Added to Platform</span>;
-                extra = <p className="text-white/70 text-sm font-sans mt-1">Your song is now being discovered at our participating stores in Atlanta. Your free month trial begins today.</p>;
+                extra = <p className="text-white/70 text-sm font-sans mt-1">Your song is now being discovered by Atlanta fans online and at our participating stores. Your free month trial begins today.</p>;
               } else if (admin_status === "rejected") {
                 badge = <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-red-500 text-white whitespace-nowrap">Not Accepted</span>;
                 extra = (
