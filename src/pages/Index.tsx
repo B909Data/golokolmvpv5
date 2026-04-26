@@ -197,7 +197,7 @@ const Index = () => {
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/45" />
-        <div className="relative z-10 px-6 md:px-12 lg:px-20 pt-32 pb-16 max-w-3xl">
+        <div className="relative z-10 px-6 md:px-12 lg:px-20 pt-[182px] pb-16 max-w-3xl">
           <h1 className="mb-4">
             <span style={{ fontFamily: "'Anton', sans-serif", fontWeight: 700, fontSize: 56, lineHeight: 1.0, color: "#FFD600" }}>
               Good Music Lives<br />in Atlanta
