@@ -486,10 +486,11 @@ const LokolListensGenre = () => {
       }
     } else {
       audio.src = track.mp3_url;
+      audio.currentTime = 30;
       audio.play();
       setPlayingId(track.id);
       setIsPlaying(true);
-      setCurrentTime(0);
+      setCurrentTime(30);
       setDuration(0);
       setUnsaveConfirmId(null);
     }
@@ -499,6 +500,13 @@ const LokolListensGenre = () => {
     const audio = audioRef.current;
     if (!audio || !playingId) return;
     setCurrentTime(audio.currentTime);
+    // Stop playback at 1:30 (90 seconds)
+    if (audio.currentTime >= 90) {
+      audio.pause();
+      audio.currentTime = 30;
+      setIsPlaying(false);
+      setCurrentTime(30);
+    }
     if (audio.duration > 0 && audio.currentTime / audio.duration >= 0.5) {
       trackUnder50InSession(playingId, false);
     }
@@ -572,7 +580,14 @@ const LokolListensGenre = () => {
       <audio
         ref={audioRef}
         onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={() => setDuration(audioRef.current?.duration || 0)}
+        onLoadedMetadata={() => {
+          const audio = audioRef.current;
+          if (!audio) return;
+          setDuration(Math.min(audio.duration, 90));
+          if (audio.currentTime < 30) {
+            audio.currentTime = 30;
+          }
+        }}
         onEnded={() => setIsPlaying(false)}
       />
 
