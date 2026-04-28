@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import type { User } from "@supabase/supabase-js";
 
-const GENRE_OPTIONS = ["Hip Hop", "RnB", "Alternative", "Hardcore + Punk", "Indie", "Jazz"];
+const GENRE_OPTIONS = ["Hip Hop", "R&B", "Alternative", "Hardcore", "Indie", "Jazz"];
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_MP3_SIZE = 20 * 1024 * 1024;
