@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const GENRE_OPTIONS = ["Hip Hop", "RnB", "Alternative", "Hardcore + Punk"];
+const GENRE_OPTIONS = ["Hip Hop", "RnB", "Alternative", "Hardcore + Punk", "Indie", "Jazz"];
 
 interface Submission {
   id: string;
@@ -459,18 +459,33 @@ const AdminLLS = () => {
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm text-muted-foreground">Genre *</label>
-                  <Select value={addGenre} onValueChange={setAddGenre}>
-                    <SelectTrigger className="bg-card/50 border-border/50">
-                      <SelectValue placeholder="Select genre" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {GENRE_OPTIONS.map((g) => (
-                        <SelectItem key={g} value={g}>
+                  <div className="flex flex-wrap gap-2">
+                    {GENRE_OPTIONS.map((g) => {
+                      const selected = addGenre.split(",").map((s) => s.trim()).filter(Boolean);
+                      const isSelected = selected.includes(g);
+                      return (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setAddGenre(selected.filter((s) => s !== g).join(", "));
+                            } else if (selected.length < 2) {
+                              setAddGenre([...selected, g].join(", "));
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                            isSelected
+                              ? "bg-[#FFD600] text-black"
+                              : "bg-card/50 text-muted-foreground border border-border/50 hover:border-foreground/30"
+                          }`}
+                        >
                           {g}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Select up to 2 genres</p>
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm text-muted-foreground">Upload MP3 * (max 20MB)</label>
