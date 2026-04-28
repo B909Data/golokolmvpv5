@@ -725,10 +725,10 @@ function HomeView({
                   <p
                     style={{ fontFamily: anton, fontSize: 14, color: "#fff", textTransform: "uppercase", marginTop: 8 }}
                   >
-                    {track.artist_name}
+                    {track.song_title}
                   </p>
                   <p className="text-white text-xs" style={{ opacity: 0.7 }}>
-                    {track.song_title}
+                    {track.artist_name}
                   </p>
                 </div>
               );
@@ -827,10 +827,10 @@ function ArtistsTab({ saves, onArtistTap, onRemoveArtist, userId }: { saves: Sav
                   </div>
                 </div>
                 <p style={{ fontFamily: anton, fontSize: 14, color: "#fff", textTransform: "uppercase", marginTop: 8 }}>
-                  {sub?.artist_name || s.artist_choice}
+                  {sub?.song_title || ""}
                 </p>
                 <p className="text-white text-xs" style={{ opacity: 0.7 }}>
-                  {sub?.song_title || ""}
+                  {sub?.artist_name || s.artist_choice}
                 </p>
                 <div className="flex items-center justify-between mt-1">
                   <img src={fanmenuArtists} alt="saved" className="w-5 h-5" style={{ filter: "none" }} />

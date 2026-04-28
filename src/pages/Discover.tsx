@@ -66,12 +66,13 @@ const Discover = () => {
       const genreMap = new Map<string, string>();
 
       for (const row of data) {
-        const genre = (row.genre_style as string).split(",")[0].trim();
-        if (!genre || genreMap.has(genre)) continue;
-        const img = row.song_image_url as string;
-        if (usedImages.has(img)) continue;
-        usedImages.add(img);
-        genreMap.set(genre, GENRE_IMAGES[genre] || img);
+        const parts = (row.genre_style as string).split(",").map((s: string) => s.trim());
+        for (const genre of parts) {
+          if (!genre) continue;
+          if (genreMap.has(genre)) continue;
+          const img = row.song_image_url as string;
+          genreMap.set(genre, GENRE_IMAGES[genre] || img);
+        }
       }
 
       const cards: { label: string; slug: string; image: string }[] = [];

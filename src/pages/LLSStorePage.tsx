@@ -224,12 +224,12 @@ const LLSStorePage = () => {
 
       for (const row of data) {
         const parts = (row.genre_style as string).split(",").map((s: string) => s.trim());
-        const firstGenre = parts[0];
-        if (!firstGenre || genreMap.has(firstGenre)) continue;
-        const img = row.song_image_url as string;
-        if (usedImages.has(img)) continue;
-        usedImages.add(img);
-        genreMap.set(firstGenre, img);
+        for (const genre of parts) {
+          if (!genre) continue;
+          if (genreMap.has(genre)) continue;
+          const img = row.song_image_url as string;
+          genreMap.set(genre, img);
+        }
       }
 
       const cards: GenreCard[] = [];
