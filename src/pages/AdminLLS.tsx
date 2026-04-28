@@ -477,7 +477,7 @@ const AdminLLS = () => {
                           className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
                             isSelected
                               ? "bg-[#FFD600] text-black"
-                              : "bg-card/50 text-muted-foreground border border-border/50 hover:border-foreground/30"
+                              : "bg-white text-black border border-border/50 hover:bg-white/90"
                           }`}
                         >
                           {g}
