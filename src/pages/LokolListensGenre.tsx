@@ -774,8 +774,8 @@ const LokolListensGenre = () => {
                 {/* Artist info */}
                 {!isSceneFlash && !isPointsFlash && (
                   <div className="absolute bottom-2 left-2 right-8 z-10">
-                    <p className="text-white font-bold text-[13px] truncate">{track.artist_name}</p>
-                    <p className="text-white/70 text-[11px] truncate">{track.song_title}</p>
+                    <p className="text-white font-bold text-[13px] truncate">{track.song_title}</p>
+                    <p className="text-white/70 text-[11px] truncate">{track.artist_name}</p>
                   </div>
                 )}
               </div>
@@ -834,8 +834,8 @@ const LokolListensGenre = () => {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-[13px] truncate">{currentTrack.artist_name}</p>
-              <p className="text-white/60 text-[11px] truncate">{currentTrack.song_title}</p>
+              <p className="text-white font-bold text-[13px] truncate">{currentTrack.song_title}</p>
+              <p className="text-white/60 text-[11px] truncate">{currentTrack.artist_name}</p>
             </div>
             <button
               onClick={() => handlePlayToggle(currentTrack)}
