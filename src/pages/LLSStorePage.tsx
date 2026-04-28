@@ -10,6 +10,7 @@ import genreRnb from "@/assets/Genre-rnb.png";
 import genreAlternative from "@/assets/Genre-alternative.png";
 import genreHardcore from "@/assets/Genre-hardcore.png";
 import genreIndie from "@/assets/Genre-indie.png";
+import genreJazz from "@/assets/Genre-jazz.png";
 
 const HERO_MAP: Record<string, string> = {
   "crates-atl": cratesHero,
@@ -23,6 +24,7 @@ const GENRE_IMAGES: Record<string, string> = {
   Alternative: genreAlternative,
   Hardcore: genreHardcore,
   Indie: genreIndie,
+  Jazz: genreJazz,
 };
 
 const SLUG_MAP: Record<string, string> = {
