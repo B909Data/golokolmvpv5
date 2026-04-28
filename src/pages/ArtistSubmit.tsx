@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
 import type { User } from "@supabase/supabase-js";
 
-const GENRE_OPTIONS = ["Hip Hop", "RnB", "Alternative", "Hardcore + Punk"];
+const GENRE_OPTIONS = ["Hip Hop", "RnB", "Alternative", "Hardcore + Punk", "Indie", "Jazz"];
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_MP3_SIZE = 20 * 1024 * 1024;
@@ -61,7 +61,7 @@ const ArtistSubmit = () => {
     setForm((f) => {
       const current = f.genre_style;
       if (current.includes(genre)) return { ...f, genre_style: current.filter((g) => g !== genre) };
-      if (current.length >= 3) return f;
+      if (current.length >= 2) return f;
       return { ...f, genre_style: [...current, genre] };
     });
   };
@@ -286,7 +286,7 @@ const ArtistSubmit = () => {
 
       <div className="space-y-2">
         <Label className="text-primary-foreground text-base font-sans">
-          Genre / Style * <span className="text-primary-foreground/60">(up to 3)</span>
+          Genre / Style * <span className="text-primary-foreground/60">(up to 2)</span>
         </Label>
         <div className="flex flex-wrap gap-2 mt-1">
           {GENRE_OPTIONS.map((genre) => (
