@@ -8,6 +8,7 @@ import genreRnb from "@/assets/Genre-rnb.png";
 import genreAlternative from "@/assets/Genre-alternative.png";
 import genreHardcore from "@/assets/Genre-hardcore.png";
 import genreIndie from "@/assets/Genre-indie.png";
+import genreJazz from "@/assets/Genre-jazz.png";
 
 const SLUG_MAP: Record<string, string> = {
   "Hip-Hop": "hiphop",
@@ -29,6 +30,7 @@ const Discover = () => {
     "Alternative": genreAlternative,
     "Hardcore": genreHardcore,
     "Indie": genreIndie,
+    "Jazz": genreJazz,
   };
 
   useEffect(() => {
