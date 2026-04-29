@@ -10,120 +10,87 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const AGREEMENT_VERSION = "LLS_KIOSK_PLACEMENT_V1";
+const AGREEMENT_VERSION = "LOKOL_STICKER_PARTNER_V1";
 
-const buildAgreementText = (storeName: string, contactName: string, city: string) =>
-  `LOKOL LISTENING SESSIONS KIOSK PLACEMENT AGREEMENT
+const buildAgreementText = (storeName: string, contactName: string) =>
+  `LOKOL STICKER PARTNER AGREEMENT
 
 This Agreement is entered into between:
 
 GoLokol, Inc. ("GoLokol")
 and
-${storeName} and ${contactName} ("Store")
+${storeName} and ${contactName} ("Partner")
 
-Effective Date: [Date of Signature]
-Pilot Period: 90 days from installation
+Effective Date: Date of Sticker Pack Purchase
 
 1. WHAT IS LOKOL LISTENING SESSIONS?
 
-GoLokol provides a music discovery kiosk featuring local artists from ${city}. Here's how it works:
+GoLokol is a music discovery platform featuring local artists. Here's how the partnership works:
 
-Customers scan a QR code on a foam board poster placed in your store.
-They listen to curated local music and vote on their favorites.
-Votes are counted toward seasonal compilations and featured content.
-Customers earn Points with each vote, which they can redeem for discounts at your store.
-The kiosk uses geo-location technology—it only works inside your store.
+GoLokol provides Partner with branded sticker packs containing QR codes.
+Partner gives one sticker to customers after purchase as a gift.
+Customers scan the sticker on their own device at their convenience and enter the GoLokol music discovery experience.
+Customers vote on local music, earn Points, and can redeem rewards at Partner's business.
 Customers are invited to join GoLokol Connect, our artist discovery app (optional for them).
 
-This is a 90-day pilot. After the pilot ends, GoLokol and Store will meet to review results and decide whether to continue.
+This is a flexible, ongoing partnership based on sticker distribution. There is no fixed end date — the partnership remains active as long as stickers are in circulation.
 
-2. WHAT GOLOKOL PROVIDES
+2. THE STICKER PACK & PRICING
 
-Foam board poster with QR code (includes GoLokol branding and one rotating sponsor logo)
-Full technical setup and troubleshooting — we handle all platform issues
-Points tracking system — customers can redeem points via QR code scan at your register
-Data insights — we'll share voting trends and customer engagement metrics
-One foam board replacement during the 90-day pilot if damaged by normal wear and tear
-Optional promotional support — we may create and share promotional content featuring your store (see Section 5)
+What GoLokol Provides:
+One initial pack of 500 branded stickers per order. Each sticker contains a unique QR code tied to Partner's location. Stickers are printed with GoLokol branding and Partner's business name. GoLokol handles all QR code generation, tracking, and platform infrastructure.
 
-3. WHAT THE STORE PROVIDES
+Partner's Investment:
+Partner pays $40 per sticker pack (500 stickers = $40 one-time). Payment is due at signup before stickers are printed. Additional sticker pack orders follow the same $40 pricing. No refunds are issued after the sticker pack order is fulfilled and printed.
 
-Store WiFi access (if available) for the kiosk platform
-Physical space for the foam board poster in a visible customer area
-Notification of technical issues — email or text GoLokol immediately if the QR code is damaged or the kiosk isn't working
-Points redemption at checkout — scan customer QR codes to deduct points when they redeem discounts
-Data integrity — store staff do not modify, remove, or tamper with the kiosk or QR code
-Optional: Create one social media post or in-store signage promoting the voting experience to your customers.
+3. PARTNER'S RESPONSIBILITIES
 
-4. POINTS & REDEMPTION
+Partner agrees to:
+- Distribute stickers to customers after purchase as a gift (recommended practice, not a hard requirement)
+- Notify GoLokol when the sticker pack distribution begins and when the last sticker has been given away
+- Set their own redemption reward rate
+- Honor point redemptions at checkout by scanning customer QR codes to deduct Points
+- Honor remaining customer points if the partnership ends
 
-Customers earn points each time they vote on a song.
-The Store sets the redemption rate — e.g., 50 points = $5 off, 100 points = $10 off. GoLokol will help design this with you.
-Points are tracked in the GoLokol system. Store staff scan the customer's QR code at checkout to redeem.
-If this agreement ends before the 90-day pilot completes, Store honors all remaining customer points (no expiration).
+What Partner does NOT need to provide:
+- Physical wall or floor space
+- Store WiFi or internet access
+- Hardware installation or maintenance
+- Technical support (GoLokol handles all platform issues)
 
-5. SPONSORSHIP & CONTENT
+4. DISTRIBUTION TIMELINE & PARTNERSHIP DURATION
 
-Sponsorship:
-GoLokol places one sponsor logo on the foam board (local business—café, restaurant, neighborhood partner).
-Store receives no sponsorship revenue. All sponsorship fees go to GoLokol.
-Sponsors are small, local businesses aligned with your store's community. GoLokol will not partner with alcohol, drug, or political organizations.
-Sponsor logos may rotate (GoLokol may update the foam board with new sponsors during the 90-day period).
+The partnership begins on the date of sticker pack purchase. The active distribution period is defined as the time between first sticker distribution and the last sticker being given away.
 
-Promotional Content:
-GoLokol may film in-store to create promotional content (photos, video clips) featuring the kiosk and your store.
-Store grants GoLokol permission to use this content in promotional materials (social media, website, case studies).
-Filming will be unobtrusive and brief—we'll coordinate timing with you.
-Store is acknowledged as a GoLokol partner in promotional materials.
+A 30-day review period begins after the last sticker has been distributed. During this review period, GoLokol and Partner will meet to assess results and determine whether to continue. If both parties agree to continue, Partner may order a new sticker pack at the same $40 pricing.
 
-6. CUSTOMER DATA
+The partnership remains active and ongoing as long as stickers are in circulation and Points are being redeemed. There is no predetermined expiration date unless either party terminates.
 
-GoLokol owns all customer data collected through the kiosk (names, emails, voting history, music preferences, visit frequency).
-Store does not receive customer lists or access to voting data.
-After the 90-day pilot ends, Store has the option to purchase customer data from GoLokol. Pricing and terms will be discussed separately if Store is interested.
-All customer data is used only for music discovery and platform improvements.
+5. POINTS & REDEMPTION
 
-7. TECHNICAL SUPPORT & TROUBLESHOOTING
+Customers earn Points each time they engage with local music via the sticker QR code. Partner sets the redemption rate. Points are tracked in the GoLokol system. Partner staff scan the customer's QR code at checkout to redeem. If the partnership ends, Partner honors all remaining customer Points (no expiration).
 
-GoLokol is responsible for all platform issues, QR code functionality, and system troubleshooting.
-Store's role: Notify GoLokol immediately by text or email if the kiosk isn't working or the QR code is damaged.
-Response time: GoLokol will respond within 24 hours and resolve issues as quickly as possible.
-Foam board replacement: GoLokol will replace one damaged foam board (normal wear and tear) during the 90-day pilot at no cost to Store.
-Additional damage: If the foam board is damaged again due to negligence or intentional damage, Store will pay $20 per replacement.
+6. CUSTOMER DATA & CO-BRANDING
 
-8. LIABILITY & RESPONSIBILITY
+GoLokol owns all customer data collected through the sticker QR codes. Partner does not receive customer lists or access to voting data. After the partnership ends, Partner has the option to purchase customer data from GoLokol.
 
-GoLokol is liable for all technical failures, data loss, or platform malfunctions.
-Store is not liable if customers experience issues with voting, points, or the platform.
-Store is not liable for customer disputes about points or voting results.
-GoLokol indemnifies Store — if a customer claims damages related to the kiosk or voting platform, GoLokol handles the claim and expense.
+GoLokol may co-brand the stickers with a sponsor logo. Sponsors are small, local businesses aligned with Partner's community. GoLokol will not partner with alcohol, drug, or political organizations. Partner will be notified of any co-branding before stickers are printed. Partner retains the right to request sponsor review if there are community concerns.
 
-9. TERMINATION
+7. TERMINATION
 
-During the 90-Day Pilot:
-Either party may terminate this agreement with 3 days' written notice (email is acceptable).
-Store honors all remaining customer points upon termination.
-GoLokol removes the foam board and any signage within 5 business days.
+Either party may terminate this agreement with 3 days' written notice (email is acceptable) at any time. Upon termination, Partner honors all remaining customer Points. No sticker refunds are issued after the order is fulfilled.
 
-After the 90-Day Pilot:
-GoLokol and Store will meet to review results and decide on continuation.
-If both parties agree to continue, a new agreement will be executed.
-If either party declines to continue, this agreement ends.
+8. CHANGES & UPDATES
 
-10. CHANGES & UPDATES
+GoLokol may update the discovery platform, voting mechanics, or features without additional notice. Material changes will be communicated to Partner before implementation.
 
-GoLokol may update the kiosk platform, voting mechanics, or features without additional notice.
-Store acknowledges that technology evolves and that GoLokol may make improvements to the system.
-Material changes (e.g., new customer data collection) will be communicated to Store before implementation.
+9. LIABILITY & INDEMNITY
 
-11. NO EXCLUSIVITY
+GoLokol is liable for all technical failures, data loss, or platform malfunctions. Partner is not liable for customer disputes about Points or voting results. GoLokol indemnifies Partner — if a customer claims damages related to the stickers, QR code, or voting platform, GoLokol handles the claim and expense.
 
-GoLokol may place Lokol Listening Stations kiosks in other record stores and retail locations in ${city} and beyond.
-This agreement does not grant Store any exclusive rights.
+10. NO EXCLUSIVITY
 
-12. SIGNATURES
-
-By signing below, both parties agree to the terms of this Lokol Listening Stations Kiosk Placement Agreement.`;
+GoLokol may provide sticker packs to other retail and gathering spot partners in the same geographic area and beyond. This agreement does not grant Partner any exclusive rights.`;
 
 interface LocationState {
   retail_signup_id?: string;
@@ -150,7 +117,7 @@ const LLSUsTerms = () => {
   }
 
   const { store_name, contact_name, contact_email, city, retail_signup_id } = state;
-  const agreementText = buildAgreementText(store_name, contact_name, city);
+  const agreementText = buildAgreementText(store_name, contact_name);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,7 +147,6 @@ const LLSUsTerms = () => {
       } as any);
       if (error) throw error;
 
-      // Mark terms_accepted on the retail signup
       if (retail_signup_id) {
         await supabase
           .from("lls_retail_signups")
@@ -188,27 +154,29 @@ const LLSUsTerms = () => {
           .eq("id", retail_signup_id);
       }
 
-      // Send agreement copy via email (fire-and-forget)
       const signedDate = new Date().toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       });
-      supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "kiosk-agreement-confirmation",
-          recipientEmail: contact_email,
-          idempotencyKey: `kiosk-agreement-${signatureId}`,
-          templateData: {
-            contact_name,
-            store_name,
-            city,
-            signed_date: signedDate,
-            agreement_text: agreementText,
-            agreement_version: AGREEMENT_VERSION,
+
+      supabase.functions
+        .invoke("send-transactional-email", {
+          body: {
+            templateName: "kiosk-agreement-confirmation",
+            recipientEmail: contact_email,
+            idempotencyKey: `sticker-agreement-${signatureId}`,
+            templateData: {
+              contact_name,
+              store_name,
+              city,
+              signed_date: signedDate,
+              agreement_text: agreementText,
+              agreement_version: AGREEMENT_VERSION,
+            },
           },
-        },
-      }).catch((err: any) => console.error("Email send error:", err));
+        })
+        .catch((err: any) => console.error("Email send error:", err));
 
       setSigned(true);
       toast.success("Agreement signed successfully.");
@@ -227,17 +195,16 @@ const LLSUsTerms = () => {
         <main className="flex-1 px-6 md:px-12 lg:px-20 py-12">
           <div className="max-w-2xl mx-auto text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
-            <h1 className="font-display text-2xl md:text-3xl text-black mb-4">
-              Agreement Signed Successfully
-            </h1>
+            <h1 className="font-display text-2xl md:text-3xl text-black mb-4">Agreement Signed Successfully</h1>
             <p className="text-black/70 mb-2">
               Thank you, <span className="text-black font-medium">{contact_name}</span>.
             </p>
             <p className="text-black/70 mb-8">
-              Your electronic signature for the Lokol Listening Stations Kiosk Placement Agreement has been recorded. We'll be in touch shortly to get your store set up.
+              Your electronic signature for the Lokol Sticker Partner Agreement has been recorded. A copy has been sent
+              to your email. We'll be in touch shortly to get your sticker pack on the way.
             </p>
-            <Link to="/lls-us">
-              <Button className="bg-black text-yellow-400 hover:bg-black/90">Back to LLS</Button>
+            <Link to="/">
+              <Button className="bg-black text-yellow-400 hover:bg-black/90">Back to GoLokol</Button>
             </Link>
           </div>
         </main>
@@ -249,170 +216,188 @@ const LLSUsTerms = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar />
-
       <main className="flex-1 px-6 md:px-12 lg:px-20 py-12">
         <div className="max-w-2xl mx-auto">
-          <h1 className="font-display text-2xl md:text-3xl text-black mb-2">
-            LOKOL LISTENING SESSIONS
-          </h1>
-          <h2 className="font-display text-xl md:text-2xl text-black mb-8">
-            KIOSK PLACEMENT AGREEMENT
-          </h2>
+          <h1 className="font-display text-2xl md:text-3xl text-black mb-2">LOKOL STICKER PARTNER AGREEMENT</h1>
+          <p className="text-black/50 text-sm mb-8">Version: {AGREEMENT_VERSION}</p>
 
-          {/* Agreement preamble */}
-          <div className="space-y-6 text-black/70 leading-relaxed mb-12">
-            <p>This Agreement is entered into between:</p>
-            <p>
-              <strong className="text-black">GoLokol, Inc.</strong> ("GoLokol")<br />
-              and<br />
-              <strong className="text-black">{store_name}</strong> and <strong className="text-black">{contact_name}</strong> ("Store")
-            </p>
-            <p>Effective Date: Date of Signature<br />Pilot Period: 90 days from installation</p>
+          <div className="space-y-8 text-black/70 leading-relaxed mb-12">
+            <div>
+              <p>This Agreement is entered into between:</p>
+              <p className="mt-3">
+                <strong className="text-black">GoLokol, Inc.</strong> ("GoLokol")
+                <br />
+                and
+                <br />
+                <strong className="text-black">{store_name}</strong> and{" "}
+                <strong className="text-black">{contact_name}</strong> ("Partner")
+              </p>
+              <p className="mt-3">Effective Date: Date of Sticker Pack Purchase</p>
+            </div>
 
-            {/* Section 1 */}
             <div>
               <h3 className="text-black font-semibold mb-3">1. WHAT IS LOKOL LISTENING SESSIONS?</h3>
-              <p className="mb-3">GoLokol provides a music discovery kiosk featuring local artists from {city}. Here's how it works:</p>
+              <p className="mb-3">
+                GoLokol is a music discovery platform featuring local artists. Here's how the partnership works:
+              </p>
               <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>Customers scan a QR code on a foam board poster placed in your store.</li>
-                <li>They listen to curated local music and vote on their favorites.</li>
-                <li>Votes are counted toward seasonal compilations and featured content.</li>
-                <li>Customers earn Points with each vote, which they can redeem for discounts at your store.</li>
-                <li>The kiosk uses geo-location technology—it only works inside your store.</li>
+                <li>GoLokol provides Partner with branded sticker packs containing QR codes.</li>
+                <li>Partner gives one sticker to customers after purchase as a gift.</li>
+                <li>
+                  Customers scan the sticker on their own device at their convenience and enter the GoLokol music
+                  discovery experience.
+                </li>
+                <li>Customers vote on local music, earn Points, and can redeem rewards at Partner's business.</li>
                 <li>Customers are invited to join GoLokol Connect, our artist discovery app (optional for them).</li>
               </ul>
-              <p className="mt-3">This is a 90-day pilot. After the pilot ends, GoLokol and Store will meet to review results and decide whether to continue.</p>
+              <p className="mt-3">
+                This is a flexible, ongoing partnership based on sticker distribution. There is no fixed end date — the
+                partnership remains active as long as stickers are in circulation.
+              </p>
             </div>
 
-            {/* Section 2 */}
             <div>
-              <h3 className="text-black font-semibold mb-3">2. WHAT GOLOKOL PROVIDES</h3>
-              <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>Foam board poster with QR code (includes GoLokol branding and one rotating sponsor logo)</li>
-                <li>Full technical setup and troubleshooting — we handle all platform issues</li>
-                <li>Points tracking system — customers can redeem points via QR code scan at your register</li>
-                <li>Data insights — we'll share voting trends and customer engagement metrics</li>
-                <li>One foam board replacement during the 90-day pilot if damaged by normal wear and tear</li>
-                <li>Optional promotional support — we may create and share promotional content featuring your store (see Section 5)</li>
-              </ul>
-            </div>
-
-            {/* Section 3 */}
-            <div>
-              <h3 className="text-black font-semibold mb-3">3. WHAT THE STORE PROVIDES</h3>
-              <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>Store WiFi access (if available) for the kiosk platform</li>
-                <li>Physical space for the foam board poster in a visible customer area</li>
-                <li>Notification of technical issues — email or text GoLokol immediately if the QR code is damaged or the kiosk isn't working</li>
-                <li>Points redemption at checkout — scan customer QR codes to deduct points when they redeem discounts</li>
-                <li>Data integrity — store staff do not modify, remove, or tamper with the kiosk or QR code</li>
-                <li>Optional: Create one social media post or in-store signage promoting the voting experience to your customers.</li>
-              </ul>
-            </div>
-
-            {/* Section 4 */}
-            <div>
-              <h3 className="text-black font-semibold mb-3">4. POINTS & REDEMPTION</h3>
-              <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>Customers earn points each time they vote on a song.</li>
-                <li>The Store sets the redemption rate — e.g., 50 points = $5 off, 100 points = $10 off. GoLokol will help design this with you.</li>
-                <li>Points are tracked in the GoLokol system. Store staff scan the customer's QR code at checkout to redeem.</li>
-                <li>If this agreement ends before the 90-day pilot completes, Store honors all remaining customer points (no expiration).</li>
-              </ul>
-            </div>
-
-            {/* Section 5 */}
-            <div>
-              <h3 className="text-black font-semibold mb-3">5. SPONSORSHIP & CONTENT</h3>
-              <p className="font-medium text-black mb-2">Sponsorship:</p>
+              <h3 className="text-black font-semibold mb-3">2. THE STICKER PACK & PRICING</h3>
+              <p className="font-medium text-black mb-2">What GoLokol Provides:</p>
               <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
-                <li>GoLokol places one sponsor logo on the foam board (local business—café, restaurant, neighborhood partner).</li>
-                <li>Store receives no sponsorship revenue. All sponsorship fees go to GoLokol.</li>
-                <li>Sponsors are small, local businesses aligned with your store's community. GoLokol will not partner with alcohol, drug, or political organizations.</li>
-                <li>Sponsor logos may rotate (GoLokol may update the foam board with new sponsors during the 90-day period).</li>
+                <li>One initial pack of 500 branded stickers per order.</li>
+                <li>Each sticker contains a unique QR code tied to Partner's location.</li>
+                <li>Stickers are printed with GoLokol branding and Partner's business name.</li>
+                <li>GoLokol handles all QR code generation, tracking, and platform infrastructure.</li>
               </ul>
-              <p className="font-medium text-black mb-2">Promotional Content:</p>
+              <p className="font-medium text-black mb-2">Partner's Investment:</p>
               <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>GoLokol may film in-store to create promotional content (photos, video clips) featuring the kiosk and your store.</li>
-                <li>Store grants GoLokol permission to use this content in promotional materials (social media, website, case studies).</li>
-                <li>Filming will be unobtrusive and brief—we'll coordinate timing with you.</li>
-                <li>Store is acknowledged as a GoLokol partner in promotional materials.</li>
+                <li>Partner pays $40 per sticker pack (500 stickers = $40 one-time).</li>
+                <li>Payment is due at signup before stickers are printed.</li>
+                <li>Additional sticker pack orders follow the same $40 pricing.</li>
+                <li>No refunds are issued after the sticker pack order is fulfilled and printed.</li>
               </ul>
             </div>
 
-            {/* Section 6 */}
             <div>
-              <h3 className="text-black font-semibold mb-3">6. CUSTOMER DATA</h3>
+              <h3 className="text-black font-semibold mb-3">3. PARTNER'S RESPONSIBILITIES</h3>
+              <p className="font-medium text-black mb-2">Partner agrees to:</p>
+              <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
+                <li>
+                  Distribute stickers to customers after purchase as a gift (recommended practice, not a hard
+                  requirement).
+                </li>
+                <li>
+                  Notify GoLokol when the sticker pack distribution begins and when the last sticker has been given
+                  away.
+                </li>
+                <li>Set their own redemption reward rate.</li>
+                <li>Honor point redemptions at checkout by scanning customer QR codes to deduct Points.</li>
+                <li>Honor remaining customer points if the partnership ends.</li>
+              </ul>
+              <p className="font-medium text-black mb-2">What Partner does NOT need to provide:</p>
               <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>GoLokol owns all customer data collected through the kiosk (names, emails, voting history, music preferences, visit frequency).</li>
-                <li>Store does not receive customer lists or access to voting data.</li>
-                <li>After the 90-day pilot ends, Store has the option to purchase customer data from GoLokol. Pricing and terms will be discussed separately if Store is interested.</li>
-                <li>All customer data is used only for music discovery and platform improvements.</li>
+                <li>Physical wall or floor space.</li>
+                <li>Store WiFi or internet access.</li>
+                <li>Hardware installation or maintenance.</li>
+                <li>Technical support (GoLokol handles all platform issues).</li>
               </ul>
             </div>
 
-            {/* Section 7 */}
             <div>
-              <h3 className="text-black font-semibold mb-3">7. TECHNICAL SUPPORT & TROUBLESHOOTING</h3>
+              <h3 className="text-black font-semibold mb-3">4. DISTRIBUTION TIMELINE & PARTNERSHIP DURATION</h3>
+              <p className="mb-3">
+                The partnership begins on the date of sticker pack purchase. The active distribution period is defined
+                as the time between first sticker distribution and the last sticker being given away.
+              </p>
+              <p className="mb-3">
+                A 30-day review period begins after the last sticker has been distributed. During this review period,
+                GoLokol and Partner will meet to assess results and determine whether to continue. If both parties agree
+                to continue, Partner may order a new sticker pack at the same $40 pricing.
+              </p>
+              <p>
+                The partnership remains active and ongoing as long as stickers are in circulation and Points are being
+                redeemed. There is no predetermined expiration date unless either party terminates.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-black font-semibold mb-3">5. POINTS & REDEMPTION</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>GoLokol is responsible for all platform issues, QR code functionality, and system troubleshooting.</li>
-                <li>Store's role: Notify GoLokol immediately by text or email if the kiosk isn't working or the QR code is damaged.</li>
-                <li>Response time: GoLokol will respond within 24 hours and resolve issues as quickly as possible.</li>
-                <li>Foam board replacement: GoLokol will replace one damaged foam board (normal wear and tear) during the 90-day pilot at no cost to Store.</li>
-                <li>Additional damage: If the foam board is damaged again due to negligence or intentional damage, Store will pay $20 per replacement.</li>
+                <li>Customers earn Points each time they engage with local music via the sticker QR code.</li>
+                <li>
+                  Partner sets the redemption rate — e.g., 50 points = $5 off, 100 points = 10% off $50+ purchase.
+                  GoLokol will help design this with Partner.
+                </li>
+                <li>
+                  Points are tracked in the GoLokol system. Partner staff scan the customer's QR code at checkout to
+                  redeem.
+                </li>
+                <li>If the partnership ends, Partner honors all remaining customer Points (no expiration).</li>
               </ul>
             </div>
 
-            {/* Section 8 */}
             <div>
-              <h3 className="text-black font-semibold mb-3">8. LIABILITY & RESPONSIBILITY</h3>
+              <h3 className="text-black font-semibold mb-3">6. CUSTOMER DATA & CO-BRANDING</h3>
+              <p className="font-medium text-black mb-2">Customer Data Ownership:</p>
+              <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
+                <li>GoLokol owns all customer data collected through the sticker QR codes.</li>
+                <li>Partner does not receive customer lists or access to voting data.</li>
+                <li>
+                  After the partnership ends, Partner has the option to purchase customer data from GoLokol. Pricing and
+                  terms will be discussed separately.
+                </li>
+              </ul>
+              <p className="font-medium text-black mb-2">Co-Branding & Sponsorship:</p>
+              <ul className="list-disc list-inside space-y-2 ml-2">
+                <li>GoLokol may co-brand the stickers with a sponsor logo (local businesses only).</li>
+                <li>Partner receives no sponsorship revenue. All sponsorship fees go to GoLokol.</li>
+                <li>GoLokol will not partner with alcohol, drug, or political organizations.</li>
+                <li>Partner will be notified of any co-branding before stickers are printed.</li>
+                <li>Partner retains the right to request sponsor review if there are community concerns.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-black font-semibold mb-3">7. TERMINATION</h3>
+              <p className="mb-3">
+                Either party may terminate this agreement with 3 days' written notice (email is acceptable) at any time.
+              </p>
+              <ul className="list-disc list-inside space-y-2 ml-2">
+                <li>Partner honors all remaining customer Points upon termination (no expiration).</li>
+                <li>No sticker refunds are issued after the order is fulfilled.</li>
+                <li>Customer voting data and historical Points remain valid for redemption after termination.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-black font-semibold mb-3">8. CHANGES & UPDATES</h3>
+              <ul className="list-disc list-inside space-y-2 ml-2">
+                <li>
+                  GoLokol may update the discovery platform, voting mechanics, or features without additional notice.
+                </li>
+                <li>Material changes will be communicated to Partner before implementation.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-black font-semibold mb-3">9. LIABILITY & INDEMNITY</h3>
               <ul className="list-disc list-inside space-y-2 ml-2">
                 <li>GoLokol is liable for all technical failures, data loss, or platform malfunctions.</li>
-                <li>Store is not liable if customers experience issues with voting, points, or the platform.</li>
-                <li>Store is not liable for customer disputes about points or voting results.</li>
-                <li>GoLokol indemnifies Store — if a customer claims damages related to the kiosk or voting platform, GoLokol handles the claim and expense.</li>
+                <li>Partner is not liable for customer disputes about Points or voting results.</li>
+                <li>
+                  GoLokol indemnifies Partner — if a customer claims damages related to the stickers, QR code, or voting
+                  platform, GoLokol handles the claim and expense.
+                </li>
               </ul>
             </div>
 
-            {/* Section 9 */}
             <div>
-              <h3 className="text-black font-semibold mb-3">9. TERMINATION</h3>
-              <p className="font-medium text-black mb-2">During the 90-Day Pilot:</p>
-              <ul className="list-disc list-inside space-y-2 ml-2 mb-4">
-                <li>Either party may terminate this agreement with 3 days' written notice (email is acceptable).</li>
-                <li>Store honors all remaining customer points upon termination.</li>
-                <li>GoLokol removes the foam board and any signage within 5 business days.</li>
-              </ul>
-              <p className="font-medium text-black mb-2">After the 90-Day Pilot:</p>
-              <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>GoLokol and Store will meet to review results and decide on continuation.</li>
-                <li>If both parties agree to continue, a new agreement will be executed.</li>
-                <li>If either party declines to continue, this agreement ends.</li>
-              </ul>
+              <h3 className="text-black font-semibold mb-3">10. NO EXCLUSIVITY</h3>
+              <p>
+                GoLokol may provide sticker packs to other retail and gathering spot partners in the same geographic
+                area and beyond. This agreement does not grant Partner any exclusive rights.
+              </p>
             </div>
 
-            {/* Section 10 */}
             <div>
-              <h3 className="text-black font-semibold mb-3">10. CHANGES & UPDATES</h3>
-              <ul className="list-disc list-inside space-y-2 ml-2">
-                <li>GoLokol may update the kiosk platform, voting mechanics, or features without additional notice.</li>
-                <li>Store acknowledges that technology evolves and that GoLokol may make improvements to the system.</li>
-                <li>Material changes (e.g., new customer data collection) will be communicated to Store before implementation.</li>
-              </ul>
-            </div>
-
-            {/* Section 11 */}
-            <div>
-              <h3 className="text-black font-semibold mb-3">11. NO EXCLUSIVITY</h3>
-              <p>GoLokol may place Lokol Listening Stations kiosks in other record stores and retail locations in {city} and beyond. This agreement does not grant Store any exclusive rights.</p>
-            </div>
-
-            {/* Section 12 */}
-            <div>
-              <h3 className="text-black font-semibold mb-3">12. SIGNATURES</h3>
-              <p>By signing below, both parties agree to the terms of this Lokol Listening Stations Kiosk Placement Agreement.</p>
-
-              <div className="mt-6 space-y-4">
+              <h3 className="text-black font-semibold mb-3">SIGNATURES</h3>
+              <div className="space-y-3">
                 <div>
                   <p className="font-medium text-black">For GoLokol, Inc.:</p>
                   <p className="text-black/70">Name: Hanifah Walidah</p>
@@ -428,16 +413,18 @@ const LLSUsTerms = () => {
 
           {/* Signature Section */}
           <div className="border-t border-black/20 pt-10">
-            <h2 className="font-display text-xl md:text-2xl text-black mb-8">
-              Store Agreement Signature
-            </h2>
-
+            <h2 className="font-display text-xl md:text-2xl text-black mb-8">Sign the Agreement</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Pre-filled info */}
               <div className="rounded-lg bg-gray-100 border border-black/10 p-4 space-y-1">
-                <p className="type-body-sm text-black/70">Signing on behalf of: <span className="text-black font-medium">{store_name}</span></p>
-                <p className="type-body-sm text-black/70">Contact: <span className="text-black font-medium">{contact_name}</span></p>
-                <p className="type-body-sm text-black/70">Email: <span className="text-black font-medium">{contact_email}</span></p>
+                <p className="text-sm text-black/70">
+                  Signing on behalf of: <span className="text-black font-medium">{store_name}</span>
+                </p>
+                <p className="text-sm text-black/70">
+                  Contact: <span className="text-black font-medium">{contact_name}</span>
+                </p>
+                <p className="text-sm text-black/70">
+                  Email: <span className="text-black font-medium">{contact_email}</span>
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -454,7 +441,6 @@ const LLSUsTerms = () => {
                 />
               </div>
 
-              {/* Consent Checkbox */}
               <div className="flex items-start gap-3 pt-2">
                 <Checkbox
                   id="consent"
@@ -463,11 +449,12 @@ const LLSUsTerms = () => {
                   className="mt-0.5 border-black/40"
                 />
                 <Label htmlFor="consent" className="text-black text-sm leading-relaxed cursor-pointer">
-                  I confirm that I have read and agree to the Lokol Listening Stations Kiosk Placement Agreement and that I have the authority to enter into this agreement on behalf of the Store. <span className="text-red-500">*</span>
+                  I confirm that I have read and agree to the Lokol Sticker Partner Agreement and that I have the
+                  authority to enter into this agreement on behalf of the Partner.{" "}
+                  <span className="text-red-500">*</span>
                 </Label>
               </div>
 
-              {/* Electronic Signature */}
               <div className="space-y-2">
                 <Label htmlFor="signature_name" className="text-black">
                   Type your full legal name to sign <span className="text-red-500">*</span>
@@ -482,7 +469,8 @@ const LLSUsTerms = () => {
                   maxLength={200}
                 />
                 <p className="text-xs text-black/50 mt-1">
-                  By typing my name above and submitting this form, I acknowledge that this constitutes my electronic signature and that I am legally bound by the terms of this agreement.
+                  By typing my name above and submitting this form, I acknowledge that this constitutes my electronic
+                  signature and that I am legally bound by the terms of this agreement.
                 </p>
               </div>
 
