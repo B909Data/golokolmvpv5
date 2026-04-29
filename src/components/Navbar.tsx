@@ -34,7 +34,7 @@ const Navbar = () => {
   const isActive = (p: string) => path === p;
 
   const navItems = [
-    { label: "Record Stores", path: "/lls-us/retail" },
+    { label: "Retail", path: "/lls-us/retail" },
     { label: "Artists", path: "/lls-us/artists" },
     { label: "How to GoLokol", path: "/how-to-golokol" },
     { label: "Pricing", path: "/pricing" },
