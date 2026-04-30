@@ -225,13 +225,6 @@ const Index = () => {
             >
               How It Works
             </button>
-            <button
-              type="button"
-              onClick={() => setShowFanSignIn(true)}
-              className="inline-flex items-center justify-center bg-transparent text-white/60 font-bold text-sm rounded-2xl h-10 px-6 border border-white/30 transition-all duration-200 hover:-translate-y-0.5"
-            >
-              Sign In
-            </button>
           </div>
         </div>
       </section>
