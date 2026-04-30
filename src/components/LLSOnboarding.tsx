@@ -39,9 +39,9 @@ const SLIDES = [
     screenshot: slide1Screenshot,
     heading: (
       <>
-        1
+        Listen to ATL's emerging music.
         <br />
-        Listen to Atlanta's emerging music. No algorithm.
+        All genres.
       </>
     ),
   },
@@ -59,9 +59,11 @@ const SLIDES = [
     screenshot: slide3Screenshot,
     heading: (
       <>
-        3
+        Share. Go to Shows.
         <br />
-        Show up. Show out. Earn points. Redeem locally.
+        Earn Points.
+        <br />
+        Redeem Locally.
       </>
     ),
   },
@@ -86,9 +88,16 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
         <div className="relative z-10 flex flex-col items-center gap-6 px-8 text-center max-w-md">
           <img src={golokolLogo} alt="GoLokol" className="w-16 h-16" />
           <SoundWave />
-          <p className="text-white text-[18px] leading-relaxed">
+          <h1
+            style={{
+              fontFamily: "'Anton', sans-serif",
+              color: "#FFD600",
+              fontSize: 32,
+              lineHeight: 1.15,
+            }}
+          >
             Discover Atlanta artists and shows in 3 steps.
-          </p>
+          </h1>
           <button
             onClick={() => setPhase("swipe")}
             className="mt-4 font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
