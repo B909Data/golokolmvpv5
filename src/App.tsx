@@ -61,6 +61,8 @@ import LLSUsArtistAgreement from "./pages/LLSUsArtistAgreement";
 import LLSUsRetail from "./pages/LLSUsRetail";
 import LLSUsTerms from "./pages/LLSUsTerms";
 import PartnerSuccess from "@/pages/PartnerSuccess";
+import SignIn from "@/pages/SignIn";
+import AuthCallback from "@/pages/AuthCallback";
 import LokolListens from "./pages/LokolListens";
 import LokolListensGenre from "./pages/LokolListensGenre";
 import LLSStorePage from "./pages/LLSStorePage";
@@ -115,6 +117,8 @@ const App = () => (
            <Route path="/lls-us/retail" element={<LLSUsRetail />} />
            <Route path="/lls-us/terms" element={<LLSUsTerms />} />
            <Route path="/partner/success" element={<PartnerSuccess />} />
+           <Route path="/signin" element={<SignIn />} />
+           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/admin/after-parties" element={<AdminAfterParties />} />
           <Route path="/admin/discount-codes" element={<AdminDiscountCodes />} />
           <Route path="/admin/partners" element={<AdminPartners />} />

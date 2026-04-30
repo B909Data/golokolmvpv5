@@ -60,7 +60,7 @@ const Navbar = () => {
         className="font-bold text-[13px] text-black rounded-[8px] px-[14px] py-2"
         style={{ backgroundColor: "#FFD600" }}
       >
-        Sign In
+        Sign Up
       </button>
     </Link>
   );
