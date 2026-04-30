@@ -37,7 +37,6 @@ const Navbar = () => {
     { label: "Retail", path: "/lls-us/retail" },
     { label: "Artists", path: "/lls-us/artists" },
     { label: "How to GoLokol", path: "/how-to-golokol" },
-    { label: "Pricing", path: "/pricing" },
   ];
 
   const handleSignOut = async () => {
@@ -46,13 +45,22 @@ const Navbar = () => {
     navigate("/");
   };
 
-  const authButton = (
-    <Link to={isLoggedIn ? "/artist/dashboard" : "/artist/signup"}>
+  const authButton = isLoggedIn ? (
+    <Link to="/artist/dashboard">
       <button
         className="font-bold text-[13px] text-black rounded-[8px] px-[14px] py-2"
         style={{ backgroundColor: "#FFD600" }}
       >
-        {isLoggedIn ? "My Dashboard" : "Artist Login"}
+        My Dashboard
+      </button>
+    </Link>
+  ) : (
+    <Link to="/signin">
+      <button
+        className="font-bold text-[13px] text-black rounded-[8px] px-[14px] py-2"
+        style={{ backgroundColor: "#FFD600" }}
+      >
+        Sign In
       </button>
     </Link>
   );
