@@ -1,15 +1,15 @@
 import { useState, useRef, ReactNode } from "react";
-import atlantaBg from "@/assets/atlanta-bg.svg";
 import golokolLogo from "@/assets/golokol-logo.svg";
-import fanmenuShows from "@/assets/fanmenu-shows.svg";
-import fanmenuMarket from "@/assets/fanmenu-market.svg";
+import slide1Screenshot from "@/assets/slide1-screenshot.png";
+import slide2Screenshot from "@/assets/slide2-screenshot.png";
+import slide3Screenshot from "@/assets/slide3-screenshot.png";
 
 interface LLSOnboardingProps {
   storeSlug: string;
   children: ReactNode;
 }
 
-const STORAGE_KEY_PREFIX = "golokol_onboarded_v2_";
+const STORAGE_KEY_PREFIX = "golokol_onboarded_v3_";
 
 const KEYFRAMES = `
   @keyframes soundWave { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
@@ -36,50 +36,32 @@ const SoundWave = () => (
 
 const SLIDES = [
   {
-    icon: golokolLogo,
-    animation: "float 2.5s ease-in-out infinite",
+    screenshot: slide1Screenshot,
     heading: (
       <>
-        1<br />
-        Discover Local Music
-      </>
-    ),
-    body: (
-      <>
-        Save artists who move you. <br /> It matters.
-      </>
-    ),
-  },
-  {
-    icon: fanmenuShows,
-    animation: "pulse 2s ease-in-out infinite",
-    heading: (
-      <>
-        2<br />
-        Build Your Lokol Scene
-      </>
-    ),
-    body: (
-      <>
-        New music and shows
+        1
         <br />
-        from those you said mattered.
+        Listen to Atlanta's emerging music. No algorithm.
       </>
     ),
   },
   {
-    icon: fanmenuMarket,
-    animation: "float 2.5s ease-in-out infinite",
+    screenshot: slide2Screenshot,
     heading: (
       <>
-        3<br />
-        Show Up. Earn. Redeem.
+        2
+        <br />
+        Add artists to your own Lokol Scene.
       </>
     ),
-    body: (
+  },
+  {
+    screenshot: slide3Screenshot,
+    heading: (
       <>
-        Engage + Go to shows = Earn Points. <br />
-        Redeem points around town.
+        3
+        <br />
+        Show up. Show out. Earn points. Redeem locally.
       </>
     ),
   },
@@ -98,26 +80,14 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
     return (
       <div
         className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-        style={{ fontFamily: "'Montserrat', sans-serif" }}
+        style={{ fontFamily: "'Montserrat', sans-serif", backgroundColor: "#000" }}
       >
         <style>{KEYFRAMES}</style>
-        <img src={atlantaBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 flex flex-col items-center gap-6 px-8 text-center max-w-md">
           <img src={golokolLogo} alt="GoLokol" className="w-16 h-16" />
           <SoundWave />
-          <h1
-            style={{
-              fontFamily: "'Anton', sans-serif",
-              color: "#FFD600",
-              fontSize: 32,
-              lineHeight: 1.1,
-            }}
-          >
-            Good Music Lives Here
-          </h1>
           <p className="text-white text-[18px] leading-relaxed">
-            Discover and build your own <br /> Atlanta music scene in 3 steps
+            Discover Atlanta artists and shows in 3 steps.
           </p>
           <button
             onClick={() => setPhase("swipe")}
@@ -138,9 +108,7 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
     if (isLast) {
       localStorage.setItem(storageKey, "true");
       setOnboarded(true);
-      setTimeout(() => {
-        document.getElementById("lokol-music-section")?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       setCurrentSlide((s) => s + 1);
     }
@@ -165,13 +133,11 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-      style={{ fontFamily: "'Montserrat', sans-serif" }}
+      style={{ fontFamily: "'Montserrat', sans-serif", backgroundColor: "#000" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
       <style>{KEYFRAMES}</style>
-      <img src={atlantaBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-black/70" />
 
       <div className="absolute top-12 flex gap-2 z-10">
         {SLIDES.map((_, i) => (
@@ -185,22 +151,20 @@ const LLSOnboarding = ({ storeSlug, children }: LLSOnboardingProps) => {
 
       <div className="relative z-10 flex flex-col items-center gap-6 px-8 text-center max-w-md">
         <img
-          src={slide.icon}
+          src={slide.screenshot}
           alt=""
-          className="w-20 h-20"
-          style={{ animation: slide.animation }}
+          className="w-auto max-h-[55vh] rounded-2xl"
         />
         <h2
           style={{
             fontFamily: "'Anton', sans-serif",
             color: "#FFD600",
-            fontSize: 36,
-            lineHeight: 1.1,
+            fontSize: 28,
+            lineHeight: 1.15,
           }}
         >
           {slide.heading}
         </h2>
-        <p className="text-white text-[16px] leading-relaxed max-w-xs">{slide.body}</p>
       </div>
 
       <button
