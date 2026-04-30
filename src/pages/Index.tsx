@@ -203,17 +203,32 @@ const Index = () => {
         <div className="relative z-10 px-6 md:px-12 lg:px-20 pt-[232px] pb-8 max-w-3xl">
           <h1 className="mb-4">
             <span style={{ fontFamily: "'Anton', sans-serif", fontWeight: 700, fontSize: 56, lineHeight: 1.0, color: "#FFD600" }}>
-              Good Music Lives<br />in Atlanta
+              Good Music Lives<br />in Atlanta.
             </span>
           </h1>
-          <p className="text-white text-base md:text-lg mt-4 max-w-xl opacity-90">
-            Discover and build your Lokol Scene.
-          </p>
-          <div className="mt-8 flex gap-4 items-center">
+          <div className="mt-8 flex flex-wrap gap-4 items-center">
+            <button
+              type="button"
+              onClick={() => {
+                document.getElementById("lokol-music-section")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="inline-flex items-center justify-center bg-[#FFD600] text-black font-bold text-base rounded-2xl h-12 px-8 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              Start Listening
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="inline-flex items-center justify-center bg-transparent text-white font-bold text-base rounded-2xl h-12 px-8 border-2 border-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              How It Works
+            </button>
             <button
               type="button"
               onClick={() => setShowFanSignIn(true)}
-              className="inline-flex items-center justify-center bg-[#FFD600] text-black font-bold text-base rounded-2xl h-12 px-8 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+              className="inline-flex items-center justify-center bg-transparent text-white/60 font-bold text-sm rounded-2xl h-10 px-6 border border-white/30 transition-all duration-200 hover:-translate-y-0.5"
             >
               Sign In
             </button>
@@ -273,7 +288,7 @@ const Index = () => {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="bg-[#0E0E0E] px-6 md:px-12 lg:px-20 py-16 md:py-24">
+      <section id="how-it-works" className="bg-[#0E0E0E] px-6 md:px-12 lg:px-20 py-16 md:py-24">
         <h2 className="text-center font-display font-bold text-3xl md:text-[40px] text-white mb-12">
           How it works
         </h2>
