@@ -251,27 +251,32 @@ const HowToGoLokol = () => {
                 </Paragraph>
               </AccordionItem>
 
-              {/* Section 4: What Are Lokol Listening Stations? */}
+              {/* Section 4: How Does Discovery Work? */}
               <AccordionItem
-                id="what-are-lls"
-                title="What Are Lokol Listening Stations?"
-                isOpen={openSections.has("what-are-lls")}
-                onToggle={() => toggleSection("what-are-lls")}
+                id="how-discovery-works"
+                title="How Does Discovery Work?"
+                isOpen={openSections.has("how-discovery-works")}
+                onToggle={() => toggleSection("how-discovery-works")}
               >
                 <Paragraph>
-                  Lokol Listening Stations are physical QR code displays placed inside partner stores. When a fan scans the QR code they are taken to a mobile discovery experience where they can:
+                  Lokol Listening Stations are GoLokol's discovery experience — accessible online at golokol.app and through QR codes at partner retail locations. No app download required.
                 </Paragraph>
+                <Paragraph className="font-semibold">When a fan visits golokol.app or scans a partner QR sticker they can:</Paragraph>
                 <ul className="space-y-3 mb-6">
                   <CheckBullet>Browse local Atlanta artists by genre</CheckBullet>
-                  <CheckBullet>Listen to curated song previews</CheckBullet>
-                  <CheckBullet>Save artists they love to their Lokol Scene</CheckBullet>
-                  <CheckBullet>Earn Lokol Points for listening and saving</CheckBullet>
+                  <CheckBullet>Listen to curated 60-second song previews</CheckBullet>
+                  <CheckBullet>Save artists they love to their personal Lokol Scene</CheckBullet>
+                  <CheckBullet>Earn Lokol Points for saving artists and visiting partner locations</CheckBullet>
+                  <CheckBullet>See upcoming shows from artists they follow</CheckBullet>
                 </ul>
                 <Paragraph>
                   Fans do not need an account to browse. They create a free account to save artists and track their points.
                 </Paragraph>
                 <Paragraph>
-                  Lokol Listening Stations are currently live at Crate ATL in Atlanta as part of our Record Store Day 2026 pilot launch.
+                  Lokol Listening Stations are currently live across Atlanta with partner retail locations. Fans can also access the full discovery experience at any time at{" "}
+                  <button onClick={() => navigate("/")} className="text-primary hover:underline font-semibold">
+                    golokol.app
+                  </button>.
                 </Paragraph>
               </AccordionItem>
 
