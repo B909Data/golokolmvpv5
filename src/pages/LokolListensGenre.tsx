@@ -620,7 +620,16 @@ const LokolListensGenre = () => {
         <img src={golokolLogo} alt="GoLokol" className="w-8 h-8" />
         {isFan ? (
           <div className="flex items-center gap-2">
-            <span className="text-[#FFD600] font-bold text-sm">🎵 {points} pts</span>
+            <div className="flex flex-col items-end gap-0.5">
+              <span className="text-[#FFD600] font-bold text-sm">🎵 {points} pts</span>
+              <a
+                href="/how-to-golokol"
+                onClick={e => { e.stopPropagation(); }}
+                className="text-white/40 text-[10px] underline"
+              >
+                Earn more. Redeem around ATL.
+              </a>
+            </div>
             <button
               onClick={() => navigate("/fan/scene")}
               className="px-3 py-1 rounded-full text-xs font-bold bg-[#FFD600] text-black"
