@@ -63,7 +63,7 @@ const SECTIONS = [
   { id: "what-is-golokol", title: "What is GoLokol?" },
   { id: "serve-artists", title: "How do we serve Artists?" },
   { id: "serve-small-business", title: "How do we serve small business?" },
-  { id: "what-are-lls", title: "What Are Lokol Listening Stations?" },
+  { id: "how-discovery-works", title: "How Does Discovery Work?" },
   { id: "serve-fans", title: "How do we serve Local Music Fans?" },
   { id: "suggestion-box", title: "Suggestion Box" },
 ];
@@ -176,7 +176,7 @@ const HowToGoLokol = () => {
                 onToggle={() => toggleSection("what-is-golokol")}
               >
                 <Paragraph>
-                  GoLokol is a music discovery platform built for local artists and the fans who support them in person. We connect emerging artists with local music fans through Lokol Listening Stations — physical discovery kiosks placed inside independent record stores and music-friendly retail.
+                  GoLokol is a music discovery platform built for local artists and the fans who support them. We connect emerging Atlanta artists with local fans through Lokol Listening Stations — digital discovery experiences accessible online at golokol.app and through QR codes at partner retail locations across the city.
                 </Paragraph>
                 <Paragraph>
                   No algorithm. No streaming. No followers required. Just real music, real fans, and real community.
@@ -200,8 +200,8 @@ const HowToGoLokol = () => {
                 <ul className="space-y-3 mb-6">
                   <CheckBullet>Submit up to 2 songs per month for free</CheckBullet>
                   <CheckBullet>GoLokol reviews each submission for sound quality and community fit</CheckBullet>
-                  <CheckBullet>Selected songs are placed on Lokol Listening Stations inside Atlanta record stores</CheckBullet>
-                  <CheckBullet>Local fans discover, listen, and save your music in person</CheckBullet>
+                  <CheckBullet>Selected songs are featured on GoLokol for fans to discover online and at partner locations across Atlanta</CheckBullet>
+                  <CheckBullet>Local fans discover, listen, and save your music to their customized Lokol Atlanta Scene</CheckBullet>
                   <CheckBullet>Every fan who saves you gets notified when you have a show — and earns points for showing up</CheckBullet>
                 </ul>
 
@@ -210,7 +210,7 @@ const HowToGoLokol = () => {
                   <CheckBullet>Dashboard showing how many fans have listened to and saved your song</CheckBullet>
                   <CheckBullet>Fan neighborhood data so you know where your supporters are coming from</CheckBullet>
                   <CheckBullet>Show promotion — alert your fans directly when you have an upcoming show</CheckBullet>
-                  <CheckBullet>After your free month GoLokol Connect is $9.99 per month</CheckBullet>
+                  <CheckBullet>After your free month GoLokol Connect is $5.99 per month</CheckBullet>
                 </ul>
 
                 <Paragraph className="font-semibold">Submission requirements:</Paragraph>
@@ -218,7 +218,6 @@ const HowToGoLokol = () => {
                   <CheckBullet>MP3 format only, max 20MB</CheckBullet>
                   <CheckBullet>Square song artwork (minimum 200×200px, max 3MB)</CheckBullet>
                   <CheckBullet>Short bio (240 characters max) — this is what new fans see</CheckBullet>
-                  <CheckBullet>Physical product status (vinyl, CD, merch — in production counts)</CheckBullet>
                 </ul>
               </AccordionItem>
 
@@ -230,51 +229,54 @@ const HowToGoLokol = () => {
                 onToggle={() => toggleSection("serve-small-business")}
               >
                 <Paragraph>
-                  GoLokol partners with independent record stores and music-friendly retail to bring local music discovery into your space.
+                  GoLokol partners with independent retail and community gathering spots to bring local music discovery to your customers.
                 </Paragraph>
-                <Paragraph className="font-semibold">What you get as a partner:</Paragraph>
+                <Paragraph className="font-semibold">Here is how the partnership works:</Paragraph>
                 <ul className="space-y-3 mb-6">
-                  <CheckBullet>A Lokol Listening Station — a QR code display that turns your store into a discovery hub</CheckBullet>
-                  <CheckBullet>Foot traffic from music fans who come in specifically to discover local artists</CheckBullet>
-                  <CheckBullet>A digital presence on the GoLokol platform listing your store as a discovery location</CheckBullet>
-                  <CheckBullet>Revenue share opportunities from future GoLokol market features</CheckBullet>
-                  <CheckBullet>Your store logo featured in the GoLokol Lokol Market rewards section</CheckBullet>
+                  <CheckBullet>Get a pack of 500 GoLokol branded stickers for $40 one-time</CheckBullet>
+                  <CheckBullet>Each sticker has a unique QR code tied to your location</CheckBullet>
+                  <CheckBullet>Hand one to every customer after purchase — it's their gift</CheckBullet>
+                  <CheckBullet>Customers scan the sticker, discover local Atlanta music, earn Lokol Points, and redeem rewards back at your business</CheckBullet>
+                  <CheckBullet>You set your own redemption rate — GoLokol handles all the infrastructure</CheckBullet>
+                  <CheckBullet>Your business is listed as a GoLokol partner location on the platform</CheckBullet>
                 </ul>
                 <Paragraph>
-                  Partnership is free during our Atlanta pilot. We are currently placing stations in select Atlanta stores.
-                </Paragraph>
-                <Paragraph>
-                  Interested in becoming a partner?{" "}
+                  Interested?{" "}
                   <button
                     onClick={() => navigate("/lls-us/retail")}
                     className="text-primary hover:underline font-semibold"
                   >
-                    Visit our Record Stores page to apply.
+                    Become a GoLokol retail partner.
                   </button>
                 </Paragraph>
               </AccordionItem>
 
-              {/* Section 4: What Are Lokol Listening Stations? */}
+              {/* Section 4: How Does Discovery Work? */}
               <AccordionItem
-                id="what-are-lls"
-                title="What Are Lokol Listening Stations?"
-                isOpen={openSections.has("what-are-lls")}
-                onToggle={() => toggleSection("what-are-lls")}
+                id="how-discovery-works"
+                title="How Does Discovery Work?"
+                isOpen={openSections.has("how-discovery-works")}
+                onToggle={() => toggleSection("how-discovery-works")}
               >
                 <Paragraph>
-                  Lokol Listening Stations are physical QR code displays placed inside partner stores. When a fan scans the QR code they are taken to a mobile discovery experience where they can:
+                  Lokol Listening Stations are GoLokol's discovery experience — accessible online at golokol.app and through QR codes at partner retail locations. No app download required.
                 </Paragraph>
+                <Paragraph className="font-semibold">When a fan visits golokol.app or scans a partner QR sticker they can:</Paragraph>
                 <ul className="space-y-3 mb-6">
                   <CheckBullet>Browse local Atlanta artists by genre</CheckBullet>
-                  <CheckBullet>Listen to curated song previews</CheckBullet>
-                  <CheckBullet>Save artists they love to their Lokol Scene</CheckBullet>
-                  <CheckBullet>Earn Lokol Points for listening and saving</CheckBullet>
+                  <CheckBullet>Listen to curated 60-second song previews</CheckBullet>
+                  <CheckBullet>Save artists they love to their personal Lokol Scene</CheckBullet>
+                  <CheckBullet>Earn Lokol Points for saving artists and visiting partner locations</CheckBullet>
+                  <CheckBullet>See upcoming shows from artists they follow</CheckBullet>
                 </ul>
                 <Paragraph>
                   Fans do not need an account to browse. They create a free account to save artists and track their points.
                 </Paragraph>
                 <Paragraph>
-                  Lokol Listening Stations are currently live at Crate ATL in Atlanta as part of our Record Store Day 2026 pilot launch.
+                  Lokol Listening Stations are currently live across Atlanta with partner retail locations. Fans can also access the full discovery experience at any time at{" "}
+                  <button onClick={() => navigate("/")} className="text-primary hover:underline font-semibold">
+                    golokol.app
+                  </button>.
                 </Paragraph>
               </AccordionItem>
 
@@ -290,12 +292,23 @@ const HowToGoLokol = () => {
                 </Paragraph>
                 <Paragraph className="font-semibold">As a GoLokol fan you can:</Paragraph>
                 <ul className="space-y-3 mb-6">
-                  <CheckBullet>Discover local Atlanta artists at record stores through Lokol Listening Stations</CheckBullet>
+                  <CheckBullet>Discover local Atlanta artists online at golokol.app or at partner retail locations</CheckBullet>
                   <CheckBullet>Build your Lokol Scene — a personal collection of artists you love</CheckBullet>
-                  <CheckBullet>Earn Lokol Points for listening, saving artists, and attending shows</CheckBullet>
-                  <CheckBullet>Redeem points for discounts at local partner stores</CheckBullet>
+                  <CheckBullet>Earn Lokol Points for saving artists, visiting partner locations, and attending shows</CheckBullet>
+                  <CheckBullet>Redeem points for discounts at local partner businesses</CheckBullet>
                   <CheckBullet>Get notified when artists in your scene have upcoming shows</CheckBullet>
                 </ul>
+
+                <Paragraph className="font-semibold">Lokol Points — how they work:</Paragraph>
+                <ul className="space-y-3 mb-6">
+                  <CheckBullet>Save an artist: 10pts (up to 3 saves per day online = 30pts max)</CheckBullet>
+                  <CheckBullet>Scan a partner QR sticker in-store: 15pts bonus (once per day)</CheckBullet>
+                  <CheckBullet>In-store saves: up to 5 per day = 50pts max</CheckBullet>
+                  <CheckBullet>Refer a friend who signs up: 5pts</CheckBullet>
+                  <CheckBullet>Attend a show and get checked in by the artist: 25pts</CheckBullet>
+                  <CheckBullet>Redeem starting at 300pts at partner locations</CheckBullet>
+                </ul>
+
                 <Paragraph>
                   My Lokol Scene is your personal music dashboard. It lives on your phone and grows every time you engage with local music.
                 </Paragraph>
