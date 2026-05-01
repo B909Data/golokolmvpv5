@@ -176,7 +176,7 @@ const HowToGoLokol = () => {
                 onToggle={() => toggleSection("what-is-golokol")}
               >
                 <Paragraph>
-                  GoLokol is a music discovery platform built for local artists and the fans who support them in person. We connect emerging artists with local music fans through Lokol Listening Stations — physical discovery kiosks placed inside independent record stores and music-friendly retail.
+                  GoLokol is a music discovery platform built for local artists and the fans who support them. We connect emerging Atlanta artists with local fans through Lokol Listening Stations — digital discovery experiences accessible online at golokol.app and through QR codes at partner retail locations across the city.
                 </Paragraph>
                 <Paragraph>
                   No algorithm. No streaming. No followers required. Just real music, real fans, and real community.
