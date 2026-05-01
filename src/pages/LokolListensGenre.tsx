@@ -650,7 +650,7 @@ const LokolListensGenre = () => {
       ) : tracks.length === 0 ? (
         <p className="text-white text-center py-16">No songs here yet. Check back soon.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-3 px-3 py-4" style={{ paddingBottom: playingId ? 96 : 24 }}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 px-3 py-4" style={{ paddingBottom: playingId ? 96 : 24 }}>
           {tracks.map((track) => {
             const isCurrentlyPlaying = playingId === track.id && isPlaying;
             const isCurrent = playingId === track.id;
@@ -777,8 +777,8 @@ const LokolListensGenre = () => {
                 {/* Artist info */}
                 {!isSceneFlash && !isPointsFlash && (
                   <div className="pt-2 pb-1 px-0.5">
-                    <p style={{ fontFamily: "'Anton', sans-serif", fontSize: 13, color: "#fff", textTransform: "uppercase", lineHeight: 1.2 }} className="truncate">{track.song_title}</p>
-                    <p className="text-white/60 text-[11px] truncate mt-0.5">{track.artist_name}</p>
+                    <p className="truncate" style={{ fontFamily: "'Anton', sans-serif", fontSize: 13, color: "#ffffff", textTransform: "uppercase", lineHeight: 1.2, display: "block" }}>{track.song_title}</p>
+                    <p className="truncate mt-0.5" style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{track.artist_name}</p>
                   </div>
                 )}
               </div>
