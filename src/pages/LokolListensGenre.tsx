@@ -3,6 +3,7 @@ import { ArrowLeft, Play, Pause, SkipForward, Heart } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import golokolLogo from "@/assets/golokol-logo.svg";
+import fanmenuShows from "@/assets/fanmenu-shows.svg";
 import genreHiphop from "@/assets/Genre-hiphop.png";
 import genreRnb from "@/assets/Genre-rnb.png";
 import genreAlternative from "@/assets/Genre-alternative.png";
@@ -72,9 +73,6 @@ const trackUnder50InSession = (submissionId: string, add: boolean) => {
   } catch {}
 };
 
-// === SOUNDS ===
-
-// Save sound — warm ascending chord, celebratory
 const playSaveSound = () => {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -94,7 +92,6 @@ const playSaveSound = () => {
   } catch {}
 };
 
-// Points sound — bright ping, reward feeling
 const playPointsSound = () => {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -113,7 +110,6 @@ const playPointsSound = () => {
   } catch {}
 };
 
-// Cap sound — gentle bump, not punishing
 const playCapSound = () => {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -132,7 +128,6 @@ const playCapSound = () => {
   } catch {}
 };
 
-// Unsave sound — soft descending tone
 const playUnsaveSound = () => {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -176,9 +171,26 @@ interface Track {
   song_title: string;
   song_image_url: string;
   mp3_url: string;
+  artist_user_id?: string;
+}
+
+interface Show {
+  artist_user_id: string;
+  venue_name: string;
+  show_date: string;
+  ticket_url: string | null;
 }
 
 const getTodayAtlanta = () => new Date().toLocaleDateString("en-US", { timeZone: "America/New_York" });
+
+const formatShowDate = (dateStr: string): string => {
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
+  const tomorrowStr = new Date(today.getTime() + 86400000).toISOString().split("T")[0];
+  if (dateStr === todayStr) return "Tonight";
+  if (dateStr === tomorrowStr) return "Tomorrow";
+  return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
 
 const LokolListensGenre = () => {
   const { genre, storeSlug } = useParams<{ genre: string; storeSlug: string }>();
@@ -192,13 +204,14 @@ const LokolListensGenre = () => {
   const GENRE_IMAGES: Record<string, string> = {
     "Hip-Hop": genreHiphop,
     "R&B": genreRnb,
-    "Alternative": genreAlternative,
-    "Hardcore": genreHardcore,
-    "Indie": genreIndie,
-    "Jazz": genreJazz,
+    Alternative: genreAlternative,
+    Hardcore: genreHardcore,
+    Indie: genreIndie,
+    Jazz: genreJazz,
   };
 
   const [tracks, setTracks] = useState<Track[]>([]);
+  const [upcomingShows, setUpcomingShows] = useState<Show[]>([]);
   const [tracksLoading, setTracksLoading] = useState(true);
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -219,16 +232,12 @@ const LokolListensGenre = () => {
       return new Set();
     }
   });
-  const [splashIds, setSplashIds] = useState<Set<string>>(new Set());
-  // sceneFlashIds: shows "ADDED TO YOUR LOKOL SCENE" full screen flash
   const [sceneFlashIds, setSceneFlashIds] = useState<Set<string>>(new Set());
-  // pointsFlashIds: shows "+10 POINTS" flash (separate from scene flash)
   const [pointsFlashIds, setPointsFlashIds] = useState<Set<string>>(new Set());
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayTrack, setOverlayTrack] = useState<Track | null>(null);
   const [isFan, setIsFan] = useState(false);
   const [capToast, setCapToast] = useState("");
-  // Unsave confirm state — which track id is pending removal confirmation
   const [unsaveConfirmId, setUnsaveConfirmId] = useState<string | null>(null);
 
   const hasValidTokenRef = useRef(false);
@@ -239,14 +248,17 @@ const LokolListensGenre = () => {
 
   const genreLabel = SLUG_TO_GENRE[genre || ""] || genre || "";
 
+  const getShowForTrack = (track: Track): Show | null => {
+    if (!track.artist_user_id) return null;
+    return upcomingShows.find((s) => s.artist_user_id === track.artist_user_id) || null;
+  };
+
   useEffect(() => {
     isFanRef.current = isFan;
   }, [isFan]);
-
   useEffect(() => {
     localStorage.setItem("golokol_saved_ids", JSON.stringify([...savedIds]));
   }, [savedIds]);
-
   useEffect(() => {
     localStorage.setItem("golokol_session_points", points.toString());
   }, [points]);
@@ -325,7 +337,7 @@ const LokolListensGenre = () => {
 
       const { data } = await (supabase as any)
         .from("lls_artist_submissions")
-        .select("id, artist_name, song_title, song_image_url, mp3_url, genre_style")
+        .select("id, artist_name, song_title, song_image_url, mp3_url, genre_style, artist_user_id")
         .eq("admin_status", "approved")
         .not("mp3_url", "is", null);
 
@@ -334,7 +346,20 @@ const LokolListensGenre = () => {
       );
       setTracks(filtered);
       setTracksLoading(false);
-      // Auto-play specific song if autoplay param present
+
+      // Load upcoming shows
+      const artistUserIds = filtered.map((row: any) => row.artist_user_id).filter(Boolean);
+      if (artistUserIds.length > 0) {
+        const todayStr = new Date().toISOString().split("T")[0];
+        const { data: showData } = await (supabase as any)
+          .from("show_listings")
+          .select("artist_user_id, venue_name, show_date, ticket_url")
+          .in("artist_user_id", artistUserIds)
+          .gte("show_date", todayStr)
+          .order("show_date", { ascending: true });
+        if (showData) setUpcomingShows(showData);
+      }
+
       if (autoplayId) {
         const autoTrack = filtered.find((t: Track) => t.id === autoplayId);
         if (autoTrack) {
@@ -354,7 +379,6 @@ const LokolListensGenre = () => {
 
   const awardPoints = useCallback(async (amount: number): Promise<number> => {
     if (!hasValidTokenRef.current) return 0;
-
     const saveCapForSession = isInStoreRef.current ? STORE_SAVE_CAP : GENERAL_SAVE_CAP;
     const pointsCapForSession = saveCapForSession * 10;
 
@@ -372,7 +396,6 @@ const LokolListensGenre = () => {
     }
 
     const pointsToAward = Math.min(amount, DAILY_CAP - dailyPointsRef.current);
-
     setPoints((prev) => {
       const newVal = prev + pointsToAward;
       localStorage.setItem("golokol_session_points", newVal.toString());
@@ -412,7 +435,6 @@ const LokolListensGenre = () => {
         }
       } catch {}
     }
-
     return pointsToAward;
   }, []);
 
@@ -425,9 +447,7 @@ const LokolListensGenre = () => {
       return newVal;
     });
     dailyPointsRef.current = Math.max(0, dailyPointsRef.current - deduct);
-    // Reset cap toast so it can fire again if they re-save
     capToastShownRef.current = false;
-
     try {
       const { data: fp } = await (supabase as any)
         .from("fan_profiles")
@@ -460,7 +480,6 @@ const LokolListensGenre = () => {
         return n;
       });
       setUnsaveConfirmId(null);
-      // Deduct points if they earned them (only if token was valid when they saved)
       await deductPoints(10);
       try {
         await (supabase as any)
@@ -502,7 +521,6 @@ const LokolListensGenre = () => {
     const audio = audioRef.current;
     if (!audio || !playingId) return;
     setCurrentTime(audio.currentTime);
-    // Stop playback at 1:30 (90 seconds)
     if (audio.currentTime >= 90) {
       audio.pause();
       audio.currentTime = 30;
@@ -527,16 +545,13 @@ const LokolListensGenre = () => {
       setShowOverlay(true);
       return;
     }
-    if (savedIds.has(track.id) || splashIds.has(track.id)) return;
+    if (savedIds.has(track.id) || sceneFlashIds.has(track.id)) return;
 
     trackGenreInSession(genreLabel);
     localStorage.setItem("golokol_last_genre_url", `/lls/${storeSlug}/genre/${genre}`);
     trackUnder50InSession(track.id, false);
-
-    // 1. Play save sound
     playSaveSound();
 
-    // 2. Show "ADDED TO YOUR LOKOL SCENE" full screen flash
     setSceneFlashIds((prev) => new Set(prev).add(track.id));
     setTimeout(() => {
       setSceneFlashIds((prev) => {
@@ -546,7 +561,6 @@ const LokolListensGenre = () => {
       });
     }, 1800);
 
-    // 3. Award points — if points awarded show +10 flash with sound
     const awarded = await awardPoints(10);
     if (awarded > 0) {
       playPointsSound();
@@ -560,7 +574,6 @@ const LokolListensGenre = () => {
       }, 1500);
     }
 
-    // 4. Save to DB
     try {
       await (supabase as any).from("lokol_scene_saves").insert({
         fan_user_id: userIdRef.current,
@@ -570,7 +583,6 @@ const LokolListensGenre = () => {
       });
     } catch {}
 
-    // 5. Mark as saved (shows heart badge)
     setSavedIds((prev) => new Set(prev).add(track.id));
   };
 
@@ -587,9 +599,7 @@ const LokolListensGenre = () => {
           const audio = audioRef.current;
           if (!audio) return;
           setDuration(Math.min(audio.duration, 90));
-          if (audio.currentTime < 30) {
-            audio.currentTime = 30;
-          }
+          if (audio.currentTime < 30) audio.currentTime = 30;
         }}
         onEnded={() => setIsPlaying(false)}
       />
@@ -599,11 +609,8 @@ const LokolListensGenre = () => {
         <button
           onClick={() => {
             const citySlugs = ["atlanta"];
-            if (!storeSlug || citySlugs.includes(storeSlug)) {
-              navigate("/discover");
-            } else {
-              navigate(`/lls/${storeSlug}`);
-            }
+            if (!storeSlug || citySlugs.includes(storeSlug)) navigate("/discover");
+            else navigate(`/lls/${storeSlug}`);
           }}
           className="text-white"
           aria-label="Back"
@@ -651,149 +658,215 @@ const LokolListensGenre = () => {
       ) : tracks.length === 0 ? (
         <p className="text-white text-center py-16">No songs here yet. Check back soon.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 px-3 py-4" style={{ paddingBottom: playingId ? 96 : 24 }}>
+        <div
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 px-3 py-4"
+          style={{ paddingBottom: playingId ? 96 : 24 }}
+        >
           {tracks.map((track) => {
             const isCurrentlyPlaying = playingId === track.id && isPlaying;
             const isCurrent = playingId === track.id;
             const isSaved = savedIds.has(track.id);
             const isSceneFlash = sceneFlashIds.has(track.id);
             const isPointsFlash = pointsFlashIds.has(track.id);
+            const show = getShowForTrack(track);
 
             return (
-              <div
-                key={track.id}
-                onClick={() => handlePlayToggle(track)}
-                className="flex flex-col cursor-pointer"
-              >
+              <div key={track.id} onClick={() => handlePlayToggle(track)} className="flex flex-col cursor-pointer">
+                {/* Square image */}
                 <div className="relative aspect-square rounded-2xl overflow-hidden w-full">
-                <img
-                  src={track.song_image_url || "/placeholder.svg"}
-                  alt={track.song_title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
+                  <img
+                    src={track.song_image_url || "/placeholder.svg"}
+                    alt={track.song_title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
 
-                {/* Saved heart badge — upper right corner */}
-                {isSaved && !isSceneFlash && !isPointsFlash && (
-                  <div className="absolute top-2 right-2 z-20">
-                    <Heart size={20} fill="#FFD600" stroke="#FFD600" />
-                  </div>
-                )}
+                  {/* Saved heart badge */}
+                  {isSaved && !isSceneFlash && !isPointsFlash && (
+                    <div className="absolute top-2 right-2 z-20">
+                      <Heart size={20} fill="#FFD600" stroke="#FFD600" />
+                    </div>
+                  )}
 
-                {/* Default: play icon */}
-                {!isCurrent && !isSceneFlash && !isPointsFlash && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Play size={56} className="text-white drop-shadow-lg" strokeWidth={1.5} />
-                  </div>
-                )}
+                  {/* Default play */}
+                  {!isCurrent && !isSceneFlash && !isPointsFlash && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <Play size={48} className="text-white drop-shadow-lg" strokeWidth={1.5} />
+                    </div>
+                  )}
 
-                {/* Playing: + save button */}
-                {isCurrent && !isSaved && !isSceneFlash && !isPointsFlash && (
-                  <>
-                    <div className="absolute inset-0 bg-black/50" />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSave(track);
-                      }}
-                      className="absolute inset-0 flex items-center justify-center"
-                      aria-label="Save"
+                  {/* Playing unsaved */}
+                  {isCurrent && !isSaved && !isSceneFlash && !isPointsFlash && (
+                    <>
+                      <div className="absolute inset-0 bg-black/50" />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSave(track);
+                        }}
+                        className="absolute inset-0 flex items-center justify-center"
+                        aria-label="Save"
+                      >
+                        <div className="w-16 h-16 rounded-full border-2 border-white flex items-center justify-center text-white text-3xl font-light">
+                          +
+                        </div>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNext();
+                        }}
+                        className="absolute bottom-2 right-2 text-white"
+                        aria-label="Next"
+                      >
+                        <SkipForward size={20} />
+                      </button>
+                      {isCurrentlyPlaying && (
+                        <div className="absolute top-2 right-2 text-white bg-black/60 rounded-full p-1">
+                          <Pause size={14} />
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Playing saved */}
+                  {isCurrent && isSaved && !isSceneFlash && !isPointsFlash && (
+                    <>
+                      <div className="absolute inset-0 bg-black/30" />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNext();
+                        }}
+                        className="absolute bottom-2 right-2 text-white"
+                        aria-label="Next"
+                      >
+                        <SkipForward size={20} />
+                      </button>
+                      {isCurrentlyPlaying && (
+                        <div className="absolute top-2 left-2 text-white bg-black/60 rounded-full p-1">
+                          <Pause size={14} />
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Scene flash */}
+                  {isSceneFlash && (
+                    <div
+                      className="absolute inset-0 bg-black flex flex-col items-center justify-center gap-2 rounded-2xl"
+                      style={{ animation: "sceneFlash 1.8s ease-out forwards" }}
                     >
-                      <div className="w-16 h-16 rounded-full border-2 border-white flex items-center justify-center text-white text-3xl font-light">
-                        +
-                      </div>
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleNext();
-                      }}
-                      className="absolute bottom-2 right-2 text-white"
-                      aria-label="Next"
+                      <Heart size={32} fill="#FFD600" stroke="#FFD600" />
+                      <span
+                        style={{
+                          fontFamily: "Anton, sans-serif",
+                          fontSize: 18,
+                          color: "#FFD600",
+                          textAlign: "center",
+                          lineHeight: 1.2,
+                          padding: "0 8px",
+                        }}
+                      >
+                        ADDED TO YOUR{"\n"}LOKOL SCENE
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Points flash */}
+                  {isPointsFlash && !isSceneFlash && (
+                    <div
+                      className="absolute inset-0 bg-[#FFD600]/20 ring-4 ring-[#FFD600] rounded-2xl flex items-center justify-center"
+                      style={{ animation: "pointsFlash 1.5s ease-out forwards" }}
                     >
-                      <SkipForward size={20} />
-                    </button>
-                    {isCurrentlyPlaying && (
-                      <div className="absolute top-2 right-2 text-white bg-black/60 rounded-full p-1">
-                        <Pause size={14} />
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {/* Playing saved song: show play state with heart badge */}
-                {isCurrent && isSaved && !isSceneFlash && !isPointsFlash && (
-                  <>
-                    <div className="absolute inset-0 bg-black/30" />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleNext();
-                      }}
-                      className="absolute bottom-2 right-2 text-white"
-                      aria-label="Next"
-                    >
-                      <SkipForward size={20} />
-                    </button>
-                    {isCurrentlyPlaying && (
-                      <div className="absolute top-2 left-2 text-white bg-black/60 rounded-full p-1">
-                        <Pause size={14} />
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {/* FULL SCREEN: ADDED TO YOUR LOKOL SCENE flash */}
-                {isSceneFlash && (
-                  <div
-                    className="absolute inset-0 bg-black flex flex-col items-center justify-center gap-2 rounded-2xl"
-                    style={{ animation: "sceneFlash 1.8s ease-out forwards" }}
-                  >
-                    <Heart size={32} fill="#FFD600" stroke="#FFD600" />
-                    <span
-                      style={{
-                        fontFamily: "'Anton', sans-serif",
-                        fontSize: 18,
-                        color: "#FFD600",
-                        textAlign: "center",
-                        lineHeight: 1.2,
-                        padding: "0 8px",
-                      }}
-                    >
-                      ADDED TO YOUR{"\n"}LOKOL SCENE
-                    </span>
-                  </div>
-                )}
-
-                {/* FULL SCREEN: +10 POINTS flash (after scene flash) */}
-                {isPointsFlash && !isSceneFlash && (
-                  <div
-                    className="absolute inset-0 bg-[#FFD600]/20 ring-4 ring-[#FFD600] rounded-2xl flex items-center justify-center"
-                    style={{ animation: "pointsFlash 1.5s ease-out forwards" }}
-                  >
-                    <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 28, color: "#fff" }}>+10 POINTS</span>
-                  </div>
-                )}
-
+                      <span style={{ fontFamily: "Anton, sans-serif", fontSize: 28, color: "#fff" }}>+10 POINTS</span>
+                    </div>
+                  )}
                 </div>
-                {/* Artist info */}
-                {!isSceneFlash && !isPointsFlash && (
-                  <div className="pt-2 pb-1 px-0.5">
-                    <p className="truncate" style={{ fontFamily: "Anton, sans-serif", fontSize: 14, color: "#ffffff", textTransform: "uppercase", lineHeight: 1.2, display: "block", fontWeight: 400, letterSpacing: "0.01em" }}>{track.song_title}</p>
-                    <p className="truncate mt-0.5" style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{track.artist_name}</p>
+
+                {/* Text + show info below image */}
+                <div className="pt-2 pb-1 px-0.5">
+                  <div className="flex items-start gap-2">
+                    {/* Left: song + artist */}
+                    <div className="flex-1 min-w-0">
+                      <p
+                        style={{
+                          fontFamily: "Anton, sans-serif",
+                          fontSize: 13,
+                          color: "#ffffff",
+                          textTransform: "uppercase",
+                          lineHeight: 1.2,
+                          wordBreak: "break-word",
+                          whiteSpace: "normal",
+                        }}
+                      >
+                        {track.song_title}
+                      </p>
+                      <p
+                        style={{
+                          fontFamily: "Montserrat, sans-serif",
+                          fontSize: 11,
+                          color: "rgba(255,255,255,0.6)",
+                          marginTop: 2,
+                        }}
+                        className="truncate"
+                      >
+                        {track.artist_name}
+                      </p>
+                    </div>
+                    {/* Right: show badge */}
+                    {show && (
+                      <div className="flex flex-col items-center shrink-0" style={{ minWidth: 40 }}>
+                        <img
+                          src={fanmenuShows}
+                          alt="show"
+                          className="w-4 h-4"
+                          style={{
+                            filter:
+                              "brightness(0) saturate(100%) invert(84%) sepia(61%) saturate(748%) hue-rotate(359deg) brightness(103%) contrast(104%)",
+                          }}
+                        />
+                        <p
+                          style={{
+                            fontFamily: "Montserrat, sans-serif",
+                            fontSize: 9,
+                            color: "#FFD600",
+                            fontWeight: 700,
+                            lineHeight: 1.2,
+                            textAlign: "center",
+                            marginTop: 2,
+                            wordBreak: "break-word",
+                            maxWidth: 44,
+                          }}
+                        >
+                          {show.venue_name}
+                        </p>
+                        <p
+                          style={{
+                            fontFamily: "Montserrat, sans-serif",
+                            fontSize: 9,
+                            color: "#FFD600",
+                            lineHeight: 1.2,
+                            textAlign: "center",
+                          }}
+                        >
+                          {formatShowDate(show.show_date)}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* Bottom player bar */}
+      {/* Bottom player */}
       {playingId && currentTrack && (
         <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#333] z-40">
           <div
             className="absolute top-0 left-0 h-[2px] bg-[#FFD600] transition-all"
-            style={{ width: duration > 0 ? `${(currentTime / duration) * 100}%` : "0%" }}
+            style={{ width: duration > 30 ? `${((currentTime - 30) / (duration - 30)) * 100}%` : "0%" }}
           />
           <div className="flex items-center gap-3 px-4 py-3">
             <img
@@ -801,8 +874,6 @@ const LokolListensGenre = () => {
               alt=""
               className="w-12 h-12 rounded-lg object-cover"
             />
-
-            {/* Heart unsave button */}
             <div className="relative">
               {unsaveConfirmId === currentTrack.id ? (
                 <div className="flex items-center gap-1">
@@ -819,11 +890,8 @@ const LokolListensGenre = () => {
               ) : (
                 <button
                   onClick={() => {
-                    if (savedIds.has(currentTrack.id)) {
-                      setUnsaveConfirmId(currentTrack.id);
-                    } else {
-                      handleSave(currentTrack);
-                    }
+                    if (savedIds.has(currentTrack.id)) setUnsaveConfirmId(currentTrack.id);
+                    else handleSave(currentTrack);
                   }}
                   className="p-1"
                   aria-label={savedIds.has(currentTrack.id) ? "Unsave" : "Save"}
@@ -836,7 +904,6 @@ const LokolListensGenre = () => {
                 </button>
               )}
             </div>
-
             <div className="flex-1 min-w-0">
               <p className="text-white font-bold text-[13px] truncate">{currentTrack.song_title}</p>
               <p className="text-white/60 text-[11px] truncate">{currentTrack.artist_name}</p>
@@ -855,7 +922,7 @@ const LokolListensGenre = () => {
         </div>
       )}
 
-      {/* Save overlay for non-fans */}
+      {/* Save overlay */}
       {showOverlay && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#1a1a1a] rounded-2xl p-6 max-w-sm w-full flex flex-col items-center gap-4">
@@ -866,7 +933,8 @@ const LokolListensGenre = () => {
                   alt=""
                   className="w-20 h-20 rounded-xl object-cover"
                 />
-                <p className="text-white font-bold text-[18px] text-center">{overlayTrack.artist_name}</p>
+                <p className="text-white font-bold text-[18px] text-center">{overlayTrack.song_title}</p>
+                <p className="text-white/60 text-[14px] text-center">{overlayTrack.artist_name}</p>
                 <p className="text-white text-[14px] text-center">Save to your Atlanta Lokol Scene.</p>
                 {hasValidTokenRef.current && (
                   <p className="font-bold text-[14px] text-center" style={{ color: "#FFD600" }}>
