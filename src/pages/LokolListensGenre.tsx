@@ -778,8 +778,8 @@ const LokolListensGenre = () => {
                 {/* Artist info */}
                 {!isSceneFlash && !isPointsFlash && (
                   <div className="pt-2 pb-1 px-0.5">
-                    <p className="truncate" style={{ fontFamily: "'Anton', sans-serif", fontSize: 13, color: "#ffffff", textTransform: "uppercase", lineHeight: 1.2, display: "block" }}>{track.song_title}</p>
-                    <p className="truncate mt-0.5" style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{track.artist_name}</p>
+                    <p className="truncate" style={{ fontFamily: "Anton, sans-serif", fontSize: 14, color: "#ffffff", textTransform: "uppercase", lineHeight: 1.2, display: "block", fontWeight: 400, letterSpacing: "0.01em" }}>{track.song_title}</p>
+                    <p className="truncate mt-0.5" style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{track.artist_name}</p>
                   </div>
                 )}
               </div>
