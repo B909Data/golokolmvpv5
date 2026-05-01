@@ -662,14 +662,14 @@ const LokolListensGenre = () => {
               <div
                 key={track.id}
                 onClick={() => handlePlayToggle(track)}
-                className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer"
+                className="flex flex-col cursor-pointer"
               >
+                <div className="relative aspect-square rounded-2xl overflow-hidden w-full">
                 <img
                   src={track.song_image_url || "/placeholder.svg"}
                   alt={track.song_title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
                 {/* Saved heart badge — upper right corner */}
                 {isSaved && !isSceneFlash && !isPointsFlash && (
@@ -773,11 +773,12 @@ const LokolListensGenre = () => {
                   </div>
                 )}
 
+                </div>
                 {/* Artist info */}
                 {!isSceneFlash && !isPointsFlash && (
-                  <div className="absolute bottom-2 left-2 right-8 z-10">
-                    <p className="text-white font-bold text-[13px] truncate">{track.song_title}</p>
-                    <p className="text-white/70 text-[11px] truncate">{track.artist_name}</p>
+                  <div className="pt-2 pb-1 px-0.5">
+                    <p style={{ fontFamily: "'Anton', sans-serif", fontSize: 13, color: "#fff", textTransform: "uppercase", lineHeight: 1.2 }} className="truncate">{track.song_title}</p>
+                    <p className="text-white/60 text-[11px] truncate mt-0.5">{track.artist_name}</p>
                   </div>
                 )}
               </div>
