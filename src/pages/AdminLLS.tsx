@@ -77,6 +77,15 @@ const AdminLLS = () => {
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [dateFrom, setDateFrom] = useState("2026-04-18");
   const [dateTo, setDateTo] = useState(() => new Date().toISOString().split("T")[0]);
+  const [showForm, setShowForm] = useState<{
+    event_name: string;
+    venue_name: string;
+    show_date: string;
+    show_time: string;
+    ticket_url: string;
+  } | null>(null);
+  const [showSaving, setShowSaving] = useState(false);
+  const [existingShow, setExistingShow] = useState<any | null>(null);
 
   const fetchAnalytics = async () => {
     setAnalyticsLoading(true);
