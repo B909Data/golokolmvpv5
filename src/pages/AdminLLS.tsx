@@ -36,6 +36,7 @@ interface Submission {
   song_image_url?: string | null;
   short_bio?: string | null;
   claim_code?: string | null;
+  artist_user_id?: string | null;
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
