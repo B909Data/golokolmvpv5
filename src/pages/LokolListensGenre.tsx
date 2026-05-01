@@ -578,6 +578,7 @@ const LokolListensGenre = () => {
 
   return (
     <div className="min-h-screen bg-black text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
       <style>{KEYFRAMES}</style>
       <audio
         ref={audioRef}
