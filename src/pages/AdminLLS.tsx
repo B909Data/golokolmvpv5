@@ -292,6 +292,75 @@ const AdminLLS = () => {
     }
   };
 
+  const handleSaveShow = async () => {
+    if (!showForm || !selectedSubmission?.artist_user_id) return;
+    if (!showForm.event_name || !showForm.venue_name || !showForm.show_date) {
+      toast.error("Event name, venue, and date are required.");
+      return;
+    }
+    setShowSaving(true);
+    try {
+      if (existingShow) {
+        await (supabase as any)
+          .from("show_listings")
+          .update({
+            event_name: showForm.event_name.trim(),
+            venue_name: showForm.venue_name.trim(),
+            show_date: showForm.show_date,
+            show_time: showForm.show_time || null,
+            ticket_url: showForm.ticket_url.trim() || null,
+            city: "Atlanta",
+          })
+          .eq("id", existingShow.id);
+        toast.success("Show updated.");
+      } else {
+        await (supabase as any)
+          .from("show_listings")
+          .insert({
+            artist_user_id: selectedSubmission.artist_user_id,
+            event_name: showForm.event_name.trim(),
+            venue_name: showForm.venue_name.trim(),
+            show_date: showForm.show_date,
+            show_time: showForm.show_time || null,
+            ticket_url: showForm.ticket_url.trim() || null,
+            city: "Atlanta",
+          });
+        toast.success("Show added.");
+      }
+      const todayStr = new Date().toISOString().split("T")[0];
+      const { data } = await (supabase as any)
+        .from("show_listings")
+        .select("*")
+        .eq("artist_user_id", selectedSubmission.artist_user_id)
+        .gte("show_date", todayStr)
+        .order("show_date", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      setExistingShow(data || null);
+      setShowForm(null);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save show.");
+    } finally {
+      setShowSaving(false);
+    }
+  };
+
+  const handleDeleteShow = async () => {
+    if (!existingShow) return;
+    if (!window.confirm("Remove this show listing?")) return;
+    setShowSaving(true);
+    try {
+      await (supabase as any).from("show_listings").delete().eq("id", existingShow.id);
+      setExistingShow(null);
+      setShowForm(null);
+      toast.success("Show removed.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to remove show.");
+    } finally {
+      setShowSaving(false);
+    }
+  };
+
   const toggleReason = (reason: string) => {
     setSelectedReasons((prev) => (prev.includes(reason) ? prev.filter((r) => r !== reason) : [...prev, reason]));
   };
