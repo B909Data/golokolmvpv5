@@ -63,7 +63,7 @@ const SECTIONS = [
   { id: "what-is-golokol", title: "What is GoLokol?" },
   { id: "serve-artists", title: "How do we serve Artists?" },
   { id: "serve-small-business", title: "How do we serve small business?" },
-  { id: "what-are-lls", title: "What Are Lokol Listening Stations?" },
+  { id: "how-discovery-works", title: "How Does Discovery Work?" },
   { id: "serve-fans", title: "How do we serve Local Music Fans?" },
   { id: "suggestion-box", title: "Suggestion Box" },
 ];
