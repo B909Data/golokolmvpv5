@@ -324,6 +324,12 @@ const LLSStorePage = () => {
           <p className="text-white font-normal leading-[1.6] text-[18px] md:text-[20px] max-w-2xl mx-auto">
             Listen, earn points and build your local music scene on GoLokol.
           </p>
+          <a
+            href="/how-to-golokol"
+            className="inline-block mt-2 text-white/50 text-sm underline"
+          >
+            How to GoLokol
+          </a>
           <button
             onClick={scrollToGenres}
             className="mt-8 inline-block font-bold text-[16px] rounded-[16px] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
