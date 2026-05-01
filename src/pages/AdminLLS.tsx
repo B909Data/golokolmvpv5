@@ -179,6 +179,27 @@ const AdminLLS = () => {
     setEditingYoutube(selectedSubmission?.youtube_url || "");
   }, [selectedId]);
 
+  useEffect(() => {
+    if (!selectedSubmission?.artist_user_id) {
+      setExistingShow(null);
+      setShowForm(null);
+      return;
+    }
+    const fetchShow = async () => {
+      const todayStr = new Date().toISOString().split("T")[0];
+      const { data } = await (supabase as any)
+        .from("show_listings")
+        .select("*")
+        .eq("artist_user_id", selectedSubmission.artist_user_id)
+        .gte("show_date", todayStr)
+        .order("show_date", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      setExistingShow(data || null);
+    };
+    fetchShow();
+  }, [selectedId]);
+
   const handleStatusChange = async (status: string) => {
     if (!selectedId) return;
     setSaving(true);
