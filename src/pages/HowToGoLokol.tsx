@@ -200,8 +200,8 @@ const HowToGoLokol = () => {
                 <ul className="space-y-3 mb-6">
                   <CheckBullet>Submit up to 2 songs per month for free</CheckBullet>
                   <CheckBullet>GoLokol reviews each submission for sound quality and community fit</CheckBullet>
-                  <CheckBullet>Selected songs are placed on Lokol Listening Stations inside Atlanta record stores</CheckBullet>
-                  <CheckBullet>Local fans discover, listen, and save your music in person</CheckBullet>
+                  <CheckBullet>Selected songs are featured on GoLokol for fans to discover online and at partner locations across Atlanta</CheckBullet>
+                  <CheckBullet>Local fans discover, listen, and save your music to their customized Lokol Atlanta Scene</CheckBullet>
                   <CheckBullet>Every fan who saves you gets notified when you have a show — and earns points for showing up</CheckBullet>
                 </ul>
 
@@ -210,7 +210,7 @@ const HowToGoLokol = () => {
                   <CheckBullet>Dashboard showing how many fans have listened to and saved your song</CheckBullet>
                   <CheckBullet>Fan neighborhood data so you know where your supporters are coming from</CheckBullet>
                   <CheckBullet>Show promotion — alert your fans directly when you have an upcoming show</CheckBullet>
-                  <CheckBullet>After your free month GoLokol Connect is $9.99 per month</CheckBullet>
+                  <CheckBullet>After your free month GoLokol Connect is $5.99 per month</CheckBullet>
                 </ul>
 
                 <Paragraph className="font-semibold">Submission requirements:</Paragraph>
@@ -218,7 +218,6 @@ const HowToGoLokol = () => {
                   <CheckBullet>MP3 format only, max 20MB</CheckBullet>
                   <CheckBullet>Square song artwork (minimum 200×200px, max 3MB)</CheckBullet>
                   <CheckBullet>Short bio (240 characters max) — this is what new fans see</CheckBullet>
-                  <CheckBullet>Physical product status (vinyl, CD, merch — in production counts)</CheckBullet>
                 </ul>
               </AccordionItem>
 
