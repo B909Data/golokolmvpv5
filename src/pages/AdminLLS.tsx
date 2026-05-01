@@ -928,6 +928,126 @@ const AdminLLS = () => {
                       disabled={saving}
                     />
                   </div>
+
+                  {/* Show Listing */}
+                  {selectedSubmission.artist_user_id && (
+                    <div className="space-y-2 pt-2 border-t border-border/30">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground font-bold uppercase tracking-wide">Show Listing</p>
+                        {!showForm && (
+                          <button
+                            onClick={() => setShowForm(existingShow ? {
+                              event_name: existingShow.event_name || "",
+                              venue_name: existingShow.venue_name || "",
+                              show_date: existingShow.show_date || "",
+                              show_time: existingShow.show_time || "",
+                              ticket_url: existingShow.ticket_url || "",
+                            } : {
+                              event_name: "",
+                              venue_name: "",
+                              show_date: "",
+                              show_time: "",
+                              ticket_url: "",
+                            })}
+                            className="text-xs font-bold px-2 py-1 rounded"
+                            style={{ backgroundColor: "#FFD600", color: "#000" }}
+                          >
+                            {existingShow ? "Edit Show" : "+ Add Show"}
+                          </button>
+                        )}
+                      </div>
+                      {existingShow && !showForm && (
+                        <div className="bg-card/50 rounded-lg p-3 space-y-1">
+                          <p className="text-sm font-bold text-foreground">{existingShow.event_name}</p>
+                          <p className="text-xs text-muted-foreground">{existingShow.venue_name}</p>
+                          <p className="text-xs" style={{ color: "#FFD600" }}>
+                            {new Date(existingShow.show_date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                            {existingShow.show_time ? ` · ${existingShow.show_time}` : ""}
+                          </p>
+                          {existingShow.ticket_url && (
+                            <a href={existingShow.ticket_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline">Ticket Link</a>
+                          )}
+                          <button
+                            onClick={handleDeleteShow}
+                            className="text-xs text-red-400 hover:text-red-500 mt-1 block"
+                          >
+                            Remove show
+                          </button>
+                        </div>
+                      )}
+                      {!existingShow && !showForm && (
+                        <p className="text-xs text-muted-foreground">No upcoming show listed.</p>
+                      )}
+                      {showForm && (
+                        <div className="space-y-2">
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Event Name *</label>
+                            <input
+                              type="text"
+                              value={showForm.event_name}
+                              onChange={e => setShowForm(f => f ? { ...f, event_name: e.target.value } : f)}
+                              placeholder="e.g. Lokol Listening Session 4"
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Venue Name *</label>
+                            <input
+                              type="text"
+                              value={showForm.venue_name}
+                              onChange={e => setShowForm(f => f ? { ...f, venue_name: e.target.value } : f)}
+                              placeholder="e.g. Crate ATL"
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Date *</label>
+                            <input
+                              type="date"
+                              value={showForm.show_date}
+                              onChange={e => setShowForm(f => f ? { ...f, show_date: e.target.value } : f)}
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Time (optional)</label>
+                            <input
+                              type="time"
+                              value={showForm.show_time}
+                              onChange={e => setShowForm(f => f ? { ...f, show_time: e.target.value } : f)}
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Ticket URL (optional)</label>
+                            <input
+                              type="text"
+                              value={showForm.ticket_url}
+                              onChange={e => setShowForm(f => f ? { ...f, ticket_url: e.target.value } : f)}
+                              placeholder="https://..."
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="flex gap-2 pt-1">
+                            <button
+                              onClick={handleSaveShow}
+                              disabled={showSaving}
+                              className="text-xs font-bold px-3 py-1.5 rounded"
+                              style={{ backgroundColor: "#FFD600", color: "#000" }}
+                            >
+                              {showSaving ? "Saving..." : existingShow ? "Update Show" : "Save Show"}
+                            </button>
+                            <button
+                              onClick={() => setShowForm(null)}
+                              className="text-xs text-muted-foreground hover:text-foreground"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="border border-border/50 rounded-lg p-6 text-center bg-card/30">
