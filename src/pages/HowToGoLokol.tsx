@@ -292,12 +292,23 @@ const HowToGoLokol = () => {
                 </Paragraph>
                 <Paragraph className="font-semibold">As a GoLokol fan you can:</Paragraph>
                 <ul className="space-y-3 mb-6">
-                  <CheckBullet>Discover local Atlanta artists at record stores through Lokol Listening Stations</CheckBullet>
+                  <CheckBullet>Discover local Atlanta artists online at golokol.app or at partner retail locations</CheckBullet>
                   <CheckBullet>Build your Lokol Scene — a personal collection of artists you love</CheckBullet>
-                  <CheckBullet>Earn Lokol Points for listening, saving artists, and attending shows</CheckBullet>
-                  <CheckBullet>Redeem points for discounts at local partner stores</CheckBullet>
+                  <CheckBullet>Earn Lokol Points for saving artists, visiting partner locations, and attending shows</CheckBullet>
+                  <CheckBullet>Redeem points for discounts at local partner businesses</CheckBullet>
                   <CheckBullet>Get notified when artists in your scene have upcoming shows</CheckBullet>
                 </ul>
+
+                <Paragraph className="font-semibold">Lokol Points — how they work:</Paragraph>
+                <ul className="space-y-3 mb-6">
+                  <CheckBullet>Save an artist: 10pts (up to 3 saves per day online = 30pts max)</CheckBullet>
+                  <CheckBullet>Scan a partner QR sticker in-store: 15pts bonus (once per day)</CheckBullet>
+                  <CheckBullet>In-store saves: up to 5 per day = 50pts max</CheckBullet>
+                  <CheckBullet>Refer a friend who signs up: 5pts</CheckBullet>
+                  <CheckBullet>Attend a show and get checked in by the artist: 25pts</CheckBullet>
+                  <CheckBullet>Redeem starting at 300pts at partner locations</CheckBullet>
+                </ul>
+
                 <Paragraph>
                   My Lokol Scene is your personal music dashboard. It lives on your phone and grows every time you engage with local music.
                 </Paragraph>
