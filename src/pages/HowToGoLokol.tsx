@@ -229,26 +229,24 @@ const HowToGoLokol = () => {
                 onToggle={() => toggleSection("serve-small-business")}
               >
                 <Paragraph>
-                  GoLokol partners with independent record stores and music-friendly retail to bring local music discovery into your space.
+                  GoLokol partners with independent retail and community gathering spots to bring local music discovery to your customers.
                 </Paragraph>
-                <Paragraph className="font-semibold">What you get as a partner:</Paragraph>
+                <Paragraph className="font-semibold">Here is how the partnership works:</Paragraph>
                 <ul className="space-y-3 mb-6">
-                  <CheckBullet>A Lokol Listening Station — a QR code display that turns your store into a discovery hub</CheckBullet>
-                  <CheckBullet>Foot traffic from music fans who come in specifically to discover local artists</CheckBullet>
-                  <CheckBullet>A digital presence on the GoLokol platform listing your store as a discovery location</CheckBullet>
-                  <CheckBullet>Revenue share opportunities from future GoLokol market features</CheckBullet>
-                  <CheckBullet>Your store logo featured in the GoLokol Lokol Market rewards section</CheckBullet>
+                  <CheckBullet>Get a pack of 500 GoLokol branded stickers for $40 one-time</CheckBullet>
+                  <CheckBullet>Each sticker has a unique QR code tied to your location</CheckBullet>
+                  <CheckBullet>Hand one to every customer after purchase — it's their gift</CheckBullet>
+                  <CheckBullet>Customers scan the sticker, discover local Atlanta music, earn Lokol Points, and redeem rewards back at your business</CheckBullet>
+                  <CheckBullet>You set your own redemption rate — GoLokol handles all the infrastructure</CheckBullet>
+                  <CheckBullet>Your business is listed as a GoLokol partner location on the platform</CheckBullet>
                 </ul>
                 <Paragraph>
-                  Partnership is free during our Atlanta pilot. We are currently placing stations in select Atlanta stores.
-                </Paragraph>
-                <Paragraph>
-                  Interested in becoming a partner?{" "}
+                  Interested?{" "}
                   <button
                     onClick={() => navigate("/lls-us/retail")}
                     className="text-primary hover:underline font-semibold"
                   >
-                    Visit our Record Stores page to apply.
+                    Become a GoLokol retail partner.
                   </button>
                 </Paragraph>
               </AccordionItem>
