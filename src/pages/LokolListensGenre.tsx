@@ -650,8 +650,15 @@ const LokolListensGenre = () => {
             </button>
           </div>
         ) : (
-          <div className="flex items-center">
+          <div className="flex flex-col items-end gap-0.5">
             <span className="text-[#FFD600] font-bold text-sm">Points: {points}</span>
+            <a
+              href="/how-to-golokol"
+              onClick={e => { e.stopPropagation(); }}
+              className="text-white/40 text-[10px] underline"
+            >
+              How to GoLokol
+            </a>
           </div>
         )}
       </div>
