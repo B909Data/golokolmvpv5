@@ -36,6 +36,7 @@ interface Submission {
   song_image_url?: string | null;
   short_bio?: string | null;
   claim_code?: string | null;
+  artist_user_id?: string | null;
 }
 
 const STATUS_OPTIONS = ["Unreviewed", "Reviewed", "Shortlisted", "Selected"];
@@ -77,6 +78,15 @@ const AdminLLS = () => {
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [dateFrom, setDateFrom] = useState("2026-04-18");
   const [dateTo, setDateTo] = useState(() => new Date().toISOString().split("T")[0]);
+  const [showForm, setShowForm] = useState<{
+    event_name: string;
+    venue_name: string;
+    show_date: string;
+    show_time: string;
+    ticket_url: string;
+  } | null>(null);
+  const [showSaving, setShowSaving] = useState(false);
+  const [existingShow, setExistingShow] = useState<any | null>(null);
 
   const fetchAnalytics = async () => {
     setAnalyticsLoading(true);
@@ -170,6 +180,27 @@ const AdminLLS = () => {
     setEditingYoutube(selectedSubmission?.youtube_url || "");
   }, [selectedId]);
 
+  useEffect(() => {
+    if (!selectedSubmission?.artist_user_id) {
+      setExistingShow(null);
+      setShowForm(null);
+      return;
+    }
+    const fetchShow = async () => {
+      const todayStr = new Date().toISOString().split("T")[0];
+      const { data } = await (supabase as any)
+        .from("show_listings")
+        .select("*")
+        .eq("artist_user_id", selectedSubmission.artist_user_id)
+        .gte("show_date", todayStr)
+        .order("show_date", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      setExistingShow(data || null);
+    };
+    fetchShow();
+  }, [selectedId]);
+
   const handleStatusChange = async (status: string) => {
     if (!selectedId) return;
     setSaving(true);
@@ -258,6 +289,75 @@ const AdminLLS = () => {
       toast.success("YouTube URL saved");
     } catch {
       toast.error("Failed to save YouTube URL");
+    }
+  };
+
+  const handleSaveShow = async () => {
+    if (!showForm || !selectedSubmission?.artist_user_id) return;
+    if (!showForm.event_name || !showForm.venue_name || !showForm.show_date) {
+      toast.error("Event name, venue, and date are required.");
+      return;
+    }
+    setShowSaving(true);
+    try {
+      if (existingShow) {
+        await (supabase as any)
+          .from("show_listings")
+          .update({
+            event_name: showForm.event_name.trim(),
+            venue_name: showForm.venue_name.trim(),
+            show_date: showForm.show_date,
+            show_time: showForm.show_time || null,
+            ticket_url: showForm.ticket_url.trim() || null,
+            city: "Atlanta",
+          })
+          .eq("id", existingShow.id);
+        toast.success("Show updated.");
+      } else {
+        await (supabase as any)
+          .from("show_listings")
+          .insert({
+            artist_user_id: selectedSubmission.artist_user_id,
+            event_name: showForm.event_name.trim(),
+            venue_name: showForm.venue_name.trim(),
+            show_date: showForm.show_date,
+            show_time: showForm.show_time || null,
+            ticket_url: showForm.ticket_url.trim() || null,
+            city: "Atlanta",
+          });
+        toast.success("Show added.");
+      }
+      const todayStr = new Date().toISOString().split("T")[0];
+      const { data } = await (supabase as any)
+        .from("show_listings")
+        .select("*")
+        .eq("artist_user_id", selectedSubmission.artist_user_id)
+        .gte("show_date", todayStr)
+        .order("show_date", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      setExistingShow(data || null);
+      setShowForm(null);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save show.");
+    } finally {
+      setShowSaving(false);
+    }
+  };
+
+  const handleDeleteShow = async () => {
+    if (!existingShow) return;
+    if (!window.confirm("Remove this show listing?")) return;
+    setShowSaving(true);
+    try {
+      await (supabase as any).from("show_listings").delete().eq("id", existingShow.id);
+      setExistingShow(null);
+      setShowForm(null);
+      toast.success("Show removed.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to remove show.");
+    } finally {
+      setShowSaving(false);
     }
   };
 
@@ -828,6 +928,126 @@ const AdminLLS = () => {
                       disabled={saving}
                     />
                   </div>
+
+                  {/* Show Listing */}
+                  {selectedSubmission.artist_user_id && (
+                    <div className="space-y-2 pt-2 border-t border-border/30">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground font-bold uppercase tracking-wide">Show Listing</p>
+                        {!showForm && (
+                          <button
+                            onClick={() => setShowForm(existingShow ? {
+                              event_name: existingShow.event_name || "",
+                              venue_name: existingShow.venue_name || "",
+                              show_date: existingShow.show_date || "",
+                              show_time: existingShow.show_time || "",
+                              ticket_url: existingShow.ticket_url || "",
+                            } : {
+                              event_name: "",
+                              venue_name: "",
+                              show_date: "",
+                              show_time: "",
+                              ticket_url: "",
+                            })}
+                            className="text-xs font-bold px-2 py-1 rounded"
+                            style={{ backgroundColor: "#FFD600", color: "#000" }}
+                          >
+                            {existingShow ? "Edit Show" : "+ Add Show"}
+                          </button>
+                        )}
+                      </div>
+                      {existingShow && !showForm && (
+                        <div className="bg-card/50 rounded-lg p-3 space-y-1">
+                          <p className="text-sm font-bold text-foreground">{existingShow.event_name}</p>
+                          <p className="text-xs text-muted-foreground">{existingShow.venue_name}</p>
+                          <p className="text-xs" style={{ color: "#FFD600" }}>
+                            {new Date(existingShow.show_date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                            {existingShow.show_time ? ` · ${existingShow.show_time}` : ""}
+                          </p>
+                          {existingShow.ticket_url && (
+                            <a href={existingShow.ticket_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline">Ticket Link</a>
+                          )}
+                          <button
+                            onClick={handleDeleteShow}
+                            className="text-xs text-red-400 hover:text-red-500 mt-1 block"
+                          >
+                            Remove show
+                          </button>
+                        </div>
+                      )}
+                      {!existingShow && !showForm && (
+                        <p className="text-xs text-muted-foreground">No upcoming show listed.</p>
+                      )}
+                      {showForm && (
+                        <div className="space-y-2">
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Event Name *</label>
+                            <input
+                              type="text"
+                              value={showForm.event_name}
+                              onChange={e => setShowForm(f => f ? { ...f, event_name: e.target.value } : f)}
+                              placeholder="e.g. Lokol Listening Session 4"
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Venue Name *</label>
+                            <input
+                              type="text"
+                              value={showForm.venue_name}
+                              onChange={e => setShowForm(f => f ? { ...f, venue_name: e.target.value } : f)}
+                              placeholder="e.g. Crate ATL"
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Date *</label>
+                            <input
+                              type="date"
+                              value={showForm.show_date}
+                              onChange={e => setShowForm(f => f ? { ...f, show_date: e.target.value } : f)}
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Time (optional)</label>
+                            <input
+                              type="time"
+                              value={showForm.show_time}
+                              onChange={e => setShowForm(f => f ? { ...f, show_time: e.target.value } : f)}
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs text-muted-foreground">Ticket URL (optional)</label>
+                            <input
+                              type="text"
+                              value={showForm.ticket_url}
+                              onChange={e => setShowForm(f => f ? { ...f, ticket_url: e.target.value } : f)}
+                              placeholder="https://..."
+                              className="w-full text-xs px-2 py-1.5 rounded bg-card/50 border border-border/50 text-foreground focus:outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="flex gap-2 pt-1">
+                            <button
+                              onClick={handleSaveShow}
+                              disabled={showSaving}
+                              className="text-xs font-bold px-3 py-1.5 rounded"
+                              style={{ backgroundColor: "#FFD600", color: "#000" }}
+                            >
+                              {showSaving ? "Saving..." : existingShow ? "Update Show" : "Save Show"}
+                            </button>
+                            <button
+                              onClick={() => setShowForm(null)}
+                              className="text-xs text-muted-foreground hover:text-foreground"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="border border-border/50 rounded-lg p-6 text-center bg-card/30">
